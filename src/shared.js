@@ -112,7 +112,9 @@ class RcCard extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    if (!this._dragging) this._render();
+    // No re-render during a drag or a press: it would replace the tile under the finger.
+    if (this._dragging || this._pressing) this._deferred = true;
+    else this._render();
   }
 
   getCardSize() {
@@ -241,10 +243,13 @@ class RcCard extends HTMLElement {
       if (ev.button !== 0) return;
       start = { x: ev.clientX, y: ev.clientY };
       mode = null;
+      this._pressing = true;
       clearTimeout(timer);
       timer = setTimeout(() => {
         if (mode) return;
         mode = "hold";
+        // The press is settled (no tap): the details may open over the tile, so its pointerup may never come.
+        this._released();
         onHold();
       }, RC_HOLD_MS);
     });
@@ -261,13 +266,15 @@ class RcCard extends HTMLElement {
       } else if (!mode && (Math.abs(dx) > RC_MOVE_PX || Math.abs(dy) > RC_MOVE_PX)) {
         clearTimeout(timer); // scrolling, or dragging what cannot be dragged: not a tap
         start = null;
+        this._released();
       }
       if (mode === "drag") drag.move(ev.clientX);
     });
     const end = (ev, cancelled) => {
       clearTimeout(timer);
       if (!start) return;
-      if (mode === "drag") {
+      const wasDrag = mode === "drag";
+      if (wasDrag) {
         this._dragging = false;
         el.classList.remove("dragging");
         if (!cancelled) drag.end(ev.clientX);
@@ -277,6 +284,8 @@ class RcCard extends HTMLElement {
       }
       start = null;
       mode = null;
+      // After a drag, the next update redraws (the bar keeps the new level until the light reports it).
+      this._released(!wasDrag);
     };
     el.addEventListener("pointerup", (ev) => end(ev, false));
     el.addEventListener("pointercancel", (ev) => end(ev, true));
@@ -287,6 +296,14 @@ class RcCard extends HTMLElement {
         onTap();
       }
     });
+  }
+
+  // End of a press: renders now what an update brought during it.
+  _released(flush = true) {
+    this._pressing = false;
+    if (!this._deferred || this._dragging) return;
+    this._deferred = false;
+    if (flush) this._render();
   }
 
   // Default tile: tap toggles, hold opens the details.
