@@ -18,21 +18,67 @@ const rcIsLightSwitch = (st) => RC_LIGHT_NAME.test(st.attributes.friendly_name |
 const rcIsPlug = (st) =>
   !rcIsLightSwitch(st) && (st.attributes.device_class === "outlet" || RC_PLUG_NAME.test(st.attributes.friendly_name || ""));
 
-// Devices with a camera entity: their motion and person detections are left out.
-const rcCameraDevices = (hass) =>
-  new Set(
-    Object.entries(hass.entities || {})
-      .filter(([id, r]) => id.startsWith("camera.") && r.device_id)
-      .map(([, r]) => r.device_id),
-  );
+// What each room card shows, shared with the Overview so that both count the same entities.
+// Sensors card: leak, door, window and opening sensors, plus presence and motion unless `presence` is false
+// (the devices in `cameras` excepted).
+const rcMatchSensor = (hass, id, { presence = true, cameras = new Set() } = {}) => {
+  if (!id.startsWith("binary_sensor.")) return false;
+  const dc = hass.states[id]?.attributes.device_class;
+  if (RC_OPENING_CLASSES.includes(dc)) return true;
+  if (presence === false || !RC_PRESENCE_CLASSES.includes(dc)) return false;
+  return !cameras.has(hass.entities?.[id]?.device_id);
+};
+// Lights card: lights (groups excepted) and switches driving a light, configuration and diagnostic entities excepted.
+const rcMatchLight = (hass, id) => {
+  const st = hass.states[id];
+  if (!st || hass.entities?.[id]?.entity_category) return false;
+  if (id.startsWith("light.")) return !Array.isArray(st.attributes.entity_id);
+  return id.startsWith("switch.") && rcIsLightSwitch(st);
+};
+// Plugs card: switches that are plugs, configuration and diagnostic entities excepted.
+const rcMatchPlug = (hass, id) => {
+  const st = hass.states[id];
+  if (!st || !id.startsWith("switch.") || hass.entities?.[id]?.entity_category) return false;
+  return rcIsPlug(st);
+};
 
-// Power sensor (device class power, W or kW) of each device.
-const rcPowerSensors = (hass) => {
+// `fn(hass)` computed once per entity registry: HA replaces hass.entities only when the registry changes,
+// whereas a new hass (and hass.states) comes with every state change of the whole instance.
+const rcPerRegistry = (fn) => {
+  const cache = new WeakMap();
+  const none = {};
+  return (hass) => {
+    const reg = hass.entities || none;
+    if (!cache.has(reg)) cache.set(reg, fn(hass));
+    return cache.get(reg);
+  };
+};
+
+// Devices with a camera entity: their motion and person detections are left out.
+const rcCameraDevices = rcPerRegistry(
+  (hass) =>
+    new Set(
+      Object.entries(hass.entities || {})
+        .filter(([id, r]) => id.startsWith("camera.") && r.device_id)
+        .map(([, r]) => r.device_id),
+    ),
+);
+
+// The sensor entities of each device, in registry order.
+const rcDeviceSensors = rcPerRegistry((hass) => {
   const out = {};
   for (const [id, r] of Object.entries(hass.entities || {})) {
-    if (r.device_id && !out[r.device_id] && id.startsWith("sensor.") && hass.states[id]?.attributes.device_class === "power") {
-      out[r.device_id] = id;
-    }
+    if (r.device_id && id.startsWith("sensor.")) (out[r.device_id] ||= []).push(id);
+  }
+  return out;
+});
+
+// Power sensor (device class power, W or kW) of each device; only the device's own sensors are read.
+const rcPowerSensors = (hass) => {
+  const out = {};
+  for (const [device, ids] of Object.entries(rcDeviceSensors(hass))) {
+    const id = ids.find((s) => hass.states[s]?.attributes.device_class === "power");
+    if (id) out[device] = id;
   }
   return out;
 };
@@ -86,6 +132,15 @@ const rcNavigate = (path) => {
 };
 
 const rcUnavailable = (st) => ["unavailable", "unknown"].includes(st.state);
+
+// `fn()`, computed again only when one of `deps` is no longer the same object (or value) as last time.
+const rcMemo = (store, key, deps, fn) => {
+  const hit = store[key];
+  if (hit && hit.deps.length === deps.length && hit.deps.every((d, i) => d === deps[i])) return hit.value;
+  const value = fn();
+  store[key] = { deps, value };
+  return value;
+};
 
 // ── Base card ────────────────────────────────────────────────────────────────
 class RcCard extends HTMLElement {
@@ -151,15 +206,21 @@ class RcCard extends HTMLElement {
     const c = this._config;
     const list = (l) => (l || []).map((e) => (typeof e === "string" ? { entity: e } : e)).filter((e) => h.states[e.entity]);
     if (c.entities?.length) return list(c.entities);
-    const exclude = new Set(c.exclude || []);
     this._prepare();
-    const found = c.area
-      ? Object.keys(h.states)
-          .filter((id) => !exclude.has(id) && !h.entities?.[id]?.hidden && this._areaOf(id) === c.area && this._candidate(id))
-          .map((entity) => ({ entity }))
-      : [];
+    const found = c.area ? this._areaIds().filter((id) => h.states[id] && this._candidate(id)).map((entity) => ({ entity })) : [];
     const ids = new Set(found.map((e) => e.entity));
     return [...found, ...list(c.include).filter((e) => !ids.has(e.entity))];
+  }
+
+  // Visible entities of the area, minus `exclude`: the registries are scanned again only when they or the config
+  // change (an entity outside the entity registry has no area anyway).
+  _areaIds() {
+    const h = this._hass;
+    const c = this._config;
+    return rcMemo((this._memo ||= {}), "area", [c, h.entities, h.devices], () => {
+      const exclude = new Set(c.exclude || []);
+      return Object.keys(h.entities || {}).filter((id) => !exclude.has(id) && !h.entities[id].hidden && this._areaOf(id) === c.area);
+    });
   }
 
   // Hook run before the discovery, for what `_candidate` needs (the camera devices, say).
@@ -205,7 +266,7 @@ class RcCard extends HTMLElement {
   _tile(i, { cls = "", style = "", extra = "", state = i.state }) {
     return `
       <button class="tile ${i.unavailable ? "na" : i.on ? "on" : "off"}${cls}" data-id="${rcEsc(i.id)}"
-              ${style ? `style="${style}"` : ""} title="${rcEsc(i.name)} — ${rcEsc(i.state)}">
+              ${style ? `style="${rcEsc(style)}"` : ""} title="${rcEsc(i.name)} — ${rcEsc(i.state)}">
         ${extra}
         <span class="ic"><ha-icon icon="${rcEsc(i.icon)}"></ha-icon></span>
         <span class="txt">
@@ -399,8 +460,14 @@ const rcEditor = ({ i18n, defaults, helpers, schema }) =>
         this.appendChild(this._form);
       }
       this._form.hass = this._hass;
-      this._form.data = { ...defaults, ...this._config };
-      this._form.schema = schema(lang, this._hass, this._config);
+      // A new data or schema object re-renders the whole form, and the schema runs the card's discovery:
+      // both only change with the config, the language or the registries.
+      const memo = (this._memo ||= {});
+      const h = this._hass;
+      this._form.data = rcMemo(memo, "data", [this._config], () => ({ ...defaults, ...this._config }));
+      this._form.schema = rcMemo(memo, "schema", [lang, this._config, h.entities, h.devices, h.areas], () =>
+        schema(lang, h, this._config),
+      );
     }
   };
 

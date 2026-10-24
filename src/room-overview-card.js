@@ -145,15 +145,30 @@ class RoomOverviewCard extends RcCard {
     return 1 + Math.ceil((this._rooms?.length || 1) / 3);
   }
 
-
   // ── Data ───────────────────────────────────────────────────────────────────
+  // Visible entities of the domains the room cards show, by area, minus `exclude`: the registries are scanned
+  // again only when they or the config change.
+  _byArea() {
+    const h = this._hass;
+    const c = this._config;
+    return rcMemo((this._memo ||= {}), "areas", [c, h.entities, h.devices], () => {
+      const excluded = new Set(c.exclude || []);
+      const out = [];
+      for (const [id, r] of Object.entries(h.entities || {})) {
+        if (r.hidden || excluded.has(id) || !/^(binary_sensor|light|switch)\./.test(id)) continue;
+        const aid = this._areaOf(id);
+        if (aid) out.push([id, aid]);
+      }
+      return out;
+    });
+  }
+
   _collect() {
     const h = this._hass;
     const c = this._config;
     const reg = h.entities || {};
-    const areaOf = (id) => reg[id]?.area_id ?? h.devices?.[reg[id]?.device_id]?.area_id;
 
-    const cameraDevices = rcCameraDevices(h);
+    const cameras = rcCameraDevices(h);
     const power = rcPowerSensors(h);
     const watts = (id) => rcWattsOf(h, power[reg[id]?.device_id]);
 
@@ -165,23 +180,18 @@ class RoomOverviewCard extends RcCard {
       return rooms[aid];
     };
 
-    const excluded = new Set(c.exclude || []);
-    for (const [id, st] of Object.entries(h.states)) {
-      const r = reg[id];
-      if (r?.hidden || r?.entity_category || excluded.has(id)) continue;
-      const aid = areaOf(id);
-      if (!aid) continue;
+    // The room cards' own rules, so that a room counts what its unfolded details show.
+    for (const [id, aid] of this._byArea()) {
+      const st = h.states[id];
+      if (!st) continue;
       const dc = st.attributes.device_class;
-      if (id.startsWith("binary_sensor.")) {
+      if (rcMatchSensor(h, id, { presence: c.presence, cameras })) {
         if (RC_OPENING_CLASSES.includes(dc)) room(aid).sensors.push({ id, leak: dc === "moisture", st });
-        else if (c.presence !== false && RC_PRESENCE_CLASSES.includes(dc) && !cameraDevices.has(r?.device_id)) {
-          room(aid).presence.push({ id, st });
-        }
-      } else if (id.startsWith("light.")) {
-        if (!Array.isArray(st.attributes.entity_id)) room(aid).lights.push({ id, st });
-      } else if (id.startsWith("switch.")) {
-        if (rcIsLightSwitch(st)) room(aid).lights.push({ id, st });
-        else if (rcIsPlug(st)) room(aid).plugs.push({ id, st, watts: watts(id) });
+        else room(aid).presence.push({ id, st });
+      } else if (rcMatchLight(h, id)) {
+        room(aid).lights.push({ id, st });
+      } else if (rcMatchPlug(h, id)) {
+        room(aid).plugs.push({ id, st, watts: watts(id) });
       }
     }
 
@@ -380,7 +390,13 @@ class RoomOverviewCard extends RcCard {
     for (const [tag, count, extra] of parts) {
       if (!count || !customElements.get(tag)) continue;
       const el = document.createElement(tag);
-      el.setConfig({ type: `custom:${tag}`, area: x.id, exclude: this._config.exclude || [], ...extra });
+      el.setConfig({
+        type: `custom:${tag}`,
+        area: x.id,
+        exclude: this._config.exclude || [],
+        ...(this._config.language ? { language: this._config.language } : {}),
+        ...extra,
+      });
       el.hass = this._hass;
       panel.appendChild(el);
       this._details.push(el);

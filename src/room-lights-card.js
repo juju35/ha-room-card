@@ -89,10 +89,7 @@ class RoomLightsCard extends RcCard {
   };
 
   _candidate(id) {
-    if (this._hass.entities?.[id]?.entity_category) return false;
-    const st = this._hass.states[id];
-    if (id.startsWith("light.")) return !Array.isArray(st.attributes.entity_id); // skip light groups
-    return id.startsWith("switch.") && rcIsLightSwitch(st);
+    return rcMatchLight(this._hass, id);
   }
 
   _collect() {

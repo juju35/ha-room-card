@@ -127,11 +127,7 @@ class RoomSensorsCard extends RcCard {
   static defaults = { columns: 2, only_alerts: false, hide_when_clear: false, presence: true, blink: true, exclude: [] };
 
   _candidate(id) {
-    if (!id.startsWith("binary_sensor.")) return false;
-    const dc = this._hass.states[id].attributes.device_class;
-    if (RC_OPENING_CLASSES.includes(dc)) return true;
-    if (this._config.presence === false || !RC_PRESENCE_CLASSES.includes(dc)) return false;
-    return !this._cameras.has(this._hass.entities?.[id]?.device_id);
+    return rcMatchSensor(this._hass, id, { presence: this._config.presence, cameras: this._cameras });
   }
 
   _stateText(kind, on) {

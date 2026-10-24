@@ -86,8 +86,7 @@ class RoomSwitchCard extends RcCard {
   };
 
   _candidate(id) {
-    if (!id.startsWith("switch.") || this._hass.entities?.[id]?.entity_category) return false;
-    return rcIsPlug(this._hass.states[id]);
+    return rcMatchPlug(this._hass, id);
   }
 
   _collect() {
