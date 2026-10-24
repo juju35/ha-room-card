@@ -72,8 +72,10 @@ export const pair = (file, extra = {}) => [
 export const shoot = async ({ prefix, tag, shots, setup, icons = [] }) => {
   const iconMap = iconsFor(icons);
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
-  const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1000, height: 2000 } });
   for (const s of shots) {
+    // A new page per shot: the card's script declares top-level names, which cannot be evaluated twice in one page.
+    const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1000, height: 2000 } });
+    page.on("pageerror", (err) => console.error(`pageerror (${prefix}-${s.file}): ${err.message}`));
     const lang = s.theme === "dark" ? "fr" : "en";
     const { hass, config, open } = setup(s, lang);
     await page.setContent(pageHtml(s.theme));
@@ -93,6 +95,7 @@ export const shoot = async ({ prefix, tag, shots, setup, icons = [] }) => {
     const out = `screenshots/${prefix}-${s.file}.png`;
     await page.locator(tag).screenshot({ path: `${root}${out}`, animations: "disabled" });
     console.log(out);
+    await page.close();
   }
   await browser.close();
 };

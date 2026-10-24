@@ -3,7 +3,7 @@
   "threshold": 0,
   "absolute": false,
   "gitignore": true,
-  "ignore": ["**/dist/**", "**/vendor/**", "**/node_modules/**", "**/tests/**", "**/.git/**", "**/*.min.js"],
+  "ignore": ["**/dist/**", "**/vendor/**", "**/node_modules/**", "**/tests/**", "**/test/**", "**/.git/**", "**/*.min.js"],
   "reporters": ["console", "json"],
   "output": "report"
 }
