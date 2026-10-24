@@ -104,7 +104,7 @@ class RoomOverviewCard extends RcCard {
     super();
     // A click anywhere else folds the open room back.
     this._onOutside = (ev) => {
-      if (this._openArea && !ev.composedPath().includes(this)) this._toggle(null);
+      if (this._openArea && !ev.composedPath().includes(this) && !rcInDialog(ev)) this._toggle(null);
     };
   }
 
@@ -234,7 +234,12 @@ class RoomOverviewCard extends RcCard {
     this._rooms = rooms;
 
     const parts = rooms.map((x) => [x.id, x.name, x.icon, x.leaks, x.open, x.occupied, x.lightsOn, x.plugsOn, x.watts && Math.round(x.watts)]);
-    if (!this._changed([this._openArea, parts])) return;
+    // The plain list of the open room (no room card installed) shows every entity's state.
+    const shown = this._fallback && rooms.find((x) => x.id === this._openArea);
+    const list = shown
+      ? [...shown.sensors, ...shown.presence, ...shown.lights, ...shown.plugs].map((e) => [e.id, e.st.state, e.st.attributes.friendly_name])
+      : null;
+    if (!this._changed([this._openArea, parts, list])) return;
 
     if (!this.shadowRoot.querySelector("ha-card")) {
       this.shadowRoot.innerHTML = `
@@ -244,7 +249,7 @@ class RoomOverviewCard extends RcCard {
         if (!ev.target.closest(".chip.action")) return;
         ev.stopPropagation();
         const ids = this._rooms.flatMap((x) => x.lights.filter((e) => e.st.state === "on").map((e) => e.id));
-        if (ids.length) this._hass.callService("homeassistant", "turn_off", { entity_id: ids });
+        if (ids.length) rcCall(this._hass, "homeassistant", "turn_off", { entity_id: ids });
       });
       this.shadowRoot.querySelector(".grid").addEventListener("click", (ev) => {
         const tile = ev.target.closest(".room");

@@ -177,6 +177,7 @@ class RoomSensorsCard extends RcCard {
       items.length ? "all_quiet" : "no_sensors",
     );
     const shown = c.only_alerts ? items.filter((i) => i.on || i.unavailable) : items;
+    this._shown = shown.length;
     const tiles = shown
       .map((i) =>
         this._tile(i, {

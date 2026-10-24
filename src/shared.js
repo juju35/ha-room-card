@@ -174,6 +174,12 @@ const rcNavigate = (path) => {
 
 const rcUnavailable = (st) => ["unavailable", "unknown"].includes(st.state);
 
+// HA's callService already shows a toast when the call fails, then rejects: the rejection is only swallowed here
+// so that it does not end up as "Uncaught (in promise)".
+const rcCall = (hass, domain, service, data) => Promise.resolve(hass.callService(domain, service, data)).catch(() => {});
+
+// A click inside a dialog (more-info opened from the card, say) is not a click outside the card.
+const rcInDialog = (ev) => ev.composedPath().some((n) => ["ha-more-info-dialog", "ha-dialog", "dialog"].includes(n.localName));
 
 // `fn()`, computed again only when one of `deps` is no longer the same object (or value) as last time.
 const rcMemo = (store, key, deps, fn) => {
@@ -214,8 +220,11 @@ class RcCard extends HTMLElement {
     else this._render();
   }
 
+  // The tiles actually shown (`only_on` / `only_alerts` applied), nothing when the card is hidden.
   getCardSize() {
-    return 1 + Math.ceil((this._items?.length || 1) / (this._config?.columns || 2));
+    if (this.style.display === "none") return 0;
+    const n = this._shown ?? this._items?.length ?? 0;
+    return n && this._config ? 1 + Math.ceil(n / this._cols()) : 1;
   }
 
   getGridOptions() {
@@ -303,7 +312,7 @@ class RcCard extends HTMLElement {
   _head({ icon, title, status, chips = "", allOff = false }) {
     const c = this._config;
     return `
-      <div class="head${c.navigation_path ? " nav" : ""}">
+      <div class="head${c.navigation_path ? " nav" : ""}"${c.navigation_path ? ' role="link" tabindex="0"' : ""}>
         <div class="badge"><ha-icon icon="${icon}"></ha-icon></div>
         <div class="title">${rcEsc(title)}</div>
         ${chips}
@@ -337,10 +346,14 @@ class RcCard extends HTMLElement {
     root.querySelector(".pill.action")?.addEventListener("click", (ev) => {
       ev.stopPropagation();
       const ids = (this._items || []).filter((i) => i.on).map((i) => i.id);
-      if (ids.length) this._hass.callService("homeassistant", "turn_off", { entity_id: ids });
+      if (ids.length) rcCall(this._hass, "homeassistant", "turn_off", { entity_id: ids });
     });
     if (this._config.navigation_path) {
-      root.querySelector(".head").addEventListener("click", () => rcNavigate(this._config.navigation_path));
+      const head = root.querySelector(".head");
+      head.addEventListener("click", () => rcNavigate(this._config.navigation_path));
+      head.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" && ev.target === head) rcNavigate(this._config.navigation_path);
+      });
     }
     for (const el of root.querySelectorAll(".tile")) this._bindTile(el, (this._items || []).find((i) => i.id === el.dataset.id));
   }
@@ -404,7 +417,7 @@ class RcCard extends HTMLElement {
     el.addEventListener("keydown", (ev) => {
       if (ev.key === "Enter" || ev.key === " ") {
         ev.preventDefault();
-        onTap();
+        if (!ev.repeat) onTap();
       }
     });
   }
@@ -420,7 +433,7 @@ class RcCard extends HTMLElement {
   // Default tile: tap toggles, hold opens the details.
   _bindTile(el, item) {
     this._bindPress(el, {
-      onTap: () => !item?.unavailable && this._hass.callService("homeassistant", "toggle", { entity_id: el.dataset.id }),
+      onTap: () => !item?.unavailable && rcCall(this._hass, "homeassistant", "toggle", { entity_id: el.dataset.id }),
       onHold: () => rcMoreInfo(this, el.dataset.id),
     });
   }
@@ -443,6 +456,7 @@ class RcToggleCard extends RcCard {
     if (this._hide(c.hide_when_off && level === "off")) return;
 
     const shown = c.only_on ? items.filter((i) => i.on || i.unavailable) : items;
+    this._shown = shown.length;
     const [onIcon, offIcon] = this.constructor.headIcons;
     const status = lit.length
       ? this._t(lit.length > 1 ? "on_many" : "on_one", { n: lit.length })
@@ -594,6 +608,7 @@ const RC_BASE_STYLES = `
 
   .head { display: flex; align-items: center; gap: 10px; }
   .head.nav { cursor: pointer; }
+  .head.nav:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; border-radius: 4px; }
   .badge { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
            background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
   .badge ha-icon { --mdc-icon-size: 20px; }

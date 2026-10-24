@@ -58,7 +58,7 @@ export const load = () => {
   return vm.runInContext(
     `${code}
     ({ RcCard, rcCleanName, rcIsPlug, rcIsLightSwitch, rcMatchSensor, rcMatchLight, rcMatchPlug, rcEsc, rcMemo,
-       rcPowerSensors, RC_HOLD_MS, cards: Object.fromEntries(${JSON.stringify(cards)}.map((t) => [t, customElements.get(t)])) })`,
+       rcPowerSensors, rcCall, rcInDialog, RC_HOLD_MS, customElements, cards: Object.fromEntries(${JSON.stringify(cards)}.map((t) => [t, customElements.get(t)])) })`,
     ctx,
   );
 };

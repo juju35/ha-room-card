@@ -137,13 +137,13 @@ class RoomLightsCard extends RcToggleCard {
       el.querySelector(".state").textContent = `${this._t("on")} · ${pct} %`;
     };
     this._bindPress(el, {
-      onTap: () => !item?.unavailable && this._hass.callService("homeassistant", "toggle", { entity_id: item.id }),
+      onTap: () => !item?.unavailable && rcCall(this._hass, "homeassistant", "toggle", { entity_id: item.id }),
       onHold: () => rcMoreInfo(this, item.id),
       drag:
         this._config.show_brightness && item?.dimmable
           ? {
               move: (x) => show(pctAt(x)),
-              end: (x) => this._hass.callService("light", "turn_on", { entity_id: item.id, brightness_pct: pctAt(x) }),
+              end: (x) => rcCall(this._hass, "light", "turn_on", { entity_id: item.id, brightness_pct: pctAt(x) }),
             }
           : null,
     });
