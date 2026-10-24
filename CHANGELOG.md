@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.7.0
+
+### Changes
+- Overview: the "Turn all plugs off" button (`plugs_off_button`) now asks for confirmation in a small popup at the top of the card, listing every plug it will turn off with its room and power draw. OK turns them off; Cancel, Escape or a click outside does nothing. The lights button still turns the lights off at once.
+- Overview: the plugs button has its own icon (`mdi:power-plug-off`) instead of the power icon of the lights button, and both header buttons are easier to tap (32 px tall hit area, same look).
+- Overview on a narrow card (340 px or less): tighter header spacing and the small power icons of the header buttons are hidden, so nothing overflows.
+
+### Fixes
+- A tap on a header button is no longer lost when a plug's power reading changes during the press.
+- A double click on OK in the confirmation popup no longer also hits the header or the room tile underneath.
+- Pressing a tile and sliding off it cancels the press: no more-info, no toggle.
+- A new `language`, `presence`, `exclude` or `plugs_off_button` set in the editor reaches the room cards already unfolded in the Overview.
+- An Overview removed from the page in the middle of a press on its header no longer stays frozen once shown again.
+
+### Maintenance
+- Tests for the header buttons and the confirmation (27 in all); the screenshot script renders each capture in its own page, and the overview screenshots show the new plugs icon; lockfile synced and the duplicate-code check ignores test folders.
+
 ## 1.6.0
 
 ### What's new
