@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.5.0
+
+### Fixes
+- A tap on a tile is no longer lost when the card updates between press and release (frequent on the Plugs card, whose tiles show the live power), and it no longer opens more-info by mistake.
+- The Overview counts the same sensors as the Sensors card it unfolds: a door or window sensor flagged as diagnostic now shows on the room tile too.
+- The Overview passes its `language` to the room cards shown in its details.
+- The Overview no longer folds when you click inside the more-info dialog, and its plain list (no room card installed) refreshes when a sensor changes, for example when it becomes unavailable.
+- Holding Enter on a tile no longer toggles it repeatedly, and a header with `navigation_path` can be reached and opened with the keyboard.
+- A failed service call no longer leaves an error in the browser console (Home Assistant still shows its own message).
+- Card size in masonry dashboards counts only the tiles shown with `only_on` / `only_alerts`, and is 0 when the card is hidden.
+
+### Changes
+- Faster updates: rooms and entities are looked up again only when the entity, device or area registries change, not on every state change, and the visual editor no longer rebuilds its form on every update.
+- README: the sliding-door icon rule is described as it works (`porte_fenetre`, `baie`, `sliding` or `patio` in the entity ID); the behaviour itself is unchanged.
+
+### Maintenance
+- Shared code for the four cards (translations, editors, Lights/Plugs drawing, status line); no visible change.
+- CI: actions pinned by commit SHA, read-only token permissions, Dependabot for GitHub Actions, duplicate-code annotations, and a `node --test` suite run on every push.
+
 ## 1.4.0
 
 ### Changes
