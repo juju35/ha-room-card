@@ -90,6 +90,47 @@ const rcWattsOf = (hass, sensorId) => {
   return st.attributes.unit_of_measurement === "kW" ? v * 1000 : v;
 };
 
+// ── i18n ─────────────────────────────────────────────────────────────────────
+// Strings shared by the cards; a card's own dictionary wins over these.
+const RC_I18N = {
+  en: {
+    all_closed: "All closed",
+    all_quiet: "All quiet",
+    open_one: "{n} open",
+    open_many: "{n} open",
+    leak: "Water leak",
+    unavailable: "Unavailable",
+    on: "On",
+    off: "Off",
+    turn_all_off: "Turn everything off",
+    ed_area: "Area",
+    ed_title: "Title",
+    ed_title_helper: "Leave empty for the area name",
+    ed_columns: "Columns",
+    ed_navigation_path: "Navigation path",
+    ed_all_off_button: "“Turn everything off” button",
+    err_config: "Set `area` or `entities`",
+  },
+  fr: {
+    all_closed: "Tout est fermé",
+    all_quiet: "Tout est calme",
+    open_one: "{n} ouverture",
+    open_many: "{n} ouvertures",
+    leak: "Fuite d'eau",
+    unavailable: "Indisponible",
+    on: "Allumée",
+    off: "Éteinte",
+    turn_all_off: "Tout éteindre",
+    ed_area: "Pièce",
+    ed_title: "Titre",
+    ed_title_helper: "Laisser vide pour le nom de la pièce",
+    ed_columns: "Colonnes",
+    ed_navigation_path: "Chemin de navigation",
+    ed_all_off_button: "Bouton « Tout éteindre »",
+    err_config: "Définis `area` ou `entities`",
+  },
+};
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 const rcLang = (i18n, hass, config) => {
   const l = (config?.language || hass?.locale?.language || hass?.language || "en").slice(0, 2);
@@ -97,7 +138,7 @@ const rcLang = (i18n, hass, config) => {
 };
 
 const rcT = (i18n, lang, key, vars = {}) => {
-  const s = i18n[lang]?.[key] ?? i18n.en[key] ?? key;
+  const s = i18n[lang]?.[key] ?? RC_I18N[lang]?.[key] ?? i18n.en[key] ?? RC_I18N.en[key] ?? key;
   return s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
 };
 
@@ -132,6 +173,13 @@ const rcNavigate = (path) => {
 };
 
 const rcUnavailable = (st) => ["unavailable", "unknown"].includes(st.state);
+
+// HA's callService already shows a toast when the call fails, then rejects: the rejection is only swallowed here
+// so that it does not end up as "Uncaught (in promise)".
+const rcCall = (hass, domain, service, data) => Promise.resolve(hass.callService(domain, service, data)).catch(() => {});
+
+// A click inside a dialog (more-info opened from the card, say) is not a click outside the card.
+const rcInDialog = (ev) => ev.composedPath().some((n) => ["ha-more-info-dialog", "ha-dialog", "dialog"].includes(n.localName));
 
 // `fn()`, computed again only when one of `deps` is no longer the same object (or value) as last time.
 const rcMemo = (store, key, deps, fn) => {
@@ -172,8 +220,11 @@ class RcCard extends HTMLElement {
     else this._render();
   }
 
+  // The tiles actually shown (`only_on` / `only_alerts` applied), nothing when the card is hidden.
   getCardSize() {
-    return 1 + Math.ceil((this._items?.length || 1) / (this._config?.columns || 2));
+    if (this.style.display === "none") return 0;
+    const n = this._shown ?? this._items?.length ?? 0;
+    return n && this._config ? 1 + Math.ceil(n / this._cols()) : 1;
   }
 
   getGridOptions() {
@@ -239,6 +290,14 @@ class RcCard extends HTMLElement {
     return hidden;
   }
 
+  // Status of a set of opening and leak sensors: a leak, then the open ones, then "All closed" when there are door
+  // or window sensors (`closable`), `idle` otherwise.
+  _openingStatus(leaks, open, closable, idle = "all_quiet") {
+    if (leaks) return this._t("leak");
+    if (open) return this._t(open > 1 ? "open_many" : "open_one", { n: open });
+    return this._t(closable ? "all_closed" : idle);
+  }
+
   // Subclasses implement `_collect()` (the tiles) and `_draw(items)`.
   _render() {
     if (!this._config || !this._hass || !this.shadowRoot) return;
@@ -253,7 +312,7 @@ class RcCard extends HTMLElement {
   _head({ icon, title, status, chips = "", allOff = false }) {
     const c = this._config;
     return `
-      <div class="head${c.navigation_path ? " nav" : ""}">
+      <div class="head${c.navigation_path ? " nav" : ""}"${c.navigation_path ? ' role="link" tabindex="0"' : ""}>
         <div class="badge"><ha-icon icon="${icon}"></ha-icon></div>
         <div class="title">${rcEsc(title)}</div>
         ${chips}
@@ -287,10 +346,14 @@ class RcCard extends HTMLElement {
     root.querySelector(".pill.action")?.addEventListener("click", (ev) => {
       ev.stopPropagation();
       const ids = (this._items || []).filter((i) => i.on).map((i) => i.id);
-      if (ids.length) this._hass.callService("homeassistant", "turn_off", { entity_id: ids });
+      if (ids.length) rcCall(this._hass, "homeassistant", "turn_off", { entity_id: ids });
     });
     if (this._config.navigation_path) {
-      root.querySelector(".head").addEventListener("click", () => rcNavigate(this._config.navigation_path));
+      const head = root.querySelector(".head");
+      head.addEventListener("click", () => rcNavigate(this._config.navigation_path));
+      head.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" && ev.target === head) rcNavigate(this._config.navigation_path);
+      });
     }
     for (const el of root.querySelectorAll(".tile")) this._bindTile(el, (this._items || []).find((i) => i.id === el.dataset.id));
   }
@@ -348,13 +411,20 @@ class RcCard extends HTMLElement {
       // After a drag, the next update redraws (the bar keeps the new level until the light reports it).
       this._released(!wasDrag);
     };
+    // The mouse leaving the tile mid-press (no capture outside a drag) cancels it: neither a tap nor a hold.
+    el.addEventListener("pointerleave", () => {
+      if (!start || mode) return;
+      clearTimeout(timer);
+      start = null;
+      this._released();
+    });
     el.addEventListener("pointerup", (ev) => end(ev, false));
     el.addEventListener("pointercancel", (ev) => end(ev, true));
     el.addEventListener("contextmenu", (ev) => ev.preventDefault());
     el.addEventListener("keydown", (ev) => {
       if (ev.key === "Enter" || ev.key === " ") {
         ev.preventDefault();
-        onTap();
+        if (!ev.repeat) onTap();
       }
     });
   }
@@ -370,9 +440,41 @@ class RcCard extends HTMLElement {
   // Default tile: tap toggles, hold opens the details.
   _bindTile(el, item) {
     this._bindPress(el, {
-      onTap: () => !item?.unavailable && this._hass.callService("homeassistant", "toggle", { entity_id: el.dataset.id }),
+      onTap: () => !item?.unavailable && rcCall(this._hass, "homeassistant", "toggle", { entity_id: el.dataset.id }),
       onHold: () => rcMoreInfo(this, el.dataset.id),
     });
+  }
+}
+
+// Lights and plugs: entities that are on or off, a status counting the ones on, an optional "turn everything off".
+// Subclasses set `static headIcons` ([on, off]) and `static emptyKey`, and implement `_sigOf(item)` (what a tile
+// shows) and `_tileOf(item)`; `_statusExtra(lit)` adds to the status.
+class RcToggleCard extends RcCard {
+  _statusExtra() {
+    return "";
+  }
+
+  _draw(items) {
+    const c = this._config;
+    const lit = items.filter((i) => i.on);
+    const level = lit.length ? "on" : "off";
+
+    if (!this._changed(items.map((i) => this._sigOf(i)))) return;
+    if (this._hide(c.hide_when_off && level === "off")) return;
+
+    const shown = c.only_on ? items.filter((i) => i.on || i.unavailable) : items;
+    this._shown = shown.length;
+    const [onIcon, offIcon] = this.constructor.headIcons;
+    const status = lit.length
+      ? this._t(lit.length > 1 ? "on_many" : "on_one", { n: lit.length })
+      : this._t(items.length ? "all_off" : this.constructor.emptyKey);
+    const head = this._head({
+      icon: lit.length ? onIcon : offIcon,
+      title: c.title || this._areaName() || this._t("title"),
+      status: status + this._statusExtra(lit),
+      allOff: c.all_off_button && lit.length > 0,
+    });
+    this._paint(level, head, shown.map((i) => this._tileOf(i)).join(""));
   }
 }
 
@@ -385,6 +487,9 @@ const rcAreaFields = (navigation) => [
   { name: "columns", selector: { number: { min: 1, max: 4, mode: "box" } } },
 ];
 const rcBooleans = (...names) => names.map((name) => ({ name, selector: { boolean: {} } }));
+// Entity picker limited to `ids`, left out when there is none.
+const rcEntitiesField = (name, ids) =>
+  ids.length ? [{ name, selector: { entity: { multiple: true, include_entities: ids } } }] : [];
 
 // Include list: the entities of the card's domains, anywhere in the home, that the card does not show yet
 // (entities already included stay in the list).
@@ -406,7 +511,7 @@ const rcIncludeField = (card, hass, config) => {
     const id = typeof e === "string" ? e : e.entity;
     if (!ids.includes(id)) ids.push(id);
   }
-  return ids.length ? [{ name: "include", selector: { entity: { multiple: true, include_entities: ids } } }] : [];
+  return rcEntitiesField("include", ids);
 };
 
 // A detached card of class `card`, with `config` over its defaults, to run its discovery from the editor.
@@ -426,12 +531,15 @@ const rcExcludeField = (card, hass, config) => {
           ._entries()
           .map((e) => e.entity)
       : [];
-  return ids.length ? [{ name: "exclude", selector: { entity: { multiple: true, include_entities: ids } } }] : [];
+  return rcEntitiesField("exclude", ids);
 };
 
-// `schema(lang, hass, config)` lists the fields; options left at their default are not written to the YAML.
-const rcEditor = ({ i18n, defaults, helpers, schema }) =>
-  class extends HTMLElement {
+// `schema(lang, hass, config)` lists the fields; options left at the card's default are not written to the YAML
+// (list defaults such as `exclude: []` are not shown in the form: an empty list is never written anyway).
+const rcEditor = ({ card, helpers, schema }) => {
+  const i18n = card.i18n;
+  const defaults = Object.fromEntries(Object.entries(card.defaults).filter(([, v]) => !Array.isArray(v)));
+  return class extends HTMLElement {
     setConfig(config) {
       this._config = config;
       this._update();
@@ -470,6 +578,7 @@ const rcEditor = ({ i18n, defaults, helpers, schema }) =>
       );
     }
   };
+};
 
 const rcRegister = (card, editor, name, description) => {
   if (customElements.get(card.tag)) return;
@@ -506,6 +615,7 @@ const RC_BASE_STYLES = `
 
   .head { display: flex; align-items: center; gap: 10px; }
   .head.nav { cursor: pointer; }
+  .head.nav:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; border-radius: 4px; }
   .badge { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
            background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
   .badge ha-icon { --mdc-icon-size: 20px; }

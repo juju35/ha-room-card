@@ -7,13 +7,7 @@
 const RS_I18N = {
   en: {
     title: "Sensors",
-    all_closed: "All closed",
-    all_quiet: "All quiet",
-    open_one: "{n} open",
-    open_many: "{n} open",
-    leak: "Water leak",
     no_sensors: "No sensor",
-    unavailable: "Unavailable",
     leak_on: "Leak!",
     leak_off: "Dry",
     open: "Open",
@@ -27,10 +21,6 @@ const RS_I18N = {
     min: "{n} min",
     hour: "{n} h",
     day: "{n} d",
-    ed_area: "Area",
-    ed_title: "Title",
-    ed_title_helper: "Leave empty for the area name",
-    ed_columns: "Columns",
     ed_only_alerts: "Hide idle sensors",
     ed_only_alerts_helper: "Only open, leaking or detecting sensors stay visible",
     ed_hide_when_clear: "Hide the card when idle",
@@ -41,17 +31,10 @@ const RS_I18N = {
     ed_include: "Sensors to add",
     ed_include_helper: "From another room or without one",
     ed_exclude: "Sensors to exclude",
-    err_config: "Set `area` or `entities`",
   },
   fr: {
     title: "Capteurs",
-    all_closed: "Tout est fermé",
-    all_quiet: "Tout est calme",
-    open_one: "{n} ouverture",
-    open_many: "{n} ouvertures",
-    leak: "Fuite d'eau",
     no_sensors: "Aucun capteur",
-    unavailable: "Indisponible",
     leak_on: "Fuite !",
     leak_off: "Sec",
     open: "Ouvert",
@@ -67,10 +50,6 @@ const RS_I18N = {
     min: "{n} min",
     hour: "{n} h",
     day: "{n} j",
-    ed_area: "Pièce",
-    ed_title: "Titre",
-    ed_title_helper: "Laisser vide pour le nom de la pièce",
-    ed_columns: "Colonnes",
     ed_only_alerts: "Masquer les capteurs au repos",
     ed_only_alerts_helper: "Seuls les capteurs ouverts, en fuite ou détectant une présence restent affichés",
     ed_hide_when_clear: "Masquer la carte au repos",
@@ -81,7 +60,6 @@ const RS_I18N = {
     ed_include: "Capteurs à ajouter",
     ed_include_helper: "D'une autre pièce ou sans pièce",
     ed_exclude: "Capteurs à exclure",
-    err_config: "Définis `area` ou `entities`",
   },
 };
 
@@ -192,13 +170,14 @@ class RoomSensorsCard extends RcCard {
     // Hidden only when nothing needs a look: everything closed and dry, and no presence.
     if (this._hide(c.hide_when_clear && level === "ok" && !occupied)) return;
 
-    const status = leaks
-      ? this._t("leak")
-      : open
-        ? this._t(open > 1 ? "open_many" : "open_one", { n: open })
-        : // "All closed" only makes sense with door or window sensors.
-          this._t(items.some((i) => i.kind !== "leak" && !i.info) ? "all_closed" : items.length ? "all_quiet" : "no_sensors");
+    const status = this._openingStatus(
+      leaks,
+      open,
+      items.some((i) => i.kind !== "leak" && !i.info),
+      items.length ? "all_quiet" : "no_sensors",
+    );
     const shown = c.only_alerts ? items.filter((i) => i.on || i.unavailable) : items;
+    this._shown = shown.length;
     const tiles = shown
       .map((i) =>
         this._tile(i, {
@@ -245,8 +224,7 @@ class RoomSensorsCard extends RcCard {
 
 // ── Editor ───────────────────────────────────────────────────────────────────
 const RoomSensorsCardEditor = rcEditor({
-  i18n: RS_I18N,
-  defaults: { columns: 2, only_alerts: false, hide_when_clear: false, presence: true, blink: true },
+  card: RoomSensorsCard,
   helpers: ["title", "only_alerts", "hide_when_clear", "presence", "include"],
   schema: (_lang, hass, config) => [
     ...rcAreaFields(false),

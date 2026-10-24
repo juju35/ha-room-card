@@ -1,4 +1,4 @@
-// Turns jscpd's JSON report into GitHub annotations, then fails like jscpd would.
+// Turns jscpd's JSON report into GitHub annotations. The job fails on the jscpd step itself; this script only annotates.
 // Usage: node .github/scripts/jscpd-annotate.mjs [report/jscpd-report.json]
 import { readFileSync } from "node:fs";
 

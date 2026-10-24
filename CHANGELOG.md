@@ -1,5 +1,46 @@
 # Changelog
 
+## 1.7.0
+
+### Changes
+- Overview: the "Turn all plugs off" button (`plugs_off_button`) now asks for confirmation in a small popup at the top of the card, listing every plug it will turn off with its room and power draw. OK turns them off; Cancel, Escape or a click outside does nothing. The lights button still turns the lights off at once.
+- Overview: the plugs button has its own icon (`mdi:power-plug-off`) instead of the power icon of the lights button, and both header buttons are easier to tap (32 px tall hit area, same look).
+- Overview on a narrow card (340 px or less): tighter header spacing and the small power icons of the header buttons are hidden, so nothing overflows.
+
+### Fixes
+- A tap on a header button is no longer lost when a plug's power reading changes during the press.
+- A double click on OK in the confirmation popup no longer also hits the header or the room tile underneath.
+- Pressing a tile and sliding off it cancels the press: no more-info, no toggle.
+- A new `language`, `presence`, `exclude` or `plugs_off_button` set in the editor reaches the room cards already unfolded in the Overview.
+- An Overview removed from the page in the middle of a press on its header no longer stays frozen once shown again.
+
+### Maintenance
+- Tests for the header buttons and the confirmation (27 in all); the screenshot script renders each capture in its own page, and the overview screenshots show the new plugs icon; lockfile synced and the duplicate-code check ignores test folders.
+
+## 1.6.0
+
+### What's new
+- Overview: `plugs_off_button` turns every plug off from the header, like the lights: the plugs chip becomes a button (with a power icon) that turns off every plug the card counts, and the Plugs card of the room details gets its turn-everything-off pill. Off by default, since a plug may feed a camera or a network switch: leave those out with `exclude`. In the visual editor: *“Turn all plugs off” button*.
+
+## 1.5.0
+
+### Fixes
+- A tap on a tile is no longer lost when the card updates between press and release (frequent on the Plugs card, whose tiles show the live power), and it no longer opens more-info by mistake.
+- The Overview counts the same sensors as the Sensors card it unfolds: a door or window sensor flagged as diagnostic now shows on the room tile too.
+- The Overview passes its `language` to the room cards shown in its details.
+- The Overview no longer folds when you click inside the more-info dialog, and its plain list (no room card installed) refreshes when a sensor changes, for example when it becomes unavailable.
+- Holding Enter on a tile no longer toggles it repeatedly, and a header with `navigation_path` can be reached and opened with the keyboard.
+- A failed service call no longer leaves an error in the browser console (Home Assistant still shows its own message).
+- Card size in masonry dashboards counts only the tiles shown with `only_on` / `only_alerts`, and is 0 when the card is hidden.
+
+### Changes
+- Faster updates: rooms and entities are looked up again only when the entity, device or area registries change, not on every state change, and the visual editor no longer rebuilds its form on every update.
+- README: the sliding-door icon rule is described as it works (`porte_fenetre`, `baie`, `sliding` or `patio` in the entity ID); the behaviour itself is unchanged.
+
+### Maintenance
+- Shared code for the four cards (translations, editors, Lights/Plugs drawing, status line); no visible change.
+- CI: actions pinned by commit SHA, read-only token permissions, Dependabot for GitHub Actions, duplicate-code annotations, and a `node --test` suite run on every push.
+
 ## 1.4.0
 
 ### Changes

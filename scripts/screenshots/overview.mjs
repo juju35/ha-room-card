@@ -65,7 +65,7 @@ await shoot({
   shots: [...pair("all"), ...pair("details", { open: "living_room", dry: true })],
   setup: (s, lang) => ({
     hass: mockHass(lang, s.dry),
-    config: {},
+    config: { plugs_off_button: true },
     open: s.open && `.room[data-area="${s.open}"]`,
   }),
 });
