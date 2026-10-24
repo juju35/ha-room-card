@@ -24,11 +24,6 @@ const RO_ROOM_ICONS = [
 const RO_I18N = {
   en: {
     title: "Home",
-    all_closed: "All closed",
-    all_quiet: "All quiet",
-    open_one: "{n} open",
-    open_many: "{n} open",
-    leak: "Water leak",
     presence: "Presence",
     no_rooms: "No room with sensors, lights or plugs",
     lights_on: "Lights on",
@@ -38,16 +33,11 @@ const RO_I18N = {
     sensors: "Sensors",
     lights: "Lights",
     plugs: "Plugs",
-    on: "On",
-    off: "Off",
     open: "Open",
     closed: "Closed",
     detected: "Detected",
     clear: "Clear",
-    unavailable: "Unavailable",
-    ed_title: "Title",
     ed_title_helper: "Leave empty for “Home”",
-    ed_columns: "Columns",
     ed_columns_helper: "Empty: 3, or 2 on narrow screens",
     ed_presence: "Include presence sensors",
     ed_presence_helper: "Presence and motion sensors, cameras excluded",
@@ -64,11 +54,6 @@ const RO_I18N = {
   },
   fr: {
     title: "Maison",
-    all_closed: "Tout est fermé",
-    all_quiet: "Tout est calme",
-    open_one: "{n} ouverture",
-    open_many: "{n} ouvertures",
-    leak: "Fuite d'eau",
     presence: "Présence",
     no_rooms: "Aucune pièce avec des capteurs, lumières ou prises",
     lights_on: "Lumières allumées",
@@ -78,16 +63,11 @@ const RO_I18N = {
     sensors: "Capteurs",
     lights: "Lumières",
     plugs: "Prises",
-    on: "Allumée",
-    off: "Éteinte",
     open: "Ouvert",
     closed: "Fermé",
     detected: "Détectée",
     clear: "Aucune",
-    unavailable: "Indisponible",
-    ed_title: "Titre",
     ed_title_helper: "Laisser vide pour « Maison »",
-    ed_columns: "Colonnes",
     ed_columns_helper: "Vide : 3, ou 2 sur les écrans étroits",
     ed_presence: "Inclure les capteurs de présence",
     ed_presence_helper: "Capteurs de présence et de mouvement, hors caméras",
@@ -241,11 +221,9 @@ class RoomOverviewCard extends RcCard {
   }
 
   _roomState(x) {
-    if (x.leaks) return { lvl: "alert", text: this._t("leak") };
-    if (x.open) return { lvl: "warn", text: this._t(x.open > 1 ? "open_many" : "open_one", { n: x.open }) };
+    if (x.leaks || x.open) return { lvl: x.leaks ? "alert" : "warn", text: this._openingStatus(x.leaks, x.open) };
     if (x.occupied) return { lvl: "info", text: this._t("presence") };
-    // "All closed" only makes sense with door or window sensors.
-    return { lvl: "ok", text: this._t(x.sensors.some((e) => !e.leak) ? "all_closed" : "all_quiet") };
+    return { lvl: "ok", text: this._openingStatus(0, 0, x.sensors.some((e) => !e.leak)) };
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -281,11 +259,7 @@ class RoomOverviewCard extends RcCard {
     const watts = rooms.some((x) => x.watts != null) ? rooms.reduce((t, x) => t + (x.watts ?? 0), 0) : null;
     const occupied = rooms.filter((x) => x.occupied).length;
     const level = leaks ? "alert" : open ? "warn" : "ok";
-    const status = leaks
-      ? this._t("leak")
-      : open
-        ? this._t(open > 1 ? "open_many" : "open_one", { n: open })
-        : this._t(this._anySensors ? "all_closed" : "all_quiet");
+    const status = this._openingStatus(leaks, open, this._anySensors);
     const headIcon = leaks ? "mdi:water-alert" : open ? "mdi:home-alert-outline" : "mdi:home-outline";
 
     const chip = (cls, icon, label, text) =>
@@ -437,6 +411,7 @@ class RoomOverviewCard extends RcCard {
       ha-card.lvl-warn  { --c: var(--rc-warn); }
       ha-card.lvl-alert { --c: var(--rc-alert); }
 
+      :where(button.chip) { all: unset; }
       .chip { --k: var(--rc-idle); flex: none; display: inline-flex; align-items: center; gap: 2px; height: 18px; padding: 0 5px;
               border-radius: 999px; font-size: 11px; font-weight: 500; line-height: 1; white-space: nowrap;
               color: var(--k); background: color-mix(in srgb, var(--k) 14%, transparent); }
@@ -448,9 +423,7 @@ class RoomOverviewCard extends RcCard {
       .chip.info  { --k: var(--rc-info); }
       .chip.light { --k: var(--rc-light); }
       .chip.plug  { --k: var(--rc-plug); }
-      button.chip { all: unset; --k: var(--rc-light); flex: none; display: inline-flex; align-items: center; gap: 2px; height: 20px;
-                    padding: 0 6px; border-radius: 999px; font-size: 11px; font-weight: 500; line-height: 1; white-space: nowrap;
-                    color: var(--k); background: color-mix(in srgb, var(--k) 14%, transparent); cursor: pointer; transition: background .2s; }
+      button.chip { cursor: pointer; transition: background .2s; }
       button.chip:hover { background: color-mix(in srgb, var(--k) 26%, transparent); }
       button.chip:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
       button.chip .off { --mdc-icon-size: 11px; margin-left: 2px; opacity: .75; }
@@ -511,12 +484,11 @@ const roExcludeField = (hass, config) => {
   const rooms = rcProbe(RoomOverviewCard, hass, { ...config, exclude: [], only_active: false })._collect();
   const ids = rooms.flatMap((x) => [...x.sensors, ...x.presence, ...x.lights, ...x.plugs].map((e) => e.id));
   for (const id of config?.exclude || []) if (!ids.includes(id)) ids.push(id);
-  return ids.length ? [{ name: "exclude", selector: { entity: { multiple: true, include_entities: ids } } }] : [];
+  return rcEntitiesField("exclude", ids);
 };
 
 const RoomOverviewCardEditor = rcEditor({
-  i18n: RO_I18N,
-  defaults: { presence: true, only_active: false, all_off_button: true, sort: "name" },
+  card: RoomOverviewCard,
   helpers: ["title", "columns", "presence", "only_active", "all_off_button", "exclude"],
   schema: (lang, hass, config) => [
     { name: "title", selector: { text: {} } },

@@ -11,15 +11,6 @@ const RL_I18N = {
     on_one: "{n} on",
     on_many: "{n} on",
     no_lights: "No light",
-    unavailable: "Unavailable",
-    on: "On",
-    off: "Off",
-    turn_all_off: "Turn everything off",
-    ed_area: "Area",
-    ed_title: "Title",
-    ed_title_helper: "Leave empty for the area name",
-    ed_columns: "Columns",
-    ed_navigation_path: "Navigation path",
     ed_navigation_path_helper: "Dashboard opened when tapping the title, e.g. /light",
     ed_only_on: "Hide lights that are off",
     ed_only_on_helper: "Only the lights that are on stay visible",
@@ -27,12 +18,10 @@ const RL_I18N = {
     ed_hide_when_off_helper: "The card only appears when a light is on",
     ed_show_brightness: "Show and adjust brightness",
     ed_show_brightness_helper: "Drag a light sideways to set its brightness",
-    ed_all_off_button: "“Turn everything off” button",
     ed_all_off_button_helper: "Tapping the status pill turns every light of the card off",
     ed_include: "Lights to add",
     ed_include_helper: "From another room or without one",
     ed_exclude: "Lights to exclude",
-    err_config: "Set `area` or `entities`",
   },
   fr: {
     title: "Lumières",
@@ -40,15 +29,6 @@ const RL_I18N = {
     on_one: "{n} allumée",
     on_many: "{n} allumées",
     no_lights: "Aucune lumière",
-    unavailable: "Indisponible",
-    on: "Allumée",
-    off: "Éteinte",
-    turn_all_off: "Tout éteindre",
-    ed_area: "Pièce",
-    ed_title: "Titre",
-    ed_title_helper: "Laisser vide pour le nom de la pièce",
-    ed_columns: "Colonnes",
-    ed_navigation_path: "Chemin de navigation",
     ed_navigation_path_helper: "Tableau de bord ouvert au tap sur le titre, par exemple /light",
     ed_only_on: "Masquer les lumières éteintes",
     ed_only_on_helper: "Seules les lumières allumées restent affichées",
@@ -56,12 +36,10 @@ const RL_I18N = {
     ed_hide_when_off_helper: "La carte n'apparaît que si une lumière est allumée",
     ed_show_brightness: "Afficher et régler la luminosité",
     ed_show_brightness_helper: "Glisser une lumière sur le côté pour régler sa luminosité",
-    ed_all_off_button: "Bouton « Tout éteindre »",
     ed_all_off_button_helper: "Un tap sur la pastille éteint toutes les lumières de la carte",
     ed_include: "Lumières à ajouter",
     ed_include_helper: "D'une autre pièce ou sans pièce",
     ed_exclude: "Lumières à exclure",
-    err_config: "Définis `area` ou `entities`",
   },
 };
 
@@ -74,11 +52,13 @@ const rlDimmable = (st) =>
   st.entity_id.startsWith("light.") && (st.attributes.supported_color_modes || []).some((m) => m !== "onoff");
 
 // ── Card ─────────────────────────────────────────────────────────────────────
-class RoomLightsCard extends RcCard {
+class RoomLightsCard extends RcToggleCard {
   static tag = "room-lights-card";
   static i18n = RL_I18N;
   static needsArea = true;
   static includeDomains = ["light", "switch"];
+  static headIcons = ["mdi:lightbulb-group", "mdi:lightbulb-group-off-outline"];
+  static emptyKey = "no_lights";
   static defaults = {
     columns: 2,
     only_on: false,
@@ -125,34 +105,19 @@ class RoomLightsCard extends RcCard {
     return i.pct != null ? `${this._t("on")} · ${i.pct} %` : this._t("on");
   }
 
-  _draw(items) {
-    const c = this._config;
-    const lit = items.filter((i) => i.on);
-    const level = lit.length ? "on" : "off";
+  _sigOf(i) {
+    return [i.id, i.on, i.unavailable, i.pct, i.color, i.name, i.icon];
+  }
 
-    if (!this._changed(items.map((i) => [i.id, i.on, i.unavailable, i.pct, i.color, i.name, i.icon]))) return;
-    if (this._hide(c.hide_when_off && level === "off")) return;
-
-    const shown = c.only_on ? items.filter((i) => i.on || i.unavailable) : items;
-    const tiles = shown
-      .map((i) =>
-        this._tile(i, {
-          style: i.color ? `--t:${i.color}` : "",
-          extra:
-            c.show_brightness && i.dimmable && i.on ? `<span class="bar" style="width:${i.pct ?? 100}%"></span>` : "",
-          state: rcEsc(i.state),
-        }),
-      )
-      .join("");
-    const head = this._head({
-      icon: lit.length ? "mdi:lightbulb-group" : "mdi:lightbulb-group-off-outline",
-      title: c.title || this._areaName() || this._t("title"),
-      status: lit.length
-        ? this._t(lit.length > 1 ? "on_many" : "on_one", { n: lit.length })
-        : this._t(items.length ? "all_off" : "no_lights"),
-      allOff: c.all_off_button && lit.length > 0,
+  _tileOf(i) {
+    return this._tile(i, {
+      style: i.color ? `--t:${i.color}` : "",
+      extra:
+        this._config.show_brightness && i.dimmable && i.on
+          ? `<span class="bar" style="width:${i.pct ?? 100}%"></span>`
+          : "",
+      state: rcEsc(i.state),
     });
-    this._paint(level, head, tiles);
   }
 
   // Tap: toggle · hold: more-info · horizontal drag on a dimmable light: brightness.
@@ -199,8 +164,7 @@ class RoomLightsCard extends RcCard {
 
 // ── Editor ───────────────────────────────────────────────────────────────────
 const RoomLightsCardEditor = rcEditor({
-  i18n: RL_I18N,
-  defaults: { columns: 2, only_on: false, hide_when_off: false, show_brightness: true, all_off_button: true },
+  card: RoomLightsCard,
   helpers: ["title", "navigation_path", "only_on", "hide_when_off", "show_brightness", "all_off_button", "include"],
   schema: (_lang, hass, config) => [
     ...rcAreaFields(true),
