@@ -215,3 +215,175 @@ test("the Overview's plain list is redrawn when an entity of the open room becom
     rc.customElements.get = realGet;
   }
 });
+
+// An Overview whose shadow-root nodes are kept by selector and record their listeners, so that the header can be
+// clicked and pressed by hand. `calls` collects the service calls.
+const overviewSetup = (options = {}, hass = makeHass()) => {
+  const overview = new cards["room-overview-card"]();
+  const nodes = {};
+  const node = () => {
+    const on = {};
+    return {
+      ...fakeNode(),
+      on,
+      style: { setProperty() {} },
+      addEventListener(type, fn) {
+        (on[type] ||= []).push(fn);
+      },
+      fire(type, ev = {}) {
+        for (const fn of on[type] || []) fn({ button: 0, stopPropagation() {}, ...ev });
+      },
+      focus() {
+        focused.push(this);
+      },
+      querySelector: (s) => (nodes[s] ||= node()),
+    };
+  };
+  const focused = [];
+  overview.attachShadow();
+  // No <ha-card> until the first render has written the skeleton, so that the card wires its listeners.
+  overview.shadowRoot.querySelector = (s) => (s === "ha-card" && !overview.shadowRoot.innerHTML ? null : (nodes[s] ||= node()));
+  const calls = [];
+  overview.setConfig({ ...options });
+  overview.hass = { ...hass, callService: (...a) => calls.push(JSON.parse(JSON.stringify(a))) };
+  return { overview, nodes, calls, focused };
+};
+
+// Event target inside the header: `kind` is the data-kind of the chip it belongs to, or null.
+const chipTarget = (kind) => ({ closest: (s) => (kind && s === ".chip.action" ? { dataset: { kind } } : null) });
+
+const withWatts = (w) => {
+  const h = makeHass();
+  h.states["sensor.coffee_power"] = { ...h.states["sensor.coffee_power"], state: String(w) };
+  return h;
+};
+
+test("a power update during a press on a header chip does not rewrite the header", async () => {
+  const { overview, nodes, calls } = overviewSetup({ plugs_off_button: true }, withWatts(80));
+  const head = nodes[".head"];
+  const before = head.innerHTML;
+  assert.match(before, /80 W/);
+  head.fire("pointerdown", { target: chipTarget("lights") });
+  overview.hass = { ...withWatts(83), callService: (...a) => calls.push(a) };
+  assert.equal(head.innerHTML, before, "header kept while the chip is pressed");
+  head.fire("pointerup", { target: chipTarget("lights") });
+  head.fire("click", { target: chipTarget("lights") });
+  assert.equal(calls.length, 1, "the tap reached the chip");
+  await new Promise((r) => setTimeout(r, 10));
+  assert.match(head.innerHTML, /83 W/, "deferred update rendered after the tap");
+});
+
+// A home with a second room and plugs: the kitchen's coffee plug (on), a TV plug (on, excluded by entity), and a
+// fridge plug in the cellar (on, excluded by room in some tests), plus an unavailable plug.
+const plugsHass = () => {
+  const h = makeHass();
+  const st = (entity_id, state, friendly_name) => ({ entity_id, state, attributes: { device_class: "outlet", friendly_name } });
+  h.areas = { ...h.areas, cellar: { area_id: "cellar", name: "Cellar" } };
+  Object.assign(h.entities, {
+    "switch.tv_plug": { area_id: "kitchen" },
+    "switch.fridge_plug": { area_id: "cellar" },
+    "switch.dead_plug": { area_id: "cellar" },
+  });
+  Object.assign(h.states, {
+    "switch.tv_plug": st("switch.tv_plug", "on", "TV plug"),
+    "switch.fridge_plug": st("switch.fridge_plug", "on", "Fridge plug"),
+    "switch.dead_plug": st("switch.dead_plug", "unavailable", "Dead plug"),
+  });
+  return h;
+};
+const clickOn = (node, target) => node.fire("click", { target });
+const confirmTarget = (action) => ({ closest: (s) => (s === "[data-action]" ? { dataset: { action } } : null) });
+
+test("the plugs chip asks for confirmation, listing the plugs; Cancel, Escape and a click outside do nothing", () => {
+  const { overview, nodes, calls, focused } = overviewSetup({ plugs_off_button: true, exclude: ["switch.tv_plug"] }, plugsHass());
+  const open = () => {
+    overview._closedAt = null; // the double-click guard is tested on its own
+    clickOn(nodes[".head"], chipTarget("plugs"));
+  };
+  open();
+  assert.equal(calls.length, 0, "no call before confirming");
+  const box = nodes[".confirm"];
+  assert.equal(box.hidden, false);
+  assert.match(box.innerHTML, /Éteindre ces 2 prises \?/);
+  assert.match(box.innerHTML, /Coffee plug/);
+  assert.match(box.innerHTML, /Fridge plug/);
+  assert.doesNotMatch(box.innerHTML, /TV plug|Dead plug/);
+  assert.equal(focused.at(-1), box.querySelector(".primary"), "OK has the focus");
+
+  clickOn(box, confirmTarget("cancel"));
+  assert.equal(box.hidden, true);
+  open();
+  rc.window.fire("keydown", { key: "Escape", stopPropagation() {} });
+  assert.equal(box.hidden, true, "Escape closes it, wherever the focus is");
+  open();
+  const backdrop = { dataset: { action: "backdrop" } };
+  backdrop.closest = () => backdrop;
+  const inside = { closest: (s) => (s === "[data-action]" ? backdrop : null) };
+  clickOn(box, inside); // a click on the dialog itself, inside the backdrop
+  assert.equal(box.hidden, false);
+  clickOn(box, backdrop); // the backdrop itself
+  assert.equal(box.hidden, true);
+  open();
+  overview._onOutside({ composedPath: () => [{ localName: "hui-view" }] });
+  assert.equal(box.hidden, true);
+  assert.equal(calls.length, 0);
+});
+
+test("confirming turns off the plugs listed, rooms and entities excluded spared, unavailable ones left out", () => {
+  const { nodes, calls } = overviewSetup(
+    { plugs_off_button: true, exclude: ["switch.tv_plug"], exclude_areas: ["cellar"] },
+    plugsHass(),
+  );
+  clickOn(nodes[".head"], chipTarget("plugs"));
+  assert.doesNotMatch(nodes[".confirm"].innerHTML, /Fridge plug/);
+  assert.match(nodes[".confirm"].innerHTML, /Éteindre cette prise \?/);
+  clickOn(nodes[".confirm"], confirmTarget("ok"));
+  assert.deepEqual(calls, [["homeassistant", "turn_off", { entity_id: ["switch.coffee_plug"] }]]);
+  assert.equal(nodes[".confirm"].hidden, true);
+});
+
+test("the lights chip turns the lights off at once, without confirmation", () => {
+  const { nodes, calls } = overviewSetup({}, plugsHass());
+  clickOn(nodes[".head"], chipTarget("lights"));
+  assert.deepEqual(calls, [["homeassistant", "turn_off", { entity_id: ["light.ceiling"] }]]);
+  assert.equal(nodes[".confirm"].innerHTML, "", "no popup");
+});
+
+test("the second click of a double click on OK does not reach the card under the popup", () => {
+  const { overview, nodes, calls } = overviewSetup({ plugs_off_button: true }, plugsHass());
+  clickOn(nodes[".head"], chipTarget("plugs"));
+  clickOn(nodes[".confirm"], confirmTarget("ok"));
+  clickOn(nodes[".head"], chipTarget("lights")); // what lies under OK
+  nodes[".grid"].fire("click", { target: { closest: () => ({ dataset: { area: "kitchen" } }) } });
+  assert.equal(calls.length, 1, "only the plugs call");
+  assert.equal(overview._openArea, undefined, "no room unfolded");
+  overview._closedAt -= 1000;
+  clickOn(nodes[".head"], chipTarget("lights"));
+  assert.equal(calls.length, 2, "clicks act again afterwards");
+});
+
+test("a new config rebuilds the details of the open room", () => {
+  const overview = new cards["room-overview-card"]();
+  const panel = fakeNode();
+  overview.shadowRoot = { ...fakeNode(), querySelector: (s) => (s === ".panel" ? panel : null) };
+  overview._config = { ...cards["room-overview-card"].defaults, plugs_off_button: true };
+  overview._hass = makeHass();
+  overview._rooms = overview._collect();
+  overview._openArea = "kitchen";
+  overview._fillPanel();
+  overview._render = () => {};
+  overview.setConfig({ plugs_off_button: false });
+  overview._fillPanel();
+  const plugs = panel.children.filter((el) => el._config.type === "custom:room-switch-card");
+  assert.equal(plugs.at(-1)._config.all_off_button, false);
+});
+
+test("pressing a tile and leaving it with the mouse neither toggles nor opens more-info", async () => {
+  const t = pressSetup();
+  t.tile.fire("pointerdown");
+  t.tile.fire("pointerleave");
+  await new Promise((r) => setTimeout(r, rc.RC_HOLD_MS + 50));
+  t.tile.fire("pointerup");
+  assert.deepEqual(t.calls, []);
+  assert.equal(t.card._pressing, false);
+});

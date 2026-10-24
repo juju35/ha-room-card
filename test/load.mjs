@@ -51,6 +51,13 @@ export const load = () => {
     setTimeout,
     clearTimeout,
   };
+  // window-level listeners (Escape on the confirmation popup), fired by hand with window.fire(type, ev).
+  const winListeners = {};
+  sandbox.addEventListener = (type, fn) => (winListeners[type] ||= new Set()).add(fn);
+  sandbox.removeEventListener = (type, fn) => winListeners[type]?.delete(fn);
+  sandbox.fire = (type, ev) => {
+    for (const fn of winListeners[type] || []) fn(ev);
+  };
   sandbox.window = sandbox;
   const ctx = vm.createContext(sandbox);
   const cards = ["room-sensors-card", "room-lights-card", "room-switch-card", "room-overview-card"];
@@ -58,7 +65,7 @@ export const load = () => {
   return vm.runInContext(
     `${code}
     ({ RcCard, rcCleanName, rcIsPlug, rcIsLightSwitch, rcMatchSensor, rcMatchLight, rcMatchPlug, rcEsc, rcMemo,
-       rcPowerSensors, rcCall, rcInDialog, RC_HOLD_MS, customElements, cards: Object.fromEntries(${JSON.stringify(cards)}.map((t) => [t, customElements.get(t)])) })`,
+       rcPowerSensors, rcCall, rcInDialog, RC_HOLD_MS, customElements, window, cards: Object.fromEntries(${JSON.stringify(cards)}.map((t) => [t, customElements.get(t)])) })`,
     ctx,
   );
 };

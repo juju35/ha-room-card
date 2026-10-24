@@ -30,6 +30,10 @@ const RO_I18N = {
     plugs_on: "Plugs on",
     turn_lights_off: "Turn all lights off",
     turn_plugs_off: "Turn all plugs off",
+    confirm_plugs_one: "Turn this plug off?",
+    confirm_plugs_many: "Turn these {n} plugs off?",
+    turn_off: "Turn off",
+    cancel: "Cancel",
     rooms_occupied: "Occupied rooms",
     sensors: "Sensors",
     lights: "Lights",
@@ -48,7 +52,7 @@ const RO_I18N = {
     ed_all_off_button_helper: "Tapping the lights chip of the header turns every light the card counts off",
     ed_plugs_off_button: "“Turn all plugs off” button",
     ed_plugs_off_button_helper:
-      "Tapping the plugs chip of the header turns every plug the card counts off; also on the Plugs card of the room details. Off by default: a plug may feed a camera or a network switch",
+      "Tapping the plugs chip of the header lists every plug the card counts that is on and turns them off once confirmed; also on the Plugs card of the room details. Off by default: a plug may feed a camera or a network switch",
     ed_sort: "Sort",
     ed_sort_name: "By name",
     ed_sort_state: "Rooms needing attention first",
@@ -64,6 +68,10 @@ const RO_I18N = {
     plugs_on: "Prises allumées",
     turn_lights_off: "Éteindre toutes les lumières",
     turn_plugs_off: "Éteindre toutes les prises",
+    confirm_plugs_one: "Éteindre cette prise ?",
+    confirm_plugs_many: "Éteindre ces {n} prises ?",
+    turn_off: "Éteindre",
+    cancel: "Annuler",
     rooms_occupied: "Pièces occupées",
     sensors: "Capteurs",
     lights: "Lumières",
@@ -82,7 +90,7 @@ const RO_I18N = {
     ed_all_off_button_helper: "Un tap sur la pastille des lumières de l'en-tête éteint toutes les lumières comptées par la carte",
     ed_plugs_off_button: "Bouton « Éteindre toutes les prises »",
     ed_plugs_off_button_helper:
-      "Un tap sur la pastille des prises de l'en-tête éteint toutes les prises comptées par la carte ; aussi sur la carte Prises du détail des pièces. Désactivé par défaut : une prise peut alimenter une caméra ou un switch réseau",
+      "Un tap sur la pastille des prises de l'en-tête liste les prises allumées comptées par la carte et les éteint après confirmation ; aussi sur la carte Prises du détail des pièces. Désactivé par défaut : une prise peut alimenter une caméra ou un switch réseau",
     ed_sort: "Tri",
     ed_sort_name: "Par nom",
     ed_sort_state: "Pièces à surveiller en premier",
@@ -91,6 +99,10 @@ const RO_I18N = {
     ed_exclude_helper: "Ignorées dans les tuiles, les totaux et le détail des pièces",
   },
 };
+
+// After the confirmation popup closes, clicks are ignored for this long: the second click of a double click on OK
+// would otherwise land on what lies under the button (the lights chip, a room tile).
+const RO_CLOSED_GUARD_MS = 400;
 
 const roRoomIcon = (area) => {
   if (area.icon) return area.icon;
@@ -121,8 +133,22 @@ class RoomOverviewCard extends RcCard {
     super();
     // A click anywhere else folds the open room back.
     this._onOutside = (ev) => {
-      if (this._openArea && !ev.composedPath().includes(this) && !rcInDialog(ev)) this._toggle(null);
+      if (ev.composedPath().includes(this) || rcInDialog(ev)) return;
+      if (this._confirm) this._closeConfirm();
+      if (this._openArea) this._toggle(null);
     };
+    // Escape closes the confirmation popup (as Cancel), wherever the focus is.
+    this._onKey = (ev) => {
+      if (ev.key !== "Escape" || !this._confirm) return;
+      ev.stopPropagation();
+      this._closeConfirm();
+    };
+  }
+
+  // A new config rebuilds the room details, which take part of it (language, presence, exclude, plugs_off_button).
+  setConfig(config) {
+    this._panelArea = null;
+    super.setConfig(config);
   }
 
   set hass(hass) {
@@ -136,6 +162,7 @@ class RoomOverviewCard extends RcCard {
 
   disconnectedCallback() {
     document.removeEventListener("click", this._onOutside, true);
+    if (this._confirm) this._closeConfirm();
   }
 
   getCardSize() {
@@ -261,18 +288,39 @@ class RoomOverviewCard extends RcCard {
     if (!this.shadowRoot.querySelector("ha-card")) {
       this.shadowRoot.innerHTML = `
         <style>${RC_BASE_STYLES}${RoomOverviewCard.styles}</style>
-        <ha-card><div class="head"></div><div class="panel" hidden></div><div class="grid"></div></ha-card>`;
-      this.shadowRoot.querySelector(".head").addEventListener("click", (ev) => {
+        <ha-card><div class="head"></div><div class="panel" hidden></div><div class="grid"></div><div class="confirm" hidden></div></ha-card>`;
+      const head = this.shadowRoot.querySelector(".head");
+      head.addEventListener("click", (ev) => {
         const button = ev.target.closest(".chip.action");
-        if (!button) return;
+        if (!button || this._justClosed()) return;
         ev.stopPropagation();
-        const kind = button.dataset.kind === "plugs" ? "plugs" : "lights";
-        const ids = this._rooms.flatMap((x) => x[kind].filter((e) => e.st.state === "on").map((e) => e.id));
-        if (ids.length) rcCall(this._hass, "homeassistant", "turn_off", { entity_id: ids });
+        this._headAction(button.dataset.kind === "plugs" ? "plugs" : "lights");
       });
+      // No header rewrite while an action chip is pressed (a power reading changes its text): the chip under the
+      // finger would be replaced and the click lost. The update is rendered once the click is through.
+      head.addEventListener("pointerdown", (ev) => {
+        if (ev.button === 0 && ev.target.closest(".chip.action")) this._pressing = true;
+      });
+      for (const type of ["pointerup", "pointercancel", "pointerleave"]) {
+        head.addEventListener(type, () => {
+          if (this._pressing) setTimeout(() => this._released());
+        });
+      }
       this.shadowRoot.querySelector(".grid").addEventListener("click", (ev) => {
         const tile = ev.target.closest(".room");
-        if (tile) this._tap(tile.dataset.area);
+        if (tile && !this._justClosed()) this._tap(tile.dataset.area);
+      });
+      this.shadowRoot.querySelector(".confirm").addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        const el = ev.target.closest("[data-action]");
+        const action = el?.dataset.action;
+        if (action === "ok") {
+          const ids = this._confirm.map((e) => e.id);
+          this._closeConfirm();
+          rcCall(this._hass, "homeassistant", "turn_off", { entity_id: ids });
+        } else if (action === "cancel" || (action === "backdrop" && ev.target === el)) {
+          this._closeConfirm();
+        }
       });
     }
 
@@ -289,8 +337,8 @@ class RoomOverviewCard extends RcCard {
     const chip = (cls, icon, label, text) =>
       `<span class="chip ${cls}" title="${rcEsc(label)}"><ha-icon icon="${icon}"></ha-icon>${text ? `<span>${rcEsc(text)}</span>` : ""}</span>`;
     // Header chip that turns everything of its kind off when tapped.
-    const offChip = (cls, kind, icon, label, text) =>
-      `<button class="chip ${cls} action" data-kind="${kind}" title="${rcEsc(label)}"><ha-icon icon="${icon}"></ha-icon><span>${rcEsc(text)}</span><ha-icon class="off" icon="mdi:power"></ha-icon></button>`;
+    const offChip = (cls, kind, icon, label, text, offIcon) =>
+      `<button class="chip ${cls} action" data-kind="${kind}" title="${rcEsc(label)}"><ha-icon icon="${icon}"></ha-icon><span>${rcEsc(text)}</span><ha-icon class="off" icon="${offIcon}"></ha-icon></button>`;
     const plugText = watts != null ? rcWatts(watts) : String(plugs);
 
     const card = this.shadowRoot.querySelector("ha-card");
@@ -302,14 +350,14 @@ class RoomOverviewCard extends RcCard {
       ${
         lights
           ? c.all_off_button !== false
-            ? offChip("light", "lights", "mdi:lightbulb", this._t("turn_lights_off"), String(lights))
+            ? offChip("light", "lights", "mdi:lightbulb", this._t("turn_lights_off"), String(lights), "mdi:power")
             : chip("light", "mdi:lightbulb", this._t("lights_on"), String(lights))
           : ""
       }
       ${
         plugs
           ? c.plugs_off_button
-            ? offChip("plug", "plugs", "mdi:power-socket-fr", this._t("turn_plugs_off"), plugText)
+            ? offChip("plug", "plugs", "mdi:power-socket-fr", this._t("turn_plugs_off"), plugText, "mdi:power-plug-off")
             : chip("plug", "mdi:power-socket-fr", this._t("plugs_on"), plugText)
           : ""
       }
@@ -351,6 +399,59 @@ class RoomOverviewCard extends RcCard {
 
     if (this._openArea && !rooms.some((x) => x.id === this._openArea)) this._toggle(null);
     else if (this._openArea) this._fillPanel();
+  }
+
+  // What a header chip turns off: every light, or every plug, that is on in the rooms shown. Lights go off at once;
+  // plugs only once the list is confirmed, since one of them may feed a fridge, a camera or the network.
+  _headAction(kind) {
+    const on = this._rooms.flatMap((x) => x[kind].filter((e) => e.st.state === "on").map((e) => ({ ...e, room: x.name })));
+    if (!on.length) return;
+    if (kind === "plugs") this._openConfirm(on);
+    else rcCall(this._hass, "homeassistant", "turn_off", { entity_id: on.map((e) => e.id) });
+  }
+
+  // In-card confirmation at the top of the card (as in ha-system-monitor-card and ha-roborock-card), drawn once:
+  // updates leave it, and the focus in it, alone. OK turns off the plugs listed, nothing else.
+  _openConfirm(plugs) {
+    this._confirm = plugs;
+    const n = plugs.length;
+    const items = plugs
+      .map((e) => {
+        const extra = [e.room, e.watts != null ? rcWatts(e.watts) : ""].filter(Boolean).join(" · ");
+        return `<div class="modal-item"><span>${rcEsc(e.st.attributes.friendly_name || e.id)}</span><span>${rcEsc(extra)}</span></div>`;
+      })
+      .join("");
+    const box = this.shadowRoot.querySelector(".confirm");
+    box.innerHTML = `
+      <div class="backdrop" data-action="backdrop">
+        <div class="modal" role="dialog" aria-modal="true" aria-label="${rcEsc(this._t("turn_plugs_off"))}">
+          <h3>${rcEsc(this._t("turn_plugs_off"))}</h3>
+          <div class="hint">${rcEsc(this._t(n > 1 ? "confirm_plugs_many" : "confirm_plugs_one", { n }))}</div>
+          <div class="modal-list">${items}</div>
+          <div class="modal-actions">
+            <button class="act cancel" data-action="cancel">${rcEsc(this._t("cancel"))}</button>
+            <button class="act primary" data-action="ok">${rcEsc(this._t("turn_off"))}</button>
+          </div>
+        </div>
+      </div>`;
+    box.hidden = false;
+    window.addEventListener("keydown", this._onKey);
+    box.querySelector(".primary")?.focus();
+  }
+
+  _closeConfirm() {
+    this._confirm = null;
+    this._closedAt = Date.now();
+    window.removeEventListener("keydown", this._onKey);
+    const box = this.shadowRoot?.querySelector(".confirm");
+    if (box) {
+      box.hidden = true;
+      box.innerHTML = "";
+    }
+  }
+
+  _justClosed() {
+    return this._closedAt != null && Date.now() - this._closedAt < RO_CLOSED_GUARD_MS;
   }
 
   _tap(aid) {
@@ -440,7 +541,7 @@ class RoomOverviewCard extends RcCard {
   }
 
   static styles = `
-      ha-card { container-type: inline-size; }
+      ha-card { container-type: inline-size; position: relative; }
       ha-card.lvl-ok    { --c: var(--rc-ok); }
       ha-card.lvl-warn  { --c: var(--rc-warn); }
       ha-card.lvl-alert { --c: var(--rc-alert); }
@@ -461,6 +562,33 @@ class RoomOverviewCard extends RcCard {
       button.chip:hover { background: color-mix(in srgb, var(--k) 26%, transparent); }
       button.chip:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
       button.chip .off { --mdc-icon-size: 11px; margin-left: 2px; opacity: .75; }
+      /* A 32 px tall touch target around the 20 px header chips, without changing how they look. */
+      .head button.chip { position: relative; }
+      .head button.chip::before { content: ""; position: absolute; inset: -6px -3px; }
+      /* Narrow card: the header keeps the title readable (the power icons go, the chips stay tappable). */
+      @container (max-width: 340px) {
+        .head { gap: 6px; }
+        .head button.chip .off { display: none; }
+      }
+
+      .confirm[hidden] { display: none; }
+      ha-card:has(> .confirm:not([hidden])) { min-height: 220px; }
+      .backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: flex-start; justify-content: center;
+                  padding-top: 12px; box-sizing: border-box; z-index: 9; border-radius: inherit; }
+      .modal { background: var(--card-background-color, #1c1c1c); color: var(--primary-text-color); width: min(92%, 340px); max-height: calc(100% - 24px);
+               box-sizing: border-box; border-radius: 14px; padding: 16px; box-shadow: 0 8px 30px rgba(0,0,0,.4);
+               display: flex; flex-direction: column; gap: 10px; }
+      .modal h3 { margin: 0; font-size: 16px; font-weight: 500; }
+      .modal .hint { font-size: 13px; color: var(--secondary-text-color); }
+      .modal-list { display: flex; flex-direction: column; gap: 4px; overflow: auto; min-height: 0; }
+      .modal-item { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+      .modal-item span:first-child { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .modal-item span:last-child { flex: none; color: var(--secondary-text-color); font-variant-numeric: tabular-nums; }
+      .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 2px; }
+      .modal button.act { border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
+      .modal button.cancel { background: var(--secondary-background-color, rgba(127,127,127,.12)); color: var(--primary-text-color); }
+      .modal button.primary { background: var(--primary-color, #03a9f4); color: #fff; }
+      .modal button.act:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
 
       .grid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
       @container (max-width: 340px) { .grid:not(.fixed) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

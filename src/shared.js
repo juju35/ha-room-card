@@ -411,6 +411,13 @@ class RcCard extends HTMLElement {
       // After a drag, the next update redraws (the bar keeps the new level until the light reports it).
       this._released(!wasDrag);
     };
+    // The mouse leaving the tile mid-press (no capture outside a drag) cancels it: neither a tap nor a hold.
+    el.addEventListener("pointerleave", () => {
+      if (!start || mode) return;
+      clearTimeout(timer);
+      start = null;
+      this._released();
+    });
     el.addEventListener("pointerup", (ev) => end(ev, false));
     el.addEventListener("pointercancel", (ev) => end(ev, true));
     el.addEventListener("contextmenu", (ev) => ev.preventDefault());
