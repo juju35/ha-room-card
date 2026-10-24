@@ -4,5 +4,6 @@
   "absolute": false,
   "gitignore": true,
   "ignore": ["**/dist/**", "**/vendor/**", "**/node_modules/**", "**/tests/**", "**/.git/**", "**/*.min.js"],
-  "reporters": ["console"]
+  "reporters": ["console", "json"],
+  "output": "report"
 }
