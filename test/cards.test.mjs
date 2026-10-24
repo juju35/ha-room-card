@@ -273,6 +273,21 @@ test("a power update during a press on a header chip does not rewrite the header
   assert.match(head.innerHTML, /83 W/, "deferred update rendered after the tap");
 });
 
+test("a press on a header chip cut short by detaching the card does not freeze the header", () => {
+  const { overview, nodes } = overviewSetup({ plugs_off_button: true }, withWatts(80));
+  const head = nodes[".head"];
+  head.fire("pointerdown", { target: chipTarget("lights") });
+  overview.hass = withWatts(83); // deferred: the chip is pressed
+  assert.match(head.innerHTML, /80 W/);
+  // Detached before pointerup (view change): that pointerup never comes.
+  overview.disconnectedCallback();
+  overview.connectedCallback();
+  assert.equal(overview._pressing, false);
+  assert.match(head.innerHTML, /83 W/, "the deferred update is rendered");
+  overview.hass = withWatts(90);
+  assert.match(head.innerHTML, /90 W/, "later updates are rendered too");
+});
+
 // A home with a second room and plugs: the kitchen's coffee plug (on), a TV plug (on, excluded by entity), and a
 // fridge plug in the cellar (on, excluded by room in some tests), plus an unavailable plug.
 const plugsHass = () => {

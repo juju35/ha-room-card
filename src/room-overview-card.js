@@ -163,6 +163,8 @@ class RoomOverviewCard extends RcCard {
   disconnectedCallback() {
     document.removeEventListener("click", this._onOutside, true);
     if (this._confirm) this._closeConfirm();
+    // A press cut short by the detach never gets its pointerup: end it, or the header stays frozen.
+    if (this._pressing) this._released();
   }
 
   getCardSize() {
