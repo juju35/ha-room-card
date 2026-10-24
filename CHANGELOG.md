@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.0
+
+### What's new
+- Overview: `plugs_off_button` turns every plug off from the header, like the lights: the plugs chip becomes a button (with a power icon) that turns off every plug the card counts, and the Plugs card of the room details gets its turn-everything-off pill. Off by default, since a plug may feed a camera or a network switch: leave those out with `exclude`. In the visual editor: *“Turn all plugs off” button*.
+
 ## 1.5.0
 
 ### Fixes

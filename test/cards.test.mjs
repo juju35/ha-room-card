@@ -103,6 +103,22 @@ test("the Overview passes its language to the room details", () => {
   for (const el of panel.children) assert.equal(el._config.language, "en");
 });
 
+test("the Overview's plugs_off_button reaches the Plugs card of the room details", () => {
+  const plugsCard = (options) => {
+    const overview = new cards["room-overview-card"]();
+    const panel = fakeNode();
+    overview.shadowRoot = { ...fakeNode(), querySelector: (s) => (s === ".panel" ? panel : null) };
+    overview._config = { ...cards["room-overview-card"].defaults, ...options };
+    overview._hass = makeHass();
+    overview._rooms = overview._collect();
+    overview._openArea = "kitchen";
+    overview._fillPanel();
+    return panel.children.find((el) => el._config.type === "custom:room-switch-card");
+  };
+  assert.equal(plugsCard({})._config.all_off_button, false);
+  assert.equal(plugsCard({ plugs_off_button: true })._config.all_off_button, true);
+});
+
 test("holding Enter on a tile toggles once, not on every key repeat", () => {
   const t = pressSetup();
   const key = (repeat) => t.tile.fire("keydown", { key: "Enter", repeat });

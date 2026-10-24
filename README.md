@@ -32,7 +32,7 @@ All four cards share the same look (header with a status pill, compact tiles), a
 - One compact tile per room, coloured by what matters most: *Water leak* (red, blinking), *1 open* (orange), *Presence* (blue), otherwise *All closed* / *All quiet*
 - Small chips on each tile for the lights that are on, the plugs that are on with their power draw, and presence when an alert is already shown
 - Header with the home status and totals: occupied rooms, lights on, power drawn by the plugs
-- **Tap** the lights chip of the header to turn every light the card counts off (`all_off_button`)
+- **Tap** the lights chip of the header to turn every light the card counts off (`all_off_button`), and the plugs chip to turn every plug off (`plugs_off_button`, off by default: a plug may feed a camera or a network switch)
 - **Tap** a room to unfold its details at the top of the card: the Sensors, Lights and Plugs cards of that room; tap it again or anywhere else to fold it back
 - Automatic discovery: every area with door, window, leak or presence sensors, lights or plugs becomes a room, with an icon picked from its name
 - Same rules as the room cards: camera detections, configuration entities and light groups are skipped, light switches count as lights
@@ -154,6 +154,7 @@ sort: name
 presence: true
 only_active: false
 all_off_button: true
+plugs_off_button: false
 exclude_areas:
   - garage
 exclude:
@@ -178,6 +179,7 @@ rooms:
 | `presence` | ❌ | `true` | Include the presence and motion sensors (camera detections are always left out) |
 | `only_active` | ❌ | `false` | Show only the rooms with something open, on or detected |
 | `all_off_button` | ❌ | `true` | Tapping the lights chip of the header turns every light the card counts off |
+| `plugs_off_button` | ❌ | `false` | Tapping the plugs chip of the header turns every plug the card counts off; the Plugs card of the room details gets its turn-everything-off pill too. Off by default: a plug may feed a camera or a network switch, leave those out with `exclude` |
 | `exclude_areas` | ❌ | — | Rooms left out; the visual editor only offers the rooms the card finds |
 | `exclude` | ❌ | — | Entities left out of the tiles, the totals and the room details; the visual editor only offers the entities the card counts in the rooms it shows |
 | `rooms` | ❌ | — | Room order and overrides, see below; the other rooms follow |

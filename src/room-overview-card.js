@@ -29,6 +29,7 @@ const RO_I18N = {
     lights_on: "Lights on",
     plugs_on: "Plugs on",
     turn_lights_off: "Turn all lights off",
+    turn_plugs_off: "Turn all plugs off",
     rooms_occupied: "Occupied rooms",
     sensors: "Sensors",
     lights: "Lights",
@@ -45,6 +46,9 @@ const RO_I18N = {
     ed_only_active_helper: "Only rooms with something open, on or detected stay visible",
     ed_all_off_button: "“Turn all lights off” button",
     ed_all_off_button_helper: "Tapping the lights chip of the header turns every light the card counts off",
+    ed_plugs_off_button: "“Turn all plugs off” button",
+    ed_plugs_off_button_helper:
+      "Tapping the plugs chip of the header turns every plug the card counts off; also on the Plugs card of the room details. Off by default: a plug may feed a camera or a network switch",
     ed_sort: "Sort",
     ed_sort_name: "By name",
     ed_sort_state: "Rooms needing attention first",
@@ -59,6 +63,7 @@ const RO_I18N = {
     lights_on: "Lumières allumées",
     plugs_on: "Prises allumées",
     turn_lights_off: "Éteindre toutes les lumières",
+    turn_plugs_off: "Éteindre toutes les prises",
     rooms_occupied: "Pièces occupées",
     sensors: "Capteurs",
     lights: "Lumières",
@@ -75,6 +80,9 @@ const RO_I18N = {
     ed_only_active_helper: "Seules les pièces avec quelque chose d'ouvert, d'allumé ou de détecté restent affichées",
     ed_all_off_button: "Bouton « Éteindre toutes les lumières »",
     ed_all_off_button_helper: "Un tap sur la pastille des lumières de l'en-tête éteint toutes les lumières comptées par la carte",
+    ed_plugs_off_button: "Bouton « Éteindre toutes les prises »",
+    ed_plugs_off_button_helper:
+      "Un tap sur la pastille des prises de l'en-tête éteint toutes les prises comptées par la carte ; aussi sur la carte Prises du détail des pièces. Désactivé par défaut : une prise peut alimenter une caméra ou un switch réseau",
     ed_sort: "Tri",
     ed_sort_name: "Par nom",
     ed_sort_state: "Pièces à surveiller en premier",
@@ -94,7 +102,16 @@ const roRoomIcon = (area) => {
 class RoomOverviewCard extends RcCard {
   static tag = "room-overview-card";
   static i18n = RO_I18N;
-  static defaults = { presence: true, only_active: false, all_off_button: true, sort: "name", exclude_areas: [], exclude: [], rooms: [] };
+  static defaults = {
+    presence: true,
+    only_active: false,
+    all_off_button: true,
+    plugs_off_button: false,
+    sort: "name",
+    exclude_areas: [],
+    exclude: [],
+    rooms: [],
+  };
 
   static getStubConfig() {
     return {};
@@ -246,9 +263,11 @@ class RoomOverviewCard extends RcCard {
         <style>${RC_BASE_STYLES}${RoomOverviewCard.styles}</style>
         <ha-card><div class="head"></div><div class="panel" hidden></div><div class="grid"></div></ha-card>`;
       this.shadowRoot.querySelector(".head").addEventListener("click", (ev) => {
-        if (!ev.target.closest(".chip.action")) return;
+        const button = ev.target.closest(".chip.action");
+        if (!button) return;
         ev.stopPropagation();
-        const ids = this._rooms.flatMap((x) => x.lights.filter((e) => e.st.state === "on").map((e) => e.id));
+        const kind = button.dataset.kind === "plugs" ? "plugs" : "lights";
+        const ids = this._rooms.flatMap((x) => x[kind].filter((e) => e.st.state === "on").map((e) => e.id));
         if (ids.length) rcCall(this._hass, "homeassistant", "turn_off", { entity_id: ids });
       });
       this.shadowRoot.querySelector(".grid").addEventListener("click", (ev) => {
@@ -269,6 +288,10 @@ class RoomOverviewCard extends RcCard {
 
     const chip = (cls, icon, label, text) =>
       `<span class="chip ${cls}" title="${rcEsc(label)}"><ha-icon icon="${icon}"></ha-icon>${text ? `<span>${rcEsc(text)}</span>` : ""}</span>`;
+    // Header chip that turns everything of its kind off when tapped.
+    const offChip = (cls, kind, icon, label, text) =>
+      `<button class="chip ${cls} action" data-kind="${kind}" title="${rcEsc(label)}"><ha-icon icon="${icon}"></ha-icon><span>${rcEsc(text)}</span><ha-icon class="off" icon="mdi:power"></ha-icon></button>`;
+    const plugText = watts != null ? rcWatts(watts) : String(plugs);
 
     const card = this.shadowRoot.querySelector("ha-card");
     card.className = `lvl-${level}`;
@@ -279,11 +302,17 @@ class RoomOverviewCard extends RcCard {
       ${
         lights
           ? c.all_off_button !== false
-            ? `<button class="chip light action" title="${rcEsc(this._t("turn_lights_off"))}"><ha-icon icon="mdi:lightbulb"></ha-icon><span>${lights}</span><ha-icon class="off" icon="mdi:power"></ha-icon></button>`
+            ? offChip("light", "lights", "mdi:lightbulb", this._t("turn_lights_off"), String(lights))
             : chip("light", "mdi:lightbulb", this._t("lights_on"), String(lights))
           : ""
       }
-      ${plugs ? chip("plug", "mdi:power-socket-fr", this._t("plugs_on"), watts != null ? rcWatts(watts) : String(plugs)) : ""}
+      ${
+        plugs
+          ? c.plugs_off_button
+            ? offChip("plug", "plugs", "mdi:power-socket-fr", this._t("turn_plugs_off"), plugText)
+            : chip("plug", "mdi:power-socket-fr", this._t("plugs_on"), plugText)
+          : ""
+      }
       <div class="pill">${rcEsc(status)}</div>`;
 
     const cols = Number(c.columns);
@@ -364,7 +393,7 @@ class RoomOverviewCard extends RcCard {
     const parts = [
       ["room-sensors-card", x.sensors.length + x.presence.length, { title: this._t("sensors"), presence: this._config.presence }],
       ["room-lights-card", x.lights.length, { title: this._t("lights") }],
-      ["room-switch-card", x.plugs.length, { title: this._t("plugs") }],
+      ["room-switch-card", x.plugs.length, { title: this._t("plugs"), all_off_button: this._config.plugs_off_button === true }],
     ];
     for (const [tag, count, extra] of parts) {
       if (!count || !customElements.get(tag)) continue;
@@ -494,7 +523,7 @@ const roExcludeField = (hass, config) => {
 
 const RoomOverviewCardEditor = rcEditor({
   card: RoomOverviewCard,
-  helpers: ["title", "columns", "presence", "only_active", "all_off_button", "exclude"],
+  helpers: ["title", "columns", "presence", "only_active", "all_off_button", "plugs_off_button", "exclude"],
   schema: (lang, hass, config) => [
     { name: "title", selector: { text: {} } },
     { name: "columns", selector: { number: { min: 1, max: 6, mode: "box" } } },
@@ -513,6 +542,7 @@ const RoomOverviewCardEditor = rcEditor({
     { name: "presence", selector: { boolean: {} } },
     { name: "only_active", selector: { boolean: {} } },
     { name: "all_off_button", selector: { boolean: {} } },
+    { name: "plugs_off_button", selector: { boolean: {} } },
     {
       name: "exclude_areas",
       // The rooms the card finds, excluded ones included.
