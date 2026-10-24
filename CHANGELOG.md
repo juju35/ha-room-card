@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0
+
+### Changes
+- Same compact header as the other ha-* cards: 36 px icon, 16 px title, 12 px card padding; medium weight for titles, pills, chips and room names.
+
+### Maintenance
+- README follows the common plan: Features, Configuration, Screenshots and How it works, with one sub-section per card.
+
 ## 1.3.0
 
 ### What's new

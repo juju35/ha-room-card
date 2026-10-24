@@ -417,25 +417,25 @@ const RC_BASE_STYLES = `
     --rc-idle: var(--secondary-text-color, #9e9e9e);
     --rc-na: var(--disabled-color, #9e9e9e);
   }
-  ha-card { padding: 10px; overflow: hidden; }
+  ha-card { padding: 12px; overflow: hidden; }
   ha-card.lvl-alert { box-shadow: 0 0 0 1px color-mix(in srgb, var(--rc-alert) 45%, transparent), var(--ha-card-box-shadow, none); }
 
-  .head { display: flex; align-items: center; gap: 8px; }
+  .head { display: flex; align-items: center; gap: 10px; }
   .head.nav { cursor: pointer; }
-  .badge { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  .badge { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
            background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
-  .badge ha-icon { --mdc-icon-size: 18px; }
+  .badge ha-icon { --mdc-icon-size: 20px; }
   .lvl-alert .badge { animation: rc-pulse 1.6s ease-in-out infinite; }
-  .title { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; color: var(--primary-text-color);
+  .title { flex: 1; min-width: 0; font-size: 16px; font-weight: 500; color: var(--primary-text-color);
            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .pill { all: unset; flex: none; display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600;
-          padding: 2px 8px; border-radius: 999px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
+  .pill { all: unset; flex: none; display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 500;
+          padding: 1px 8px; border-radius: 999px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
   .pill.action { cursor: pointer; }
   .pill.action:hover { background: color-mix(in srgb, var(--c) 24%, transparent); }
   .pill.action:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
   .pill ha-icon { --mdc-icon-size: 12px; margin-left: -2px; }
 
-  .grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+  .grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
   .tile { all: unset; position: relative; overflow: hidden; box-sizing: border-box; cursor: pointer; min-width: 0;
           display: flex; align-items: center; gap: 8px; padding: 5px 8px 5px 5px; border-radius: 10px;
           touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;

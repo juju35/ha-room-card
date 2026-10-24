@@ -422,9 +422,8 @@ class RoomOverviewCard extends RcCard {
       ha-card.lvl-alert { --c: var(--rc-alert); }
 
       .chip { --k: var(--rc-idle); flex: none; display: inline-flex; align-items: center; gap: 2px; height: 18px; padding: 0 5px;
-              border-radius: 999px; font-size: 10.5px; font-weight: 600; line-height: 1; white-space: nowrap;
+              border-radius: 999px; font-size: 11px; font-weight: 500; line-height: 1; white-space: nowrap;
               color: var(--k); background: color-mix(in srgb, var(--k) 14%, transparent); }
-      .head { gap: 6px; }
       .head .chip { height: 20px; padding: 0 6px; font-size: 11px; }
       .chip ha-icon { --mdc-icon-size: 12px; }
       .chip:not(:has(span)) { width: 18px; padding: 0; justify-content: center; }
@@ -434,7 +433,7 @@ class RoomOverviewCard extends RcCard {
       .chip.light { --k: var(--rc-light); }
       .chip.plug  { --k: var(--rc-plug); }
       button.chip { all: unset; --k: var(--rc-light); flex: none; display: inline-flex; align-items: center; gap: 2px; height: 20px;
-                    padding: 0 6px; border-radius: 999px; font-size: 11px; font-weight: 600; line-height: 1; white-space: nowrap;
+                    padding: 0 6px; border-radius: 999px; font-size: 11px; font-weight: 500; line-height: 1; white-space: nowrap;
                     color: var(--k); background: color-mix(in srgb, var(--k) 14%, transparent); cursor: pointer; transition: background .2s; }
       button.chip:hover { background: color-mix(in srgb, var(--k) 26%, transparent); }
       button.chip:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
@@ -462,7 +461,7 @@ class RoomOverviewCard extends RcCard {
       .room.lvl-ok .ic { color: var(--primary-text-color); background: color-mix(in srgb, var(--rc-idle) 14%, transparent); }
       .room .ic ha-icon { --mdc-icon-size: 15px; }
       .room.lvl-alert .ic { animation: rc-blink 1.5s ease-in-out infinite; }
-      .name { grid-area: name; font-size: 13px; font-weight: 600; line-height: 1.2; color: var(--primary-text-color);
+      .name { grid-area: name; font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--primary-text-color);
               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .state { grid-area: state; font-size: 11px; line-height: 1.2; color: var(--secondary-text-color);
                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

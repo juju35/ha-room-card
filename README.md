@@ -23,6 +23,62 @@ Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, pl
 
 All four cards share the same look (header with a status pill, compact tiles), a visual editor in the dashboard UI, English and French labels following the Home Assistant language, light and dark themes, and come in a single HACS download with no dependency.
 
+## Features
+
+### Overview
+
+`custom:room-overview-card` — Every room at a glance: one tile per room, tap a room to unfold its sensors, lights and plugs.
+
+- One compact tile per room, coloured by what matters most: *Water leak* (red, blinking), *1 open* (orange), *Presence* (blue), otherwise *All closed* / *All quiet*
+- Small chips on each tile for the lights that are on, the plugs that are on with their power draw, and presence when an alert is already shown
+- Header with the home status and totals: occupied rooms, lights on, power drawn by the plugs
+- **Tap** the lights chip of the header to turn every light the card counts off (`all_off_button`)
+- **Tap** a room to unfold its details at the top of the card: the Sensors, Lights and Plugs cards of that room; tap it again or anywhere else to fold it back
+- Automatic discovery: every area with door, window, leak or presence sensors, lights or plugs becomes a room, with an icon picked from its name
+- Same rules as the room cards: camera detections, configuration entities and light groups are skipped, light switches count as lights
+- Show only the rooms with something open, on or detected (`only_active`), or list them first (`sort: state`)
+
+### Sensors
+
+`custom:room-sensors-card` — Leak, door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open.
+
+- Header with an icon and a status pill coloured by the room state: *All closed* (green), *1 open* (orange), *Water leak* (red, pulsing)
+- Open sensors listed first, leaks before doors and windows, with a blinking icon and how long they have been open
+- Presence and motion sensors in blue (*Detected* / *Clear*), with a person icon next to the pill while someone is in the room; they are not alerts and never blink
+- Icon picked from the sensor: sliding door, window, door, garage door, water drop, person, motion sensor
+- Clean names: the `Sensor` / `Capteur` prefix, the area name and the trailing device-class word are removed (*Capteur Porte Fenêtre Cuisine Porte* → *Porte Fenêtre Cuisine*)
+- Show only the open or active sensors (`only_alerts`), or hide the whole card when everything is closed, dry and nobody is there (`hide_when_clear`)
+- Tap a sensor to open its details
+- Automatic discovery from the area, or an explicit list with name and icon overrides
+
+### Lights
+
+`custom:room-lights-card` — Lights of a room: tap to toggle, drag to dim, turn everything off from the header.
+
+- Header with an icon and a status pill: *All off*, or *2 on* with a power button that turns every light of the room off
+- Lights that are on listed first, tinted with their actual colour, brightness shown as a bar behind the tile
+- **Tap** a light to toggle it, **drag** it sideways to set its brightness, **hold** it to open its details
+- Lights and light switches: a `switch` whose name says it drives a light (*Lumière Canapé*, *Desk Lamp*) is picked up too
+- Clean names: the `Lumière` / `Light` prefix and the area name are removed (*Lumière Canapé* → *Canapé*)
+- Show only the lights that are on (`only_on`), or hide the whole card when everything is off (`hide_when_off`)
+- Tap the title to open a dashboard (`navigation_path`)
+- Automatic discovery from the area, or an explicit list with name and icon overrides (custom icon sets supported)
+
+### Plugs
+
+`custom:room-switch-card` — Smart plugs of a room with their power draw: what is on comes first, the most power-hungry first.
+
+- Header with an icon and a status pill: *All off*, or *3 on · 1.2 kW*
+- Power draw of each plug, read from the power sensor of the same device, and the total in the header
+- Plugs that are on listed first, the most power-hungry first
+- **Tap** a plug to toggle it, **hold** it to open its details
+- Optional power button on the status pill to turn every plug of the room off (`all_off_button`, off by default: a plug may feed a camera or a network switch)
+- Plugs found by device class `outlet`, or by a name that says so (*Prise Terrasse*, *Desk Plug*); switches driving a light are left to [room-lights-card](#lights)
+- Clean names: the `Prise` / `Plug` prefix or suffix and the area name are removed (*Prise Machine à café* → *Machine à café*)
+- Show only the plugs that are on (`only_on`), or hide the whole card when everything is off (`hide_when_off`)
+- Tap the title to open a dashboard (`navigation_path`)
+- Automatic discovery from the area, or an explicit list with name, icon and power sensor overrides
+
 ## Prerequisites
 
 - Home Assistant 2024.8 or later
@@ -58,9 +114,11 @@ HACS registers the dashboard resource for you; the single file provides the four
 
 Remove the old repository and its resource from HACS, then install this one: the card types are unchanged, so your dashboards keep working as they are.
 
-## Common options
+## Configuration
 
-The Sensors, Lights and Plugs cards share these options; each card section lists its own.
+### Common options
+
+The Sensors, Lights and Plugs cards share these options; each card below lists its own.
 
 | Option | Required | Default | Description |
 |---|---|---|---|
@@ -78,27 +136,7 @@ The Sensors, Lights and Plugs cards share these options; each card section lists
 
 \* `area`, `include` or `entities` is required.
 
-## Overview
-
-`custom:room-overview-card` — Every room at a glance: one tile per room, tap a room to unfold its sensors, lights and plugs.
-
-| Every room | Room details |
-|---|---|
-| ![Every room](screenshots/overview-all.png) | ![Room details](screenshots/overview-details.png) |
-| ![Every room dark](screenshots/overview-all-dark.png) | ![Room details dark](screenshots/overview-details-dark.png) |
-
-### Features
-
-- One compact tile per room, coloured by what matters most: *Water leak* (red, blinking), *1 open* (orange), *Presence* (blue), otherwise *All closed* / *All quiet*
-- Small chips on each tile for the lights that are on, the plugs that are on with their power draw, and presence when an alert is already shown
-- Header with the home status and totals: occupied rooms, lights on, power drawn by the plugs
-- **Tap** the lights chip of the header to turn every light the card counts off (`all_off_button`)
-- **Tap** a room to unfold its details at the top of the card: the Sensors, Lights and Plugs cards of that room; tap it again or anywhere else to fold it back
-- Automatic discovery: every area with door, window, leak or presence sensors, lights or plugs becomes a room, with an icon picked from its name
-- Same rules as the room cards: camera detections, configuration entities and light groups are skipped, light switches count as lights
-- Show only the rooms with something open, on or detected (`only_active`), or list them first (`sort: state`)
-
-### Configuration
+### Overview
 
 Minimal:
 
@@ -130,7 +168,7 @@ rooms:
     navigation_path: /dashboard-home/office
 ```
 
-### Options reference
+#### Options reference
 
 | Option | Required | Default | Description |
 |---|---|---|---|
@@ -154,40 +192,7 @@ rooms:
 | `icon` | Room icon; defaults to the area icon, or one picked from the name |
 | `navigation_path` | Dashboard opened on tap instead of the details, e.g. `/dashboard-home/office` |
 
-### How it works
-
-The card goes through every entity with an area (set on the entity or on its device), with the same rules as the room cards:
-
-- **Sensors**: `binary_sensor` with device class `moisture`, `door`, `window`, `opening` or `garage_door`
-- **Presence**: `binary_sensor` with device class `occupancy`, `presence` or `motion`, except the ones of a device that has a `camera` entity
-- **Lights**: every `light` except light groups, and every `switch` whose name contains *lumière*, *lampe*, *lamp*, *light*, *veilleuse* or *guirlande*
-- **Plugs**: every other `switch` with device class `outlet`, or whose name contains *prise*, *plug*, *outlet* or *socket*, with the power sensor of the same device
-
-Hidden entities and configuration or diagnostic entities are skipped. A room is shown when it has at least one of them.
-
-A tile shows the most important state of the room: a wet leak sensor, then open doors and windows, then presence, otherwise *All closed* (or *All quiet* for a room without door or window sensors). The details of a room are the Sensors, Lights and Plugs cards of that area, for the kinds of entities the room has.
-
-## Sensors
-
-`custom:room-sensors-card` — Leak, door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open.
-
-| A door open | Water leak |
-|---|---|
-| ![A door open](screenshots/sensors-open.png) | ![Water leak](screenshots/sensors-leak.png) |
-| ![A door open dark](screenshots/sensors-open-dark.png) | ![Water leak dark](screenshots/sensors-leak-dark.png) |
-
-### Features
-
-- Header with an icon and a status pill coloured by the room state: *All closed* (green), *1 open* (orange), *Water leak* (red, pulsing)
-- Open sensors listed first, leaks before doors and windows, with a blinking icon and how long they have been open
-- Presence and motion sensors in blue (*Detected* / *Clear*), with a person icon next to the pill while someone is in the room; they are not alerts and never blink
-- Icon picked from the sensor: sliding door, window, door, garage door, water drop, person, motion sensor
-- Clean names: the `Sensor` / `Capteur` prefix, the area name and the trailing device-class word are removed (*Capteur Porte Fenêtre Cuisine Porte* → *Porte Fenêtre Cuisine*)
-- Show only the open or active sensors (`only_alerts`), or hide the whole card when everything is closed, dry and nobody is there (`hide_when_clear`)
-- Tap a sensor to open its details
-- Automatic discovery from the area, or an explicit list with name and icon overrides
-
-### Configuration
+### Sensors
 
 Minimal:
 
@@ -222,7 +227,7 @@ only_alerts: true
 hide_when_clear: true
 ```
 
-### Options reference
+#### Options reference
 
 In addition to the [common options](#common-options):
 
@@ -233,33 +238,7 @@ In addition to the [common options](#common-options):
 | `presence` | ❌ | `true` | Include the presence and motion sensors of the area |
 | `blink` | ❌ | `true` | Blink the icon of open sensors (also stops when the system asks for reduced motion) |
 
-### How it works
-
-The card keeps every `binary_sensor` of the area whose device class is `moisture`, `door`, `window`, `opening` or `garage_door`, and with `presence` (the default) `occupancy`, `presence` or `motion` (the area set on the entity, or on its device). Hidden entities are skipped, and so are the motion and person detections of cameras (a sensor whose device also has a `camera` entity): list them in `entities` to show them.
-
-The room is **in alert** when a sensor is open (orange) and **critical** when a leak sensor is wet (red). Presence and motion are information, not alerts: shown in blue, they never change the header colour. Wet leak sensors come first, then open doors and windows, then detected presence, then the others by name. The icon follows the sensor: a `door` sensor whose entity ID contains `porte_fenetre`, `sliding` or `patio` gets a sliding door, a `window` sensor (or a `door` sensor with `fenetre` / `window` in its ID) gets a window.
-
-## Lights
-
-`custom:room-lights-card` — Lights of a room: tap to toggle, drag to dim, turn everything off from the header.
-
-| Lights on | All off |
-|---|---|
-| ![Lights on](screenshots/lights-on.png) | ![All off](screenshots/lights-off.png) |
-| ![Lights on dark](screenshots/lights-on-dark.png) | ![All off dark](screenshots/lights-off-dark.png) |
-
-### Features
-
-- Header with an icon and a status pill: *All off*, or *2 on* with a power button that turns every light of the room off
-- Lights that are on listed first, tinted with their actual colour, brightness shown as a bar behind the tile
-- **Tap** a light to toggle it, **drag** it sideways to set its brightness, **hold** it to open its details
-- Lights and light switches: a `switch` whose name says it drives a light (*Lumière Canapé*, *Desk Lamp*) is picked up too
-- Clean names: the `Lumière` / `Light` prefix and the area name are removed (*Lumière Canapé* → *Canapé*)
-- Show only the lights that are on (`only_on`), or hide the whole card when everything is off (`hide_when_off`)
-- Tap the title to open a dashboard (`navigation_path`)
-- Automatic discovery from the area, or an explicit list with name and icon overrides (custom icon sets supported)
-
-### Configuration
+### Lights
 
 Minimal:
 
@@ -301,7 +280,7 @@ entities:
     icon: mdi:lightbulb-night
 ```
 
-### Options reference
+#### Options reference
 
 In addition to the [common options](#common-options):
 
@@ -309,35 +288,7 @@ In addition to the [common options](#common-options):
 |---|---|---|---|
 | `show_brightness` | ❌ | `true` | Brightness bar and drag-to-dim on dimmable lights |
 
-### How it works
-
-The card keeps every `light` of the area (the area set on the entity, or on its device), plus every `switch` of the area whose name contains *lumière*, *lampe*, *lamp*, *light*, *veilleuse* or *guirlande* as a word. Hidden entities, configuration and diagnostic entities (such as indicator LEDs) and light groups are skipped.
-
-Lights that are on come first, then by name. A tap calls `homeassistant.toggle`; dragging a dimmable light sideways shows the brightness under the finger and calls `light.turn_on` with `brightness_pct` on release; a hold opens the more-info dialog. The pill calls `homeassistant.turn_off` on the lights of the card that are on.
-
-## Plugs
-
-`custom:room-switch-card` — Smart plugs of a room with their power draw: what is on comes first, the most power-hungry first.
-
-| Plugs on | All off |
-|---|---|
-| ![Plugs on](screenshots/switch-on.png) | ![All off](screenshots/switch-off.png) |
-| ![Plugs on dark](screenshots/switch-on-dark.png) | ![All off dark](screenshots/switch-off-dark.png) |
-
-### Features
-
-- Header with an icon and a status pill: *All off*, or *3 on · 1.2 kW*
-- Power draw of each plug, read from the power sensor of the same device, and the total in the header
-- Plugs that are on listed first, the most power-hungry first
-- **Tap** a plug to toggle it, **hold** it to open its details
-- Optional power button on the status pill to turn every plug of the room off (`all_off_button`, off by default: a plug may feed a camera or a network switch)
-- Plugs found by device class `outlet`, or by a name that says so (*Prise Terrasse*, *Desk Plug*); switches driving a light are left to [room-lights-card](#lights)
-- Clean names: the `Prise` / `Plug` prefix or suffix and the area name are removed (*Prise Machine à café* → *Machine à café*)
-- Show only the plugs that are on (`only_on`), or hide the whole card when everything is off (`hide_when_off`)
-- Tap the title to open a dashboard (`navigation_path`)
-- Automatic discovery from the area, or an explicit list with name, icon and power sensor overrides
-
-### Configuration
+### Plugs
 
 Minimal:
 
@@ -376,7 +327,7 @@ entities:
   - switch.coffee_machine_plug
 ```
 
-### Options reference
+#### Options reference
 
 In addition to the [common options](#common-options):
 
@@ -384,7 +335,64 @@ In addition to the [common options](#common-options):
 |---|---|---|---|
 | `show_power` | ❌ | `true` | Power draw of each plug and total in the header |
 
-### How it works
+## Screenshots
+
+### Overview
+
+| Every room | Room details |
+|---|---|
+| ![Every room](screenshots/overview-all.png) | ![Room details](screenshots/overview-details.png) |
+| ![Every room dark](screenshots/overview-all-dark.png) | ![Room details dark](screenshots/overview-details-dark.png) |
+
+### Sensors
+
+| A door open | Water leak |
+|---|---|
+| ![A door open](screenshots/sensors-open.png) | ![Water leak](screenshots/sensors-leak.png) |
+| ![A door open dark](screenshots/sensors-open-dark.png) | ![Water leak dark](screenshots/sensors-leak-dark.png) |
+
+### Lights
+
+| Lights on | All off |
+|---|---|
+| ![Lights on](screenshots/lights-on.png) | ![All off](screenshots/lights-off.png) |
+| ![Lights on dark](screenshots/lights-on-dark.png) | ![All off dark](screenshots/lights-off-dark.png) |
+
+### Plugs
+
+| Plugs on | All off |
+|---|---|
+| ![Plugs on](screenshots/switch-on.png) | ![All off](screenshots/switch-off.png) |
+| ![Plugs on dark](screenshots/switch-on-dark.png) | ![All off dark](screenshots/switch-off-dark.png) |
+
+## How it works
+
+### Overview
+
+The card goes through every entity with an area (set on the entity or on its device), with the same rules as the room cards:
+
+- **Sensors**: `binary_sensor` with device class `moisture`, `door`, `window`, `opening` or `garage_door`
+- **Presence**: `binary_sensor` with device class `occupancy`, `presence` or `motion`, except the ones of a device that has a `camera` entity
+- **Lights**: every `light` except light groups, and every `switch` whose name contains *lumière*, *lampe*, *lamp*, *light*, *veilleuse* or *guirlande*
+- **Plugs**: every other `switch` with device class `outlet`, or whose name contains *prise*, *plug*, *outlet* or *socket*, with the power sensor of the same device
+
+Hidden entities and configuration or diagnostic entities are skipped. A room is shown when it has at least one of them.
+
+A tile shows the most important state of the room: a wet leak sensor, then open doors and windows, then presence, otherwise *All closed* (or *All quiet* for a room without door or window sensors). The details of a room are the Sensors, Lights and Plugs cards of that area, for the kinds of entities the room has.
+
+### Sensors
+
+The card keeps every `binary_sensor` of the area whose device class is `moisture`, `door`, `window`, `opening` or `garage_door`, and with `presence` (the default) `occupancy`, `presence` or `motion` (the area set on the entity, or on its device). Hidden entities are skipped, and so are the motion and person detections of cameras (a sensor whose device also has a `camera` entity): list them in `entities` to show them.
+
+The room is **in alert** when a sensor is open (orange) and **critical** when a leak sensor is wet (red). Presence and motion are information, not alerts: shown in blue, they never change the header colour. Wet leak sensors come first, then open doors and windows, then detected presence, then the others by name. The icon follows the sensor: a `door` sensor whose entity ID contains `porte_fenetre`, `sliding` or `patio` gets a sliding door, a `window` sensor (or a `door` sensor with `fenetre` / `window` in its ID) gets a window.
+
+### Lights
+
+The card keeps every `light` of the area (the area set on the entity, or on its device), plus every `switch` of the area whose name contains *lumière*, *lampe*, *lamp*, *light*, *veilleuse* or *guirlande* as a word. Hidden entities, configuration and diagnostic entities (such as indicator LEDs) and light groups are skipped.
+
+Lights that are on come first, then by name. A tap calls `homeassistant.toggle`; dragging a dimmable light sideways shows the brightness under the finger and calls `light.turn_on` with `brightness_pct` on release; a hold opens the more-info dialog. The pill calls `homeassistant.turn_off` on the lights of the card that are on.
+
+### Plugs
 
 The card keeps every `switch` of the area (the area set on the entity, or on its device) whose device class is `outlet`, or whose name contains *prise*, *multiprise*, *plug*, *outlet* or *socket* as a word. Hidden entities and configuration or diagnostic entities are skipped, and so are switches whose name says they drive a light (*lumière*, *lampe*, *lamp*, *light*, *veilleuse*, *guirlande*): those belong to [room-lights-card](#lights).
 
