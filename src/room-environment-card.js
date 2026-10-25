@@ -160,6 +160,14 @@ const reKindOf = (st) => RE_DC[st?.attributes.device_class];
 const reMatch = (hass, id) =>
   id.startsWith("sensor.") && !hass.entities?.[id]?.entity_category && !!reKindOf(hass.states[id]);
 
+// Wet rooms (bathroom, shower room, laundry) live with more humidity: 70 % is a warning there, 80 % an alert.
+const RE_WET_ROOM = /salle (de )?bains?|salle d.eau|douche|bath|shower|buanderie|laundry/i;
+const RE_WET_HUMIDITY = [25, 35, 70, 80];
+
+// Thresholds of `kind` for a room: the room's own, then the card's, then the wet-room humidity, then the defaults.
+const reCustom = (kind, room) =>
+  room.thresholds?.[kind] ?? (kind === "humidity" && RE_WET_ROOM.test(room.name || "") ? RE_WET_HUMIDITY : undefined);
+
 // Thresholds and gauge of `kind` in the sensor's unit: °F and parts per billion are converted, custom thresholds
 // (`thresholds: { co2: [800, 1200] }`, two values for a one-sided kind, four otherwise) are used as they are.
 const reScale = (kind, unit, custom) => {
@@ -221,7 +229,7 @@ class RoomEnvironmentCard extends RcCard {
   // One reading per kind: the mean of the sensors of that kind that report a number, unavailable and unknown ones
   // ignored (a kind with none left is not shown). A single sensor keeps Home Assistant's formatting and its
   // `name` / `icon` overrides; a mean is formatted with the kind's precision.
-  _reading(kind, members) {
+  _reading(kind, members, room) {
     const k = RE_KINDS[kind];
     const values = members.map((m) => Number.parseFloat(m.st.state));
     const value = values.reduce((t, v) => t + v, 0) / values.length;
@@ -245,7 +253,7 @@ class RoomEnvironmentCard extends RcCard {
       gauge = k.gauge;
       item.light = band > 0;
     } else {
-      const sc = reScale(kind, unit, this._config.thresholds?.[kind]);
+      const sc = reScale(kind, unit, reCustom(kind, room));
       band = reBand(value, sc.scale);
       gauge = sc.gauge;
       item.sev = (k.sev ?? RE_SEV)[band];
@@ -265,18 +273,19 @@ class RoomEnvironmentCard extends RcCard {
   }
 
   _collect() {
-    return this._itemsOf(this._entries());
+    return this._itemsOf(this._entries(), { name: this._areaName(), thresholds: this._config.thresholds });
   }
 
   // The readings of `entries`, one per kind, in kind order; also used by the overview, room by room.
-  _itemsOf(entries) {
+  // `room`: { name, thresholds } of the room, for its comfort limits.
+  _itemsOf(entries, room) {
     const byKind = {};
     for (const e of entries) {
       const st = this._hass.states[e.entity];
       const kind = reKindOf(st);
       if (kind && !rcUnavailable(st) && Number.isFinite(Number.parseFloat(st.state))) (byKind[kind] ||= []).push({ e, st });
     }
-    return RE_ORDER.filter((kind) => byKind[kind]).map((kind) => this._reading(kind, byKind[kind]));
+    return RE_ORDER.filter((kind) => byKind[kind]).map((kind) => this._reading(kind, byKind[kind], room));
   }
 
   // Number in full, unit small and muted ("°" for a temperature) to keep the chips short.
@@ -587,9 +596,10 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
     for (const [aid, ids] of Object.entries(byArea)) {
       const area = h.areas?.[aid];
       const entries = ids.filter((id) => h.states[id] && reMatch(h, id)).map((entity) => ({ entity }));
-      const items = area && !excluded.has(aid) ? this._itemsOf(entries) : [];
-      if (!items.length) continue;
       const o = overrides[aid] || {};
+      const thresholds = this._roomThresholds(o);
+      const items = area && !excluded.has(aid) ? this._itemsOf(entries, { name: area.name, thresholds }) : [];
+      if (!items.length) continue;
       const worst = this._worst(items);
       rooms.push({
         id: aid,
@@ -698,6 +708,12 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
     this._detail = null;
   }
 
+  // The card's `thresholds` with the room's own (`rooms: [{ area, thresholds }]`) on top.
+  _roomThresholds(override) {
+    const t = { ...this._config.thresholds, ...override?.thresholds };
+    return Object.keys(t).length ? t : undefined;
+  }
+
   // The Environment card of the open room, built once per room.
   _fillPanel() {
     const panel = this.shadowRoot.querySelector(".panel");
@@ -705,13 +721,14 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
     if (this._panelArea === this._openArea) return;
     this._panelArea = this._openArea;
     const c = this._config;
+    const thresholds = this._roomThresholds((c.rooms || []).find((x) => x.area === this._openArea));
     const el = document.createElement(RoomEnvironmentCard.tag);
     el.setConfig({
       type: `custom:${RoomEnvironmentCard.tag}`,
       area: this._openArea,
       title: this._t("readings"),
       exclude: c.exclude || [],
-      ...(c.thresholds ? { thresholds: c.thresholds } : {}),
+      ...(thresholds ? { thresholds } : {}),
       ...(c.language ? { language: c.language } : {}),
     });
     el.hass = this._hass;

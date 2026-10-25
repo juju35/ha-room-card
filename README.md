@@ -417,6 +417,8 @@ Each kind has four limits — alert low, warning low, warning high, alert high �
 
 A temperature sensor in °F gets the default limits converted; a cool room (warning low band) is information, not a warning.
 
+**Wet rooms.** In a room whose name says it is a bathroom, a shower room or a laundry (*Salle de bain*, *Salle d'eau*, *Douche*, *Buanderie*, *Bathroom*, *Shower*, *Laundry*), humidity defaults to `[25, 35, 70, 80]`: 61 % after a shower is fine there. Your own `humidity` thresholds always win.
+
 #### Options reference
 
 The Environment card takes these options on top of the [common options](#common-options):
@@ -467,6 +469,9 @@ rooms:
     name: Bedroom
   - area: office
     navigation_path: /dashboard-home/office
+  - area: cellar
+    thresholds:
+      humidity: [30, 40, 75, 85]
 ```
 
 #### Options reference
@@ -480,7 +485,7 @@ rooms:
 | `thresholds` | ❌ | See [Thresholds](#thresholds) | Comfort limits per kind, also used by the unfolded room |
 | `exclude_areas` | ❌ | — | Rooms left out; the visual editor only offers the rooms the card finds |
 | `exclude` | ❌ | — | Sensors left out of the tiles, the averages and the room details |
-| `rooms` | ❌ | — | Room order and overrides (`area`, `name`, `icon`, `navigation_path`), as on the [Overview](#overview) |
+| `rooms` | ❌ | — | Room order and overrides (`area`, `name`, `icon`, `navigation_path`, as on the [Overview](#overview)), plus `thresholds` for that room only, on top of the card's |
 | `language` | ❌ | Auto | Force language: `fr` or `en` (auto-detects from HA settings) |
 
 ## Screenshots

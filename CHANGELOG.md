@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.1
+
+### Fixes
+- Environment cards: a bathroom, shower room or laundry (found from the room name) no longer shows *Too humid* at 61 %: humidity there is a warning from 70 % and an alert from 80 % (`[25, 35, 70, 80]`), unless you set your own `humidity` thresholds.
+
+### What's new
+- Environment overview: `thresholds` per room in `rooms` (`- area: cellar` / `thresholds: { humidity: [30, 40, 75, 85] }`), on top of the card's; the unfolded room uses them too.
+
 ## 1.9.0
 
 ### What's new

@@ -209,3 +209,29 @@ test("the overview averages the first temperature of each room", () => {
   assert.equal(card._average(card._collect(), "temperature", 1), "20,7");
   assert.equal(card._average(card._collect(), "humidity", 0), "48");
 });
+
+test("a bathroom tolerates more humidity: 61 % is comfortable there, not in the living room", () => {
+  const bath = st("sensor.bath_humidity", 61, "humidity", "%", "Salle de bain Humidité");
+  const hass = makeHass({ hum: 61 }, { "sensor.bath_humidity": bath });
+  hass.areas.bathroom = { area_id: "bathroom", name: "Salle de bain" };
+  hass.entities["sensor.bath_humidity"] = { area_id: "bathroom" };
+  const rooms = Object.fromEntries([...overview({}, hass)._collect()].map((x) => [x.id, x]));
+  assert.equal(rooms.bathroom.level, "ok");
+  assert.equal(rooms.living_room.items.find((i) => i.kind === "humidity").sev, "warn");
+  hass.states["sensor.bath_humidity"] = st("sensor.bath_humidity", 72, "humidity", "%", "Salle de bain Humidité");
+  assert.equal([...overview({}, hass)._collect()].find((x) => x.id === "bathroom").level, "warn");
+  // The room card of the bathroom applies the same limits.
+  const card = render({ area: "bathroom" }, hass);
+  assert.equal(card._items[0].sev, "warn");
+  assert.equal(card._items[0].word, "Humide");
+});
+
+test("thresholds can be set per room in the overview, over the card's", () => {
+  const hass = makeHass({ hum: 63, co2: 900 });
+  const rooms = (config) => Object.fromEntries([...overview(config, hass)._collect()].map((x) => [x.id, x]));
+  assert.equal(rooms({}).living_room.level, "warn");
+  const lr = rooms({ thresholds: { co2: [800, 1200] }, rooms: [{ area: "living_room", thresholds: { humidity: [20, 30, 65, 75] } }] })
+    .living_room;
+  assert.equal(lr.items.find((i) => i.kind === "humidity").sev, "ok");
+  assert.equal(lr.items.find((i) => i.kind === "co2").sev, "warn");
+});
