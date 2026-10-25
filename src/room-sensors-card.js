@@ -6,6 +6,7 @@
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const RS_I18N = {
   en: {
+    ed_columns_helper: "Mini card: columns of the zoomed-in view",
     title: "Sensors",
     no_sensors: "No sensor",
     leak_on: "Leak!",
@@ -33,6 +34,7 @@ const RS_I18N = {
     ed_exclude: "Sensors to exclude",
   },
   fr: {
+    ed_columns_helper: "Mini-carte : colonnes de la vue zoomée",
     title: "Capteurs",
     no_sensors: "Aucun capteur",
     leak_on: "Fuite !",
@@ -241,12 +243,13 @@ class RoomSensorsCard extends RcCard {
 // ── Editor ───────────────────────────────────────────────────────────────────
 const RoomSensorsCardEditor = rcEditor({
   card: RoomSensorsCard,
-  helpers: ["title", "only_alerts", "hide_when_clear", "presence", "include"],
-  schema: (_lang, hass, config) => [
-    ...rcAreaFields(false),
+  helpers: ["title", "only_alerts", "hide_when_clear", "presence", "include", ...RC_ADVANCED_HELPERS],
+  schema: (lang, hass, config) => [
+    ...rcAreaFields(true),
     ...rcBooleans("only_alerts", "hide_when_clear", "presence", "blink"),
     ...rcIncludeField(RoomSensorsCard, hass, config),
     ...rcExcludeField(RoomSensorsCard, hass, config),
+    ...rcAdvanced(RS_I18N, lang, "entities", "language"),
   ],
 });
 
@@ -295,12 +298,13 @@ class RoomSensorsMiniCard extends rcMini(
 
 const RoomSensorsMiniCardEditor = rcEditor({
   card: RoomSensorsMiniCard,
-  helpers: ["title", "hide_when_clear", "presence", "zoom", "include"],
-  schema: (_lang, hass, config) => [
-    ...rcAreaFields(false).filter((f) => f.name !== "columns"),
+  helpers: ["title", "columns", "hide_when_clear", "presence", "zoom", "include", ...RC_ADVANCED_HELPERS],
+  schema: (lang, hass, config) => [
+    ...rcAreaFields(true),
     ...rcBooleans("hide_when_clear", "presence", "blink", "zoom"),
     ...rcIncludeField(RoomSensorsMiniCard, hass, config),
     ...rcExcludeField(RoomSensorsMiniCard, hass, config),
+    ...rcAdvanced(RS_I18N, lang, "entities", "language"),
   ],
 });
 

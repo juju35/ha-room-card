@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.14.0
+
+### Changes
+- Visual editors: every option of every card is now in its editor. A folded **Advanced** section holds the `language` (Automatic, English, Français) and, edited as YAML, `entities` (room cards), `thresholds` (Environment cards) and `rooms` (overviews).
+- Sensors and Sensors mini cards: `navigation_path` (tap the title to open a dashboard) in the editor, as on the other room cards.
+- Mini cards: `columns` in the editor (columns of the zoomed-in view); Environment mini: `show_gauge` too.
+
+### Maintenance
+- Test checking that each editor offers every option of its card (57 tests in all).
+
 ## 1.13.0
 
 ### Changes

@@ -212,6 +212,16 @@ const RC_I18N = {
     ed_title: "Title",
     ed_title_helper: "Leave empty for the area name",
     ed_columns: "Columns",
+    ed_advanced: "Advanced",
+    ed_language: "Language",
+    ed_language_helper: "Empty: the Home Assistant language",
+    ed_language_auto: "Automatic",
+    ed_entities: "Explicit entities (YAML)",
+    ed_entities_helper: "Replaces the automatic discovery: entity IDs, or {entity, name, icon}",
+    ed_thresholds: "Comfort thresholds (YAML)",
+    ed_thresholds_helper: "Per kind, in the sensor's unit, e.g. co2: [800, 1200] or humidity: [25, 35, 70, 80]",
+    ed_rooms: "Rooms (YAML)",
+    ed_rooms_helper: "Order and overrides: a list of {area, name, icon, navigation_path}",
     ed_navigation_path: "Navigation path",
     ed_all_off_button: "“Turn everything off” button",
     err_config: "Set `area` or `entities`",
@@ -236,6 +246,16 @@ const RC_I18N = {
     ed_title: "Titre",
     ed_title_helper: "Laisser vide pour le nom de la pièce",
     ed_columns: "Colonnes",
+    ed_advanced: "Avancé",
+    ed_language: "Langue",
+    ed_language_helper: "Vide : la langue de Home Assistant",
+    ed_language_auto: "Automatique",
+    ed_entities: "Entités explicites (YAML)",
+    ed_entities_helper: "Remplace la découverte automatique : des identifiants d'entités, ou {entity, name, icon}",
+    ed_thresholds: "Seuils de confort (YAML)",
+    ed_thresholds_helper: "Par type, dans l'unité du capteur, par exemple co2: [800, 1200] ou humidity: [25, 35, 70, 80]",
+    ed_rooms: "Pièces (YAML)",
+    ed_rooms_helper: "Ordre et personnalisation : une liste de {area, name, icon, navigation_path}",
     ed_navigation_path: "Chemin de navigation",
     ed_all_off_button: "Bouton « Tout éteindre »",
     err_config: "Définis `area` ou `entities`",
@@ -724,6 +744,34 @@ const rcAreaFields = (navigation) => [
   { name: "columns", selector: { number: { min: 1, max: 4, mode: "box" } } },
 ];
 const rcBooleans = (...names) => names.map((name) => ({ name, selector: { boolean: {} } }));
+
+// "Advanced" section, folded, with the options that are lists or maps (edited as YAML) and the language. Its fields
+// sit at the root of the config (`flatten`).
+const RC_ADVANCED_HELPERS = ["language", "entities", "thresholds", "rooms"];
+const rcAdvanced = (i18n, lang, ...names) => [
+  {
+    name: "advanced",
+    type: "expandable",
+    flatten: true,
+    schema: names.map((name) =>
+      name === "language"
+        ? {
+            name,
+            selector: {
+              select: {
+                mode: "dropdown",
+                options: [
+                  { value: "", label: rcT(i18n, lang, "ed_language_auto") },
+                  { value: "en", label: "English" },
+                  { value: "fr", label: "Français" },
+                ],
+              },
+            },
+          }
+        : { name, selector: { object: {} } },
+    ),
+  },
+];
 // Entity picker limited to `ids`, left out when there is none.
 const rcEntitiesField = (name, ids) =>
   ids.length ? [{ name, selector: { entity: { multiple: true, include_entities: ids } } }] : [];

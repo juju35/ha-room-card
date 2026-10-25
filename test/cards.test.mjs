@@ -511,3 +511,30 @@ test("a click elsewhere brings the Overview back to the active rooms", () => {
   assert.equal(overview._zoomed, false);
   assert.equal(renders, 1);
 });
+
+// Every option of each card is in its visual editor: the field names of its schema, the folded "Advanced"
+// section included (`include` / `exclude` only show when they have entities to offer, so they are not checked here).
+const editorFields = (tag, config) => {
+  const editor = new (rc.customElements.get(`${tag}-editor`))();
+  editor.appendChild = () => {};
+  editor.setConfig({ ...config });
+  editor.hass = makeHass();
+  const names = (schema) => [...schema].flatMap((f) => (f.schema ? names(f.schema) : [f.name]));
+  return names(editor._form.schema);
+};
+
+test("each visual editor offers every option of its card", () => {
+  const has = (tag, config, expected) => {
+    const fields = editorFields(tag, config);
+    for (const name of expected) assert.ok(fields.includes(name), `${tag}: ${name} missing from the editor`);
+  };
+  const room = { area: "kitchen" };
+  has("room-sensors-card", room, ["area", "title", "navigation_path", "columns", "only_alerts", "hide_when_clear", "presence", "blink", "entities", "language"]);
+  has("room-sensors-mini-card", room, ["navigation_path", "columns", "hide_when_clear", "presence", "blink", "zoom", "entities", "language"]);
+  has("room-lights-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "entities", "language"]);
+  has("room-switch-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_power", "all_off_button", "entities", "language"]);
+  has("room-environment-card", room, ["navigation_path", "columns", "only_alerts", "show_gauge", "thresholds", "entities", "language"]);
+  has("room-environment-mini-card", room, ["navigation_path", "columns", "only_alerts", "show_gauge", "zoom", "thresholds", "entities", "language"]);
+  has("room-overview-card", {}, ["title", "columns", "sort", "presence", "zoom", "all_off_button", "plugs_off_button", "exclude_areas", "rooms", "language"]);
+  has("room-environment-overview-card", {}, ["title", "columns", "sort", "zoom", "exclude_areas", "thresholds", "rooms", "language"]);
+});

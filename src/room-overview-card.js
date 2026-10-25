@@ -603,7 +603,7 @@ const roExcludeField = (hass, config) => {
 
 const RoomOverviewCardEditor = rcEditor({
   card: RoomOverviewCard,
-  helpers: ["title", "columns", "presence", "zoom", "all_off_button", "plugs_off_button", "exclude"],
+  helpers: ["title", "columns", "presence", "zoom", "all_off_button", "plugs_off_button", "exclude", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcOverviewFields(RO_I18N, lang),
     { name: "presence", selector: { boolean: {} } },
@@ -626,6 +626,7 @@ const RoomOverviewCardEditor = rcEditor({
       },
     },
     ...roExcludeField(hass, config),
+    ...rcAdvanced(RO_I18N, lang, "rooms", "language"),
   ],
 });
 

@@ -125,12 +125,13 @@ class RoomSwitchCard extends RcToggleCard {
 // ── Editor ───────────────────────────────────────────────────────────────────
 const RoomSwitchCardEditor = rcEditor({
   card: RoomSwitchCard,
-  helpers: ["title", "navigation_path", "only_on", "hide_when_off", "show_power", "all_off_button", "include"],
-  schema: (_lang, hass, config) => [
+  helpers: ["title", "navigation_path", "only_on", "hide_when_off", "show_power", "all_off_button", "include", ...RC_ADVANCED_HELPERS],
+  schema: (lang, hass, config) => [
     ...rcAreaFields(true),
     ...rcBooleans("only_on", "hide_when_off", "show_power", "all_off_button"),
     ...rcIncludeField(RoomSwitchCard, hass, config),
     ...rcExcludeField(RoomSwitchCard, hass, config),
+    ...rcAdvanced(RW_I18N, lang, "entities", "language"),
   ],
 });
 

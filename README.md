@@ -25,7 +25,7 @@ Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, pl
 |---|---|---|---|---|
 | ![Overview](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all.png) | ![Sensors](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open.png) | ![Lights](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on.png) | ![Plugs](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on.png) | ![Environment](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-stuffy.png) |
 
-All the cards share the same look (header with a status pill, compact tiles), a visual editor in the dashboard UI, English and French labels following the Home Assistant language, light and dark themes, and come in a single HACS download with no dependency.
+All the cards share the same look (header with a status pill, compact tiles), a visual editor in the dashboard UI covering every option (lists and maps such as `entities`, `thresholds` and `rooms` in its folded **Advanced** section, as YAML), English and French labels following the Home Assistant language, light and dark themes, and come in a single HACS download with no dependency.
 
 ## Features
 
@@ -176,7 +176,7 @@ The Sensors, Lights, Plugs and Environment cards share these options; each card 
 | `title` | ❌ | Area name | Card title |
 | `columns` | ❌ | `2` | Number of tile columns (1–4) |
 | `exclude` | ❌ | — | Entities left out of the automatic discovery; the visual editor only offers the ones the card finds in the chosen room |
-| `navigation_path` | ❌ | — | Lights, Plugs and Environment cards: dashboard opened when tapping the title, e.g. `/light` |
+| `navigation_path` | ❌ | — | Dashboard opened when tapping the title, e.g. `/light` |
 | `only_on` | ❌ | `false` | Lights and Plugs cards: show only what is on (and unavailable entities) |
 | `hide_when_off` | ❌ | `false` | Lights and Plugs cards: hide the whole card when everything is off |
 | `all_off_button` | ❌ | Lights `true`, Plugs `false` | Lights and Plugs cards: the status pill turns everything of the card off when tapped (off by default on Plugs: a plug may feed a camera or a network switch) |
