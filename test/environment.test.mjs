@@ -293,3 +293,25 @@ test("a click elsewhere brings the environment mini card and overview back to th
   card._onOutside({ composedPath: () => [{ localName: "div" }] });
   assert.equal(card._zoomed, false);
 });
+
+test("outdoors, temperature and humidity are information only, unless thresholds are set for them", () => {
+  const hass = makeHass({ temp: 15, hum: 82, co2: 1200 });
+  hass.areas.living_room.name = "Terrasse";
+  const card = render({}, hass);
+  const of = (c, kind) => c._items.find((i) => i.kind === kind);
+  assert.equal(of(card, "temperature").sev, "ok");
+  assert.equal(of(card, "temperature").cold, false);
+  assert.equal(of(card, "humidity").sev, "ok");
+  assert.equal(of(card, "co2").sev, "warn", "other readings keep their thresholds");
+  assert.doesNotMatch(head(card), /Trop froid|Trop humide/);
+  // The user's own thresholds still apply outdoors.
+  assert.equal(of(render({ thresholds: { temperature: [5, 10, 30, 35] } }, hass), "temperature").sev, "ok");
+  assert.equal(of(render({ thresholds: { temperature: [16, 18, 30, 35] } }, hass), "temperature").sev, "warn");
+  // In the overview, a terrace at 15 °C is not a room to check.
+  const rooms = Object.fromEntries([...overview({}, makeHass({ temp: 15 }))._collect()].map((x) => [x.id, x]));
+  assert.equal(rooms.living_room.level, "cold", "indoors, 15 °C is too cold");
+  const h2 = makeHass({ temp: 15 });
+  h2.areas.living_room.name = "Terrasse";
+  const outdoor = Object.fromEntries([...overview({}, h2)._collect()].map((x) => [x.id, x]));
+  assert.equal(outdoor.living_room.level, "ok");
+});

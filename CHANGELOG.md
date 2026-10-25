@@ -7,8 +7,11 @@
 - Sensors and Sensors mini cards: `navigation_path` (tap the title to open a dashboard) in the editor, as on the other room cards.
 - Mini cards: `columns` in the editor (columns of the zoomed-in view); Environment mini: `show_gauge` too.
 
+### Fixes
+- Environment cards: an outdoor area (*Terrasse*, *Jardin*, *Balcon*, *Patio*, *Extérieur*, *Terrace*, *Garden*, *Balcony*, *Outdoor*…, found from its name) no longer shows *Too cold* at 15 °C: its temperature and humidity are information only, unless you set `thresholds` for them.
+
 ### Maintenance
-- Test checking that each editor offers every option of its card (57 tests in all).
+- Tests checking that each editor offers every option of its card, and the outdoor areas (58 tests in all).
 
 ## 1.13.0
 

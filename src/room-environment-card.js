@@ -166,6 +166,13 @@ const reMatch = (hass, id) =>
 const RE_WET_ROOM = /salle (de )?bains?|salle d.eau|douche|bath|shower|buanderie|laundry/i;
 const RE_WET_HUMIDITY = [25, 35, 70, 80];
 
+// Outdoor areas (terrace, garden, balcony…): their temperature and humidity are the weather, not a comfort issue, so
+// they are information only, unless the user set thresholds for them.
+const RE_OUTDOOR_ROOM = /terrasse|jardin|balcon|patio|ext[ée]rieur|cour\b|garden|terrace|balcony|outdoor|outside|yard/i;
+const RE_OUTDOOR_KINDS = ["temperature", "humidity"];
+const reOutdoorInfo = (kind, room) =>
+  RE_OUTDOOR_KINDS.includes(kind) && !room.thresholds?.[kind] && RE_OUTDOOR_ROOM.test(room.name || "");
+
 // Thresholds of `kind` for a room: the room's own, then the card's, then the wet-room humidity, then the defaults.
 const reCustom = (kind, room) =>
   room.thresholds?.[kind] ?? (kind === "humidity" && RE_WET_ROOM.test(room.name || "") ? RE_WET_HUMIDITY : undefined);
@@ -245,6 +252,7 @@ class RoomEnvironmentCard extends RcCard {
       name: (single && first.e.name) || this._t(`k_${kind}`),
       on: true,
       sev: "ok",
+      cold: false,
       num: value,
       unit,
     };
@@ -258,8 +266,10 @@ class RoomEnvironmentCard extends RcCard {
       const sc = reScale(kind, unit, reCustom(kind, room));
       band = reBand(value, sc.scale);
       gauge = sc.gauge;
-      item.sev = (k.sev ?? RE_SEV)[band];
-      item.cold = !!k.cold?.includes(band);
+      if (!reOutdoorInfo(kind, room)) {
+        item.sev = (k.sev ?? RE_SEV)[band];
+        item.cold = !!k.cold?.includes(band);
+      }
     }
     const text = single ? this._format(first.st, kind) : this._formatNumber(value, k.digits, unit);
     const word = this._words(k.words)[band];
