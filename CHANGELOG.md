@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.12.0
+
+### Changes
+- Overview and Environment overview: only the rooms needing attention show — something open, on or detected on the Overview, a reading out of the comfort range on the Environment overview. A **detail** button at the top right shows every room, and back. `zoom: false` shows every room, always, with no button.
+- The `only_active` (Overview) and `only_alerts` (Environment overview) options are gone: the default view does what they did; left in YAML, they are ignored.
+- Environment overview: the header averages always count every room, even the ones not shown.
+
 ## 1.11.0
 
 ### Changes

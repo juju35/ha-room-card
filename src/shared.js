@@ -146,6 +146,29 @@ const rcSortRooms = (list, config, rank) => {
   });
 };
 
+// The overviews only show the rooms needing a look until their detail button (`zoom`, on by default) is pressed;
+// `zoom: false` shows every room, with no button.
+const rcCompact = (card) => card._config.zoom !== false && !card._zoomed;
+
+// The detail button of an overview header, at its end.
+const rcZoomButton = (card) =>
+  card._config.zoom === false
+    ? ""
+    : `<button class="zoom" title="${rcEsc(card._t(card._zoomed ? "rooms_check" : "rooms_all"))}"><ha-icon icon="${
+        card._zoomed ? "mdi:arrow-collapse" : "mdi:arrow-expand"
+      }"></ha-icon></button>`;
+
+// A click on the detail button: every room, or back to the rooms needing a look. True when handled.
+const rcZoomClick = (card, ev) => {
+  if (!ev.target.closest?.(".zoom")) return false;
+  ev.stopPropagation();
+  card._zoomed = !card._zoomed;
+  card._sig = null;
+  card._render();
+  if (ev.detail === 0) card.shadowRoot.querySelector(".zoom")?.focus();
+  return true;
+};
+
 // Editor fields shared by the overviews: title, columns and sort.
 const rcOverviewFields = (i18n, lang) => [
   { name: "title", selector: { text: {} } },
@@ -185,6 +208,8 @@ const RC_I18N = {
     zoom_out: "Back to the compact view",
     ed_zoom: "Zoom button",
     ed_zoom_helper: "Switches the mini card to the full card and back",
+    rooms_all: "Show every room",
+    rooms_check: "Only the rooms needing a look",
   },
   fr: {
     all_closed: "Tout est fermé",
@@ -207,6 +232,8 @@ const RC_I18N = {
     zoom_out: "Revenir à la vue compacte",
     ed_zoom: "Bouton zoom",
     ed_zoom_helper: "Bascule la mini-carte en carte complète, et inversement",
+    rooms_all: "Afficher toutes les pièces",
+    rooms_check: "Seulement les pièces à surveiller",
   },
 };
 
@@ -837,12 +864,16 @@ const RC_BASE_STYLES = `
 `;
 
 // Mini cards: layout, chips and zoom button. A chip is plain (icon and text) until it needs a look: then a tinted pill.
-const RC_MINI_STYLES = `
+// The zoom / detail button of the mini cards and the overviews.
+const RC_ZOOM_STYLES = `
   .zoom { all: unset; flex: none; cursor: pointer; width: 24px; height: 24px; margin: -4px -4px -4px 0; border-radius: 50%;
           display: grid; place-items: center; color: var(--secondary-text-color); }
   .zoom ha-icon { --mdc-icon-size: 16px; }
   .zoom:hover { background: color-mix(in srgb, var(--rc-idle) 16%, transparent); color: var(--primary-text-color); }
   .zoom:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
+`;
+
+const RC_MINI_STYLES = `${RC_ZOOM_STYLES}
   ha-card:has(.mini) { padding: 8px 10px; }
   .mini { display: flex; align-items: center; gap: 10px; }
   .mini .badge { width: 32px; height: 32px; }

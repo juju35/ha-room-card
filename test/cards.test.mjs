@@ -465,3 +465,19 @@ test("the sensors mini card hides quiet sensors, and shows them once zoomed in",
   assert.match(card.shadowRoot.innerHTML, /data-id="binary_sensor.door"/);
   assert.equal(card._config.only_alerts, undefined, "the config itself is left alone");
 });
+
+test("the Overview only shows active rooms until its detail button shows them all", () => {
+  const h = makeHass();
+  h.areas.office = { area_id: "office", name: "Office" };
+  h.entities["light.office"] = { area_id: "office" };
+  h.states["light.office"] = { entity_id: "light.office", state: "off", attributes: { friendly_name: "Office" } };
+  const overview = new cards["room-overview-card"]();
+  overview._config = { ...cards["room-overview-card"].defaults };
+  overview._hass = h;
+  assert.deepEqual([...overview._collect()].map((x) => x.id), ["kitchen"]);
+  overview._zoomed = true;
+  assert.deepEqual([...overview._collect()].map((x) => x.id), ["kitchen", "office"]);
+  overview._zoomed = false;
+  overview._config = { ...overview._config, zoom: false };
+  assert.deepEqual([...overview._collect()].map((x) => x.id), ["kitchen", "office"], "zoom: false shows every room");
+});

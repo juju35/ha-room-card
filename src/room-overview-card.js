@@ -31,8 +31,8 @@ const RO_I18N = {
     ed_columns_helper: "Empty: 3, or 2 on narrow screens",
     ed_presence: "Include presence sensors",
     ed_presence_helper: "Presence and motion sensors, cameras excluded",
-    ed_only_active: "Hide idle rooms",
-    ed_only_active_helper: "Only rooms with something open, on or detected stay visible",
+    ed_zoom: "Detail button",
+    ed_zoom_helper: "Only the rooms with something open, on or detected show; the button shows every room. Off: every room, always",
     ed_all_off_button: "“Turn all lights off” button",
     ed_all_off_button_helper: "Tapping the lights chip of the header turns every light the card counts off",
     ed_plugs_off_button: "“Turn all plugs off” button",
@@ -69,8 +69,8 @@ const RO_I18N = {
     ed_columns_helper: "Vide : 3, ou 2 sur les écrans étroits",
     ed_presence: "Inclure les capteurs de présence",
     ed_presence_helper: "Capteurs de présence et de mouvement, hors caméras",
-    ed_only_active: "Masquer les pièces au repos",
-    ed_only_active_helper: "Seules les pièces avec quelque chose d'ouvert, d'allumé ou de détecté restent affichées",
+    ed_zoom: "Bouton détail",
+    ed_zoom_helper: "Seules les pièces avec quelque chose d'ouvert, d'allumé ou de détecté s'affichent ; le bouton affiche toutes les pièces. Désactivé : toujours toutes les pièces",
     ed_all_off_button: "Bouton « Éteindre toutes les lumières »",
     ed_all_off_button_helper: "Un tap sur la pastille des lumières de l'en-tête éteint toutes les lumières comptées par la carte",
     ed_plugs_off_button: "Bouton « Éteindre toutes les prises »",
@@ -95,7 +95,7 @@ class RoomOverviewCard extends RcCard {
   static i18n = RO_I18N;
   static defaults = {
     presence: true,
-    only_active: false,
+    zoom: true,
     all_off_button: true,
     plugs_off_button: false,
     sort: "name",
@@ -212,7 +212,7 @@ class RoomOverviewCard extends RcCard {
     rcSortRooms(list, c, rank);
     this._total = list.length;
     this._anySensors = list.some((x) => x.sensors.some((e) => !e.leak));
-    if (c.only_active) list = list.filter((x) => rank(x) > 0 || x.id === this._openArea);
+    if (rcCompact(this)) list = list.filter((x) => rank(x) > 0 || x.id === this._openArea);
     return list;
   }
 
@@ -235,7 +235,7 @@ class RoomOverviewCard extends RcCard {
     const list = shown
       ? [...shown.sensors, ...shown.presence, ...shown.lights, ...shown.plugs].map((e) => [e.id, e.st.state, e.st.attributes.friendly_name])
       : null;
-    if (!this._changed([this._openArea, parts, list])) return;
+    if (!this._changed([this._openArea, this._zoomed, parts, list])) return;
 
     if (!this.shadowRoot.querySelector("ha-card")) {
       this.shadowRoot.innerHTML = `
@@ -256,6 +256,7 @@ class RoomOverviewCard extends RcCard {
       }
       const head = this.shadowRoot.querySelector(".head");
       head.addEventListener("click", (ev) => {
+        if (rcZoomClick(this, ev)) return;
         const button = ev.target.closest(".chip.action");
         if (!button || this._justClosed()) return;
         ev.stopPropagation();
@@ -326,7 +327,8 @@ class RoomOverviewCard extends RcCard {
             : chip("plug", "mdi:power-socket-fr", this._t("plugs_on"), plugText)
           : ""
       }
-      <div class="pill">${rcEsc(status)}</div>`;
+      <div class="pill">${rcEsc(status)}</div>
+      ${rcZoomButton(this)}`;
 
     this._roomGrid(card.querySelector(".grid"), rooms, (x) => {
       const s = this._roomState(x);
@@ -489,7 +491,7 @@ class RoomOverviewCard extends RcCard {
     }
   }
 
-  static styles = `
+  static styles = `${RC_ZOOM_STYLES}
       ha-card { container-type: inline-size; position: relative; }
       ha-card.lvl-ok    { --c: var(--rc-ok); }
       ha-card.lvl-warn  { --c: var(--rc-warn); }
@@ -592,7 +594,7 @@ class RoomOverviewCard extends RcCard {
 // Entities the card counts in the rooms it shows, plus the ones already excluded.
 const roExcludeField = (hass, config) => {
   if (!hass) return [];
-  const rooms = rcProbe(RoomOverviewCard, hass, { ...config, exclude: [], only_active: false })._collect();
+  const rooms = rcProbe(RoomOverviewCard, hass, { ...config, exclude: [], zoom: false })._collect();
   const ids = rooms.flatMap((x) => [...x.sensors, ...x.presence, ...x.lights, ...x.plugs].map((e) => e.id));
   for (const id of config?.exclude || []) if (!ids.includes(id)) ids.push(id);
   return rcEntitiesField("exclude", ids);
@@ -600,11 +602,11 @@ const roExcludeField = (hass, config) => {
 
 const RoomOverviewCardEditor = rcEditor({
   card: RoomOverviewCard,
-  helpers: ["title", "columns", "presence", "only_active", "all_off_button", "plugs_off_button", "exclude"],
+  helpers: ["title", "columns", "presence", "zoom", "all_off_button", "plugs_off_button", "exclude"],
   schema: (lang, hass, config) => [
     ...rcOverviewFields(RO_I18N, lang),
     { name: "presence", selector: { boolean: {} } },
-    { name: "only_active", selector: { boolean: {} } },
+    { name: "zoom", selector: { boolean: {} } },
     { name: "all_off_button", selector: { boolean: {} } },
     { name: "plugs_off_button", selector: { boolean: {} } },
     {
@@ -615,7 +617,7 @@ const RoomOverviewCardEditor = rcEditor({
           multiple: true,
           mode: "dropdown",
           options: hass
-            ? rcProbe(RoomOverviewCard, hass, { ...config, exclude_areas: [], only_active: false })
+            ? rcProbe(RoomOverviewCard, hass, { ...config, exclude_areas: [], zoom: false })
                 ._collect()
                 .map((x) => ({ value: x.id, label: x.name }))
             : [],

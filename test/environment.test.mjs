@@ -172,7 +172,8 @@ test("the mini card with only_alerts keeps the readings that need a look", () =>
 // Two rooms for the overview: the living room of makeHass and the kitchen with its temperature sensor.
 const overview = (config = {}, hass = makeHass()) => {
   const card = new (rc.customElements.get("room-environment-overview-card"))();
-  card._config = { ...card.constructor.defaults, ...config };
+  // Every room unless the test says otherwise (`zoom: true`: the compact view, rooms needing a look only).
+  card._config = { ...card.constructor.defaults, zoom: false, ...config };
   card._hass = hass;
   return card;
 };
@@ -188,7 +189,7 @@ test("the overview groups the environment sensors by room, with each room's stat
   );
 });
 
-test("the overview sorts rooms needing a look first, hides comfortable ones and excluded rooms", () => {
+test("the overview sorts rooms needing a look first, shows only those until zoomed in, and leaves excluded rooms out", () => {
   const hass = makeHass({ hum: 75 });
   const ids = (config) => [...overview(config, hass)._collect()].map((x) => x.id);
   assert.deepEqual(
@@ -196,7 +197,7 @@ test("the overview sorts rooms needing a look first, hides comfortable ones and 
     ["living_room", "kitchen"],
   );
   assert.deepEqual(
-    ids({ only_alerts: true }),
+    ids({ zoom: true }),
     ["living_room"],
   );
   assert.deepEqual(
@@ -266,4 +267,15 @@ test("zoomed in, the environment mini card shows every reading, whatever only_al
   card._sig = null;
   card._render();
   assert.equal(card._shown, 5);
+});
+
+test("the overview's detail button shows every room, and back", () => {
+  const card = overview({ zoom: true }, makeHass({ hum: 75 }));
+  assert.deepEqual([...card._collect()].map((x) => x.id), ["living_room"]);
+  card._zoomed = true;
+  assert.deepEqual([...card._collect()].map((x) => x.id), ["kitchen", "living_room"]);
+  card._zoomed = false;
+  assert.deepEqual([...card._collect()].map((x) => x.id), ["living_room"]);
+  // The averages still count every room.
+  assert.equal(card._average(card._everyRoom, "temperature", 1), "20,7");
 });

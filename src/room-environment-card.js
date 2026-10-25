@@ -466,8 +466,8 @@ const REO_I18N = {
     averages: "Average temperature and humidity",
     ed_title_helper: "Leave empty for “Indoor climate”",
     ed_columns_helper: "Empty: 3, or 2 on narrow screens",
-    ed_only_alerts: "Hide comfortable rooms",
-    ed_only_alerts_helper: "Only the rooms with a reading outside the comfort range stay visible",
+    ed_zoom: "Detail button",
+    ed_zoom_helper: "Only the rooms with a reading outside the comfort range show; the button shows every room. Off: every room, always",
     ed_sort: "Sort",
     ed_sort_name: "By name",
     ed_sort_state: "Rooms needing a look first",
@@ -484,8 +484,8 @@ const REO_I18N = {
     averages: "Température et humidité moyennes",
     ed_title_helper: "Laisser vide pour « Climat intérieur »",
     ed_columns_helper: "Vide : 3, ou 2 sur les écrans étroits",
-    ed_only_alerts: "Masquer les pièces confortables",
-    ed_only_alerts_helper: "Seules les pièces avec une mesure hors de la plage de confort restent affichées",
+    ed_zoom: "Bouton détail",
+    ed_zoom_helper: "Seules les pièces avec une mesure hors de la plage de confort s'affichent ; le bouton affiche toutes les pièces. Désactivé : toujours toutes les pièces",
     ed_sort: "Tri",
     ed_sort_name: "Par nom",
     ed_sort_state: "Pièces à surveiller en premier",
@@ -501,7 +501,7 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
   static tag = "room-environment-overview-card";
   static i18n = REO_I18N;
   static needsArea = false;
-  static defaults = { only_alerts: false, sort: "name", exclude_areas: [], exclude: [], rooms: [] };
+  static defaults = { zoom: true, sort: "name", exclude_areas: [], exclude: [], rooms: [] };
 
   static getStubConfig() {
     return {};
@@ -567,7 +567,8 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
     }
     rcSortRooms(rooms, c, (x) => x.rank);
     this._total = rooms.length;
-    return c.only_alerts ? rooms.filter((x) => x.rank >= RE_RANK.warn || x.id === this._openArea) : rooms;
+    this._everyRoom = rooms; // the header averages count every room, shown or not
+    return rcCompact(this) ? rooms.filter((x) => x.rank >= RE_RANK.warn || x.id === this._openArea) : rooms;
   }
 
   // Mean of the rooms' readings of `kind` (each room counting once), formatted with `digits`.
@@ -587,7 +588,7 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
   _draw(rooms) {
     const c = this._config;
     const parts = rooms.map((x) => [x.id, x.name, x.icon, x.status, x.items.map((i) => [i.id, i.state, i.sev, i.cold])]);
-    if (!this._changed([this._openArea, parts])) return;
+    if (!this._changed([this._openArea, this._zoomed, parts])) return;
 
     if (!this.shadowRoot.querySelector("ha-card")) {
       this.shadowRoot.innerHTML = `
@@ -597,9 +598,10 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
         const tile = ev.target.closest(".room");
         if (tile) this._tap(tile.dataset.area);
       });
+      this.shadowRoot.querySelector(".head").addEventListener("click", (ev) => rcZoomClick(this, ev));
     }
 
-    const all = this._total ? rooms : [];
+    const all = this._everyRoom || [];
     const worst = this._worst(rooms.map((x) => x.worst).filter(Boolean));
     const level = worst ? (worst.cold || worst.sev === "info" ? "cold" : worst.sev) : "ok";
     const toCheck = rooms.filter((x) => x.rank >= RE_RANK.warn).length;
@@ -624,7 +626,8 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
       <div class="badge"><ha-icon icon="${this._headIcon(worst)}"></ha-icon></div>
       <div class="title">${rcEsc(c.title || this._t("title"))}</div>
       ${avg}
-      <div class="pill">${rcEsc(status)}</div>`;
+      <div class="pill">${rcEsc(status)}</div>
+      ${rcZoomButton(this)}`;
 
     this._roomGrid(card.querySelector(".grid"), rooms, (x) => {
       const chips = x.items
@@ -689,7 +692,7 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
     this._detail = el;
   }
 
-  static styles = `
+  static styles = `${RC_ZOOM_STYLES}
     ha-card { container-type: inline-size; }
     ha-card.lvl-ok    { --c: var(--rc-ok); }
     ha-card.lvl-cold  { --c: var(--rc-info); }
@@ -749,15 +752,15 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
 
 const RoomEnvironmentOverviewCardEditor = rcEditor({
   card: RoomEnvironmentOverviewCard,
-  helpers: ["title", "columns", "only_alerts", "exclude"],
+  helpers: ["title", "columns", "zoom", "exclude"],
   schema: (lang, hass, config) => {
-    const probe = hass && rcProbe(RoomEnvironmentOverviewCard, hass, { ...config, exclude_areas: [], exclude: [], only_alerts: false });
+    const probe = hass && rcProbe(RoomEnvironmentOverviewCard, hass, { ...config, exclude_areas: [], exclude: [], zoom: false });
     const rooms = probe ? probe._collect() : [];
     const ids = rooms.flatMap((x) => x.items.map((i) => i.id));
     for (const id of config?.exclude || []) if (!ids.includes(id)) ids.push(id);
     return [
       ...rcOverviewFields(REO_I18N, lang),
-      ...rcBooleans("only_alerts"),
+      ...rcBooleans("zoom"),
       {
         name: "exclude_areas",
         selector: { select: { multiple: true, mode: "dropdown", options: rooms.map((x) => ({ value: x.id, label: x.name })) } },

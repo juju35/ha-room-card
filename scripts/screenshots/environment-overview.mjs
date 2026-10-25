@@ -44,6 +44,7 @@ const mockHass = (lang) => {
 await shoot({
   prefix: "environment-overview",
   tag: "room-environment-overview-card",
-  shots: [...pair("all"), ...pair("details", { open: "living_room" })],
-  setup: (s, lang) => ({ hass: mockHass(lang), config: {}, open: s.open && `.room[data-area="${s.open}"]` }),
+  // "all": every room (detail button pressed); "check": the default view; "details": a room unfolded.
+  shots: [...pair("all", { zoom: true }), ...pair("check"), ...pair("details", { open: "kitchen" })],
+  setup: (s, lang) => ({ hass: mockHass(lang), config: {}, open: s.zoom ? ".zoom" : s.open && `.room[data-area="${s.open}"]` }),
 });

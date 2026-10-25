@@ -62,10 +62,11 @@ const mockHass = (lang, dry) => {
 await shoot({
   prefix: "overview",
   tag: "room-overview-card",
-  shots: [...pair("all"), ...pair("details", { open: "living_room", dry: true })],
+  // "all": every room (detail button pressed); "active": the default view; "details": a room unfolded.
+  shots: [...pair("all", { zoom: true }), ...pair("active"), ...pair("details", { open: "living_room", dry: true })],
   setup: (s, lang) => ({
     hass: mockHass(lang, s.dry),
     config: { plugs_off_button: true },
-    open: s.open && `.room[data-area="${s.open}"]`,
+    open: s.zoom ? ".zoom" : s.open && `.room[data-area="${s.open}"]`,
   }),
 });

@@ -40,7 +40,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - **Tap** a room to unfold its details at the top of the card: the Sensors, Lights and Plugs cards of that room; tap it again or anywhere else to fold it back
 - Automatic discovery: every area with door, window, leak or presence sensors, lights or plugs becomes a room, with an icon picked from its name
 - Same rules as the room cards: camera detections, configuration entities and light groups are skipped, light switches count as lights
-- Show only the rooms with something open, on or detected (`only_active`), or list them first (`sort: state`)
+- Only the rooms with something open, on or detected show; the **detail** button (top right) shows every room, and back (`zoom: false`: every room, always, no button); `sort: state` lists the rooms needing attention first
 
 ### Sensors
 
@@ -125,7 +125,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - On each tile: temperature, humidity and CO₂, plus any other reading outside the comfort range (PM2.5, noise…); same means and thresholds as the Environment card
 - Header with the number of rooms to check and the home's average temperature and humidity
 - **Tap** a room to unfold its Environment card at the top of the card; tap it again or anywhere else to fold it back
-- Show only the rooms needing a look (`only_alerts`), or list them first (`sort: state`); room order, names and icons with `rooms`, like the [Overview](#overview)
+- Only the rooms needing a look show; the **detail** button (top right) shows every room, and back (`zoom: false`: every room, always, no button); `sort: state` lists them first; room order, names and icons with `rooms`, like the [Overview](#overview)
 
 ## Prerequisites
 
@@ -200,7 +200,7 @@ title: Home
 columns: 3
 sort: name
 presence: true
-only_active: false
+zoom: true
 all_off_button: true
 plugs_off_button: false
 exclude_areas:
@@ -225,7 +225,7 @@ rooms:
 | `columns` | ❌ | `3` | Number of room columns (1–6); when empty, 3, or 2 on narrow screens |
 | `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing attention first (leak, open, presence, something on) |
 | `presence` | ❌ | `true` | Include the presence and motion sensors (camera detections are always left out) |
-| `only_active` | ❌ | `false` | Show only the rooms with something open, on or detected |
+| `zoom` | ❌ | `true` | Show only the rooms with something open, on or detected, with a detail button showing every room; `false` shows every room, always |
 | `all_off_button` | ❌ | `true` | Tapping the lights chip of the header turns every light the card counts off |
 | `plugs_off_button` | ❌ | `false` | Tapping the plugs chip of the header opens a confirmation listing every plug the card counts that is on, and turns them off on OK (Cancel, Escape or a tap outside do nothing); the Plugs card of the room details gets its turn-everything-off pill too. Off by default: a plug may feed a camera or a network switch, leave those out with `exclude` |
 | `exclude_areas` | ❌ | — | Rooms left out; the visual editor only offers the rooms the card finds |
@@ -488,7 +488,7 @@ type: custom:room-environment-overview-card
 title: Indoor climate
 columns: 3
 sort: state
-only_alerts: false
+zoom: true
 thresholds:
   co2: [800, 1200]
 exclude_areas:
@@ -513,7 +513,7 @@ rooms:
 | `title` | ❌ | `Indoor climate` | Card title |
 | `columns` | ❌ | `3` | Number of room columns (1–6); when empty, 3, or 2 on narrow screens |
 | `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing a look first |
-| `only_alerts` | ❌ | `false` | Show only the rooms with a reading outside the comfort range |
+| `zoom` | ❌ | `true` | Show only the rooms with a reading outside the comfort range, with a detail button showing every room; `false` shows every room, always |
 | `thresholds` | ❌ | See [Thresholds](#thresholds) | Comfort limits per kind, also used by the unfolded room |
 | `exclude_areas` | ❌ | — | Rooms left out; the visual editor only offers the rooms the card finds |
 | `exclude` | ❌ | — | Sensors left out of the tiles, the averages and the room details |
@@ -524,10 +524,10 @@ rooms:
 
 ### Overview
 
-| Every room | Room details |
-|---|---|
-| ![Every room](screenshots/overview-all.png) | ![Room details](screenshots/overview-details.png) |
-| ![Every room dark](screenshots/overview-all-dark.png) | ![Room details dark](screenshots/overview-details-dark.png) |
+| Active rooms (default) | Every room (detail button) | Room details |
+|---|---|---|
+| ![Active rooms](screenshots/overview-active.png) | ![Every room](screenshots/overview-all.png) | ![Room details](screenshots/overview-details.png) |
+| ![Active rooms dark](screenshots/overview-active-dark.png) | ![Every room dark](screenshots/overview-all-dark.png) | ![Room details dark](screenshots/overview-details-dark.png) |
 
 ### Sensors
 
@@ -571,10 +571,10 @@ rooms:
 
 ### Environment overview
 
-| Every room | Room details |
-|---|---|
-| ![Every room](screenshots/environment-overview-all.png) | ![Room details](screenshots/environment-overview-details.png) |
-| ![Every room dark](screenshots/environment-overview-all-dark.png) | ![Room details dark](screenshots/environment-overview-details-dark.png) |
+| Rooms to check (default) | Every room (detail button) | Room details |
+|---|---|---|
+| ![Rooms to check](screenshots/environment-overview-check.png) | ![Every room](screenshots/environment-overview-all.png) | ![Room details](screenshots/environment-overview-details.png) |
+| ![Rooms to check dark](screenshots/environment-overview-check-dark.png) | ![Every room dark](screenshots/environment-overview-all-dark.png) | ![Room details dark](screenshots/environment-overview-details-dark.png) |
 
 ## How it works
 
