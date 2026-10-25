@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.14.1
+
+### Fixes
+- Environment cards: the noise thresholds were too low — normal conversation or the TV made a room *Noisy*. A room is now noisy from 70 dB (vacuum, loud TV) and very noisy from 85 dB (where long exposure harms hearing): `[70, 85]` instead of `[55, 70]`. Set your own with `thresholds: { noise: [...] }`.
+
 ## 1.14.0
 
 ### Changes

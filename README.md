@@ -439,7 +439,7 @@ Each kind has four limits — alert low, warning low, warning high, alert high �
 | PM10 | `pm10` | `pm10` | `[45, 100]` µg/m³ | Good · Moderate · Poor |
 | VOC | `voc` | `volatile_organic_compounds`, `volatile_organic_compounds_parts` | `[300, 1000]` µg/m³ (`[220, 660]` ppb) | Good · Moderate · Poor |
 | Air quality index | `aqi` | `aqi` | `[100, 150]` | Good · Moderate · Poor |
-| Noise | `noise` | `sound_pressure` | `[55, 70]` dB | Quiet · Noisy · Very noisy |
+| Noise | `noise` | `sound_pressure` | `[70, 85]` dB | Quiet · Noisy · Very noisy |
 | Light level | — | `illuminance` | 10 and 200 lx | Dark · Dim · Bright (information only) |
 
 A temperature sensor in °F gets the default limits converted; a cool room (warning low band) is information, not a warning.

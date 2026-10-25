@@ -12,7 +12,7 @@ const SENSORS = [
   ["sensor.living_room_illuminance", { en: "Living Room Illuminance", fr: "Séjour Luminosité" }, "illuminance", "lx"],
 ];
 const COMFORT = [21.4, 47, 640, 6, 36, 320];
-const STUFFY = [24.6, 66, 1380, 9, 58, 140];
+const STUFFY = [24.6, 66, 1380, 9, 74, 140];
 
 const setup = (s, lang) => {
     const states = {};

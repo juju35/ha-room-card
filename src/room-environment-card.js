@@ -131,8 +131,10 @@ const RE_KINDS = {
   noise: {
     dc: ["sound_pressure"],
     unit: "dB",
-    scale: [null, null, 55, 70],
-    gauge: [20, 90],
+    // Noisy from 70 dB (vacuum, loud TV), very noisy from 85 dB (the level where long exposure harms hearing):
+    // conversation and everyday sounds (40 to 65 dB) stay quiet.
+    scale: [null, null, 70, 85],
+    gauge: [20, 100],
     digits: 0,
     words: "noise",
     issue: "noise",

@@ -315,3 +315,10 @@ test("outdoors, temperature and humidity are information only, unless thresholds
   const outdoor = Object.fromEntries([...overview({}, h2)._collect()].map((x) => [x.id, x]));
   assert.equal(outdoor.living_room.level, "ok");
 });
+
+test("noise: conversation and TV are quiet, 70 dB noisy, 85 dB very noisy", () => {
+  const sev = (noise) => render({}, makeHass({ noise }))._items.find((i) => i.kind === "noise").sev;
+  assert.equal(sev(62), "ok");
+  assert.equal(sev(72), "warn");
+  assert.equal(sev(88), "alert");
+});
