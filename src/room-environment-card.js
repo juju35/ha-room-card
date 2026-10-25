@@ -36,10 +36,6 @@ const RE_I18N = {
     ed_include: "Sensors to add",
     ed_include_helper: "From another room or without one",
     ed_exclude: "Sensors to exclude",
-    zoom_in: "Show the full card",
-    zoom_out: "Back to the compact view",
-    ed_zoom: "Zoom button",
-    ed_zoom_helper: "Switches the mini card to the full Environment card and back",
   },
   fr: {
     title: "Environnement",
@@ -72,10 +68,6 @@ const RE_I18N = {
     ed_include: "Capteurs à ajouter",
     ed_include_helper: "D'une autre pièce ou sans pièce",
     ed_exclude: "Capteurs à exclure",
-    zoom_in: "Afficher la carte complète",
-    zoom_out: "Revenir à la vue compacte",
-    ed_zoom: "Bouton zoom",
-    ed_zoom_helper: "Bascule la mini-carte en carte Environnement complète, et inversement",
   },
 };
 
@@ -407,53 +399,20 @@ rcRegister(
 // The same readings on a single line: the room badge and title, then one chip per reading (icon and value),
 // tinted only when the reading needs a look. Wraps onto a second line when the card is narrow.
 // A zoom button switches the card to the full Environment card (same readings, tiles and gauges) and back.
-class RoomEnvironmentMiniCard extends RoomEnvironmentCard {
-  static tag = "room-environment-mini-card";
-  // `columns` and `show_gauge` only shape the zoomed-in view.
-  static defaults = { only_alerts: false, zoom: true, columns: 2, show_gauge: true, exclude: [] };
-  static styles = `${RoomEnvironmentCard.styles}
-    .zoom { all: unset; flex: none; cursor: pointer; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
-            color: var(--secondary-text-color); }
-    .zoom ha-icon { --mdc-icon-size: 16px; }
-    .zoom:hover { background: color-mix(in srgb, var(--rc-idle) 16%, transparent); color: var(--primary-text-color); }
-    .zoom:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
-    .zoom { margin: -4px -4px -4px 0; }
-  `;
-
-  getCardSize() {
-    if (this._zoomed) return super.getCardSize();
-    return this.style.display === "none" ? 0 : 1;
-  }
-
-  // Zoom button at the end of the header, top right in both views, added once per render.
-  _addZoom() {
-    const head = this._config.zoom && this.shadowRoot.querySelector(".head");
-    if (!head || head.querySelector(".zoom")) return;
-    const button = document.createElement("button");
-    button.className = "zoom";
-    button.title = this._t(this._zoomed ? "zoom_out" : "zoom_in");
-    button.innerHTML = `<ha-icon icon="${this._zoomed ? "mdi:arrow-collapse" : "mdi:arrow-expand"}"></ha-icon>`;
-    button.addEventListener("click", (ev) => {
-      ev.stopPropagation(); // not a tap on the title (navigation_path)
-      this._zoomed = !this._zoomed;
-      this._sig = null;
-      this._render();
-      // Keyboard use (Enter / Space: no click count) keeps the focus on the button that replaced this one.
-      if (ev.detail === 0) this.shadowRoot.querySelector(".zoom")?.focus();
-    });
-    head.appendChild(button);
-  }
-
-  getGridOptions() {
-    return { columns: 12, min_columns: 4, rows: "auto" };
-  }
-
-  _draw(items) {
-    if (this._zoomed) {
-      super._draw(items);
-      this._addZoom();
-      return;
-    }
+// `columns` and `show_gauge` only shape the zoomed-in view.
+class RoomEnvironmentMiniCard extends rcMini(
+  RoomEnvironmentCard,
+  "room-environment-mini-card",
+  `
+    .r small { font-size: 10px; font-weight: 400; opacity: .7; margin-left: 1px; }
+    .r.s-warn  { --t: var(--rc-warn); }
+    .r.s-alert { --t: var(--rc-alert); }
+    .r.cold    { --t: var(--rc-info); }
+    .r.k-illuminance     { --t: var(--rc-idle); }
+    .r.k-illuminance.lit { --t: var(--rc-light); }
+  `,
+) {
+  _drawMini(items) {
     const c = this._config;
     const worst = this._worst(items);
     const level = worst ? (worst.cold || worst.sev === "info" ? "cold" : worst.sev) : "ok";
@@ -461,69 +420,19 @@ class RoomEnvironmentMiniCard extends RoomEnvironmentCard {
 
     const shown = c.only_alerts ? items.filter((i) => i.sev !== "ok") : items;
     this._shown = shown.length;
-    const status = this._status(items, worst);
+    // Comfortable readings stay plain; the ones needing a look get a tinted pill.
+    const pill = (i) => i.sev === "warn" || i.sev === "alert" || (i.cold && i.sev !== "ok");
     const chips = shown
       .map(
         (i) => `
-        <button class="r s-${i.sev}${i.cold ? " cold" : ""}${i.light ? " lit" : ""} k-${i.kind}"
+        <button class="r s-${i.sev}${i.cold ? " cold" : ""}${i.light ? " lit" : ""}${pill(i) ? " pill" : ""} k-${i.kind}"
                 data-id="${rcEsc(i.id)}" title="${rcEsc(i.name)} — ${rcEsc(i.state)}">
           <ha-icon icon="${rcEsc(i.icon)}"></ha-icon>${this._chipValue(i)}
         </button>`,
       )
       .join("");
-    const nav = c.navigation_path;
-    this.shadowRoot.innerHTML = `
-      <style>${RC_BASE_STYLES}${RoomEnvironmentMiniCard.styles}${RoomEnvironmentMiniCard.miniStyles}</style>
-      <ha-card class="lvl-${level}">
-        <div class="mini">
-          <div class="badge" title="${rcEsc(status)}"><ha-icon icon="${this._headIcon(worst)}"></ha-icon></div>
-          <div class="body">
-            <div class="head${nav ? " nav" : ""}"${nav ? ' role="link" tabindex="0"' : ""}>
-              <div class="title">${rcEsc(c.title || this._areaName() || this._t("title"))}</div>
-              <span class="st">${rcEsc(status)}</span>
-            </div>
-            <div class="rs">${chips}</div>
-          </div>
-        </div>
-      </ha-card>`;
-    const root = this.shadowRoot;
-    if (nav) {
-      const head = root.querySelector(".head");
-      head.addEventListener("click", () => rcNavigate(nav));
-      head.addEventListener("keydown", (ev) => {
-        if (ev.key === "Enter" && ev.target === head) rcNavigate(nav);
-      });
-    }
-    for (const el of root.querySelectorAll(".r")) el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id));
-    this._addZoom();
+    this._paintMini({ level, icon: this._headIcon(worst), status: this._status(items, worst), chips });
   }
-
-  static miniStyles = `
-    ha-card { padding: 8px 10px; }
-    .mini { display: flex; align-items: center; gap: 10px; }
-    .mini .badge { width: 32px; height: 32px; }
-    .mini .badge ha-icon { --mdc-icon-size: 18px; }
-    .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-    .mini .head { gap: 8px; }
-    .mini .title { flex: 0 1 auto; font-size: 14px; line-height: 18px; }
-    .st { flex: none; margin-left: auto; font-size: 11px; font-weight: 500; color: var(--c); }
-    /* Comfortable readings are plain text; only the ones needing a look get a tinted pill. */
-    .rs { display: flex; flex-wrap: wrap; gap: 2px 4px; margin-left: -4px; }
-    .r { all: unset; cursor: pointer; display: inline-flex; align-items: baseline; gap: 1px; padding: 0 5px 0 4px;
-         border-radius: 999px; font-size: 12px; font-weight: 500; line-height: 18px; white-space: nowrap; --t: var(--rc-ok);
-         color: var(--primary-text-color); }
-    .r ha-icon { --mdc-icon-size: 13px; color: var(--t); align-self: center; margin-right: 2px; }
-    .r small { font-size: 10px; font-weight: 400; opacity: .7; margin-left: 1px; }
-    .r.s-warn  { --t: var(--rc-warn); }
-    .r.s-alert { --t: var(--rc-alert); }
-    .r.cold    { --t: var(--rc-info); }
-    .r.k-illuminance     { --t: var(--rc-idle); }
-    .r.k-illuminance.lit { --t: var(--rc-light); }
-    .r.s-warn, .r.s-alert, .r.cold.s-info, .r.cold.s-warn {
-      color: var(--t); background: color-mix(in srgb, var(--t) 14%, transparent); }
-    .r:hover { background: color-mix(in srgb, var(--t) 20%, var(--secondary-background-color, transparent)); }
-    .r:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
-  `;
 }
 
 const RoomEnvironmentMiniCardEditor = rcEditor({

@@ -3,10 +3,11 @@
 ## 1.10.0
 
 ### What's new
+- New **Sensors mini** card (`custom:room-sensors-mini-card`): the sensors of a room on two lines — room badge, title and status, then one chip per sensor (a plain icon when quiet, a tinted pill with its name when open, leaking or detecting) — with the same zoom button to the full Sensors card. Same options as the Sensors card, plus `zoom`.
 - Environment mini card: a zoom button (top right) switches the card to the full Environment card — tiles, comfort words and gauges — and back. On by default; `zoom: false` removes it (also in the visual editor). `columns` and `show_gauge` shape the zoomed-in view.
 
 ### Maintenance
-- Test for the zoom (47 in all); the screenshot script clicks like a mouse, so no focus ring is left in the shots.
+- The mini cards share their layout, chips and zoom in `shared.js` (`rcMini`); tests for both (49 in all); the screenshot script clicks like a mouse, so no focus ring is left in the shots.
 
 ## 1.9.1
 

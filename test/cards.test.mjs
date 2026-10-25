@@ -422,3 +422,31 @@ test("pressing a tile and leaving it with the mouse neither toggles nor opens mo
   assert.deepEqual(t.calls, []);
   assert.equal(t.card._pressing, false);
 });
+
+test("the sensors mini card: plain icons for quiet sensors, a named pill for open ones, and a zoom to the full card", () => {
+  const card = new cards["room-sensors-mini-card"]();
+  card.setConfig({ area: "kitchen" });
+  const h = makeHass();
+  h.states["binary_sensor.door"] = { ...h.states["binary_sensor.door"], state: "on" };
+  card.hass = h;
+  let html = card.shadowRoot.innerHTML;
+  assert.match(html, /class="mini"/);
+  assert.match(html, /class="r on pill"[^>]*data-id="binary_sensor.door"/);
+  assert.match(html, /<span>Door<\/span>/);
+  assert.match(html, /class="st">2 ouvertures</); // the diagnostic door sensor is open too
+  assert.equal(card.getCardSize(), 1);
+  card._zoomed = true;
+  card._sig = null;
+  card._render();
+  html = card.shadowRoot.innerHTML;
+  assert.doesNotMatch(html, /class="mini"/);
+  assert.match(html, /class="tile on/);
+});
+
+test("the sensors mini card hides itself when clear, like the full card", () => {
+  const card = new cards["room-sensors-mini-card"]();
+  card.setConfig({ area: "kitchen", hide_when_clear: true, entities: ["binary_sensor.door"] });
+  card.hass = makeHass();
+  assert.equal(card.style.display, "none");
+  assert.equal(card.getCardSize(), 0);
+});

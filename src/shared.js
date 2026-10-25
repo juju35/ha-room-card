@@ -181,6 +181,10 @@ const RC_I18N = {
     ed_navigation_path: "Navigation path",
     ed_all_off_button: "“Turn everything off” button",
     err_config: "Set `area` or `entities`",
+    zoom_in: "Show the full card",
+    zoom_out: "Back to the compact view",
+    ed_zoom: "Zoom button",
+    ed_zoom_helper: "Switches the mini card to the full card and back",
   },
   fr: {
     all_closed: "Tout est fermé",
@@ -199,6 +203,10 @@ const RC_I18N = {
     ed_navigation_path: "Chemin de navigation",
     ed_all_off_button: "Bouton « Tout éteindre »",
     err_config: "Définis `area` ou `entities`",
+    zoom_in: "Afficher la carte complète",
+    zoom_out: "Revenir à la vue compacte",
+    ed_zoom: "Bouton zoom",
+    ed_zoom_helper: "Bascule la mini-carte en carte complète, et inversement",
   },
 };
 
@@ -564,6 +572,79 @@ class RcToggleCard extends RcCard {
   }
 }
 
+// ── Mini cards ───────────────────────────────────────────────────────────────
+// A mini card shows what its full card (`Base`) shows on two lines: the room badge, title and status, then one chip
+// per entity. Its zoom button (top right, `zoom: false` removes it) switches it to the full card and back.
+// The subclass implements `_drawMini(items)`, which builds the chips and calls `_paintMini`.
+const rcMini = (Base, tag, styles) =>
+  class extends Base {
+    static tag = tag;
+    static defaults = { ...Base.defaults, zoom: true };
+    static styles = `${Base.styles}${RC_MINI_STYLES}${styles}`;
+
+    getCardSize() {
+      if (this._zoomed) return super.getCardSize();
+      return this.style.display === "none" ? 0 : 1;
+    }
+
+    getGridOptions() {
+      return { columns: 12, min_columns: 4, rows: "auto" };
+    }
+
+    _draw(items) {
+      if (this._zoomed) super._draw(items);
+      else this._drawMini(items);
+      this._addZoom();
+    }
+
+    _paintMini({ level, icon, status, chips, cls = "" }) {
+      const c = this._config;
+      const nav = c.navigation_path;
+      this.shadowRoot.innerHTML = `
+        <style>${RC_BASE_STYLES}${this.constructor.styles}</style>
+        <ha-card class="lvl-${level}${cls}">
+          <div class="mini">
+            <div class="badge" title="${rcEsc(status)}"><ha-icon icon="${icon}"></ha-icon></div>
+            <div class="body">
+              <div class="head${nav ? " nav" : ""}"${nav ? ' role="link" tabindex="0"' : ""}>
+                <div class="title">${rcEsc(c.title || this._areaName() || this._t("title"))}</div>
+                <span class="st">${rcEsc(status)}</span>
+              </div>
+              <div class="rs">${chips}</div>
+            </div>
+          </div>
+        </ha-card>`;
+      const root = this.shadowRoot;
+      if (nav) {
+        const head = root.querySelector(".head");
+        head.addEventListener("click", () => rcNavigate(nav));
+        head.addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter" && ev.target === head) rcNavigate(nav);
+        });
+      }
+      for (const el of root.querySelectorAll(".r")) el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id));
+    }
+
+    // Zoom button at the end of the header, top right in both views, added once per render.
+    _addZoom() {
+      const head = this._config.zoom && this.shadowRoot.querySelector(".head");
+      if (!head || head.querySelector(".zoom")) return;
+      const button = document.createElement("button");
+      button.className = "zoom";
+      button.title = this._t(this._zoomed ? "zoom_out" : "zoom_in");
+      button.innerHTML = `<ha-icon icon="${this._zoomed ? "mdi:arrow-collapse" : "mdi:arrow-expand"}"></ha-icon>`;
+      button.addEventListener("click", (ev) => {
+        ev.stopPropagation(); // not a tap on the title (navigation_path)
+        this._zoomed = !this._zoomed;
+        this._sig = null;
+        this._render();
+        // Keyboard use (Enter / Space: no click count) keeps the focus on the button that replaced this one.
+        if (ev.detail === 0) this.shadowRoot.querySelector(".zoom")?.focus();
+      });
+      head.appendChild(button);
+    }
+  };
+
 // ── Editor ───────────────────────────────────────────────────────────────────
 // Fields shared by the room cards' editors.
 const rcAreaFields = (navigation) => [
@@ -740,4 +821,29 @@ const RC_BASE_STYLES = `
   @keyframes rc-pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 45%, transparent) }
                         50% { box-shadow: 0 0 0 7px transparent } }
   @media (prefers-reduced-motion: reduce) { .tile, .lvl-alert .badge { animation: none; transition: none; } }
+`;
+
+// Mini cards: layout, chips and zoom button. A chip is plain (icon and text) until it needs a look: then a tinted pill.
+const RC_MINI_STYLES = `
+  .zoom { all: unset; flex: none; cursor: pointer; width: 24px; height: 24px; margin: -4px -4px -4px 0; border-radius: 50%;
+          display: grid; place-items: center; color: var(--secondary-text-color); }
+  .zoom ha-icon { --mdc-icon-size: 16px; }
+  .zoom:hover { background: color-mix(in srgb, var(--rc-idle) 16%, transparent); color: var(--primary-text-color); }
+  .zoom:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
+  ha-card:has(.mini) { padding: 8px 10px; }
+  .mini { display: flex; align-items: center; gap: 10px; }
+  .mini .badge { width: 32px; height: 32px; }
+  .mini .badge ha-icon { --mdc-icon-size: 18px; }
+  .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .mini .head { gap: 8px; }
+  .mini .title { flex: 0 1 auto; font-size: 14px; line-height: 18px; }
+  .st { flex: none; margin-left: auto; font-size: 11px; font-weight: 500; color: var(--c); }
+  .rs { display: flex; flex-wrap: wrap; gap: 2px 4px; margin-left: -4px; }
+  .r { all: unset; cursor: pointer; display: inline-flex; align-items: baseline; gap: 1px; padding: 0 5px 0 4px;
+       border-radius: 999px; font-size: 12px; font-weight: 500; line-height: 18px; white-space: nowrap; --t: var(--rc-ok);
+       color: var(--primary-text-color); }
+  .r ha-icon { --mdc-icon-size: 13px; color: var(--t); align-self: center; margin-right: 2px; }
+  .r.pill { color: var(--t); background: color-mix(in srgb, var(--t) 14%, transparent); }
+  .r:hover { background: color-mix(in srgb, var(--t) 20%, var(--secondary-background-color, transparent)); }
+  .r:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
 `;

@@ -19,19 +19,24 @@ const OPEN = {
 };
 const LEAK = { ...OPEN, "binary_sensor.sink_leak": [true, 3] };
 
+const setup = (s, lang) => {
+  const states = {};
+  const entities = { "camera.living_room": { entity_id: "camera.living_room", device_id: "camera" } };
+  for (const [entity_id, names, device_class, device] of SENSORS) {
+    const [on, min] = s.open[entity_id] ?? [false, 180];
+    states[entity_id] = { entity_id, state: on ? "on" : "off", last_changed: ago(min), attributes: { device_class, friendly_name: names[lang] } };
+    entities[entity_id] = { entity_id, area_id: "living_room", device_id: device };
+  }
+  const areas = { living_room: { area_id: "living_room", name: lang === "fr" ? "Séjour" : "Living room" } };
+  return { hass: { states, entities, devices: {}, areas, language: lang, locale: { language: lang } }, config: { area: "living_room", blink: false } };
+};
+
+const shots = [...pair("open", { open: OPEN }), ...pair("leak", { open: LEAK })];
+await shoot({ prefix: "sensors", tag: "room-sensors-card", shots, setup });
+// The mini card, and the same card zoomed in (its zoom button clicked).
 await shoot({
-  prefix: "sensors",
-  tag: "room-sensors-card",
-  shots: [...pair("open", { open: OPEN }), ...pair("leak", { open: LEAK })],
-  setup: (s, lang) => {
-    const states = {};
-    const entities = { "camera.living_room": { entity_id: "camera.living_room", device_id: "camera" } };
-    for (const [entity_id, names, device_class, device] of SENSORS) {
-      const [on, min] = s.open[entity_id] ?? [false, 180];
-      states[entity_id] = { entity_id, state: on ? "on" : "off", last_changed: ago(min), attributes: { device_class, friendly_name: names[lang] } };
-      entities[entity_id] = { entity_id, area_id: "living_room", device_id: device };
-    }
-    const areas = { living_room: { area_id: "living_room", name: lang === "fr" ? "Séjour" : "Living room" } };
-    return { hass: { states, entities, devices: {}, areas, language: lang, locale: { language: lang } }, config: { area: "living_room", blink: false } };
-  },
+  prefix: "sensors-mini",
+  tag: "room-sensors-mini-card",
+  shots: [...shots, ...pair("zoom", { open: OPEN, zoom: true })],
+  setup: (s, lang) => ({ ...setup(s, lang), open: s.zoom && ".zoom" }),
 });

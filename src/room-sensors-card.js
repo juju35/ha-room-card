@@ -157,27 +157,43 @@ class RoomSensorsCard extends RcCard {
       .sort((a, b) => this._rank(b) - this._rank(a) || a.name.localeCompare(b.name));
   }
 
-  _draw(items) {
-    const c = this._config;
-
+  // State of the room, shared by the full and the mini card.
+  _summary(items) {
     const leaks = items.filter((i) => i.kind === "leak" && i.on).length;
     const open = items.filter((i) => i.kind !== "leak" && !i.info && i.on).length;
-    const occupied = items.some((i) => i.info && i.on);
-    const level = leaks ? "alert" : open ? "warn" : "ok";
-
-    // The "since" label moves every minute.
-    if (!this._changed(items.map((i) => [i.id, i.on, i.unavailable, i.name, i.on ? this._ago(i.since) : ""]))) return;
-    // Hidden only when nothing needs a look: everything closed and dry, and no presence.
-    if (this._hide(c.hide_when_clear && level === "ok" && !occupied)) return;
-
-    const status = this._openingStatus(
+    return {
       leaks,
       open,
-      items.some((i) => i.kind !== "leak" && !i.info),
-      items.length ? "all_quiet" : "no_sensors",
-    );
+      occupied: items.some((i) => i.info && i.on),
+      level: leaks ? "alert" : open ? "warn" : "ok",
+      icon: leaks ? "mdi:water-alert" : open ? "mdi:shield-alert-outline" : "mdi:shield-home-outline",
+      status: this._openingStatus(
+        leaks,
+        open,
+        items.some((i) => i.kind !== "leak" && !i.info),
+        items.length ? "all_quiet" : "no_sensors",
+      ),
+    };
+  }
+
+  // The summary and the sensors to draw, or null when nothing changed since `parts` were last drawn or the card is
+  // hidden (`hide_when_clear`: only when everything is closed and dry, and nobody is there).
+  _visible(items, parts) {
+    const c = this._config;
+    const sum = this._summary(items);
+    if (!this._changed(parts)) return null;
+    if (this._hide(c.hide_when_clear && sum.level === "ok" && !sum.occupied)) return null;
     const shown = c.only_alerts ? items.filter((i) => i.on || i.unavailable) : items;
     this._shown = shown.length;
+    return { ...sum, shown };
+  }
+
+  _draw(items) {
+    const c = this._config;
+    // The "since" label moves every minute.
+    const v = this._visible(items, items.map((i) => [i.id, i.on, i.unavailable, i.name, i.on ? this._ago(i.since) : ""]));
+    if (!v) return;
+    const { occupied, level, icon, status, shown } = v;
     const tiles = shown
       .map((i) =>
         this._tile(i, {
@@ -190,7 +206,7 @@ class RoomSensorsCard extends RcCard {
       ? `<div class="chip" title="${rcEsc(this._t("occupied"))}"><ha-icon icon="mdi:account"></ha-icon></div>`
       : "";
     const head = this._head({
-      icon: leaks ? "mdi:water-alert" : open ? "mdi:shield-alert-outline" : "mdi:shield-home-outline",
+      icon,
       title: c.title || this._areaName() || this._t("title"),
       status,
       chips,
@@ -239,4 +255,57 @@ rcRegister(
   RoomSensorsCardEditor,
   "Room Sensors Card",
   "Leak, door, window, opening and presence sensors of a room, open ones first",
+);
+
+// ── Mini card ────────────────────────────────────────────────────────────────
+// The same sensors on two lines: the room badge, title and status, then one chip per sensor. A quiet sensor is a
+// plain icon; an open, leaking or detecting one a tinted pill with its name. The zoom button switches to the full card.
+class RoomSensorsMiniCard extends rcMini(
+  RoomSensorsCard,
+  "room-sensors-mini-card",
+  `
+    .r.icon { padding: 0 3px; }
+    .r.icon ha-icon { margin-right: 0; }
+    .r.on      { --t: var(--rc-warn); }
+    .r.on.leak { --t: var(--rc-alert); }
+    .r.on.info { --t: var(--rc-info); }
+    .r.na      { --t: var(--rc-na); opacity: .7; }
+    .r.on:not(.info) ha-icon { animation: rc-blink 1.5s ease-in-out infinite; }
+    .no-blink .r.on ha-icon { animation: none; }
+    @media (prefers-reduced-motion: reduce) { .r.on ha-icon { animation: none; } }
+  `,
+) {
+  _drawMini(items) {
+    const v = this._visible(items, ["mini", items.map((i) => [i.id, i.on, i.unavailable, i.name, i.icon])]);
+    if (!v) return;
+    const { level, icon, status, shown } = v;
+    const chips = shown
+      .map((i) => {
+        const cls = `${i.on ? " on pill" : " icon"}${i.kind === "leak" ? " leak" : ""}${i.info ? " info" : ""}${i.unavailable ? " na" : ""}`;
+        return `
+        <button class="r${cls}" data-id="${rcEsc(i.id)}" title="${rcEsc(i.name)} — ${rcEsc(i.state)}">
+          <ha-icon icon="${rcEsc(i.icon)}"></ha-icon>${i.on ? `<span>${rcEsc(i.name)}</span>` : ""}
+        </button>`;
+      })
+      .join("");
+    this._paintMini({ level, icon, status, chips, cls: this._config.blink === false ? " no-blink" : "" });
+  }
+}
+
+const RoomSensorsMiniCardEditor = rcEditor({
+  card: RoomSensorsMiniCard,
+  helpers: ["title", "only_alerts", "hide_when_clear", "presence", "zoom", "include"],
+  schema: (_lang, hass, config) => [
+    ...rcAreaFields(false).filter((f) => f.name !== "columns"),
+    ...rcBooleans("only_alerts", "hide_when_clear", "presence", "blink", "zoom"),
+    ...rcIncludeField(RoomSensorsMiniCard, hass, config),
+    ...rcExcludeField(RoomSensorsMiniCard, hass, config),
+  ],
+});
+
+rcRegister(
+  RoomSensorsMiniCard,
+  RoomSensorsMiniCardEditor,
+  "Room Sensors Mini Card",
+  "The sensors of a room on two lines: open, leaking or detecting ones first, with a zoom to the full card",
 );
