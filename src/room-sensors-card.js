@@ -258,8 +258,8 @@ rcRegister(
 );
 
 // ── Mini card ────────────────────────────────────────────────────────────────
-// The same sensors on two lines: the room badge, title and status, then one chip per sensor. A quiet sensor is a
-// plain icon; an open, leaking or detecting one a tinted pill with its name. The zoom button switches to the full card.
+// The room on two lines: the badge, title and status, then a tinted pill (icon and name) for each open, leaking or
+// detecting sensor; quiet sensors only show once zoomed in to the full card.
 class RoomSensorsMiniCard extends rcMini(
   RoomSensorsCard,
   "room-sensors-mini-card",
@@ -294,10 +294,10 @@ class RoomSensorsMiniCard extends rcMini(
 
 const RoomSensorsMiniCardEditor = rcEditor({
   card: RoomSensorsMiniCard,
-  helpers: ["title", "only_alerts", "hide_when_clear", "presence", "zoom", "include"],
+  helpers: ["title", "hide_when_clear", "presence", "zoom", "include"],
   schema: (_lang, hass, config) => [
     ...rcAreaFields(false).filter((f) => f.name !== "columns"),
-    ...rcBooleans("only_alerts", "hide_when_clear", "presence", "blink", "zoom"),
+    ...rcBooleans("hide_when_clear", "presence", "blink", "zoom"),
     ...rcIncludeField(RoomSensorsMiniCard, hass, config),
     ...rcExcludeField(RoomSensorsMiniCard, hass, config),
   ],

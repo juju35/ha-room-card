@@ -576,11 +576,12 @@ class RcToggleCard extends RcCard {
 // A mini card shows what its full card (`Base`) shows on two lines: the room badge, title and status, then one chip
 // per entity. Its zoom button (top right, `zoom: false` removes it) switches it to the full card and back.
 // The subclass implements `_drawMini(items)`, which builds the chips and calls `_paintMini`.
-// Zoomed in, the card shows everything: `only_alerts` and `hide_when_clear` only apply to the compact view.
+// The compact view only shows what needs a look (open sensors, readings out of range): quiet ones show once zoomed in,
+// where everything is shown (`hide_when_clear` only applies to the compact view).
 const rcMini = (Base, tag, styles) =>
   class extends Base {
     static tag = tag;
-    static defaults = { ...Base.defaults, zoom: true };
+    static defaults = (({ only_alerts, ...rest }) => ({ ...rest, zoom: true }))(Base.defaults);
     static styles = `${Base.styles}${RC_MINI_STYLES}${styles}`;
 
     getCardSize() {
@@ -593,16 +594,16 @@ const rcMini = (Base, tag, styles) =>
     }
 
     _draw(items) {
-      if (this._zoomed) {
-        const config = this._config;
-        this._config = { ...config, only_alerts: false, hide_when_clear: false };
-        try {
-          super._draw(items);
-        } finally {
-          this._config = config;
-        }
-      } else {
-        this._drawMini(items);
+      const config = this._config;
+      // The base card's own filter does the work: on in the compact view, off zoomed in.
+      this._config = this._zoomed
+        ? { ...config, only_alerts: false, hide_when_clear: false }
+        : { ...config, only_alerts: true };
+      try {
+        if (this._zoomed) super._draw(items);
+        else this._drawMini(items);
+      } finally {
+        this._config = config;
       }
       this._addZoom();
     }
@@ -849,6 +850,7 @@ const RC_MINI_STYLES = `
   .mini .title { flex: 0 1 auto; font-size: 14px; line-height: 18px; }
   .st { flex: none; margin-left: auto; font-size: 11px; font-weight: 500; color: var(--c); }
   .rs { display: flex; flex-wrap: wrap; gap: 2px 4px; margin-left: -4px; }
+  .rs:empty { display: none; }
   .r { all: unset; cursor: pointer; display: inline-flex; align-items: baseline; gap: 1px; padding: 0 5px 0 4px;
        border-radius: 999px; font-size: 12px; font-weight: 500; line-height: 18px; white-space: nowrap; --t: var(--rc-ok);
        color: var(--primary-text-color); }

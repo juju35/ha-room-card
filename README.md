@@ -57,12 +57,12 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 
 ### Sensors mini
 
-`custom:room-sensors-mini-card` — The same sensors on two lines, with a zoom to the full card.
+`custom:room-sensors-mini-card` — Only what is open or detected, for a compact dashboard; zoom in for every sensor.
 
 - Room badge coloured like the Sensors card, the title and the status (*1 open*, *Water leak*) on the first line
-- One chip per sensor on the second line: a quiet sensor is a plain icon, an open, leaking or detecting one a tinted pill with its name (blinking unless `blink: false`)
-- **Zoom** button (top right) switches the card to the full [Sensors card](#sensors) and back (`zoom: false` removes it); zoomed in, every sensor is shown, `only_alerts` only filtering the compact view
-- Same discovery and options as the Sensors card: `only_alerts`, `hide_when_clear`, `presence`, `blink`, `include` / `exclude`
+- On the second line, a tinted pill with its name for each open, leaking or detecting sensor (blinking unless `blink: false`); quiet sensors are hidden, so a quiet room is a single line
+- **Zoom** button (top right) switches the card to the full [Sensors card](#sensors) — every sensor, with how long it has been open — and back (`zoom: false` removes it)
+- Same discovery and options as the Sensors card: `hide_when_clear` (compact view only), `presence`, `blink`, `include` / `exclude`
 - Tap a sensor to open its details
 
 ### Lights
@@ -109,13 +109,13 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 
 ### Environment mini
 
-`custom:room-environment-mini-card` — The same readings on a single line, for a compact dashboard.
+`custom:room-environment-mini-card` — Only what needs a look, for a compact dashboard; zoom in for every reading.
 
 - Room badge coloured by the reading that needs a look first, the title and the status on the first line
-- One chip per reading on the second line: icon and value, the unit kept small (*21,4°*, *640 ppm*); comfortable readings are plain, the others get a tinted pill
-- Same discovery, thresholds, `only_alerts`, `include` / `exclude` and `navigation_path` as the Environment card; the chips wrap onto another line when the card is narrow or the room has many sensors
+- On the second line, a tinted chip for each reading that needs a look — icon and value, the unit kept small (*66 %*, *1 380 ppm*); comfortable readings are hidden, so a comfortable room is a single line
+- **Zoom** button (top right) switches the card to the full [Environment card](#environment) — every reading, tiles, comfort words, gauges — and back (`zoom: false` removes it)
+- Same discovery, thresholds, `include` / `exclude` and `navigation_path` as the Environment card
 - Tap a reading to open its details and history
-- **Zoom** button (top right) switches the card to the full [Environment card](#environment) — tiles, comfort words, gauges — and back (`zoom: false` removes it); zoomed in, every reading is shown, `only_alerts` only filtering the compact view
 
 ### Environment overview
 
@@ -290,7 +290,7 @@ In addition to the [common options](#common-options):
 
 ### Sensors mini
 
-Same options as the [Sensors card](#sensors), plus `zoom`; `columns` only shapes the zoomed-in view:
+Same options as the [Sensors card](#sensors) except `only_alerts` (the compact view always hides quiet sensors), plus `zoom`; `columns` only shapes the zoomed-in view:
 
 ```yaml
 type: custom:room-sensors-mini-card
@@ -458,7 +458,7 @@ The Environment card takes these options on top of the [common options](#common-
 
 ### Environment mini
 
-Same options as the [Environment card](#environment), plus `zoom`; `columns` and `show_gauge` only shape the zoomed-in view:
+Same options as the [Environment card](#environment) except `only_alerts` (the compact view always hides comfortable readings), plus `zoom`; `columns` and `show_gauge` only shape the zoomed-in view:
 
 ```yaml
 type: custom:room-environment-mini-card

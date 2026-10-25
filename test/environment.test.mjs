@@ -147,25 +147,28 @@ test("the editor offers only environment sensors to add", () => {
   assert.deepEqual([...field.selector.entity.include_entities], ["sensor.kitchen_temperature"]);
 });
 
-test("the mini card shows one chip per reading with a short unit, and the status on the title line", () => {
+test("the mini card only shows the readings that need a look, with a short unit, and the status on the title line", () => {
   const card = new rc.cards["room-environment-mini-card"]();
   card.setConfig({ area: "living_room" });
-  card.hass = makeHass({ co2: 1200 });
+  card.hass = makeHass({ co2: 1200, temp: 17.5 });
   const html = card.shadowRoot.innerHTML;
-  assert.equal((html.match(/class="r /g) || []).length, 5);
-  assert.match(html, /<span>21,4<\/span><small>°<\/small>/);
+  assert.equal((html.match(/class="r /g) || []).length, 2);
+  assert.ok(html.includes('data-id="sensor.lr_co2"'));
+  assert.match(html, /<span>17,5<\/span><small>°<\/small>/); // cool: information, still shown
+  assert.ok(!html.includes('data-id="sensor.lr_humidity"'));
   assert.match(html, /class="st">Aérer</);
   assert.match(html, /lvl-warn/);
   assert.equal(card.getCardSize(), 1);
 });
 
-test("the mini card with only_alerts keeps the readings that need a look", () => {
+test("the mini card of a comfortable room is a single line: no chip", () => {
   const card = new rc.cards["room-environment-mini-card"]();
-  card.setConfig({ area: "living_room", only_alerts: true });
-  card.hass = makeHass({ hum: 72 });
+  card.setConfig({ area: "living_room" });
+  card.hass = makeHass();
   const html = card.shadowRoot.innerHTML;
-  assert.equal((html.match(/class="r /g) || []).length, 1);
-  assert.ok(html.includes('data-id="sensor.lr_humidity"'));
+  assert.equal((html.match(/class="r /g) || []).length, 0);
+  assert.match(html, /class="st">Confortable</);
+  assert.equal(card._config.only_alerts, undefined, "no only_alerts option on the mini card");
 });
 
 // Two rooms for the overview: the living room of makeHass and the kitchen with its temperature sensor.
@@ -256,9 +259,9 @@ test("the mini card zoomed in draws the full Environment card, and back", () => 
   assert.equal(card.getCardSize(), 1);
 });
 
-test("zoomed in, the environment mini card shows every reading, whatever only_alerts says", () => {
+test("zoomed in, the environment mini card shows every reading", () => {
   const card = new rc.cards["room-environment-mini-card"]();
-  card.setConfig({ area: "living_room", only_alerts: true });
+  card.setConfig({ area: "living_room" });
   card.hass = makeHass({ co2: 1200 });
   assert.equal(card._shown, 1);
   card._zoomed = true;

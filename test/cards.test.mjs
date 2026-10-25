@@ -423,7 +423,7 @@ test("pressing a tile and leaving it with the mouse neither toggles nor opens mo
   assert.equal(t.card._pressing, false);
 });
 
-test("the sensors mini card: plain icons for quiet sensors, a named pill for open ones, and a zoom to the full card", () => {
+test("the sensors mini card: a named pill for each open sensor, quiet ones hidden, and a zoom to the full card", () => {
   const card = new cards["room-sensors-mini-card"]();
   card.setConfig({ area: "kitchen" });
   const h = makeHass();
@@ -433,6 +433,7 @@ test("the sensors mini card: plain icons for quiet sensors, a named pill for ope
   assert.match(html, /class="mini"/);
   assert.match(html, /class="r on pill"[^>]*data-id="binary_sensor.door"/);
   assert.match(html, /<span>Door<\/span>/);
+  assert.equal((html.match(/class="r /g) || []).length, 2); // the door and the (open) diagnostic door
   assert.match(html, /class="st">2 ouvertures</); // the diagnostic door sensor is open too
   assert.equal(card.getCardSize(), 1);
   card._zoomed = true;
@@ -451,15 +452,16 @@ test("the sensors mini card hides itself when clear, like the full card", () => 
   assert.equal(card.getCardSize(), 0);
 });
 
-test("zoomed in, a mini card shows every sensor, whatever only_alerts says", () => {
+test("the sensors mini card hides quiet sensors, and shows them once zoomed in", () => {
   const card = new cards["room-sensors-mini-card"]();
-  card.setConfig({ area: "kitchen", only_alerts: true });
+  card.setConfig({ area: "kitchen" });
   card.hass = makeHass();
   assert.equal(card._shown, 1); // only the open diagnostic door sensor
+  assert.ok(!card.shadowRoot.innerHTML.includes('data-id="binary_sensor.door"'));
   card._zoomed = true;
   card._sig = null;
   card._render();
   assert.equal(card._shown, 2);
   assert.match(card.shadowRoot.innerHTML, /data-id="binary_sensor.door"/);
-  assert.equal(card._config.only_alerts, true, "the config itself is left alone");
+  assert.equal(card._config.only_alerts, undefined, "the config itself is left alone");
 });
