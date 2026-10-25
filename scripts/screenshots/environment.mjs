@@ -39,9 +39,9 @@ await shoot({ prefix: "environment", tag: "room-environment-card", shots, setup 
 await shoot({
   prefix: "environment-mini",
   tag: "room-environment-mini-card",
-  shots,
+  shots: [...shots, ...pair("zoom", { values: STUFFY, zoom: true })],
   setup: (s, lang) => {
     const { hass, config } = setup(s, lang);
-    return { hass, config: { ...config, exclude: ["sensor.living_room_pm25"] } };
+    return { hass, config: { ...config, exclude: ["sensor.living_room_pm25"] }, open: s.zoom && ".zoom" };
   },
 });

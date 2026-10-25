@@ -104,6 +104,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - One chip per reading on the second line: icon and value, the unit kept small (*21,4°*, *640 ppm*); comfortable readings are plain, the others get a tinted pill
 - Same discovery, thresholds, `only_alerts`, `include` / `exclude` and `navigation_path` as the Environment card; the chips wrap onto another line when the card is narrow or the room has many sensors
 - Tap a reading to open its details and history
+- **Zoom** button (top right) switches the card to the full [Environment card](#environment) — tiles, comfort words, gauges — and back (`zoom: false` removes it)
 
 ### Environment overview
 
@@ -431,15 +432,20 @@ The Environment card takes these options on top of the [common options](#common-
 
 ### Environment mini
 
-Same options as the [Environment card](#environment), except `columns` and `show_gauge`:
+Same options as the [Environment card](#environment), plus `zoom`; `columns` and `show_gauge` only shape the zoomed-in view:
 
 ```yaml
 type: custom:room-environment-mini-card
 area: living_room
 navigation_path: /dashboard-home/living-room
+zoom: true
 exclude:
   - sensor.living_room_pm25
 ```
+
+| Option | Required | Default | Description |
+|---|---|---|---|
+| `zoom` | ❌ | `true` | Zoom button switching to the full Environment card and back |
 
 ### Environment overview
 
@@ -526,6 +532,10 @@ rooms:
 | ![Comfortable dark](screenshots/environment-comfort-dark.png) | ![Stuffy room dark](screenshots/environment-stuffy-dark.png) |
 | ![Mini comfortable](screenshots/environment-mini-comfort.png) | ![Mini stuffy room](screenshots/environment-mini-stuffy.png) |
 | ![Mini comfortable dark](screenshots/environment-mini-comfort-dark.png) | ![Mini stuffy room dark](screenshots/environment-mini-stuffy-dark.png) |
+
+| Mini card zoomed in | |
+|---|---|
+| ![Mini zoomed in](screenshots/environment-mini-zoom.png) | ![Mini zoomed in dark](screenshots/environment-mini-zoom-dark.png) |
 
 ### Environment overview
 

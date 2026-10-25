@@ -36,6 +36,10 @@ const RE_I18N = {
     ed_include: "Sensors to add",
     ed_include_helper: "From another room or without one",
     ed_exclude: "Sensors to exclude",
+    zoom_in: "Show the full card",
+    zoom_out: "Back to the compact view",
+    ed_zoom: "Zoom button",
+    ed_zoom_helper: "Switches the mini card to the full Environment card and back",
   },
   fr: {
     title: "Environnement",
@@ -68,6 +72,10 @@ const RE_I18N = {
     ed_include: "Capteurs à ajouter",
     ed_include_helper: "D'une autre pièce ou sans pièce",
     ed_exclude: "Capteurs à exclure",
+    zoom_in: "Afficher la carte complète",
+    zoom_out: "Revenir à la vue compacte",
+    ed_zoom: "Bouton zoom",
+    ed_zoom_helper: "Bascule la mini-carte en carte Environnement complète, et inversement",
   },
 };
 
@@ -398,12 +406,42 @@ rcRegister(
 // ── Mini card ────────────────────────────────────────────────────────────────
 // The same readings on a single line: the room badge and title, then one chip per reading (icon and value),
 // tinted only when the reading needs a look. Wraps onto a second line when the card is narrow.
+// A zoom button switches the card to the full Environment card (same readings, tiles and gauges) and back.
 class RoomEnvironmentMiniCard extends RoomEnvironmentCard {
   static tag = "room-environment-mini-card";
-  static defaults = { only_alerts: false, exclude: [] };
+  // `columns` and `show_gauge` only shape the zoomed-in view.
+  static defaults = { only_alerts: false, zoom: true, columns: 2, show_gauge: true, exclude: [] };
+  static styles = `${RoomEnvironmentCard.styles}
+    .zoom { all: unset; flex: none; cursor: pointer; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+            color: var(--secondary-text-color); }
+    .zoom ha-icon { --mdc-icon-size: 16px; }
+    .zoom:hover { background: color-mix(in srgb, var(--rc-idle) 16%, transparent); color: var(--primary-text-color); }
+    .zoom:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
+    .zoom { margin: -4px -4px -4px 0; }
+  `;
 
   getCardSize() {
+    if (this._zoomed) return super.getCardSize();
     return this.style.display === "none" ? 0 : 1;
+  }
+
+  // Zoom button at the end of the header, top right in both views, added once per render.
+  _addZoom() {
+    const head = this._config.zoom && this.shadowRoot.querySelector(".head");
+    if (!head || head.querySelector(".zoom")) return;
+    const button = document.createElement("button");
+    button.className = "zoom";
+    button.title = this._t(this._zoomed ? "zoom_out" : "zoom_in");
+    button.innerHTML = `<ha-icon icon="${this._zoomed ? "mdi:arrow-collapse" : "mdi:arrow-expand"}"></ha-icon>`;
+    button.addEventListener("click", (ev) => {
+      ev.stopPropagation(); // not a tap on the title (navigation_path)
+      this._zoomed = !this._zoomed;
+      this._sig = null;
+      this._render();
+      // Keyboard use (Enter / Space: no click count) keeps the focus on the button that replaced this one.
+      if (ev.detail === 0) this.shadowRoot.querySelector(".zoom")?.focus();
+    });
+    head.appendChild(button);
   }
 
   getGridOptions() {
@@ -411,6 +449,11 @@ class RoomEnvironmentMiniCard extends RoomEnvironmentCard {
   }
 
   _draw(items) {
+    if (this._zoomed) {
+      super._draw(items);
+      this._addZoom();
+      return;
+    }
     const c = this._config;
     const worst = this._worst(items);
     const level = worst ? (worst.cold || worst.sev === "info" ? "cold" : worst.sev) : "ok";
@@ -430,7 +473,7 @@ class RoomEnvironmentMiniCard extends RoomEnvironmentCard {
       .join("");
     const nav = c.navigation_path;
     this.shadowRoot.innerHTML = `
-      <style>${RC_BASE_STYLES}${RoomEnvironmentCard.styles}${RoomEnvironmentMiniCard.miniStyles}</style>
+      <style>${RC_BASE_STYLES}${RoomEnvironmentMiniCard.styles}${RoomEnvironmentMiniCard.miniStyles}</style>
       <ha-card class="lvl-${level}">
         <div class="mini">
           <div class="badge" title="${rcEsc(status)}"><ha-icon icon="${this._headIcon(worst)}"></ha-icon></div>
@@ -452,6 +495,7 @@ class RoomEnvironmentMiniCard extends RoomEnvironmentCard {
       });
     }
     for (const el of root.querySelectorAll(".r")) el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id));
+    this._addZoom();
   }
 
   static miniStyles = `
@@ -484,10 +528,10 @@ class RoomEnvironmentMiniCard extends RoomEnvironmentCard {
 
 const RoomEnvironmentMiniCardEditor = rcEditor({
   card: RoomEnvironmentMiniCard,
-  helpers: ["title", "navigation_path", "only_alerts", "include"],
+  helpers: ["title", "navigation_path", "only_alerts", "zoom", "include"],
   schema: (_lang, hass, config) => [
     ...rcAreaFields(true).filter((f) => f.name !== "columns"),
-    ...rcBooleans("only_alerts"),
+    ...rcBooleans("only_alerts", "zoom"),
     ...rcIncludeField(RoomEnvironmentMiniCard, hass, config),
     ...rcExcludeField(RoomEnvironmentMiniCard, hass, config),
   ],

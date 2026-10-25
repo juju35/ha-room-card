@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.10.0
+
+### What's new
+- Environment mini card: a zoom button (top right) switches the card to the full Environment card — tiles, comfort words and gauges — and back. On by default; `zoom: false` removes it (also in the visual editor). `columns` and `show_gauge` shape the zoomed-in view.
+
+### Maintenance
+- Test for the zoom (47 in all); the screenshot script clicks like a mouse, so no focus ring is left in the shots.
+
 ## 1.9.1
 
 ### Fixes

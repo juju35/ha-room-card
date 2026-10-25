@@ -87,7 +87,8 @@ export const shoot = async ({ prefix, tag, shots, setup, icons = [] }) => {
         el.setConfig({ type: `custom:${tag}`, ...config });
         el.hass = { ...hass, language: hass.language, themes: { darkMode: dark }, callService: async () => {} };
         document.getElementById("root").appendChild(el);
-        if (open) el.shadowRoot.querySelector(open).click();
+        // A mouse click (detail 1), not a keyboard one: no focus ring left in the shot.
+        if (open) el.shadowRoot.querySelector(open).dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true, detail: 1 }));
       },
       { tag, hass, config, dark: s.theme === "dark", open },
     );

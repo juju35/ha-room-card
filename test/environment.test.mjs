@@ -235,3 +235,23 @@ test("thresholds can be set per room in the overview, over the card's", () => {
   assert.equal(lr.items.find((i) => i.kind === "humidity").sev, "ok");
   assert.equal(lr.items.find((i) => i.kind === "co2").sev, "warn");
 });
+
+test("the mini card zoomed in draws the full Environment card, and back", () => {
+  const card = new rc.cards["room-environment-mini-card"]();
+  card.setConfig({ area: "living_room" });
+  card.hass = makeHass();
+  assert.match(card.shadowRoot.innerHTML, /class="mini"/);
+  card._zoomed = true;
+  card._sig = null;
+  card._render();
+  const html = card.shadowRoot.innerHTML;
+  assert.doesNotMatch(html, /class="mini"/);
+  assert.equal((html.match(/class="tile /g) || []).length, 5);
+  assert.match(html, /class="gauge"/);
+  assert.ok(card.getCardSize() > 1);
+  card._zoomed = false;
+  card._sig = null;
+  card._render();
+  assert.match(card.shadowRoot.innerHTML, /class="mini"/);
+  assert.equal(card.getCardSize(), 1);
+});
