@@ -253,6 +253,7 @@ class RoomEnvironmentCard extends RcCard {
     const word = this._words(k.words)[band];
     return {
       ...item,
+      unit,
       band,
       value: this._format(st, kind),
       word,
@@ -373,4 +374,119 @@ rcRegister(
   RoomEnvironmentCardEditor,
   "Room Environment Card",
   "Temperature, humidity, air quality, noise and light level of a room, coloured by comfort",
+);
+
+// ── Mini card ────────────────────────────────────────────────────────────────
+// The same readings on a single line: the room badge and title, then one chip per reading (icon and value),
+// tinted only when the reading needs a look. Wraps onto a second line when the card is narrow.
+class RoomEnvironmentMiniCard extends RoomEnvironmentCard {
+  static tag = "room-environment-mini-card";
+  static defaults = { only_alerts: false, exclude: [] };
+
+  getCardSize() {
+    return this.style.display === "none" ? 0 : 1;
+  }
+
+  getGridOptions() {
+    return { columns: 12, min_columns: 4, rows: "auto" };
+  }
+
+  // Number in full, unit small and muted ("°" for a temperature) to keep the chips short.
+  _chipValue(i) {
+    if (i.value == null) return "<span>—</span>";
+    const unit = i.unit || "";
+    const num = unit && i.value.endsWith(unit) ? i.value.slice(0, -unit.length).trim() : i.value;
+    const short = /^°[CF]$/.test(unit) ? "°" : unit;
+    return `<span>${rcEsc(num)}</span>${short && num !== i.value ? `<small>${rcEsc(short)}</small>` : ""}`;
+  }
+
+  _draw(items) {
+    const c = this._config;
+    const worst = this._worst(items);
+    const level = worst ? (worst.cold || worst.sev === "info" ? "cold" : worst.sev) : "ok";
+    if (!this._changed(["mini", items.map((i) => [i.id, i.icon, i.state, i.sev, i.cold])])) return;
+
+    const shown = c.only_alerts ? items.filter((i) => i.sev !== "ok" || i.unavailable) : items;
+    this._shown = shown.length;
+    const status = this._status(items, worst);
+    const chips = shown
+      .map(
+        (i) => `
+        <button class="r ${i.unavailable ? "na" : `s-${i.sev}`}${i.cold ? " cold" : ""}${i.light ? " lit" : ""} k-${i.kind}"
+                data-id="${rcEsc(i.id)}" title="${rcEsc(i.name)} — ${rcEsc(i.state)}">
+          <ha-icon icon="${rcEsc(i.icon)}"></ha-icon>${this._chipValue(i)}
+        </button>`,
+      )
+      .join("");
+    const nav = c.navigation_path;
+    this.shadowRoot.innerHTML = `
+      <style>${RC_BASE_STYLES}${RoomEnvironmentCard.styles}${RoomEnvironmentMiniCard.miniStyles}</style>
+      <ha-card class="lvl-${level}">
+        <div class="mini">
+          <div class="badge" title="${rcEsc(status)}"><ha-icon icon="${this._headIcon(worst)}"></ha-icon></div>
+          <div class="body">
+            <div class="head${nav ? " nav" : ""}"${nav ? ' role="link" tabindex="0"' : ""}>
+              <div class="title">${rcEsc(c.title || this._areaName() || this._t("title"))}</div>
+              <span class="st">${rcEsc(status)}</span>
+            </div>
+            <div class="rs">${chips}</div>
+          </div>
+        </div>
+      </ha-card>`;
+    const root = this.shadowRoot;
+    if (nav) {
+      const head = root.querySelector(".head");
+      head.addEventListener("click", () => rcNavigate(nav));
+      head.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" && ev.target === head) rcNavigate(nav);
+      });
+    }
+    for (const el of root.querySelectorAll(".r")) el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id));
+  }
+
+  static miniStyles = `
+    ha-card { padding: 8px 10px; }
+    .mini { display: flex; align-items: center; gap: 10px; }
+    .mini .badge { width: 32px; height: 32px; }
+    .mini .badge ha-icon { --mdc-icon-size: 18px; }
+    .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .mini .head { gap: 8px; }
+    .mini .title { flex: 0 1 auto; font-size: 14px; line-height: 18px; }
+    .st { flex: none; margin-left: auto; font-size: 11px; font-weight: 500; color: var(--c); }
+    /* Comfortable readings are plain text; only the ones needing a look get a tinted pill. */
+    .rs { display: flex; flex-wrap: wrap; gap: 2px 4px; margin-left: -4px; }
+    .r { all: unset; cursor: pointer; display: inline-flex; align-items: baseline; gap: 1px; padding: 0 5px 0 4px;
+         border-radius: 999px; font-size: 12px; font-weight: 500; line-height: 18px; white-space: nowrap; --t: var(--rc-ok);
+         color: var(--primary-text-color); }
+    .r ha-icon { --mdc-icon-size: 13px; color: var(--t); align-self: center; margin-right: 2px; }
+    .r small { font-size: 10px; font-weight: 400; opacity: .7; margin-left: 1px; }
+    .r.s-warn  { --t: var(--rc-warn); }
+    .r.s-alert { --t: var(--rc-alert); }
+    .r.cold    { --t: var(--rc-info); }
+    .r.k-illuminance     { --t: var(--rc-idle); }
+    .r.k-illuminance.lit { --t: var(--rc-light); }
+    .r.na { --t: var(--rc-na); opacity: .7; }
+    .r.s-warn, .r.s-alert, .r.cold.s-info, .r.cold.s-warn {
+      color: var(--t); background: color-mix(in srgb, var(--t) 14%, transparent); }
+    .r:hover { background: color-mix(in srgb, var(--t) 20%, var(--secondary-background-color, transparent)); }
+    .r:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+  `;
+}
+
+const RoomEnvironmentMiniCardEditor = rcEditor({
+  card: RoomEnvironmentMiniCard,
+  helpers: ["title", "navigation_path", "only_alerts", "include"],
+  schema: (_lang, hass, config) => [
+    ...rcAreaFields(true).filter((f) => f.name !== "columns"),
+    ...rcBooleans("only_alerts"),
+    ...rcIncludeField(RoomEnvironmentMiniCard, hass, config),
+    ...rcExcludeField(RoomEnvironmentMiniCard, hass, config),
+  ],
+});
+
+rcRegister(
+  RoomEnvironmentMiniCard,
+  RoomEnvironmentMiniCardEditor,
+  "Room Environment Mini Card",
+  "The environment readings of a room on a single line: one chip per reading, tinted when it needs a look",
 );

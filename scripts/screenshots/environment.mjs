@@ -14,11 +14,7 @@ const SENSORS = [
 const COMFORT = [21.4, 47, 640, 6, 36, 320];
 const STUFFY = [24.6, 66, 1380, 9, 58, 140];
 
-await shoot({
-  prefix: "environment",
-  tag: "room-environment-card",
-  shots: [...pair("comfort", { values: COMFORT }), ...pair("stuffy", { values: STUFFY })],
-  setup: (s, lang) => {
+const setup = (s, lang) => {
     const states = {};
     const entities = {};
     SENSORS.forEach(([entity_id, names, device_class, unit], n) => {
@@ -35,5 +31,17 @@ await shoot({
       hass: { states, entities, devices: {}, areas, language: lang, locale: { language: lang } },
       config: { area: "living_room" },
     };
+};
+
+const shots = [...pair("comfort", { values: COMFORT }), ...pair("stuffy", { values: STUFFY })];
+await shoot({ prefix: "environment", tag: "room-environment-card", shots, setup });
+// The mini card with the five readings of a typical indoor station (PM2.5 left out): a single line of readings.
+await shoot({
+  prefix: "environment-mini",
+  tag: "room-environment-mini-card",
+  shots,
+  setup: (s, lang) => {
+    const { hass, config } = setup(s, lang);
+    return { hass, config: { ...config, exclude: ["sensor.living_room_pm25"] } };
   },
 });

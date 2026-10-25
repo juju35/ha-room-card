@@ -17,12 +17,13 @@ Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, pl
 | [Lights](#lights) | `custom:room-lights-card` | Lights of a room: tap to toggle, drag to dim, turn everything off from the header. |
 | [Plugs](#plugs) | `custom:room-switch-card` | Smart plugs of a room with their power draw: what is on comes first, the most power-hungry first. |
 | [Environment](#environment) | `custom:room-environment-card` | Temperature, humidity, air quality, noise and light level of a room, coloured by comfort. |
+| [Environment mini](#environment-mini) | `custom:room-environment-mini-card` | The same readings on a single line, for a compact dashboard. |
 
 | Every room | Sensors | Lights | Plugs | Environment |
 |---|---|---|---|---|
 | ![Overview](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all.png) | ![Sensors](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open.png) | ![Lights](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on.png) | ![Plugs](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on.png) | ![Environment](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-stuffy.png) |
 
-All five cards share the same look (header with a status pill, compact tiles), a visual editor in the dashboard UI, English and French labels following the Home Assistant language, light and dark themes, and come in a single HACS download with no dependency.
+All the cards share the same look (header with a status pill, compact tiles), a visual editor in the dashboard UI, English and French labels following the Home Assistant language, light and dark themes, and come in a single HACS download with no dependency.
 
 ## Features
 
@@ -94,6 +95,15 @@ All five cards share the same look (header with a status pill, compact tiles), a
 - Tap a reading to open its details and history; tap the title to open a dashboard (`navigation_path`)
 - Automatic discovery from the area, or an explicit list with name and icon overrides
 
+### Environment mini
+
+`custom:room-environment-mini-card` — The same readings on a single line, for a compact dashboard.
+
+- Room badge coloured by the reading that needs a look first, the title and the status on the first line
+- One chip per reading on the second line: icon and value, the unit kept small (*21,4°*, *640 ppm*); comfortable readings are plain, the others get a tinted pill
+- Same discovery, thresholds, `only_alerts`, `include` / `exclude` and `navigation_path` as the Environment card; the chips wrap onto another line when the card is narrow or the room has many sensors
+- Tap a reading to open its details and history
+
 ## Prerequisites
 
 - Home Assistant 2024.8 or later
@@ -114,7 +124,7 @@ Or manually:
 3. Search for **Room Cards** and install it
 4. Clear your browser cache and refresh
 
-HACS registers the dashboard resource for you; the single file provides the five cards.
+HACS registers the dashboard resource for you; the single file provides every card.
 
 ### Manual
 
@@ -406,6 +416,18 @@ The Environment card takes these options on top of the [common options](#common-
 | `show_gauge` | ❌ | `true` | Thin gauge under each reading |
 | `thresholds` | ❌ | See above | Comfort limits per kind, in the sensor's unit |
 
+### Environment mini
+
+Same options as the [Environment card](#environment), except `columns` and `show_gauge`:
+
+```yaml
+type: custom:room-environment-mini-card
+area: living_room
+navigation_path: /dashboard-home/living-room
+exclude:
+  - sensor.living_room_pm25
+```
+
 ## Screenshots
 
 ### Overview
@@ -442,6 +464,8 @@ The Environment card takes these options on top of the [common options](#common-
 |---|---|
 | ![Comfortable](screenshots/environment-comfort.png) | ![Stuffy room](screenshots/environment-stuffy.png) |
 | ![Comfortable dark](screenshots/environment-comfort-dark.png) | ![Stuffy room dark](screenshots/environment-stuffy-dark.png) |
+| ![Mini comfortable](screenshots/environment-mini-comfort.png) | ![Mini stuffy room](screenshots/environment-mini-stuffy.png) |
+| ![Mini comfortable dark](screenshots/environment-mini-comfort-dark.png) | ![Mini stuffy room dark](screenshots/environment-mini-stuffy-dark.png) |
 
 ## How it works
 

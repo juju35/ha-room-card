@@ -131,3 +131,24 @@ test("the editor offers only environment sensors to add", () => {
   const field = [...editor._form.schema].find((s) => s.name === "include");
   assert.deepEqual([...field.selector.entity.include_entities], ["sensor.kitchen_temperature"]);
 });
+
+test("the mini card shows one chip per reading with a short unit, and the status on the title line", () => {
+  const card = new rc.cards["room-environment-mini-card"]();
+  card.setConfig({ area: "living_room" });
+  card.hass = makeHass({ co2: 1200 });
+  const html = card.shadowRoot.innerHTML;
+  assert.equal((html.match(/class="r /g) || []).length, 5);
+  assert.match(html, /<span>21,4<\/span><small>°<\/small>/);
+  assert.match(html, /class="st">Aérer</);
+  assert.match(html, /lvl-warn/);
+  assert.equal(card.getCardSize(), 1);
+});
+
+test("the mini card with only_alerts keeps the readings that need a look", () => {
+  const card = new rc.cards["room-environment-mini-card"]();
+  card.setConfig({ area: "living_room", only_alerts: true });
+  card.hass = makeHass({ hum: 72 });
+  const html = card.shadowRoot.innerHTML;
+  assert.equal((html.match(/class="r /g) || []).length, 1);
+  assert.ok(html.includes('data-id="sensor.lr_humidity"'));
+});

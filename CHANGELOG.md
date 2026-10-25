@@ -4,9 +4,10 @@
 
 ### What's new
 - New **Environment** card (`custom:room-environment-card`): temperature, humidity, CO₂, PM2.5, PM10, VOC, air quality index, noise and light level of a room, compact tiles with the value and a thin gauge, plus a comfort word when the reading is off. The header pill names the reading that needs a look first (*Ventilate*, *Too humid*, *Too cold*…), coloured from blue (cool) to red. Comfort thresholds can be set per kind (`thresholds`), °F and ppb sensors are handled; `only_alerts` keeps only the readings outside the comfort range. Same look, discovery rules and visual editor as the other room cards.
+- New **Environment mini** card (`custom:room-environment-mini-card`): the same readings on a single line — room badge, title and status, then one chip per reading (icon and value), tinted only when the reading needs a look.
 
 ### Maintenance
-- The include picker of a card can be narrowed to the entities it accepts (only environment sensors on the Environment card); tests for the new card (38 in all) and its screenshots.
+- The include picker of a card can be narrowed to the entities it accepts (only environment sensors on the Environment card); tests for the new cards (40 in all) and its screenshots.
 
 ## 1.7.1
 
