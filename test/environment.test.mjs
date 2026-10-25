@@ -304,7 +304,9 @@ test("outdoors, temperature, humidity and noise are information only, unless thr
   assert.equal(of(card, "humidity").sev, "ok");
   assert.equal(of(card, "noise").sev, "ok");
   assert.equal(of(card, "co2").sev, "warn", "other readings keep their thresholds");
-  assert.doesNotMatch(head(card), /Trop froid|Trop humide|Bruyant/);
+  // The status pill (the tiles' tooltips may still say "Frais" or "Bruyant", as information).
+  const pill = head(card).match(/<button class="pill"[^>]*>([^<]*)/)[1].trim();
+  assert.equal(pill, "Aérer");
   // The user's own thresholds still apply outdoors.
   assert.equal(of(render({ thresholds: { temperature: [5, 10, 30, 35] } }, hass), "temperature").sev, "ok");
   assert.equal(of(render({ thresholds: { temperature: [16, 18, 30, 35] } }, hass), "temperature").sev, "warn");
