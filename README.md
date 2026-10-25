@@ -61,7 +61,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 
 - Room badge coloured like the Sensors card, the title and the status (*1 open*, *Water leak*) on the first line
 - One chip per sensor on the second line: a quiet sensor is a plain icon, an open, leaking or detecting one a tinted pill with its name (blinking unless `blink: false`)
-- **Zoom** button (top right) switches the card to the full [Sensors card](#sensors) and back (`zoom: false` removes it)
+- **Zoom** button (top right) switches the card to the full [Sensors card](#sensors) and back (`zoom: false` removes it); zoomed in, every sensor is shown, `only_alerts` only filtering the compact view
 - Same discovery and options as the Sensors card: `only_alerts`, `hide_when_clear`, `presence`, `blink`, `include` / `exclude`
 - Tap a sensor to open its details
 
@@ -115,7 +115,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - One chip per reading on the second line: icon and value, the unit kept small (*21,4°*, *640 ppm*); comfortable readings are plain, the others get a tinted pill
 - Same discovery, thresholds, `only_alerts`, `include` / `exclude` and `navigation_path` as the Environment card; the chips wrap onto another line when the card is narrow or the room has many sensors
 - Tap a reading to open its details and history
-- **Zoom** button (top right) switches the card to the full [Environment card](#environment) — tiles, comfort words, gauges — and back (`zoom: false` removes it)
+- **Zoom** button (top right) switches the card to the full [Environment card](#environment) — tiles, comfort words, gauges — and back (`zoom: false` removes it); zoomed in, every reading is shown, `only_alerts` only filtering the compact view
 
 ### Environment overview
 

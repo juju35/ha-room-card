@@ -255,3 +255,14 @@ test("the mini card zoomed in draws the full Environment card, and back", () => 
   assert.match(card.shadowRoot.innerHTML, /class="mini"/);
   assert.equal(card.getCardSize(), 1);
 });
+
+test("zoomed in, the environment mini card shows every reading, whatever only_alerts says", () => {
+  const card = new rc.cards["room-environment-mini-card"]();
+  card.setConfig({ area: "living_room", only_alerts: true });
+  card.hass = makeHass({ co2: 1200 });
+  assert.equal(card._shown, 1);
+  card._zoomed = true;
+  card._sig = null;
+  card._render();
+  assert.equal(card._shown, 5);
+});

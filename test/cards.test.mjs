@@ -450,3 +450,16 @@ test("the sensors mini card hides itself when clear, like the full card", () => 
   assert.equal(card.style.display, "none");
   assert.equal(card.getCardSize(), 0);
 });
+
+test("zoomed in, a mini card shows every sensor, whatever only_alerts says", () => {
+  const card = new cards["room-sensors-mini-card"]();
+  card.setConfig({ area: "kitchen", only_alerts: true });
+  card.hass = makeHass();
+  assert.equal(card._shown, 1); // only the open diagnostic door sensor
+  card._zoomed = true;
+  card._sig = null;
+  card._render();
+  assert.equal(card._shown, 2);
+  assert.match(card.shadowRoot.innerHTML, /data-id="binary_sensor.door"/);
+  assert.equal(card._config.only_alerts, true, "the config itself is left alone");
+});

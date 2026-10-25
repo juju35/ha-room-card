@@ -576,6 +576,7 @@ class RcToggleCard extends RcCard {
 // A mini card shows what its full card (`Base`) shows on two lines: the room badge, title and status, then one chip
 // per entity. Its zoom button (top right, `zoom: false` removes it) switches it to the full card and back.
 // The subclass implements `_drawMini(items)`, which builds the chips and calls `_paintMini`.
+// Zoomed in, the card shows everything: `only_alerts` and `hide_when_clear` only apply to the compact view.
 const rcMini = (Base, tag, styles) =>
   class extends Base {
     static tag = tag;
@@ -592,8 +593,17 @@ const rcMini = (Base, tag, styles) =>
     }
 
     _draw(items) {
-      if (this._zoomed) super._draw(items);
-      else this._drawMini(items);
+      if (this._zoomed) {
+        const config = this._config;
+        this._config = { ...config, only_alerts: false, hide_when_clear: false };
+        try {
+          super._draw(items);
+        } finally {
+          this._config = config;
+        }
+      } else {
+        this._drawMini(items);
+      }
       this._addZoom();
     }
 
