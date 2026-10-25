@@ -396,8 +396,8 @@ rcRegister(
 );
 
 // ── Mini card ────────────────────────────────────────────────────────────────
-// The room on two lines: the badge, title and status, then a chip (icon and value) for each reading that needs a look;
-// comfortable readings only show once zoomed in to the full Environment card (tiles and gauges).
+// The room on two lines: the badge, title and status, then one chip per reading (icon and value), tinted only when
+// the reading needs a look. The zoom button switches to the full Environment card (tiles and gauges) and back.
 // `columns` and `show_gauge` only shape the zoomed-in view.
 class RoomEnvironmentMiniCard extends rcMini(
   RoomEnvironmentCard,
@@ -419,7 +419,7 @@ class RoomEnvironmentMiniCard extends rcMini(
 
     const shown = c.only_alerts ? items.filter((i) => i.sev !== "ok") : items;
     this._shown = shown.length;
-    // Only the readings needing a look are here (`only_alerts`, set by the mini base): a tinted pill, cool ones in blue.
+    // Comfortable readings stay plain; the ones needing a look get a tinted pill, cool ones in blue.
     const pill = (i) => i.sev === "warn" || i.sev === "alert" || (i.cold && i.sev !== "ok");
     const chips = shown
       .map(
@@ -436,10 +436,10 @@ class RoomEnvironmentMiniCard extends rcMini(
 
 const RoomEnvironmentMiniCardEditor = rcEditor({
   card: RoomEnvironmentMiniCard,
-  helpers: ["title", "navigation_path", "zoom", "include"],
+  helpers: ["title", "navigation_path", "only_alerts", "zoom", "include"],
   schema: (_lang, hass, config) => [
     ...rcAreaFields(true).filter((f) => f.name !== "columns"),
-    ...rcBooleans("zoom"),
+    ...rcBooleans("only_alerts", "zoom"),
     ...rcIncludeField(RoomEnvironmentMiniCard, hass, config),
     ...rcExcludeField(RoomEnvironmentMiniCard, hass, config),
   ],

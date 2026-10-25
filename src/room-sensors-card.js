@@ -274,6 +274,7 @@ class RoomSensorsMiniCard extends rcMini(
     .no-blink .r.on ha-icon { animation: none; }
     @media (prefers-reduced-motion: reduce) { .r.on ha-icon { animation: none; } }
   `,
+  { alertsOnly: true },
 ) {
   _drawMini(items) {
     const v = this._visible(items, ["mini", items.map((i) => [i.id, i.on, i.unavailable, i.name, i.icon])]);
