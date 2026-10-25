@@ -42,6 +42,28 @@ const rcMatchPlug = (hass, id) => {
   return rcIsPlug(st);
 };
 
+const RC_ROOM_ICONS = [
+  [/chambre|bedroom|nursery/i, "mdi:bed-outline"],
+  [/s[ée]jour|salon|living|lounge/i, "mdi:sofa-outline"],
+  [/cuisine|kitchen/i, "mdi:silverware-fork-knife"],
+  [/salle (de )?bains?|bath|douche|shower/i, "mdi:shower-head"],
+  [/toilettes?|wc|toilet/i, "mdi:toilet"],
+  [/entr[ée]e|entrance|hall d.entr|entry/i, "mdi:door"],
+  [/couloir|hall|corridor/i, "mdi:arrow-left-right"],
+  [/bureau|office|study/i, "mdi:desk"],
+  [/garage/i, "mdi:garage"],
+  [/terrasse|jardin|balcon|garden|terrace|balcony|patio|ext[ée]rieur|outdoor/i, "mdi:flower-outline"],
+  [/buanderie|cellier|laundry|utility/i, "mdi:washing-machine"],
+  [/salle [àa] manger|dining/i, "mdi:table-chair"],
+];
+
+// Icon of a room in the overviews: the area's own icon, or one picked from its name.
+const rcRoomIcon = (area) => {
+  if (area.icon) return area.icon;
+  const hit = RC_ROOM_ICONS.find(([re]) => re.test(area.name || area.area_id || ""));
+  return hit ? hit[1] : "mdi:home-outline";
+};
+
 // `fn(hass)` computed once per entity registry: HA replaces hass.entities only when the registry changes,
 // whereas a new hass (and hass.states) comes with every state change of the whole instance.
 const rcPerRegistry = (fn) => {
@@ -89,6 +111,55 @@ const rcWattsOf = (hass, sensorId) => {
   if (!Number.isFinite(v)) return null;
   return st.attributes.unit_of_measurement === "kW" ? v * 1000 : v;
 };
+
+// ── Overviews ────────────────────────────────────────────────────────────────
+// Shared by room-overview-card and room-environment-overview-card.
+
+// Visible entities accepted by `match(id)`, with their area, minus the config's `exclude`: the registries are
+// scanned again only when they or the config change.
+const rcByArea = (card, match) => {
+  const h = card._hass;
+  const c = card._config;
+  return rcMemo((card._memo ||= {}), "byArea", [c, h.entities, h.devices], () => {
+    const excluded = new Set(c.exclude || []);
+    const out = [];
+    for (const [id, r] of Object.entries(h.entities || {})) {
+      if (r.hidden || excluded.has(id) || !match(id)) continue;
+      const aid = card._areaOf(id);
+      if (aid) out.push([id, aid]);
+    }
+    return out;
+  });
+};
+
+// Rooms in the order of the config's `rooms` list, then, with `sort: state`, the highest `rank(room)` first,
+// then by name.
+const rcSortRooms = (list, config, rank) => {
+  const order = (config.rooms || []).map((x) => x.area);
+  return list.sort((a, b) => {
+    if (order.length) {
+      const ia = order.indexOf(a.id);
+      const ib = order.indexOf(b.id);
+      if (ia !== ib) return (ia < 0 ? 1e9 : ia) - (ib < 0 ? 1e9 : ib);
+    }
+    return (config.sort === "state" ? rank(b) - rank(a) : 0) || a.name.localeCompare(b.name);
+  });
+};
+
+// Editor fields shared by the overviews: title, columns and sort.
+const rcOverviewFields = (i18n, lang) => [
+  { name: "title", selector: { text: {} } },
+  { name: "columns", selector: { number: { min: 1, max: 6, mode: "box" } } },
+  {
+    name: "sort",
+    selector: {
+      select: {
+        mode: "dropdown",
+        options: ["name", "state"].map((value) => ({ value, label: rcT(i18n, lang, `ed_sort_${value}`) })),
+      },
+    },
+  },
+];
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 // Strings shared by the cards; a card's own dictionary wins over these.
@@ -307,6 +378,21 @@ class RcCard extends HTMLElement {
 
   _cols() {
     return Math.min(4, Math.max(1, Number(this._config.columns) || 2));
+  }
+
+  // Overviews: the grid of room tiles (`tile(room)`), its columns, the empty and idle states, then the open room's
+  // details kept in step with the rooms shown.
+  _roomGrid(grid, rooms, tile) {
+    const cols = Number(this._config.columns);
+    grid.classList.toggle("fixed", cols >= 1);
+    grid.style.setProperty("--cols", String(Math.min(6, Math.max(1, cols || 3))));
+    // Every room idle with the "hide idle rooms" option: the header alone says it all.
+    const idle = !rooms.length && this._total > 0;
+    grid.hidden = idle;
+    if (idle) grid.innerHTML = "";
+    else grid.innerHTML = rooms.length ? rooms.map(tile).join("") : `<div class="empty">${rcEsc(this._t("no_rooms"))}</div>`;
+    if (this._openArea && !rooms.some((x) => x.id === this._openArea)) this._toggle(null);
+    else if (this._openArea) this._fillPanel();
   }
 
   _head({ icon, title, status, chips = "", allOff = false }) {

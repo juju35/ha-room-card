@@ -1,6 +1,6 @@
 {
   "name": "ha-room-card",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Compact Lovelace cards for Home Assistant, room by room: sensors, lights, plugs, environment readings and an overview of every room.",
   "private": true,
   "type": "module",
@@ -8,7 +8,7 @@
     "build": "node scripts/build.mjs",
     "check": "node scripts/build.mjs && node --check dist/ha-room-card.js",
     "test": "node --test test/*.test.mjs",
-    "screenshots": "node scripts/screenshots/sensors.mjs && node scripts/screenshots/lights.mjs && node scripts/screenshots/switch.mjs && node scripts/screenshots/environment.mjs && node scripts/screenshots/overview.mjs"
+    "screenshots": "node scripts/screenshots/sensors.mjs && node scripts/screenshots/lights.mjs && node scripts/screenshots/switch.mjs && node scripts/screenshots/environment.mjs && node scripts/screenshots/environment-overview.mjs && node scripts/screenshots/overview.mjs"
   },
   "license": "MIT",
   "devDependencies": {

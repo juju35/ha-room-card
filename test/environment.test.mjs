@@ -56,7 +56,7 @@ test("finds the environment sensors of the area, in kind order, skipping diagnos
   assert.deepEqual(ids(card), ["sensor.lr_temperature", "sensor.lr_humidity", "sensor.lr_co2", "sensor.lr_noise", "sensor.lr_lux"]);
   assert.deepEqual(
     [...card._items].map((i) => i.name),
-    ["Température", "Humidité", "CO₂", "Bruit", "Luminosité"],
+    ["Température", "Humidité", "CO2", "Bruit", "Luminosité"],
   );
 });
 
@@ -108,15 +108,30 @@ test("parts-per-billion VOC sensors use their own scale", () => {
   assert.match(head(card), /Air pollué/);
 });
 
-test("two sensors of the same kind are told apart by their own name", () => {
+test("several sensors of the same kind make one reading: their mean", () => {
   const second = st("sensor.lr_netatmo_temperature", 22, "temperature", "°C", "Netatmo Salon Température");
   const card = render({}, makeHass({}, { "sensor.lr_netatmo_temperature": second }));
-  const names = [...card._items].filter((i) => i.kind === "temperature").map((i) => i.name);
-  assert.deepEqual(names.sort(), ["Température", "Température · Netatmo"]);
+  const temps = [...card._items].filter((i) => i.kind === "temperature");
+  assert.equal(temps.length, 1);
+  assert.equal(temps[0].name, "Température");
+  assert.equal(temps[0].value, "21,7 °C");
+  assert.deepEqual([...temps[0].ids], ["sensor.lr_temperature", "sensor.lr_netatmo_temperature"]);
 });
 
-test("only_alerts keeps the readings outside the comfort range and the unavailable ones", () => {
-  const card = render({ only_alerts: true }, makeHass({ co2: 1600, noise: "unavailable" }));
+test("unavailable and unknown sensors are ignored, in the mean and as tiles", () => {
+  const extra = {
+    "sensor.lr_t2": st("sensor.lr_t2", "unavailable", "temperature", "°C", "T2"),
+    "sensor.lr_t3": st("sensor.lr_t3", "unknown", "temperature", "°C", "T3"),
+  };
+  const card = render({}, makeHass({ noise: "unavailable" }, extra));
+  const temp = card._items[0];
+  assert.equal(temp.value, "21,4 °C");
+  assert.deepEqual([...temp.ids], ["sensor.lr_temperature"]);
+  assert.ok(!card._items.some((i) => i.kind === "noise"));
+});
+
+test("only_alerts keeps the readings outside the comfort range", () => {
+  const card = render({ only_alerts: true }, makeHass({ co2: 1600, noise: 72 }));
   assert.equal(card._shown, 2);
   assert.ok(head(card).includes('data-id="sensor.lr_co2"'));
   assert.ok(head(card).includes('data-id="sensor.lr_noise"'));
@@ -151,4 +166,46 @@ test("the mini card with only_alerts keeps the readings that need a look", () =>
   const html = card.shadowRoot.innerHTML;
   assert.equal((html.match(/class="r /g) || []).length, 1);
   assert.ok(html.includes('data-id="sensor.lr_humidity"'));
+});
+
+// Two rooms for the overview: the living room of makeHass and the kitchen with its temperature sensor.
+const overview = (config = {}, hass = makeHass()) => {
+  const card = new (rc.customElements.get("room-environment-overview-card"))();
+  card._config = { ...card.constructor.defaults, ...config };
+  card._hass = hass;
+  return card;
+};
+
+test("the overview groups the environment sensors by room, with each room's status", () => {
+  const rooms = [...overview({}, makeHass({ co2: 1200 }))._collect()];
+  assert.deepEqual(
+    rooms.map((x) => [x.id, x.items.length, x.status, x.level]),
+    [
+      ["kitchen", 1, "Confortable", "ok"],
+      ["living_room", 5, "Aérer", "warn"],
+    ],
+  );
+});
+
+test("the overview sorts rooms needing a look first, hides comfortable ones and excluded rooms", () => {
+  const hass = makeHass({ hum: 75 });
+  const ids = (config) => [...overview(config, hass)._collect()].map((x) => x.id);
+  assert.deepEqual(
+    ids({ sort: "state" }),
+    ["living_room", "kitchen"],
+  );
+  assert.deepEqual(
+    ids({ only_alerts: true }),
+    ["living_room"],
+  );
+  assert.deepEqual(
+    ids({ exclude_areas: ["living_room"] }),
+    ["kitchen"],
+  );
+});
+
+test("the overview averages the first temperature of each room", () => {
+  const card = overview();
+  assert.equal(card._average(card._collect(), "temperature", 1), "20,7");
+  assert.equal(card._average(card._collect(), "humidity", 0), "48");
 });

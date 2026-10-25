@@ -5,21 +5,6 @@
  * room-switch-card). Uses src/shared.js. https://github.com/juju35/ha-room-card
  */
 
-const RO_ROOM_ICONS = [
-  [/chambre|bedroom|nursery/i, "mdi:bed-outline"],
-  [/s[ée]jour|salon|living|lounge/i, "mdi:sofa-outline"],
-  [/cuisine|kitchen/i, "mdi:silverware-fork-knife"],
-  [/salle (de )?bains?|bath|douche|shower/i, "mdi:shower-head"],
-  [/toilettes?|wc|toilet/i, "mdi:toilet"],
-  [/entr[ée]e|entrance|hall d.entr|entry/i, "mdi:door"],
-  [/couloir|hall|corridor/i, "mdi:arrow-left-right"],
-  [/bureau|office|study/i, "mdi:desk"],
-  [/garage/i, "mdi:garage"],
-  [/terrasse|jardin|balcon|garden|terrace|balcony|patio|ext[ée]rieur|outdoor/i, "mdi:flower-outline"],
-  [/buanderie|cellier|laundry|utility/i, "mdi:washing-machine"],
-  [/salle [àa] manger|dining/i, "mdi:table-chair"],
-];
-
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const RO_I18N = {
   en: {
@@ -104,12 +89,6 @@ const RO_I18N = {
 // would otherwise land on what lies under the button (the lights chip, a room tile).
 const RO_CLOSED_GUARD_MS = 400;
 
-const roRoomIcon = (area) => {
-  if (area.icon) return area.icon;
-  const hit = RO_ROOM_ICONS.find(([re]) => re.test(area.name || area.area_id || ""));
-  return hit ? hit[1] : "mdi:home-outline";
-};
-
 // ── Card ─────────────────────────────────────────────────────────────────────
 class RoomOverviewCard extends RcCard {
   static tag = "room-overview-card";
@@ -172,23 +151,6 @@ class RoomOverviewCard extends RcCard {
   }
 
   // ── Data ───────────────────────────────────────────────────────────────────
-  // Visible entities of the domains the room cards show, by area, minus `exclude`: the registries are scanned
-  // again only when they or the config change.
-  _byArea() {
-    const h = this._hass;
-    const c = this._config;
-    return rcMemo((this._memo ||= {}), "areas", [c, h.entities, h.devices], () => {
-      const excluded = new Set(c.exclude || []);
-      const out = [];
-      for (const [id, r] of Object.entries(h.entities || {})) {
-        if (r.hidden || excluded.has(id) || !/^(binary_sensor|light|switch)\./.test(id)) continue;
-        const aid = this._areaOf(id);
-        if (aid) out.push([id, aid]);
-      }
-      return out;
-    });
-  }
-
   _collect() {
     const h = this._hass;
     const c = this._config;
@@ -207,7 +169,7 @@ class RoomOverviewCard extends RcCard {
     };
 
     // The room cards' own rules, so that a room counts what its unfolded details show.
-    for (const [id, aid] of this._byArea()) {
+    for (const [id, aid] of rcByArea(this, (id) => /^(binary_sensor|light|switch)\./.test(id))) {
       const st = h.states[id];
       if (!st) continue;
       const dc = st.attributes.device_class;
@@ -223,7 +185,6 @@ class RoomOverviewCard extends RcCard {
 
     const exclude = new Set(c.exclude_areas || []);
     const overrides = Object.fromEntries((c.rooms || []).map((x) => [x.area, x]));
-    const order = (c.rooms || []).map((x) => x.area);
 
     let list = Object.values(rooms)
       .filter((x) => !exclude.has(x.id) && h.areas?.[x.id])
@@ -236,7 +197,7 @@ class RoomOverviewCard extends RcCard {
         return {
           ...x,
           name: o.name ?? area.name ?? x.id,
-          icon: o.icon ?? roRoomIcon(area),
+          icon: o.icon ?? rcRoomIcon(area),
           navigation_path: o.navigation_path,
           leaks: x.sensors.filter((s) => s.leak && on(s)).length,
           open: x.sensors.filter((s) => !s.leak && on(s)).length,
@@ -248,18 +209,7 @@ class RoomOverviewCard extends RcCard {
       });
 
     const rank = (x) => (x.leaks ? 4 : x.open ? 3 : x.occupied ? 2 : x.lightsOn || x.plugsOn ? 1 : 0);
-    list.sort((a, b) => {
-      if (order.length) {
-        const ia = order.indexOf(a.id);
-        const ib = order.indexOf(b.id);
-        if (ia !== ib) return (ia < 0 ? 1e9 : ia) - (ib < 0 ? 1e9 : ib);
-      }
-      if (c.sort === "state") {
-        const d = rank(b) - rank(a);
-        if (d) return d;
-      }
-      return a.name.localeCompare(b.name);
-    });
+    rcSortRooms(list, c, rank);
     this._total = list.length;
     this._anySensors = list.some((x) => x.sensors.some((e) => !e.leak));
     if (c.only_active) list = list.filter((x) => rank(x) > 0 || x.id === this._openArea);
@@ -378,42 +328,26 @@ class RoomOverviewCard extends RcCard {
       }
       <div class="pill">${rcEsc(status)}</div>`;
 
-    const cols = Number(c.columns);
-    const grid = card.querySelector(".grid");
-    grid.classList.toggle("fixed", cols >= 1);
-    grid.style.setProperty("--cols", String(Math.min(6, Math.max(1, cols || 3))));
-    // Every room idle with "Hide idle rooms": the header alone says it all.
-    const idle = !rooms.length && this._total > 0;
-    grid.hidden = idle;
-    grid.innerHTML = idle
-      ? ""
-      : rooms.length
-      ? rooms
-          .map((x) => {
-            const s = this._roomState(x);
-            // Chips only add what the state line does not already say.
-            const chips = [
-              x.leaks && x.open ? chip("warn", "mdi:door-open", this._t("open_many", { n: x.open }), String(x.open)) : "",
-              x.occupied && s.lvl !== "info" ? chip("info", "mdi:account", this._t("presence")) : "",
-              x.lightsOn ? chip("light", "mdi:lightbulb", this._t("lights_on"), String(x.lightsOn)) : "",
-              x.plugsOn
-                ? chip("plug", "mdi:power-socket-fr", this._t("plugs_on"), x.watts != null ? rcWatts(x.watts) : String(x.plugsOn))
-                : "",
-            ].join("");
-            return `
-            <button class="room lvl-${s.lvl}${x.id === this._openArea ? " sel" : ""}" data-area="${rcEsc(x.id)}"
-                    title="${rcEsc(x.name)} — ${rcEsc(s.text)}">
-              <span class="ic"><ha-icon icon="${rcEsc(x.icon)}"></ha-icon></span>
-              <span class="name">${rcEsc(x.name)}</span>
-              <span class="state">${rcEsc(s.text)}</span>
-              <span class="chips">${chips}</span>
-            </button>`;
-          })
-          .join("")
-      : `<div class="empty">${rcEsc(this._t("no_rooms"))}</div>`;
-
-    if (this._openArea && !rooms.some((x) => x.id === this._openArea)) this._toggle(null);
-    else if (this._openArea) this._fillPanel();
+    this._roomGrid(card.querySelector(".grid"), rooms, (x) => {
+      const s = this._roomState(x);
+      // Chips only add what the state line does not already say.
+      const chips = [
+        x.leaks && x.open ? chip("warn", "mdi:door-open", this._t("open_many", { n: x.open }), String(x.open)) : "",
+        x.occupied && s.lvl !== "info" ? chip("info", "mdi:account", this._t("presence")) : "",
+        x.lightsOn ? chip("light", "mdi:lightbulb", this._t("lights_on"), String(x.lightsOn)) : "",
+        x.plugsOn
+          ? chip("plug", "mdi:power-socket-fr", this._t("plugs_on"), x.watts != null ? rcWatts(x.watts) : String(x.plugsOn))
+          : "",
+      ].join("");
+      return `
+      <button class="room lvl-${s.lvl}${x.id === this._openArea ? " sel" : ""}" data-area="${rcEsc(x.id)}"
+              title="${rcEsc(x.name)} — ${rcEsc(s.text)}">
+        <span class="ic"><ha-icon icon="${rcEsc(x.icon)}"></ha-icon></span>
+        <span class="name">${rcEsc(x.name)}</span>
+        <span class="state">${rcEsc(s.text)}</span>
+        <span class="chips">${chips}</span>
+      </button>`;
+    });
   }
 
   // What a header chip turns off: every light, or every plug, that is on in the rooms shown. Lights go off at once;
@@ -668,20 +602,7 @@ const RoomOverviewCardEditor = rcEditor({
   card: RoomOverviewCard,
   helpers: ["title", "columns", "presence", "only_active", "all_off_button", "plugs_off_button", "exclude"],
   schema: (lang, hass, config) => [
-    { name: "title", selector: { text: {} } },
-    { name: "columns", selector: { number: { min: 1, max: 6, mode: "box" } } },
-    {
-      name: "sort",
-      selector: {
-        select: {
-          mode: "dropdown",
-          options: [
-            { value: "name", label: rcT(RO_I18N, lang, "ed_sort_name") },
-            { value: "state", label: rcT(RO_I18N, lang, "ed_sort_state") },
-          ],
-        },
-      },
-    },
+    ...rcOverviewFields(RO_I18N, lang),
     { name: "presence", selector: { boolean: {} } },
     { name: "only_active", selector: { boolean: {} } },
     { name: "all_off_button", selector: { boolean: {} } },

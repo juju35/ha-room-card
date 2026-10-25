@@ -11,7 +11,7 @@ const RE_I18N = {
     comfortable: "Comfortable",
     k_temperature: "Temperature",
     k_humidity: "Humidity",
-    k_co2: "CO₂",
+    k_co2: "CO2",
     k_pm25: "PM2.5",
     k_pm10: "PM10",
     k_voc: "VOC",
@@ -43,7 +43,7 @@ const RE_I18N = {
     comfortable: "Confortable",
     k_temperature: "Température",
     k_humidity: "Humidité",
-    k_co2: "CO₂",
+    k_co2: "CO2",
     k_pm25: "PM2,5",
     k_pm10: "PM10",
     k_voc: "COV",
@@ -188,11 +188,6 @@ const reBand = (v, [al, wl, wh, ah]) => {
   return 2;
 };
 
-// "Capteur Salon Température" in Salon → "", "Netatmo Indoor Temperature" → "Netatmo Indoor"
-const RE_PREFIX = /^(capteur|sensor)\s+/i;
-const RE_SUFFIX =
-  /\s+(temp[ée]rature|humidit[ée]|humidity|co2|dioxyde de carbone|carbon dioxide|pm2[.,]?5|pm10|cov|voc|aqi|qualit[ée] de l.air|air quality|bruit|noise|niveau sonore|sound pressure|luminosit[ée]|lumi[eè]re|illuminance|light level)$/i;
-
 // ── Card ─────────────────────────────────────────────────────────────────────
 class RoomEnvironmentCard extends RcCard {
   static tag = "room-environment-card";
@@ -215,28 +210,34 @@ class RoomEnvironmentCard extends RcCard {
   _format(st, kind) {
     if (typeof this._hass.formatEntityState === "function") return this._hass.formatEntityState(st);
     const digits = this._hass.entities?.[st.entity_id]?.display_precision ?? RE_KINDS[kind].digits;
-    const n = new Intl.NumberFormat(this._lang(), { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(
-      Number.parseFloat(st.state),
-    );
-    const unit = st.attributes.unit_of_measurement;
+    return this._formatNumber(Number.parseFloat(st.state), digits, st.attributes.unit_of_measurement);
+  }
+
+  _formatNumber(value, digits, unit) {
+    const n = new Intl.NumberFormat(this._lang(), { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
     return unit ? `${n} ${unit}` : n;
   }
 
-  _item(e, areaName, dupes) {
-    const st = this._hass.states[e.entity];
-    const kind = reKindOf(st) ?? "aqi";
+  // One reading per kind: the mean of the sensors of that kind that report a number, unavailable and unknown ones
+  // ignored (a kind with none left is not shown). A single sensor keeps Home Assistant's formatting and its
+  // `name` / `icon` overrides; a mean is formatted with the kind's precision.
+  _reading(kind, members) {
     const k = RE_KINDS[kind];
-    const value = Number.parseFloat(st.state);
-    const unavailable = rcUnavailable(st) || !Number.isFinite(value);
-    const label = this._t(`k_${kind}`);
-    const own = rcCleanName(st.attributes.friendly_name, areaName, RE_PREFIX, RE_SUFFIX);
-    // The kind is enough, unless the room has several sensors of that kind: then the rest of their own name too.
-    const distinct = own && own !== label && own.toLowerCase() !== areaName.toLowerCase();
-    const name = e.name ?? (dupes.has(kind) && distinct ? `${label} · ${own}` : label);
-    const item = { id: e.entity, kind, name, unavailable, on: !unavailable, sev: "ok", band: 2 };
-    if (unavailable) return { ...item, icon: e.icon ?? k.icon, state: this._t("unavailable"), value: null };
-
-    const unit = st.attributes.unit_of_measurement;
+    const values = members.map((m) => Number.parseFloat(m.st.state));
+    const value = values.reduce((t, v) => t + v, 0) / values.length;
+    const [first] = members;
+    const single = members.length === 1;
+    const unit = first.st.attributes.unit_of_measurement;
+    const item = {
+      id: first.e.entity,
+      ids: members.map((m) => m.e.entity),
+      kind,
+      name: (single && first.e.name) || this._t(`k_${kind}`),
+      on: true,
+      sev: "ok",
+      num: value,
+      unit,
+    };
     let band;
     let gauge;
     if (k.steps) {
@@ -244,37 +245,47 @@ class RoomEnvironmentCard extends RcCard {
       gauge = k.gauge;
       item.light = band > 0;
     } else {
-      const s = reScale(kind, unit, this._config.thresholds?.[kind]);
-      band = reBand(value, s.scale);
-      gauge = s.gauge;
+      const sc = reScale(kind, unit, this._config.thresholds?.[kind]);
+      band = reBand(value, sc.scale);
+      gauge = sc.gauge;
       item.sev = (k.sev ?? RE_SEV)[band];
       item.cold = !!k.cold?.includes(band);
     }
+    const text = single ? this._format(first.st, kind) : this._formatNumber(value, k.digits, unit);
     const word = this._words(k.words)[band];
     return {
       ...item,
-      unit,
       band,
-      value: this._format(st, kind),
+      value: text,
       word,
-      state: word ? `${this._format(st, kind)} · ${word}` : this._format(st, kind),
-      icon: e.icon ?? k.icons?.[band] ?? k.icon,
+      state: word ? `${text} · ${word}` : text,
+      icon: (single && first.e.icon) || k.icons?.[band] || k.icon,
       pct: Math.round(Math.min(1, Math.max(0, (value - gauge[0]) / (gauge[1] - gauge[0]))) * 100),
     };
   }
 
   _collect() {
-    const areaName = this._areaName();
-    const entries = this._entries();
-    const seen = new Set();
-    const dupes = new Set();
+    return this._itemsOf(this._entries());
+  }
+
+  // The readings of `entries`, one per kind, in kind order; also used by the overview, room by room.
+  _itemsOf(entries) {
+    const byKind = {};
     for (const e of entries) {
-      const kind = reKindOf(this._hass.states[e.entity]);
-      if (seen.has(kind)) dupes.add(kind);
-      seen.add(kind);
+      const st = this._hass.states[e.entity];
+      const kind = reKindOf(st);
+      if (kind && !rcUnavailable(st) && Number.isFinite(Number.parseFloat(st.state))) (byKind[kind] ||= []).push({ e, st });
     }
-    const order = (i) => RE_ORDER.indexOf(i.kind);
-    return entries.map((e) => this._item(e, areaName, dupes)).sort((a, b) => order(a) - order(b) || a.name.localeCompare(b.name));
+    return RE_ORDER.filter((kind) => byKind[kind]).map((kind) => this._reading(kind, byKind[kind]));
+  }
+
+  // Number in full, unit small and muted ("°" for a temperature) to keep the chips short.
+  _chipValue(i) {
+    if (i.value == null) return "<span>—</span>";
+    const unit = i.unit || "";
+    const num = unit && i.value.endsWith(unit) ? i.value.slice(0, -unit.length).trim() : i.value;
+    const short = /^°[CF]$/.test(unit) ? "°" : unit;
+    return `<span>${rcEsc(num)}</span>${short && num !== i.value ? `<small>${rcEsc(short)}</small>` : ""}`;
   }
 
   // The reading that needs a look first: the highest severity, then the kind order.
@@ -305,7 +316,7 @@ class RoomEnvironmentCard extends RcCard {
 
     if (!this._changed(items.map((i) => [i.id, i.name, i.icon, i.state, i.sev, i.cold, i.pct]))) return;
 
-    const shown = c.only_alerts ? items.filter((i) => i.sev !== "ok" || i.unavailable) : items;
+    const shown = c.only_alerts ? items.filter((i) => i.sev !== "ok") : items;
     this._shown = shown.length;
     const tiles = shown
       .map((i) =>
@@ -345,7 +356,6 @@ class RoomEnvironmentCard extends RcCard {
     .tile.k-illuminance.lit { --t: var(--rc-light); }
     /* Only what needs a look is tinted: comfortable readings and the light level stay neutral. */
     .tile.s-ok { background: var(--secondary-background-color, transparent); border-color: transparent; }
-    .tile.na { --t: var(--rc-na); }
     .val { color: var(--primary-text-color); font-weight: 600; }
     .tile.s-warn .state, .tile.s-alert .state, .tile.cold .state { color: var(--t); }
     .tile.s-warn .val, .tile.s-alert .val, .tile.cold .val { color: inherit; }
@@ -391,28 +401,19 @@ class RoomEnvironmentMiniCard extends RoomEnvironmentCard {
     return { columns: 12, min_columns: 4, rows: "auto" };
   }
 
-  // Number in full, unit small and muted ("°" for a temperature) to keep the chips short.
-  _chipValue(i) {
-    if (i.value == null) return "<span>—</span>";
-    const unit = i.unit || "";
-    const num = unit && i.value.endsWith(unit) ? i.value.slice(0, -unit.length).trim() : i.value;
-    const short = /^°[CF]$/.test(unit) ? "°" : unit;
-    return `<span>${rcEsc(num)}</span>${short && num !== i.value ? `<small>${rcEsc(short)}</small>` : ""}`;
-  }
-
   _draw(items) {
     const c = this._config;
     const worst = this._worst(items);
     const level = worst ? (worst.cold || worst.sev === "info" ? "cold" : worst.sev) : "ok";
     if (!this._changed(["mini", items.map((i) => [i.id, i.icon, i.state, i.sev, i.cold])])) return;
 
-    const shown = c.only_alerts ? items.filter((i) => i.sev !== "ok" || i.unavailable) : items;
+    const shown = c.only_alerts ? items.filter((i) => i.sev !== "ok") : items;
     this._shown = shown.length;
     const status = this._status(items, worst);
     const chips = shown
       .map(
         (i) => `
-        <button class="r ${i.unavailable ? "na" : `s-${i.sev}`}${i.cold ? " cold" : ""}${i.light ? " lit" : ""} k-${i.kind}"
+        <button class="r s-${i.sev}${i.cold ? " cold" : ""}${i.light ? " lit" : ""} k-${i.kind}"
                 data-id="${rcEsc(i.id)}" title="${rcEsc(i.name)} — ${rcEsc(i.state)}">
           <ha-icon icon="${rcEsc(i.icon)}"></ha-icon>${this._chipValue(i)}
         </button>`,
@@ -465,7 +466,6 @@ class RoomEnvironmentMiniCard extends RoomEnvironmentCard {
     .r.cold    { --t: var(--rc-info); }
     .r.k-illuminance     { --t: var(--rc-idle); }
     .r.k-illuminance.lit { --t: var(--rc-light); }
-    .r.na { --t: var(--rc-na); opacity: .7; }
     .r.s-warn, .r.s-alert, .r.cold.s-info, .r.cold.s-warn {
       color: var(--t); background: color-mix(in srgb, var(--t) 14%, transparent); }
     .r:hover { background: color-mix(in srgb, var(--t) 20%, var(--secondary-background-color, transparent)); }
@@ -489,4 +489,318 @@ rcRegister(
   RoomEnvironmentMiniCardEditor,
   "Room Environment Mini Card",
   "The environment readings of a room on a single line: one chip per reading, tinted when it needs a look",
+);
+
+// ── Overview card ────────────────────────────────────────────────────────────
+// Every room with environment sensors, one tile per room: its status and its main readings. Tap a room to unfold
+// its Environment card.
+const REO_I18N = {
+  en: {
+    ...RE_I18N.en,
+    title: "Indoor climate",
+    check_one: "{n} to check",
+    check_many: "{n} to check",
+    no_rooms: "No room with environment sensors",
+    readings: "Readings",
+    averages: "Average temperature and humidity",
+    ed_title_helper: "Leave empty for “Indoor climate”",
+    ed_columns_helper: "Empty: 3, or 2 on narrow screens",
+    ed_only_alerts: "Hide comfortable rooms",
+    ed_only_alerts_helper: "Only the rooms with a reading outside the comfort range stay visible",
+    ed_sort: "Sort",
+    ed_sort_name: "By name",
+    ed_sort_state: "Rooms needing a look first",
+    ed_exclude_areas: "Rooms to exclude",
+    ed_exclude_helper: "Left out of the tiles, the averages and the room details",
+  },
+  fr: {
+    ...RE_I18N.fr,
+    title: "Climat intérieur",
+    check_one: "{n} à surveiller",
+    check_many: "{n} à surveiller",
+    no_rooms: "Aucune pièce avec des capteurs d'environnement",
+    readings: "Mesures",
+    averages: "Température et humidité moyennes",
+    ed_title_helper: "Laisser vide pour « Climat intérieur »",
+    ed_columns_helper: "Vide : 3, ou 2 sur les écrans étroits",
+    ed_only_alerts: "Masquer les pièces confortables",
+    ed_only_alerts_helper: "Seules les pièces avec une mesure hors de la plage de confort restent affichées",
+    ed_sort: "Tri",
+    ed_sort_name: "Par nom",
+    ed_sort_state: "Pièces à surveiller en premier",
+    ed_exclude_areas: "Pièces à exclure",
+    ed_exclude_helper: "Ignorés dans les tuiles, les moyennes et le détail des pièces",
+  },
+};
+
+// Readings always shown on a room tile; the others only when they need a look.
+const REO_MAIN = ["temperature", "humidity", "co2"];
+
+class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
+  static tag = "room-environment-overview-card";
+  static i18n = REO_I18N;
+  static needsArea = false;
+  static defaults = { only_alerts: false, sort: "name", exclude_areas: [], exclude: [], rooms: [] };
+
+  static getStubConfig() {
+    return {};
+  }
+
+  constructor() {
+    super();
+    // A click anywhere else folds the open room back.
+    this._onOutside = (ev) => {
+      if (this._openArea && !ev.composedPath().includes(this) && !rcInDialog(ev)) this._toggle(null);
+    };
+  }
+
+  setConfig(config) {
+    this._panelArea = null;
+    super.setConfig(config);
+  }
+
+  set hass(hass) {
+    super.hass = hass;
+    if (this._detail) this._detail.hass = hass;
+  }
+
+  connectedCallback() {
+    document.addEventListener("click", this._onOutside, true);
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener("click", this._onOutside, true);
+  }
+
+  getCardSize() {
+    return 1 + Math.ceil((this._items?.length || 1) / 3);
+  }
+
+  _collect() {
+    const h = this._hass;
+    const c = this._config;
+    const excluded = new Set(c.exclude_areas || []);
+    const overrides = Object.fromEntries((c.rooms || []).map((x) => [x.area, x]));
+    const byArea = {};
+    for (const [id, aid] of rcByArea(this, (id) => id.startsWith("sensor."))) (byArea[aid] ||= []).push(id);
+    const rooms = [];
+    for (const [aid, ids] of Object.entries(byArea)) {
+      const area = h.areas?.[aid];
+      const entries = ids.filter((id) => h.states[id] && reMatch(h, id)).map((entity) => ({ entity }));
+      const items = area && !excluded.has(aid) ? this._itemsOf(entries) : [];
+      if (!items.length) continue;
+      const o = overrides[aid] || {};
+      const worst = this._worst(items);
+      rooms.push({
+        id: aid,
+        name: o.name ?? area.name ?? aid,
+        icon: o.icon ?? rcRoomIcon(area),
+        navigation_path: o.navigation_path,
+        items,
+        worst,
+        rank: worst ? RE_RANK[worst.sev] : 0,
+        level: worst ? (worst.cold || worst.sev === "info" ? "cold" : worst.sev) : "ok",
+        status: this._status(items, worst),
+      });
+    }
+    rcSortRooms(rooms, c, (x) => x.rank);
+    this._total = rooms.length;
+    return c.only_alerts ? rooms.filter((x) => x.rank >= RE_RANK.warn || x.id === this._openArea) : rooms;
+  }
+
+  // Mean of the rooms' readings of `kind` (each room counting once), formatted with `digits`.
+  _average(rooms, kind, digits) {
+    const values = rooms.map((x) => x.items.find((i) => i.kind === kind)?.num).filter((v) => v != null);
+    if (!values.length) return null;
+    const mean = values.reduce((t, v) => t + v, 0) / values.length;
+    return new Intl.NumberFormat(this._lang(), { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(mean);
+  }
+
+  _chip(i) {
+    const cls = `chip s-${i.sev}${i.cold ? " cold" : ""}`;
+    return `<span class="${cls}" title="${rcEsc(i.name)} — ${rcEsc(i.state)}"><ha-icon icon="${rcEsc(i.icon)}"></ha-icon>${this._chipValue(i)}</span>`;
+  }
+
+  // The base card's render collects the rooms (`_collect`) and hands them here.
+  _draw(rooms) {
+    const c = this._config;
+    const parts = rooms.map((x) => [x.id, x.name, x.icon, x.status, x.items.map((i) => [i.id, i.state, i.sev, i.cold])]);
+    if (!this._changed([this._openArea, parts])) return;
+
+    if (!this.shadowRoot.querySelector("ha-card")) {
+      this.shadowRoot.innerHTML = `
+        <style>${RC_BASE_STYLES}${RoomEnvironmentOverviewCard.styles}</style>
+        <ha-card><div class="head"></div><div class="panel" hidden></div><div class="grid"></div></ha-card>`;
+      this.shadowRoot.querySelector(".grid").addEventListener("click", (ev) => {
+        const tile = ev.target.closest(".room");
+        if (tile) this._tap(tile.dataset.area);
+      });
+    }
+
+    const all = this._total ? rooms : [];
+    const worst = this._worst(rooms.map((x) => x.worst).filter(Boolean));
+    const level = worst ? (worst.cold || worst.sev === "info" ? "cold" : worst.sev) : "ok";
+    const toCheck = rooms.filter((x) => x.rank >= RE_RANK.warn).length;
+    const status = !this._total
+      ? this._t("no_rooms")
+      : toCheck
+        ? this._t(toCheck > 1 ? "check_many" : "check_one", { n: toCheck })
+        : worst
+          ? worst.word
+          : this._t("comfortable");
+    const temp = this._average(all, "temperature", 1);
+    const hum = this._average(all, "humidity", 0);
+    // One chip for the home averages: "21,0° · 53 %".
+    const avgText = [temp && `${temp}°`, hum && `${hum} %`].filter(Boolean).join(" · ");
+    const avg = avgText
+      ? `<span class="chip avg" title="${rcEsc(this._t("averages"))}"><ha-icon icon="mdi:home-thermometer-outline"></ha-icon><span>${rcEsc(avgText)}</span></span>`
+      : "";
+
+    const card = this.shadowRoot.querySelector("ha-card");
+    card.className = `lvl-${level}`;
+    card.querySelector(".head").innerHTML = `
+      <div class="badge"><ha-icon icon="${this._headIcon(worst)}"></ha-icon></div>
+      <div class="title">${rcEsc(c.title || this._t("title"))}</div>
+      ${avg}
+      <div class="pill">${rcEsc(status)}</div>`;
+
+    this._roomGrid(card.querySelector(".grid"), rooms, (x) => {
+      const chips = x.items
+        .filter((i) => REO_MAIN.includes(i.kind) || RE_RANK[i.sev] >= RE_RANK.warn)
+        .map((i) => this._chip(i))
+        .join("");
+      return `
+      <button class="room lvl-${x.level}${x.id === this._openArea ? " sel" : ""}" data-area="${rcEsc(x.id)}"
+              title="${rcEsc(x.name)} — ${rcEsc(x.status)}">
+        <span class="ic"><ha-icon icon="${rcEsc(x.icon)}"></ha-icon></span>
+        <span class="name">${rcEsc(x.name)}</span>
+        <span class="state">${rcEsc(x.status)}</span>
+        <span class="chips">${chips}</span>
+      </button>`;
+    });
+  }
+
+  _tap(aid) {
+    const x = this._items.find((r) => r.id === aid);
+    if (x?.navigation_path) rcNavigate(x.navigation_path);
+    else this._toggle(this._openArea === aid ? null : aid);
+  }
+
+  _toggle(aid) {
+    this._openArea = aid;
+    this._sig = null;
+    this._render();
+    if (aid) return;
+    const panel = this.shadowRoot.querySelector(".panel");
+    panel.hidden = true;
+    panel.innerHTML = "";
+    this._panelArea = null;
+    this._detail = null;
+  }
+
+  // The Environment card of the open room, built once per room.
+  _fillPanel() {
+    const panel = this.shadowRoot.querySelector(".panel");
+    panel.hidden = false;
+    if (this._panelArea === this._openArea) return;
+    this._panelArea = this._openArea;
+    const c = this._config;
+    const el = document.createElement(RoomEnvironmentCard.tag);
+    el.setConfig({
+      type: `custom:${RoomEnvironmentCard.tag}`,
+      area: this._openArea,
+      title: this._t("readings"),
+      exclude: c.exclude || [],
+      ...(c.thresholds ? { thresholds: c.thresholds } : {}),
+      ...(c.language ? { language: c.language } : {}),
+    });
+    el.hass = this._hass;
+    panel.innerHTML = "";
+    panel.appendChild(el);
+    this._detail = el;
+  }
+
+  static styles = `
+    ha-card { container-type: inline-size; }
+    ha-card.lvl-ok    { --c: var(--rc-ok); }
+    ha-card.lvl-cold  { --c: var(--rc-info); }
+    ha-card.lvl-warn  { --c: var(--rc-warn); }
+    ha-card.lvl-alert { --c: var(--rc-alert); }
+
+    /* Comfortable readings are plain text, the ones needing a look a tinted pill (as on the mini card). */
+    .chip { --k: var(--rc-ok); flex: none; display: inline-flex; align-items: baseline; gap: 1px; height: 18px; padding: 0 4px 0 3px;
+            border-radius: 999px; font-size: 11px; font-weight: 500; line-height: 18px; white-space: nowrap;
+            color: var(--primary-text-color); }
+    .chip ha-icon { --mdc-icon-size: 12px; color: var(--k); align-self: center; margin-right: 1px; }
+    .chip small { font-size: 9px; opacity: .7; margin-left: 1px; }
+    .chip.s-warn  { --k: var(--rc-warn); }
+    .chip.s-alert { --k: var(--rc-alert); }
+    .chip.cold    { --k: var(--rc-info); }
+    .chip.s-warn, .chip.s-alert, .chip.cold.s-info, .chip.cold.s-warn {
+      color: var(--k); background: color-mix(in srgb, var(--k) 14%, transparent); }
+    .head .chip.avg { --k: var(--secondary-text-color); height: 20px; padding: 0 6px; color: var(--secondary-text-color);
+                      background: color-mix(in srgb, var(--rc-idle) 12%, transparent); }
+    @container (max-width: 340px) { .head { gap: 6px; } .head .chip.avg { display: none; } }
+
+    .grid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+    @container (max-width: 340px) { .grid:not(.fixed) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .grid[hidden] { display: none; }
+    .room { --t: var(--rc-ok); all: unset; box-sizing: border-box; cursor: pointer; min-width: 0;
+            display: grid; grid-template-columns: 26px minmax(0, 1fr); grid-template-areas: "ic name" "ic state" "chips chips";
+            column-gap: 7px; align-items: center; align-content: start; padding: 6px 7px; border-radius: 10px;
+            background: var(--secondary-background-color, transparent); border: 1px solid transparent;
+            transition: background .2s, border-color .2s; }
+    .room.lvl-cold  { --t: var(--rc-info); }
+    .room.lvl-warn  { --t: var(--rc-warn); }
+    .room.lvl-alert { --t: var(--rc-alert); }
+    .room.lvl-warn, .room.lvl-alert {
+      background: color-mix(in srgb, var(--t) 9%, var(--secondary-background-color, transparent));
+      border-color: color-mix(in srgb, var(--t) 22%, transparent); }
+    .room:hover { background: color-mix(in srgb, var(--t) 13%, var(--secondary-background-color, transparent)); }
+    .room:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+    .room.sel { border-color: color-mix(in srgb, var(--primary-color) 55%, transparent); }
+    .room .ic { grid-area: ic; align-self: start; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+                color: var(--t); background: color-mix(in srgb, var(--t) 16%, transparent); }
+    .room.lvl-ok .ic { color: var(--primary-text-color); background: color-mix(in srgb, var(--rc-idle) 14%, transparent); }
+    .room .ic ha-icon { --mdc-icon-size: 15px; }
+    .room .name { grid-area: name; }
+    .room .state { grid-area: state; }
+    .room:not(.lvl-ok) .state { color: var(--t); }
+    .chips { grid-area: chips; display: flex; flex-wrap: wrap; gap: 1px 2px; margin: 3px 0 0 -3px; }
+    .chips:empty { display: none; }
+    .empty { grid-column: 1 / -1; padding: 12px; text-align: center; font-size: 13px; color: var(--secondary-text-color); }
+
+    .panel { margin-top: 8px; border-radius: 12px; overflow: hidden; background: var(--secondary-background-color, transparent);
+             --ha-card-background: transparent; --card-background-color: transparent;
+             --ha-card-box-shadow: none; --ha-card-border-width: 0; }
+    .panel[hidden] { display: none; }
+    @media (prefers-reduced-motion: reduce) { .room { transition: none; } }
+  `;
+}
+
+const RoomEnvironmentOverviewCardEditor = rcEditor({
+  card: RoomEnvironmentOverviewCard,
+  helpers: ["title", "columns", "only_alerts", "exclude"],
+  schema: (lang, hass, config) => {
+    const probe = hass && rcProbe(RoomEnvironmentOverviewCard, hass, { ...config, exclude_areas: [], exclude: [], only_alerts: false });
+    const rooms = probe ? probe._collect() : [];
+    const ids = rooms.flatMap((x) => x.items.map((i) => i.id));
+    for (const id of config?.exclude || []) if (!ids.includes(id)) ids.push(id);
+    return [
+      ...rcOverviewFields(REO_I18N, lang),
+      ...rcBooleans("only_alerts"),
+      {
+        name: "exclude_areas",
+        selector: { select: { multiple: true, mode: "dropdown", options: rooms.map((x) => ({ value: x.id, label: x.name })) } },
+      },
+      ...rcEntitiesField("exclude", ids),
+    ];
+  },
+});
+
+rcRegister(
+  RoomEnvironmentOverviewCard,
+  RoomEnvironmentOverviewCardEditor,
+  "Room Environment Overview Card",
+  "The indoor climate of every room at a glance: temperature, humidity, CO₂ and what needs a look; tap a room for its readings",
 );

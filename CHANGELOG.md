@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.9.0
+
+### What's new
+- New **Environment overview** card (`custom:room-environment-overview-card`): one tile per room with environment sensors, coloured by the reading that needs a look first, with its temperature, humidity, CO₂ and any reading out of range; the header counts the rooms to check and shows the home's average temperature and humidity. Tap a room to unfold its Environment card. Options: `columns`, `sort`, `only_alerts`, `thresholds`, `exclude_areas`, `exclude`, `rooms`.
+
+### Changes
+- Environment cards: several sensors of the same kind in a room now make one reading, their mean, instead of one tile each.
+- Environment cards: unavailable and unknown sensors are ignored (left out of the mean; a kind with no sensor left is not shown).
+- Environment cards: the CO₂ label is written *CO2*, the subscript ₂ being missing from some fonts.
+
+### Maintenance
+- Room icons, room sorting, the room grid and the editor fields shared by both overviews moved to `shared.js`; tests for the means and the new card (44 in all) and its screenshots.
+
 ## 1.8.0
 
 ### What's new

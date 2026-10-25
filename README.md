@@ -18,6 +18,7 @@ Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, pl
 | [Plugs](#plugs) | `custom:room-switch-card` | Smart plugs of a room with their power draw: what is on comes first, the most power-hungry first. |
 | [Environment](#environment) | `custom:room-environment-card` | Temperature, humidity, air quality, noise and light level of a room, coloured by comfort. |
 | [Environment mini](#environment-mini) | `custom:room-environment-mini-card` | The same readings on a single line, for a compact dashboard. |
+| [Environment overview](#environment-overview) | `custom:room-environment-overview-card` | The indoor climate of every room at a glance; tap a room to unfold its readings. |
 
 | Every room | Sensors | Lights | Plugs | Environment |
 |---|---|---|---|---|
@@ -90,7 +91,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Each tile shows the value as Home Assistant formats it, with a thin gauge underneath; a comfort word (*Dry*, *Moderate*, *Noisy*…) is added when the reading is off, and to the light level (*Dark*, *Dim*, *Bright*)
 - Only what is outside the comfort range is tinted; cold readings are blue, the light level is information only and never alerts
 - Built-in comfort thresholds (WHO and common indoor guidelines), adjustable per kind with `thresholds`; °F and ppb sensors are handled
-- Two sensors of the same kind in a room are told apart by their own name (*Temperature · Netatmo*)
+- Several sensors of the same kind in a room make **one reading: their mean** (three thermometers, one *Temperature* tile); unavailable and unknown sensors are left out of it
 - Show only the readings outside the comfort range (`only_alerts`)
 - Tap a reading to open its details and history; tap the title to open a dashboard (`navigation_path`)
 - Automatic discovery from the area, or an explicit list with name and icon overrides
@@ -103,6 +104,16 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - One chip per reading on the second line: icon and value, the unit kept small (*21,4°*, *640 ppm*); comfortable readings are plain, the others get a tinted pill
 - Same discovery, thresholds, `only_alerts`, `include` / `exclude` and `navigation_path` as the Environment card; the chips wrap onto another line when the card is narrow or the room has many sensors
 - Tap a reading to open its details and history
+
+### Environment overview
+
+`custom:room-environment-overview-card` — The indoor climate of every room at a glance; tap a room to unfold its readings.
+
+- One tile per room with environment sensors, coloured by the reading that needs a look first: *Ventilate*, *Too humid*, *Poor air* (orange to red), *Cool* (blue), otherwise *Comfortable*
+- On each tile: temperature, humidity and CO₂, plus any other reading outside the comfort range (PM2.5, noise…); same means and thresholds as the Environment card
+- Header with the number of rooms to check and the home's average temperature and humidity
+- **Tap** a room to unfold its Environment card at the top of the card; tap it again or anywhere else to fold it back
+- Show only the rooms needing a look (`only_alerts`), or list them first (`sort: state`); room order, names and icons with `rooms`, like the [Overview](#overview)
 
 ## Prerequisites
 
@@ -412,7 +423,7 @@ The Environment card takes these options on top of the [common options](#common-
 
 | Option | Required | Default | Description |
 |---|---|---|---|
-| `only_alerts` | ❌ | `false` | Keep only the readings outside the comfort range (and unavailable sensors) |
+| `only_alerts` | ❌ | `false` | Keep only the readings outside the comfort range |
 | `show_gauge` | ❌ | `true` | Thin gauge under each reading |
 | `thresholds` | ❌ | See above | Comfort limits per kind, in the sensor's unit |
 
@@ -427,6 +438,50 @@ navigation_path: /dashboard-home/living-room
 exclude:
   - sensor.living_room_pm25
 ```
+
+### Environment overview
+
+Minimal:
+
+```yaml
+type: custom:room-environment-overview-card
+```
+
+Full options:
+
+```yaml
+type: custom:room-environment-overview-card
+title: Indoor climate
+columns: 3
+sort: state
+only_alerts: false
+thresholds:
+  co2: [800, 1200]
+exclude_areas:
+  - garage
+exclude:
+  - sensor.living_room_tv_temperature
+rooms:
+  - area: living_room
+  - area: bedroom_1
+    name: Bedroom
+  - area: office
+    navigation_path: /dashboard-home/office
+```
+
+#### Options reference
+
+| Option | Required | Default | Description |
+|---|---|---|---|
+| `title` | ❌ | `Indoor climate` | Card title |
+| `columns` | ❌ | `3` | Number of room columns (1–6); when empty, 3, or 2 on narrow screens |
+| `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing a look first |
+| `only_alerts` | ❌ | `false` | Show only the rooms with a reading outside the comfort range |
+| `thresholds` | ❌ | See [Thresholds](#thresholds) | Comfort limits per kind, also used by the unfolded room |
+| `exclude_areas` | ❌ | — | Rooms left out; the visual editor only offers the rooms the card finds |
+| `exclude` | ❌ | — | Sensors left out of the tiles, the averages and the room details |
+| `rooms` | ❌ | — | Room order and overrides (`area`, `name`, `icon`, `navigation_path`), as on the [Overview](#overview) |
+| `language` | ❌ | Auto | Force language: `fr` or `en` (auto-detects from HA settings) |
 
 ## Screenshots
 
@@ -467,6 +522,13 @@ exclude:
 | ![Mini comfortable](screenshots/environment-mini-comfort.png) | ![Mini stuffy room](screenshots/environment-mini-stuffy.png) |
 | ![Mini comfortable dark](screenshots/environment-mini-comfort-dark.png) | ![Mini stuffy room dark](screenshots/environment-mini-stuffy-dark.png) |
 
+### Environment overview
+
+| Every room | Room details |
+|---|---|
+| ![Every room](screenshots/environment-overview-all.png) | ![Room details](screenshots/environment-overview-details.png) |
+| ![Every room dark](screenshots/environment-overview-all-dark.png) | ![Room details dark](screenshots/environment-overview-details-dark.png) |
+
 ## How it works
 
 ### Overview
@@ -504,7 +566,13 @@ The power draw comes from the first sensor of the same device with the `power` d
 
 The card keeps every `sensor` of the area (the area set on the entity, or on its device) whose device class is `temperature`, `humidity`, `carbon_dioxide`, `pm25`, `pm10`, `volatile_organic_compounds`, `volatile_organic_compounds_parts`, `aqi`, `sound_pressure` or `illuminance`. Hidden entities and configuration or diagnostic entities (a battery or CPU temperature, say) are skipped: list another one in `exclude` if a device reports a reading that does not describe the room.
 
+The sensors of a same kind make one reading: the mean of the ones reporting a number (unavailable and unknown sensors are left out, and a kind with none left is not shown); a single sensor keeps Home Assistant's formatting, a mean is shown with one decimal for temperature and none for the others. A tap opens the details of the first sensor of the reading.
+
 Each reading falls in one of five bands of its [thresholds](#thresholds). The header takes the reading with the highest severity (alert, then warning, then information), the kind order breaking ties. Values are formatted by Home Assistant (number format and display precision of the entity); a tap opens the more-info dialog with its history.
+
+### Environment overview
+
+The card finds the rooms the way the Environment card does, area by area, and shows each with the same readings and levels. A room needs a look when one of its readings is in a warning or alert band; the header counts those rooms, and its averages count each room once (its mean temperature and humidity).
 
 ## Development
 
