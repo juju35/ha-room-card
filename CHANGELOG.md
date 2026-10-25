@@ -4,6 +4,7 @@
 
 ### Fixes
 - Environment cards: the noise thresholds were too low — normal conversation or the TV made a room *Noisy*. A room is now noisy from 70 dB (vacuum, loud TV) and very noisy from 85 dB (where long exposure harms hearing): `[70, 85]` instead of `[55, 70]`. Set your own with `thresholds: { noise: [...] }`.
+- Environment cards: outdoors (*Terrasse*, *Jardin*, *Balcon*…), noise is information only, like temperature and humidity: street noise no longer makes a terrace *Noisy*, unless you set `noise` thresholds.
 
 ## 1.14.0
 

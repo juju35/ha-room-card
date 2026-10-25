@@ -444,7 +444,7 @@ Each kind has four limits — alert low, warning low, warning high, alert high �
 
 A temperature sensor in °F gets the default limits converted; a cool room (warning low band) is information, not a warning.
 
-**Outdoor areas.** In an area whose name says it is outside (*Terrasse*, *Jardin*, *Balcon*, *Patio*, *Extérieur*, *Terrace*, *Garden*, *Balcony*, *Outdoor*…), temperature and humidity are information only — the weather, not a comfort issue: they never tint the card nor make the room one to check. Set `thresholds` for them (on the card, or per room on the overview) to bring the levels back.
+**Outdoor areas.** In an area whose name says it is outside (*Terrasse*, *Jardin*, *Balcon*, *Patio*, *Extérieur*, *Terrace*, *Garden*, *Balcony*, *Outdoor*…), temperature, humidity and noise are information only — the weather and the street, not a comfort issue: they never tint the card nor make the room one to check. Set `thresholds` for them (on the card, or per room on the overview) to bring the levels back.
 
 **Wet rooms.** In a room whose name says it is a bathroom, a shower room or a laundry (*Salle de bain*, *Salle d'eau*, *Douche*, *Buanderie*, *Bathroom*, *Shower*, *Laundry*), humidity defaults to `[25, 35, 70, 80]`: 61 % after a shower is fine there. Your own `humidity` thresholds always win.
 
