@@ -398,11 +398,11 @@ A temperature sensor in °F gets the default limits converted; a cool room (warn
 
 #### Options reference
 
-In addition to the [common options](#common-options):
+The Environment card takes these options on top of the [common options](#common-options):
 
 | Option | Required | Default | Description |
 |---|---|---|---|
-| `only_alerts` | ❌ | `false` | Show only the readings outside the comfort range (and unavailable sensors) |
+| `only_alerts` | ❌ | `false` | Keep only the readings outside the comfort range (and unavailable sensors) |
 | `show_gauge` | ❌ | `true` | Thin gauge under each reading |
 | `thresholds` | ❌ | See above | Comfort limits per kind, in the sensor's unit |
 
