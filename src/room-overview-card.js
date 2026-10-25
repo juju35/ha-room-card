@@ -291,6 +291,19 @@ class RoomOverviewCard extends RcCard {
       this.shadowRoot.innerHTML = `
         <style>${RC_BASE_STYLES}${RoomOverviewCard.styles}</style>
         <ha-card><div class="head"></div><div class="panel" hidden></div><div class="grid"></div><div class="confirm" hidden></div></ha-card>`;
+      // Just after the popup closed, the second click of a double click on OK lands on what lies under it: the header,
+      // a room tile, or a tile of the unfolded room's details (room-* cards acting on pointerup). Swallowed here, in
+      // the capture phase, before it reaches any of them.
+      const card = this.shadowRoot.querySelector("ha-card");
+      for (const type of ["pointerdown", "pointerup", "click"]) {
+        card.addEventListener(
+          type,
+          (ev) => {
+            if (this._justClosed()) ev.stopPropagation();
+          },
+          true,
+        );
+      }
       const head = this.shadowRoot.querySelector(".head");
       head.addEventListener("click", (ev) => {
         const button = ev.target.closest(".chip.action");

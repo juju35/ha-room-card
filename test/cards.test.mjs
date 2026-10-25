@@ -377,6 +377,26 @@ test("the second click of a double click on OK does not reach the card under the
   assert.equal(calls.length, 2, "clicks act again afterwards");
 });
 
+test("with a room unfolded, the second click of a double click on OK does not reach the detail tile under it", () => {
+  const { overview, nodes, calls } = overviewSetup({ plugs_off_button: true }, plugsHass());
+  overview._openArea = "kitchen"; // the details (room-* cards) lie under the popup
+  // A pointer event on a detail tile: it goes through <ha-card> first (capture), then reaches the tile unless stopped.
+  const tile = [];
+  const dispatch = (type) => {
+    let stopped = false;
+    nodes["ha-card"].fire(type, { target: {}, stopPropagation: () => (stopped = true) });
+    if (!stopped) tile.push(type);
+  };
+  clickOn(nodes[".head"], chipTarget("plugs"));
+  clickOn(nodes[".confirm"], confirmTarget("ok"));
+  for (const type of ["pointerdown", "pointerup", "click"]) dispatch(type);
+  assert.deepEqual(tile, [], "the second click is swallowed");
+  assert.equal(calls.length, 1, "only the plugs call");
+  overview._closedAt -= 1000;
+  for (const type of ["pointerdown", "pointerup", "click"]) dispatch(type);
+  assert.deepEqual(tile, ["pointerdown", "pointerup", "click"], "taps reach the tiles again afterwards");
+});
+
 test("a new config rebuilds the details of the open room", () => {
   const overview = new cards["room-overview-card"]();
   const panel = fakeNode();
