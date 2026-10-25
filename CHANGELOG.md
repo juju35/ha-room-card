@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.1
+
+### Fixes
+- Overview: with a room unfolded, a double click on OK in the "Turn all plugs off" popup no longer also toggles the light, plug or sensor of the room details lying under the button.
+
+### Maintenance
+- Test for that case (28 in all); duplication checks run on Node 22.
+
 ## 1.7.0
 
 ### Changes
