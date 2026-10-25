@@ -481,3 +481,33 @@ test("the Overview only shows active rooms until its detail button shows them al
   overview._config = { ...overview._config, zoom: false };
   assert.deepEqual([...overview._collect()].map((x) => x.id), ["kitchen", "office"], "zoom: false shows every room");
 });
+
+// A click event seen by the document: `path` is what it went through.
+const clickVia = (...path) => ({ composedPath: () => path });
+
+test("a click elsewhere brings a zoomed mini card back to its compact view, not one inside it or in a dialog", () => {
+  const card = new cards["room-sensors-mini-card"]();
+  card.setConfig({ area: "kitchen" });
+  card.hass = makeHass();
+  card._zoomed = true;
+  card._onUnzoom(clickVia(card));
+  assert.equal(card._zoomed, true, "click inside the card");
+  card._onUnzoom(clickVia({ localName: "ha-more-info-dialog" }));
+  assert.equal(card._zoomed, true, "click in the more-info dialog");
+  card._onUnzoom(clickVia({ localName: "div" }));
+  assert.equal(card._zoomed, false);
+  assert.match(card.shadowRoot.innerHTML, /class="mini"/);
+});
+
+test("a click elsewhere brings the Overview back to the active rooms", () => {
+  const overview = new cards["room-overview-card"]();
+  overview._config = { ...cards["room-overview-card"].defaults };
+  overview._zoomed = true;
+  let renders = 0;
+  overview._render = () => renders++;
+  overview._onOutside(clickVia(overview));
+  assert.equal(overview._zoomed, true);
+  overview._onOutside(clickVia({ localName: "div" }));
+  assert.equal(overview._zoomed, false);
+  assert.equal(renders, 1);
+});

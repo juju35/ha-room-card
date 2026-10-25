@@ -40,7 +40,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - **Tap** a room to unfold its details at the top of the card: the Sensors, Lights and Plugs cards of that room; tap it again or anywhere else to fold it back
 - Automatic discovery: every area with door, window, leak or presence sensors, lights or plugs becomes a room, with an icon picked from its name
 - Same rules as the room cards: camera detections, configuration entities and light groups are skipped, light switches count as lights
-- Only the rooms with something open, on or detected show; the **detail** button (top right) shows every room, and back (`zoom: false`: every room, always, no button); `sort: state` lists the rooms needing attention first
+- Only the rooms with something open, on or detected show; the **detail** button (top right) shows every room, and back, as does a click anywhere else (`zoom: false`: every room, always, no button); `sort: state` lists the rooms needing attention first
 
 ### Sensors
 
@@ -61,7 +61,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 
 - Room badge coloured like the Sensors card, the title and the status (*1 open*, *Water leak*) on the first line
 - On the second line, a tinted pill with its name for each open, leaking or detecting sensor (blinking unless `blink: false`); quiet sensors are hidden, so a quiet room is a single line
-- **Zoom** button (top right) switches the card to the full [Sensors card](#sensors) — every sensor, with how long it has been open — and back (`zoom: false` removes it)
+- **Zoom** button (top right) switches the card to the full [Sensors card](#sensors) — every sensor, with how long it has been open — and back, as does a click anywhere else (`zoom: false` removes it)
 - Same discovery and options as the Sensors card: `hide_when_clear` (compact view only), `presence`, `blink`, `include` / `exclude`
 - Tap a sensor to open its details
 
@@ -115,7 +115,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - One chip per reading on the second line: icon and value, the unit kept small (*21,4°*, *640 ppm*); comfortable readings are plain, the others get a tinted pill
 - Same discovery, thresholds, `only_alerts`, `include` / `exclude` and `navigation_path` as the Environment card; the chips wrap onto another line when the card is narrow or the room has many sensors
 - Tap a reading to open its details and history
-- **Zoom** button (top right) switches the card to the full [Environment card](#environment) — tiles, comfort words, gauges — and back (`zoom: false` removes it); zoomed in, every reading is shown, `only_alerts` only filtering the compact view
+- **Zoom** button (top right) switches the card to the full [Environment card](#environment) — tiles, comfort words, gauges — and back, as does a click anywhere else (`zoom: false` removes it); zoomed in, every reading is shown, `only_alerts` only filtering the compact view
 
 ### Environment overview
 
@@ -125,7 +125,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - On each tile: temperature, humidity and CO₂, plus any other reading outside the comfort range (PM2.5, noise…); same means and thresholds as the Environment card
 - Header with the number of rooms to check and the home's average temperature and humidity
 - **Tap** a room to unfold its Environment card at the top of the card; tap it again or anywhere else to fold it back
-- Only the rooms needing a look show; the **detail** button (top right) shows every room, and back (`zoom: false`: every room, always, no button); `sort: state` lists them first; room order, names and icons with `rooms`, like the [Overview](#overview)
+- Only the rooms needing a look show; the **detail** button (top right) shows every room, and back, as does a click anywhere else (`zoom: false`: every room, always, no button); `sort: state` lists them first; room order, names and icons with `rooms`, like the [Overview](#overview)
 
 ## Prerequisites
 

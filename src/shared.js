@@ -158,6 +158,17 @@ const rcZoomButton = (card) =>
         card._zoomed ? "mdi:arrow-collapse" : "mdi:arrow-expand"
       }"></ha-icon></button>`;
 
+// Back to the compact view (mini card, or overview showing the rooms needing a look), when zoomed in.
+const rcUnzoom = (card) => {
+  if (!card._zoomed) return;
+  card._zoomed = false;
+  card._sig = null;
+  card._render();
+};
+
+// True for a click outside `card` that is not in a dialog opened from it (more-info, say): it folds the card back.
+const rcOutside = (card, ev) => !ev.composedPath().includes(card) && !rcInDialog(ev);
+
 // A click on the detail button: every room, or back to the rooms needing a look. True when handled.
 const rcZoomClick = (card, ev) => {
   if (!ev.target.closest?.(".zoom")) return false;
@@ -601,7 +612,8 @@ class RcToggleCard extends RcCard {
 
 // ── Mini cards ───────────────────────────────────────────────────────────────
 // A mini card shows what its full card (`Base`) shows on two lines: the room badge, title and status, then one chip
-// per entity. Its zoom button (top right, `zoom: false` removes it) switches it to the full card and back.
+// per entity. Its zoom button (top right, `zoom: false` removes it) switches it to the full card and back; a click
+// anywhere else brings it back too.
 // The subclass implements `_drawMini(items)`, which builds the chips and calls `_paintMini`.
 // Zoomed in, everything is shown (`only_alerts` and `hide_when_clear` only apply to the compact view). With
 // `alertsOnly`, the compact view always shows only what needs a look (no `only_alerts` option then): quiet entities
@@ -613,6 +625,24 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
       Base.defaults,
     );
     static styles = `${Base.styles}${RC_MINI_STYLES}${styles}`;
+
+    constructor() {
+      super();
+      // A click anywhere else brings the card back to its compact view.
+      this._onUnzoom = (ev) => {
+        if (rcOutside(this, ev)) rcUnzoom(this);
+      };
+    }
+
+    connectedCallback() {
+      super.connectedCallback?.();
+      document.addEventListener("click", this._onUnzoom, true);
+    }
+
+    disconnectedCallback() {
+      super.disconnectedCallback?.();
+      document.removeEventListener("click", this._onUnzoom, true);
+    }
 
     getCardSize() {
       if (this._zoomed) return super.getCardSize();

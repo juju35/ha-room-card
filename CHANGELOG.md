@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.13.0
+
+### Changes
+- Every card with a zoom or detail button — Sensors mini, Environment mini, Overview, Environment overview — goes back to its compact view on a click anywhere else, as an unfolded room already did. Clicks inside the card or in a dialog opened from it (more-info) leave it as it is.
+
 ## 1.12.0
 
 ### Changes

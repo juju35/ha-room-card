@@ -509,9 +509,11 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
 
   constructor() {
     super();
-    // A click anywhere else folds the open room back.
+    // A click anywhere else folds the open room back, and returns to the rooms needing a look.
     this._onOutside = (ev) => {
-      if (this._openArea && !ev.composedPath().includes(this) && !rcInDialog(ev)) this._toggle(null);
+      if (!rcOutside(this, ev)) return;
+      if (this._openArea) this._toggle(null);
+      rcUnzoom(this);
     };
   }
 

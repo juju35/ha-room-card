@@ -110,11 +110,12 @@ class RoomOverviewCard extends RcCard {
 
   constructor() {
     super();
-    // A click anywhere else folds the open room back.
+    // A click anywhere else folds the open room back, and returns to the rooms needing attention.
     this._onOutside = (ev) => {
-      if (ev.composedPath().includes(this) || rcInDialog(ev)) return;
+      if (!rcOutside(this, ev)) return;
       if (this._confirm) this._closeConfirm();
       if (this._openArea) this._toggle(null);
+      rcUnzoom(this);
     };
     // Escape closes the confirmation popup (as Cancel), wherever the focus is.
     this._onKey = (ev) => {

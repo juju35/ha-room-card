@@ -279,3 +279,17 @@ test("the overview's detail button shows every room, and back", () => {
   // The averages still count every room.
   assert.equal(card._average(card._everyRoom, "temperature", 1), "20,7");
 });
+
+test("a click elsewhere brings the environment mini card and overview back to their compact view", () => {
+  const mini = new rc.cards["room-environment-mini-card"]();
+  mini.setConfig({ area: "living_room" });
+  mini.hass = makeHass();
+  mini._zoomed = true;
+  mini._onUnzoom({ composedPath: () => [{ localName: "div" }] });
+  assert.equal(mini._zoomed, false);
+  const card = overview({ zoom: true });
+  card._zoomed = true;
+  card._render = () => {};
+  card._onOutside({ composedPath: () => [{ localName: "div" }] });
+  assert.equal(card._zoomed, false);
+});
