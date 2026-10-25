@@ -6,7 +6,7 @@
 [![Release](https://img.shields.io/github/v/release/juju35/ha-room-card)](https://github.com/juju35/ha-room-card/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, plugs, and an overview of every room. Add a card, pick a room, it finds the entities by itself.
+Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, plugs, environment readings, and an overview of every room. Add a card, pick a room, it finds the entities by itself.
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-room-card&category=plugin)
 
@@ -16,12 +16,13 @@ Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, pl
 | [Sensors](#sensors) | `custom:room-sensors-card` | Leak, door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open. |
 | [Lights](#lights) | `custom:room-lights-card` | Lights of a room: tap to toggle, drag to dim, turn everything off from the header. |
 | [Plugs](#plugs) | `custom:room-switch-card` | Smart plugs of a room with their power draw: what is on comes first, the most power-hungry first. |
+| [Environment](#environment) | `custom:room-environment-card` | Temperature, humidity, air quality, noise and light level of a room, coloured by comfort. |
 
-| Every room | Sensors | Lights | Plugs |
-|---|---|---|---|
-| ![Overview](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all.png) | ![Sensors](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open.png) | ![Lights](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on.png) | ![Plugs](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on.png) |
+| Every room | Sensors | Lights | Plugs | Environment |
+|---|---|---|---|---|
+| ![Overview](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all.png) | ![Sensors](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open.png) | ![Lights](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on.png) | ![Plugs](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on.png) | ![Environment](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-stuffy.png) |
 
-All four cards share the same look (header with a status pill, compact tiles), a visual editor in the dashboard UI, English and French labels following the Home Assistant language, light and dark themes, and come in a single HACS download with no dependency.
+All five cards share the same look (header with a status pill, compact tiles), a visual editor in the dashboard UI, English and French labels following the Home Assistant language, light and dark themes, and come in a single HACS download with no dependency.
 
 ## Features
 
@@ -79,6 +80,20 @@ All four cards share the same look (header with a status pill, compact tiles), a
 - Tap the title to open a dashboard (`navigation_path`)
 - Automatic discovery from the area, or an explicit list with name, icon and power sensor overrides
 
+### Environment
+
+`custom:room-environment-card` — Temperature, humidity, air quality, noise and light level of a room, coloured by comfort.
+
+- Header with an icon and a status pill coloured by the reading that needs a look first: *Comfortable* (green), *Cool* (blue), *Ventilate*, *Too humid*, *Noisy* (orange), up to red past the alert thresholds, with `+N` when several readings are off
+- One tile per reading, in a fixed order: temperature, humidity, CO₂, PM2.5, PM10, VOC, air quality index, noise, light level
+- Each tile shows the value as Home Assistant formats it, with a thin gauge underneath; a comfort word (*Dry*, *Moderate*, *Noisy*…) is added when the reading is off, and to the light level (*Dark*, *Dim*, *Bright*)
+- Only what is outside the comfort range is tinted; cold readings are blue, the light level is information only and never alerts
+- Built-in comfort thresholds (WHO and common indoor guidelines), adjustable per kind with `thresholds`; °F and ppb sensors are handled
+- Two sensors of the same kind in a room are told apart by their own name (*Temperature · Netatmo*)
+- Show only the readings outside the comfort range (`only_alerts`)
+- Tap a reading to open its details and history; tap the title to open a dashboard (`navigation_path`)
+- Automatic discovery from the area, or an explicit list with name and icon overrides
+
 ## Prerequisites
 
 - Home Assistant 2024.8 or later
@@ -99,7 +114,7 @@ Or manually:
 3. Search for **Room Cards** and install it
 4. Clear your browser cache and refresh
 
-HACS registers the dashboard resource for you; the single file provides the four cards.
+HACS registers the dashboard resource for you; the single file provides the five cards.
 
 ### Manual
 
@@ -118,7 +133,7 @@ Remove the old repository and its resource from HACS, then install this one: the
 
 ### Common options
 
-The Sensors, Lights and Plugs cards share these options; each card below lists its own.
+The Sensors, Lights, Plugs and Environment cards share these options; each card below lists its own.
 
 | Option | Required | Default | Description |
 |---|---|---|---|
@@ -128,7 +143,7 @@ The Sensors, Lights and Plugs cards share these options; each card below lists i
 | `title` | ❌ | Area name | Card title |
 | `columns` | ❌ | `2` | Number of tile columns (1–4) |
 | `exclude` | ❌ | — | Entities left out of the automatic discovery; the visual editor only offers the ones the card finds in the chosen room |
-| `navigation_path` | ❌ | — | Lights and Plugs cards: dashboard opened when tapping the title, e.g. `/light` |
+| `navigation_path` | ❌ | — | Lights, Plugs and Environment cards: dashboard opened when tapping the title, e.g. `/light` |
 | `only_on` | ❌ | `false` | Lights and Plugs cards: show only what is on (and unavailable entities) |
 | `hide_when_off` | ❌ | `false` | Lights and Plugs cards: hide the whole card when everything is off |
 | `all_off_button` | ❌ | Lights `true`, Plugs `false` | Lights and Plugs cards: the status pill turns everything of the card off when tapped (off by default on Plugs: a plug may feed a camera or a network switch) |
@@ -337,6 +352,60 @@ In addition to the [common options](#common-options):
 |---|---|---|---|
 | `show_power` | ❌ | `true` | Power draw of each plug and total in the header |
 
+### Environment
+
+Minimal:
+
+```yaml
+type: custom:room-environment-card
+area: living_room
+```
+
+Full options:
+
+```yaml
+type: custom:room-environment-card
+area: living_room
+title: Living room
+navigation_path: /dashboard-home/living-room
+columns: 2
+only_alerts: false
+show_gauge: true
+thresholds:
+  temperature: [17, 19, 24, 27]
+  co2: [800, 1200]
+exclude:
+  - sensor.living_room_tv_temperature
+```
+
+#### Thresholds
+
+Each kind has four limits — alert low, warning low, warning high, alert high — or two (warning, alert) for the kinds that only go wrong upwards. Set your own under `thresholds`, in the unit of the sensor; `null` leaves a side out.
+
+| Kind | Key | Device class | Default | Below / between / above |
+|---|---|---|---|---|
+| Temperature | `temperature` | `temperature` | `[16, 18, 25, 28]` °C | Cold · Cool · Comfortable · Warm · Hot |
+| Humidity | `humidity` | `humidity` | `[25, 35, 60, 70]` % | Very dry · Dry · Comfortable · Humid · Very humid |
+| CO₂ | `co2` | `carbon_dioxide` | `[1000, 1500]` ppm | Good · Moderate · Poor |
+| PM2.5 | `pm25` | `pm25` | `[15, 35]` µg/m³ | Good · Moderate · Poor |
+| PM10 | `pm10` | `pm10` | `[45, 100]` µg/m³ | Good · Moderate · Poor |
+| VOC | `voc` | `volatile_organic_compounds`, `volatile_organic_compounds_parts` | `[300, 1000]` µg/m³ (`[220, 660]` ppb) | Good · Moderate · Poor |
+| Air quality index | `aqi` | `aqi` | `[100, 150]` | Good · Moderate · Poor |
+| Noise | `noise` | `sound_pressure` | `[55, 70]` dB | Quiet · Noisy · Very noisy |
+| Light level | — | `illuminance` | 10 and 200 lx | Dark · Dim · Bright (information only) |
+
+A temperature sensor in °F gets the default limits converted; a cool room (warning low band) is information, not a warning.
+
+#### Options reference
+
+In addition to the [common options](#common-options):
+
+| Option | Required | Default | Description |
+|---|---|---|---|
+| `only_alerts` | ❌ | `false` | Show only the readings outside the comfort range (and unavailable sensors) |
+| `show_gauge` | ❌ | `true` | Thin gauge under each reading |
+| `thresholds` | ❌ | See above | Comfort limits per kind, in the sensor's unit |
+
 ## Screenshots
 
 ### Overview
@@ -366,6 +435,13 @@ In addition to the [common options](#common-options):
 |---|---|
 | ![Plugs on](screenshots/switch-on.png) | ![All off](screenshots/switch-off.png) |
 | ![Plugs on dark](screenshots/switch-on-dark.png) | ![All off dark](screenshots/switch-off-dark.png) |
+
+### Environment
+
+| Comfortable | Stuffy room |
+|---|---|
+| ![Comfortable](screenshots/environment-comfort.png) | ![Stuffy room](screenshots/environment-stuffy.png) |
+| ![Comfortable dark](screenshots/environment-comfort-dark.png) | ![Stuffy room dark](screenshots/environment-stuffy-dark.png) |
 
 ## How it works
 
@@ -399,6 +475,12 @@ Lights that are on come first, then by name. A tap calls `homeassistant.toggle`;
 The card keeps every `switch` of the area (the area set on the entity, or on its device) whose device class is `outlet`, or whose name contains *prise*, *multiprise*, *plug*, *outlet* or *socket* as a word. Hidden entities and configuration or diagnostic entities are skipped, and so are switches whose name says they drive a light (*lumière*, *lampe*, *lamp*, *light*, *veilleuse*, *guirlande*): those belong to [room-lights-card](#lights).
 
 The power draw comes from the first sensor of the same device with the `power` device class (W or kW), or from the `power` sensor set on the entity. Plugs that are on come first, the most power-hungry first, then by name. A tap calls `homeassistant.toggle`, a hold opens the more-info dialog, and the pill calls `homeassistant.turn_off` on the plugs of the card that are on when `all_off_button` is set.
+
+### Environment
+
+The card keeps every `sensor` of the area (the area set on the entity, or on its device) whose device class is `temperature`, `humidity`, `carbon_dioxide`, `pm25`, `pm10`, `volatile_organic_compounds`, `volatile_organic_compounds_parts`, `aqi`, `sound_pressure` or `illuminance`. Hidden entities and configuration or diagnostic entities (a battery or CPU temperature, say) are skipped: list another one in `exclude` if a device reports a reading that does not describe the room.
+
+Each reading falls in one of five bands of its [thresholds](#thresholds). The header takes the reading with the highest severity (alert, then warning, then information), the kind order breaking ties. Values are formatted by Home Assistant (number format and display precision of the entity); a tap opens the more-info dialog with its history.
 
 ## Development
 

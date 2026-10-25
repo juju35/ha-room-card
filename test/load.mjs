@@ -60,7 +60,7 @@ export const load = () => {
   };
   sandbox.window = sandbox;
   const ctx = vm.createContext(sandbox);
-  const cards = ["room-sensors-card", "room-lights-card", "room-switch-card", "room-overview-card"];
+  const cards = ["room-sensors-card", "room-lights-card", "room-switch-card", "room-environment-card", "room-overview-card"];
   const code = [read("shared"), ...cards.map((c) => `{\n${read(c)}}\n`)].join("\n");
   return vm.runInContext(
     `${code}

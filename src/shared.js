@@ -491,8 +491,8 @@ const rcBooleans = (...names) => names.map((name) => ({ name, selector: { boolea
 const rcEntitiesField = (name, ids) =>
   ids.length ? [{ name, selector: { entity: { multiple: true, include_entities: ids } } }] : [];
 
-// Include list: the entities of the card's domains, anywhere in the home, that the card does not show yet
-// (entities already included stay in the list).
+// Include list: the entities of the card's domains (narrowed by `card.includeMatch` when set), anywhere in the home,
+// that the card does not show yet (entities already included stay in the list).
 const rcIncludeField = (card, hass, config) => {
   if (!hass) return [];
   const shown = new Set(
@@ -503,6 +503,7 @@ const rcIncludeField = (card, hass, config) => {
   const ids = Object.keys(hass.states).filter(
     (id) =>
       card.includeDomains.includes(id.split(".")[0]) &&
+      (!card.includeMatch || card.includeMatch(hass, id)) &&
       !shown.has(id) &&
       !hass.entities?.[id]?.hidden &&
       !hass.entities?.[id]?.entity_category,
