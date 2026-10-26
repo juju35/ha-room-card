@@ -335,7 +335,7 @@ class RoomOverviewCard extends RcCard {
       const s = this._roomState(x);
       // Chips only add what the state line does not already say.
       const chips = [
-        x.leaks && x.open ? chip("warn", "mdi:door-open", this._t("open_many", { n: x.open }), String(x.open)) : "",
+        x.leaks && x.open ? chip("warn", "mdi:door-open", this._t(x.open > 1 ? "open_many" : "open_one", { n: x.open }), String(x.open)) : "",
         x.occupied && s.lvl !== "info" ? chip("info", "mdi:account", this._t("presence")) : "",
         x.lightsOn ? chip("light", "mdi:lightbulb", this._t("lights_on"), String(x.lightsOn)) : "",
         x.plugsOn
