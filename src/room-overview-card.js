@@ -539,7 +539,9 @@ class RoomOverviewCard extends RcCard {
       .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 2px; }
       .modal button.act { border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
       .modal button.cancel { background: var(--secondary-background-color, rgba(127,127,127,.12)); color: var(--primary-text-color); }
-      .modal button.primary { background: var(--primary-color, #03a9f4); color: #fff; }
+      .modal button.cancel:hover { background: color-mix(in srgb, var(--primary-text-color) 10%, var(--secondary-background-color, transparent)); }
+      .modal button.primary { background: color-mix(in srgb, var(--primary-color, #03a9f4) 16%, transparent); color: var(--primary-color, #03a9f4); }
+      .modal button.primary:hover { background: color-mix(in srgb, var(--primary-color, #03a9f4) 24%, transparent); }
       .modal button.act:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
 
       .grid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
