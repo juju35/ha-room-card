@@ -902,9 +902,9 @@ const RC_BASE_STYLES = `
   .head { display: flex; align-items: center; gap: 10px; }
   .head.nav { cursor: pointer; }
   .head.nav:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; border-radius: 4px; }
-  .badge { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+  .badge { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
            background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
-  .badge ha-icon { --mdc-icon-size: 20px; }
+  .badge ha-icon { --mdc-icon-size: 24px; }
   .lvl-alert .badge { animation: rc-pulse 1.6s ease-in-out infinite; }
   .title { flex: 1; min-width: 0; font-size: 16px; font-weight: 500; color: var(--primary-text-color);
            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -955,7 +955,7 @@ const RC_MINI_STYLES = `${RC_ZOOM_STYLES}
   ha-card:has(.mini) { padding: 8px 10px; }
   .mini { display: flex; align-items: center; gap: 10px; }
   .mini .badge { width: 32px; height: 32px; }
-  .mini .badge ha-icon { --mdc-icon-size: 18px; }
+  .mini .badge ha-icon { --mdc-icon-size: 20px; }
   .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
   .mini .head { gap: 8px; }
   .mini .title { flex: 0 1 auto; font-size: 14px; line-height: 18px; }

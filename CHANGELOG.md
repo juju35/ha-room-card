@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Changes
+- Header icon sized like the other ha-* cards: the round badge of the full cards and the overviews grows from 36px to 40px with a 24px icon; the mini cards keep their 32px badge, with a 20px icon.
+
 ## 1.14.1
 
 ### Fixes
