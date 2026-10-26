@@ -19,7 +19,7 @@ const iconsFor = (extra) => {
 
 const THEMES = {
   light: {
-    "--primary-background-color": "#f4f4f4", "--secondary-background-color": "#efefef", "--card-background-color": "#ffffff",
+    "--primary-background-color": "#e8eaed", "--secondary-background-color": "#ececec", "--card-background-color": "#ffffff",
     "--primary-text-color": "#212121", "--secondary-text-color": "#727272", "--divider-color": "rgba(0,0,0,.12)",
   },
   dark: {
@@ -38,8 +38,8 @@ customElements.define("ha-card", class extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" }).innerHTML =
-      "<style>:host{display:block;background:var(--ha-card-background,var(--card-background-color));border-radius:12px;" +
-      "box-shadow:var(--ha-card-box-shadow,0 1px 4px rgba(0,0,0,.08));color:var(--primary-text-color);overflow:hidden}</style><slot></slot>";
+      "<style>:host{display:block;background:var(--card-background-color);border-radius:12px;" +
+      "border:1px solid var(--divider-color);color:var(--primary-text-color);overflow:hidden}</style><slot></slot>";
   }
 });
 customElements.define("ha-icon", class extends HTMLElement {
@@ -53,22 +53,24 @@ customElements.define("ha-icon", class extends HTMLElement {
   }
 });`;
 
-const pageHtml = (theme) => `<!doctype html><html><head><meta charset="utf-8">
+const pageHtml = (theme, width) => `<!doctype html><html><head><meta charset="utf-8">
 <style>
   :root { ${Object.entries({ ...THEMES[theme], ...COMMON }).map(([k, v]) => `${k}:${v};`).join("")} }
   body { margin: 0; padding: 16px; background: var(--primary-background-color); color: var(--primary-text-color);
-         font-family: Roboto, "Segoe UI", Helvetica, Arial, sans-serif; width: 428px; }
+         font-family: Roboto, "Segoe UI", Helvetica, Arial, sans-serif; width: ${width}px; }
 </style></head><body><div id="root"></div></body></html>`;
 
+// Card widths: 460px for the full cards, the overviews and a zoomed-in mini card, 380px for the mini cards.
+const widthFor = (tag, s) => (tag.endsWith("-mini-card") && !s.zoom ? 380 : 460);
 
-// A light shot (English) and its dark twin (French): pair("on", { on: X }).
+// A light shot and its dark twin, both in English: pair("on", { on: X }).
 export const pair = (file, extra = {}) => [
   { file, theme: "light", ...extra },
   { file: `${file}-dark`, theme: "dark", ...extra },
 ];
 
 // Renders each shot of `shots` ({ file, theme, ... }) into screenshots/<prefix>-<file>.png.
-// `setup(shot)` returns { hass, config, open? } for that shot; light shots are in English, dark ones in French.
+// `setup(shot, lang)` returns { hass, config, open? } for that shot; every shot is in English.
 export const shoot = async ({ prefix, tag, shots, setup, icons = [] }) => {
   const iconMap = iconsFor(icons);
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
@@ -76,9 +78,10 @@ export const shoot = async ({ prefix, tag, shots, setup, icons = [] }) => {
     // A new page per shot: the card's script declares top-level names, which cannot be evaluated twice in one page.
     const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1000, height: 2000 } });
     page.on("pageerror", (err) => console.error(`pageerror (${prefix}-${s.file}): ${err.message}`));
-    const lang = s.theme === "dark" ? "fr" : "en";
+    const lang = "en";
+    const width = widthFor(tag, s);
     const { hass, config, open } = setup(s, lang);
-    await page.setContent(pageHtml(s.theme));
+    await page.setContent(pageHtml(s.theme, width));
     await page.addScriptTag({ content: haElements(iconMap) });
     await page.addScriptTag({ content: cardJs });
     await page.evaluate(
@@ -94,7 +97,13 @@ export const shoot = async ({ prefix, tag, shots, setup, icons = [] }) => {
     );
     await page.waitForTimeout(400);
     const out = `screenshots/${prefix}-${s.file}.png`;
-    await page.locator(tag).screenshot({ path: `${root}${out}`, animations: "disabled" });
+    // The card on the theme background, with the body's 16px padding around it.
+    const box = await page.locator("#root").boundingBox();
+    await page.screenshot({
+      path: `${root}${out}`,
+      clip: { x: 0, y: 0, width: width + 32, height: Math.ceil(box.height) + 32 },
+      animations: "disabled",
+    });
     console.log(out);
     await page.close();
   }
