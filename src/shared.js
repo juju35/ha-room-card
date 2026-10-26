@@ -958,7 +958,7 @@ const RC_MINI_STYLES = `${RC_ZOOM_STYLES}
   .mini .badge ha-icon { --mdc-icon-size: 20px; }
   .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
   .mini .head { gap: 8px; }
-  .mini .title { flex: 0 1 auto; font-size: 14px; line-height: 18px; }
+  .mini .title { flex: 0 1 auto; line-height: 1.25; }
   .st { flex: none; margin-left: auto; font-size: 11px; font-weight: 500; color: var(--c); }
   .rs { display: flex; flex-wrap: wrap; gap: 2px 4px; margin-left: -4px; }
   .rs:empty { display: none; }

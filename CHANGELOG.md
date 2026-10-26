@@ -4,6 +4,7 @@
 
 ### Changes
 - Header icon sized like the other ha-* cards: the round badge of the full cards and the overviews grows from 36px to 40px with a 24px icon; the mini cards keep their 32px badge, with a 20px icon.
+- Mini cards (sensors and environment): the room name is 16px / 500 / 1.25 like the full cards' title (it was 14px on an 18px line); a long name still ends with an ellipsis.
 
 ## 1.14.1
 
