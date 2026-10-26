@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.16.0 - 2026-10-26
+### Fixes
+- Overview: on a room both leaking *and* with a single opening, the tile's openings chip always used the plural i18n key `open_many`, showing "1 ouvertures" in French instead of "1 ouverture". The key is now chosen by count (`open > 1 ? open_many : open_one`), as everywhere else in the code.
+
 ## 1.15.0
 ### Changes
 - Header icon sized like the other ha-* cards: the round badge of the full cards and the overviews grows from 36px to 40px with a 24px icon; the mini cards keep their 32px badge, with a 20px icon.
