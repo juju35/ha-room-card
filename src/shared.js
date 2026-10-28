@@ -96,14 +96,16 @@ const rcDeviceSensors = rcPerRegistry((hass) => {
 });
 
 // Power sensor (device class power, W or kW) of each device; only the device's own sensors are read.
-const rcPowerSensors = (hass) => {
+// Memoized per registry like rcDeviceSensors: a device_class read from states next to never changes,
+// and this pass would otherwise rescan every device on every state change of the instance.
+const rcPowerSensors = rcPerRegistry((hass) => {
   const out = {};
   for (const [device, ids] of Object.entries(rcDeviceSensors(hass))) {
     const id = ids.find((s) => hass.states[s]?.attributes.device_class === "power");
     if (id) out[device] = id;
   }
   return out;
-};
+});
 
 const rcWattsOf = (hass, sensorId) => {
   const st = sensorId && hass.states[sensorId];
@@ -150,13 +152,14 @@ const rcSortRooms = (list, config, rank) => {
 // `zoom: false` shows every room, with no button.
 const rcCompact = (card) => card._config.zoom !== false && !card._zoomed;
 
+// The zoom / detail button: the same icons on the overviews and the mini cards.
+const rcZoomIcon = (card) => (card._zoomed ? "mdi:arrow-collapse" : "mdi:arrow-expand");
+
 // The detail button of an overview header, at its end.
 const rcZoomButton = (card) =>
   card._config.zoom === false
     ? ""
-    : `<button class="zoom" title="${rcEsc(card._t(card._zoomed ? "rooms_check" : "rooms_all"))}"><ha-icon icon="${
-        card._zoomed ? "mdi:arrow-collapse" : "mdi:arrow-expand"
-      }"></ha-icon></button>`;
+    : `<button class="zoom" title="${rcEsc(card._t(card._zoomed ? "rooms_check" : "rooms_all"))}"><ha-icon icon="${rcZoomIcon(card)}"></ha-icon></button>`;
 
 // Back to the compact view (mini card, or overview showing the rooms needing a look), when zoomed in.
 const rcUnzoom = (card) => {
@@ -231,6 +234,9 @@ const RC_I18N = {
     ed_zoom_helper: "Switches the mini card to the full card and back",
     rooms_all: "Show every room",
     rooms_check: "Only the rooms needing a look",
+    ed_sort: "Sort",
+    ed_sort_name: "By name",
+    ed_exclude_areas: "Rooms to exclude",
   },
   fr: {
     all_closed: "Tout est fermé",
@@ -265,6 +271,9 @@ const RC_I18N = {
     ed_zoom_helper: "Bascule la mini-carte en carte complète, et inversement",
     rooms_all: "Afficher toutes les pièces",
     rooms_check: "Seulement les pièces à surveiller",
+    ed_sort: "Tri",
+    ed_sort_name: "Par nom",
+    ed_exclude_areas: "Pièces à exclure",
   },
 };
 
@@ -307,6 +316,14 @@ const rcMoreInfo = (node, entityId) => {
 const rcNavigate = (path) => {
   history.pushState(null, "", path);
   window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
+};
+
+// Wires a card header to its `navigation_path`: click, and Enter on the header itself.
+const rcBindNav = (head, path) => {
+  head.addEventListener("click", () => rcNavigate(path));
+  head.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter" && ev.target === head) rcNavigate(path);
+  });
 };
 
 const rcUnavailable = (st) => ["unavailable", "unknown"].includes(st.state);
@@ -465,7 +482,7 @@ class RcCard extends HTMLElement {
     const c = this._config;
     return `
       <div class="head${c.navigation_path ? " nav" : ""}"${c.navigation_path ? ' role="link" tabindex="0"' : ""}>
-        <div class="badge"><ha-icon icon="${icon}"></ha-icon></div>
+        <div class="badge"><ha-icon icon="${rcEsc(icon)}"></ha-icon></div>
         <div class="title">${rcEsc(title)}</div>
         ${chips}
         <button class="pill${allOff ? " action" : ""}" ${allOff ? `title="${rcEsc(this._t("turn_all_off"))}"` : "disabled"}>
@@ -500,13 +517,7 @@ class RcCard extends HTMLElement {
       const ids = (this._items || []).filter((i) => i.on).map((i) => i.id);
       if (ids.length) rcCall(this._hass, "homeassistant", "turn_off", { entity_id: ids });
     });
-    if (this._config.navigation_path) {
-      const head = root.querySelector(".head");
-      head.addEventListener("click", () => rcNavigate(this._config.navigation_path));
-      head.addEventListener("keydown", (ev) => {
-        if (ev.key === "Enter" && ev.target === head) rcNavigate(this._config.navigation_path);
-      });
-    }
+    if (this._config.navigation_path) rcBindNav(root.querySelector(".head"), this._config.navigation_path);
     for (const el of root.querySelectorAll(".tile")) this._bindTile(el, (this._items || []).find((i) => i.id === el.dataset.id));
   }
 
@@ -695,7 +706,7 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
         <style>${RC_BASE_STYLES}${this.constructor.styles}</style>
         <ha-card class="lvl-${level}${cls}">
           <div class="mini">
-            <div class="badge" title="${rcEsc(status)}"><ha-icon icon="${icon}"></ha-icon></div>
+            <div class="badge" title="${rcEsc(status)}"><ha-icon icon="${rcEsc(icon)}"></ha-icon></div>
             <div class="body">
               <div class="head${nav ? " nav" : ""}"${nav ? ' role="link" tabindex="0"' : ""}>
                 <div class="title">${rcEsc(c.title || this._areaName() || this._t("title"))}</div>
@@ -706,32 +717,21 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
           </div>
         </ha-card>`;
       const root = this.shadowRoot;
-      if (nav) {
-        const head = root.querySelector(".head");
-        head.addEventListener("click", () => rcNavigate(nav));
-        head.addEventListener("keydown", (ev) => {
-          if (ev.key === "Enter" && ev.target === head) rcNavigate(nav);
-        });
-      }
+      if (nav) rcBindNav(root.querySelector(".head"), nav);
       for (const el of root.querySelectorAll(".r")) el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id));
     }
 
     // Zoom button at the end of the header, top right in both views, added once per render.
+    // Its click is the overviews' (rcZoomClick): stop the tap on the title (navigation_path), toggle, keep the
+    // keyboard focus (Enter / Space: no click count) on the button that replaced this one.
     _addZoom() {
       const head = this._config.zoom && this.shadowRoot.querySelector(".head");
       if (!head || head.querySelector(".zoom")) return;
       const button = document.createElement("button");
       button.className = "zoom";
       button.title = this._t(this._zoomed ? "zoom_out" : "zoom_in");
-      button.innerHTML = `<ha-icon icon="${this._zoomed ? "mdi:arrow-collapse" : "mdi:arrow-expand"}"></ha-icon>`;
-      button.addEventListener("click", (ev) => {
-        ev.stopPropagation(); // not a tap on the title (navigation_path)
-        this._zoomed = !this._zoomed;
-        this._sig = null;
-        this._render();
-        // Keyboard use (Enter / Space: no click count) keeps the focus on the button that replaced this one.
-        if (ev.detail === 0) this.shadowRoot.querySelector(".zoom")?.focus();
-      });
+      button.innerHTML = `<ha-icon icon="${rcZoomIcon(this)}"></ha-icon>`;
+      button.addEventListener("click", (ev) => rcZoomClick(this, ev));
       head.appendChild(button);
     }
   };
@@ -950,6 +950,40 @@ const RC_ZOOM_STYLES = `
   .zoom ha-icon { --mdc-icon-size: 16px; }
   .zoom:hover { background: color-mix(in srgb, var(--rc-idle) 16%, transparent); color: var(--primary-text-color); }
   .zoom:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
+`;
+
+// The overviews' room grid: the tiles, their icon, chips row, empty state and details panel. Each overview sets the
+// tile's default tint and its own levels (`.room { --t: … }`, `.room.lvl-…`), the chips' spacing and the panel extras.
+const RC_ROOM_GRID_STYLES = `
+  .grid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+  @container (max-width: 340px) { .grid:not(.fixed) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .grid[hidden] { display: none; }
+  .room { all: unset; box-sizing: border-box; cursor: pointer; min-width: 0;
+          display: grid; grid-template-columns: 26px minmax(0, 1fr); grid-template-areas: "ic name" "ic state" "chips chips";
+          column-gap: 7px; align-items: center; align-content: start; padding: 6px 7px; border-radius: 10px;
+          background: var(--secondary-background-color, transparent); border: 1px solid transparent;
+          transition: background .2s, border-color .2s; }
+  .room.lvl-warn, .room.lvl-alert {
+    background: color-mix(in srgb, var(--t) 9%, var(--secondary-background-color, transparent));
+    border-color: color-mix(in srgb, var(--t) 22%, transparent); }
+  .room:hover { background: color-mix(in srgb, var(--t) 13%, var(--secondary-background-color, transparent)); }
+  .room:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+  .room.sel { border-color: color-mix(in srgb, var(--primary-color) 55%, transparent); }
+  .room .ic { grid-area: ic; align-self: start; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+              color: var(--t); background: color-mix(in srgb, var(--t) 16%, transparent); }
+  .room.lvl-ok .ic { color: var(--primary-text-color); background: color-mix(in srgb, var(--rc-idle) 14%, transparent); }
+  .room .ic ha-icon { --mdc-icon-size: 15px; }
+  .room .name { grid-area: name; }
+  .room .state { grid-area: state; }
+  .room:not(.lvl-ok) .state { color: var(--t); }
+  .chips { grid-area: chips; display: flex; flex-wrap: wrap; }
+  .chips:empty { display: none; }
+  .empty { grid-column: 1 / -1; padding: 12px; text-align: center; font-size: 13px; color: var(--secondary-text-color); }
+  .panel { margin-top: 8px; border-radius: 12px; overflow: hidden; background: var(--secondary-background-color, transparent);
+           --ha-card-background: transparent; --card-background-color: transparent;
+           --ha-card-box-shadow: none; --ha-card-border-width: 0; }
+  .panel[hidden] { display: none; }
+  @media (prefers-reduced-motion: reduce) { .room { animation: none; transition: none; } }
 `;
 
 const RC_MINI_STYLES = `${RC_ZOOM_STYLES}

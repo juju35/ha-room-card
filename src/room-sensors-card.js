@@ -192,15 +192,16 @@ class RoomSensorsCard extends RcCard {
 
   _draw(items) {
     const c = this._config;
-    // The "since" label moves every minute.
-    const v = this._visible(items, items.map((i) => [i.id, i.on, i.unavailable, i.name, i.on ? this._ago(i.since) : ""]));
+    // The "since" label moves every minute; computed once per item (signature, then tile).
+    const ago = new Map(items.map((i) => [i.id, i.on ? this._ago(i.since) : ""]));
+    const v = this._visible(items, items.map((i) => [i.id, i.on, i.unavailable, i.name, ago.get(i.id)]));
     if (!v) return;
     const { occupied, level, icon, status, shown } = v;
     const tiles = shown
       .map((i) =>
         this._tile(i, {
           cls: `${i.kind === "leak" ? " leak" : ""}${i.info ? " info" : ""}`,
-          state: `${rcEsc(i.state)}${i.on ? ` · <span class="since">${rcEsc(this._ago(i.since))}</span>` : ""}`,
+          state: `${rcEsc(i.state)}${i.on ? ` · <span class="since">${rcEsc(ago.get(i.id))}</span>` : ""}`,
         }),
       )
       .join("");

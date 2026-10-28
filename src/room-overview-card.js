@@ -38,10 +38,7 @@ const RO_I18N = {
     ed_plugs_off_button: "“Turn all plugs off” button",
     ed_plugs_off_button_helper:
       "Tapping the plugs chip of the header lists every plug the card counts that is on and turns them off once confirmed; also on the Plugs card of the room details. Off by default: a plug may feed a camera or a network switch",
-    ed_sort: "Sort",
-    ed_sort_name: "By name",
     ed_sort_state: "Rooms needing attention first",
-    ed_exclude_areas: "Rooms to exclude",
     ed_exclude: "Entities to exclude",
     ed_exclude_helper: "Left out of the tiles, the totals and the room details",
   },
@@ -76,10 +73,7 @@ const RO_I18N = {
     ed_plugs_off_button: "Bouton « Éteindre toutes les prises »",
     ed_plugs_off_button_helper:
       "Un tap sur la pastille des prises de l'en-tête liste les prises allumées comptées par la carte et les éteint après confirmation ; aussi sur la carte Prises du détail des pièces. Désactivé par défaut : une prise peut alimenter une caméra ou un switch réseau",
-    ed_sort: "Tri",
-    ed_sort_name: "Par nom",
     ed_sort_state: "Pièces à surveiller en premier",
-    ed_exclude_areas: "Pièces à exclure",
     ed_exclude: "Entités à exclure",
     ed_exclude_helper: "Ignorées dans les tuiles, les totaux et le détail des pièces",
   },
@@ -492,7 +486,7 @@ class RoomOverviewCard extends RcCard {
     }
   }
 
-  static styles = `${RC_ZOOM_STYLES}
+  static styles = `${RC_ZOOM_STYLES}${RC_ROOM_GRID_STYLES}
       ha-card { container-type: inline-size; position: relative; }
       ha-card.lvl-ok    { --c: var(--rc-ok); }
       ha-card.lvl-warn  { --c: var(--rc-warn); }
@@ -544,43 +538,13 @@ class RoomOverviewCard extends RcCard {
       .modal button.primary:hover { background: color-mix(in srgb, var(--primary-color, #03a9f4) 24%, transparent); }
       .modal button.act:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
 
-      .grid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
-      @container (max-width: 340px) { .grid:not(.fixed) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-
-      .room { --t: var(--rc-idle); all: unset; box-sizing: border-box; cursor: pointer; min-width: 0;
-              display: grid; grid-template-columns: 26px minmax(0, 1fr); grid-template-areas: "ic name" "ic state" "chips chips";
-              column-gap: 7px; row-gap: 0; align-items: center; align-content: start; padding: 6px 7px; border-radius: 10px;
-              background: var(--secondary-background-color, transparent); border: 1px solid transparent;
-              transition: background .2s, border-color .2s; }
+      .room { --t: var(--rc-idle); }
       .room.lvl-warn  { --t: var(--rc-warn); }
       .room.lvl-alert { --t: var(--rc-alert); }
       .room.lvl-info  { --t: var(--rc-info); }
-      .room.lvl-warn, .room.lvl-alert {
-        background: color-mix(in srgb, var(--t) 9%, var(--secondary-background-color, transparent));
-        border-color: color-mix(in srgb, var(--t) 22%, transparent); }
-      .room:hover { background: color-mix(in srgb, var(--t) 13%, var(--secondary-background-color, transparent)); }
-      .room:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
-      .room.sel { border-color: color-mix(in srgb, var(--primary-color) 55%, transparent); }
-      .room .ic { grid-area: ic; align-self: start; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
-                  color: var(--t); background: color-mix(in srgb, var(--t) 16%, transparent); }
-      .room.lvl-ok .ic { color: var(--primary-text-color); background: color-mix(in srgb, var(--rc-idle) 14%, transparent); }
-      .room .ic ha-icon { --mdc-icon-size: 15px; }
       .room.lvl-alert .ic { animation: rc-blink 1.5s ease-in-out infinite; }
-      .name { grid-area: name; font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--primary-text-color);
-              white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .state { grid-area: state; font-size: 11px; line-height: 1.2; color: var(--secondary-text-color);
-               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .room:not(.lvl-ok) .state { color: var(--t); }
-      .chips { grid-area: chips; display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
-      .chips:empty { display: none; }
-      .grid[hidden] { display: none; }
-      .empty { grid-column: 1 / -1; padding: 12px; text-align: center; font-size: 13px; color: var(--secondary-text-color); }
+      .chips { gap: 3px; margin-top: 4px; }
 
-      .panel { margin-top: 8px; border-radius: 12px; overflow: hidden;
-               background: var(--secondary-background-color, transparent);
-               --ha-card-background: transparent; --card-background-color: transparent;
-               --ha-card-box-shadow: none; --ha-card-border-width: 0; }
-      .panel[hidden] { display: none; }
       .panel > * + * { border-top: 1px solid var(--divider-color, rgba(127,127,127,.15)); }
       .list { display: flex; flex-direction: column; padding: 4px; }
       .row { all: unset; cursor: pointer; display: flex; justify-content: space-between; gap: 8px; padding: 6px 8px; border-radius: 8px;
@@ -589,7 +553,7 @@ class RoomOverviewCard extends RcCard {
       .row.on span:last-child { color: var(--rc-warn); }
       .row:hover { background: color-mix(in srgb, var(--rc-idle) 12%, transparent); }
 
-      @media (prefers-reduced-motion: reduce) { .room, .room .ic { animation: none; transition: none; } }
+      @media (prefers-reduced-motion: reduce) { .room .ic { animation: none; } }
     `;
 }
 
