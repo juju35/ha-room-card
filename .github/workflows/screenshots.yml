@@ -1,0 +1,73 @@
+name: Screenshots
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "scripts/**"
+
+# Protected main is never pushed to: the job commits the refreshed screenshots
+# back onto the pull request's own branch, so they land through the normal merge.
+permissions:
+  contents: write
+
+concurrency:
+  group: screenshots-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    name: Render screenshots
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - run: npm ci
+      # Download the browser binary (no apt here) separately from its system libraries, so the apt work all sits in
+      # the one time-boxed, retried step below and a hung mirror can never stall an unguarded install.
+      - run: npx playwright install chromium
+      # ffmpeg (required, not preinstalled) + Roboto + the browser's apt deps, each apt call time-boxed and retried
+      # so a flaky mirror is abandoned and retried instead of hanging; fail loudly if ffmpeg is still missing.
+      - name: Install ffmpeg, Roboto and browser deps
+        timeout-minutes: 12
+        run: |
+          for i in 1 2 3; do
+            timeout 150 sudo apt-get update \
+              && timeout 300 sudo apt-get install -y ffmpeg fonts-roboto \
+              && timeout 300 npx playwright install-deps chromium \
+              && break
+            echo "apt attempt $i failed or timed out, retrying in 15s"; sleep 15
+          done
+          ffmpeg -version > /dev/null
+      # npm run screenshots builds the bundle first, then renders the stills and the animation GIFs.
+      - name: Render screenshots
+        run: |
+          set -o pipefail
+          npm run screenshots 2>&1 | tee /tmp/screenshots.log || {
+            echo "::error::screenshots failed: $(tail -c 1200 /tmp/screenshots.log | tr -d '\r' | tr '\n' ' ')"
+            exit 1
+          }
+      - name: Commit refreshed screenshots
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          if [ -z "$(git status --porcelain screenshots)" ]; then
+            echo "No screenshot changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add screenshots
+          git commit -m "chore: refresh screenshots"
+          git push
+      - name: Upload screenshots (manual run)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: screenshots
+          path: screenshots/
