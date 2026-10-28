@@ -206,6 +206,19 @@ test("the overview sorts rooms needing a look first, shows only those until zoom
   );
 });
 
+test("the overview editor offers every sensor behind an averaged reading to exclude", () => {
+  const second = st("sensor.lr_temperature_2", 25, "temperature", "°C", "Salon Température 2");
+  const hass = makeHass({}, { "sensor.lr_temperature_2": second });
+  const editor = new (rc.customElements.get("room-environment-overview-card-editor"))();
+  editor.appendChild = () => {};
+  editor.setConfig({});
+  editor.hass = hass;
+  const field = [...editor._form.schema].find((s) => s.name === "exclude");
+  const ids = field.selector.entity.include_entities;
+  assert.ok(ids.includes("sensor.lr_temperature"));
+  assert.ok(ids.includes("sensor.lr_temperature_2"));
+});
+
 test("the overview averages the first temperature of each room", () => {
   const card = overview();
   assert.equal(card._average(card._collect(), "temperature", 1), "20,7");

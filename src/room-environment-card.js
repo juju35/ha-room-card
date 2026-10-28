@@ -774,7 +774,7 @@ const RoomEnvironmentOverviewCardEditor = rcEditor({
   schema: (lang, hass, config) => {
     const probe = hass && rcProbe(RoomEnvironmentOverviewCard, hass, { ...config, exclude_areas: [], exclude: [], zoom: false });
     const rooms = probe ? probe._collect() : [];
-    const ids = rooms.flatMap((x) => x.items.map((i) => i.id));
+    const ids = rooms.flatMap((x) => x.items.flatMap((i) => i.ids));
     for (const id of config?.exclude || []) if (!ids.includes(id)) ids.push(id);
     return [
       ...rcOverviewFields(REO_I18N, lang),
