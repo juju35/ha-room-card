@@ -63,10 +63,68 @@ const RS_I18N = {
     ed_include_helper: "D'une autre pièce ou sans pièce",
     ed_exclude: "Capteurs à exclure",
   },
+  de: {
+    ed_columns_helper: "Mini-Karte: Spalten der vergrößerten Ansicht",
+    title: "Sensoren",
+    no_sensors: "Kein Sensor",
+    leak_on: "Leck!",
+    leak_off: "Trocken",
+    open: "Offen",
+    closed: "Geschlossen",
+    presence_on: "Erkannt",
+    presence_off: "Frei",
+    motion_on: "Bewegung",
+    motion_off: "Ruhig",
+    occupied: "Anwesenheit erkannt",
+    now: "gerade eben",
+    min: "{n} Min.",
+    hour: "{n} Std.",
+    day: "{n} T.",
+    ed_only_alerts: "Inaktive Sensoren ausblenden",
+    ed_only_alerts_helper: "Nur offene, leckende oder erkennende Sensoren bleiben sichtbar",
+    ed_hide_when_clear: "Karte im Ruhezustand ausblenden",
+    ed_hide_when_clear_helper: "Die Karte erscheint nur, wenn eine Tür oder ein Fenster offen ist oder ein Leck oder eine Anwesenheit erkannt wird",
+    ed_presence: "Anwesenheitssensoren einbeziehen",
+    ed_presence_helper: "Anwesenheits- und Bewegungsmelder, ohne Kameras",
+    ed_blink: "Warnungen blinken lassen",
+    ed_include: "Hinzuzufügende Sensoren",
+    ed_include_helper: "Aus einem anderen Raum oder ohne Raum",
+    ed_exclude: "Auszuschließende Sensoren",
+  },
+  es: {
+    ed_columns_helper: "Minitarjeta: columnas de la vista ampliada",
+    title: "Sensores",
+    no_sensors: "Ningún sensor",
+    leak_on: "¡Fuga!",
+    leak_off: "Seco",
+    open: "Abierto",
+    closed: "Cerrado",
+    open_f: "Abierta",
+    closed_f: "Cerrada",
+    presence_on: "Detectada",
+    presence_off: "Ninguna",
+    motion_on: "Movimiento",
+    motion_off: "Tranquilo",
+    occupied: "Presencia detectada",
+    now: "ahora mismo",
+    min: "{n} min",
+    hour: "{n} h",
+    day: "{n} d",
+    ed_only_alerts: "Ocultar los sensores en reposo",
+    ed_only_alerts_helper: "Solo quedan visibles los sensores abiertos, con fuga o que detectan presencia",
+    ed_hide_when_clear: "Ocultar la tarjeta en reposo",
+    ed_hide_when_clear_helper: "La tarjeta solo aparece cuando hay una puerta o ventana abierta, o se detecta una fuga o presencia",
+    ed_presence: "Incluir los sensores de presencia",
+    ed_presence_helper: "Sensores de presencia y movimiento, sin cámaras",
+    ed_blink: "Hacer parpadear las alertas",
+    ed_include: "Sensores a añadir",
+    ed_include_helper: "De otra habitación o sin habitación",
+    ed_exclude: "Sensores a excluir",
+  },
 };
 
 // ── Sensor kinds ─────────────────────────────────────────────────────────────
-// `fem`: the French state is feminine (porte, fenêtre).
+// `fem`: the state is feminine in the languages that have `open_f` / `closed_f` (fr: porte, fenêtre; es: puerta, ventana).
 // `info`: an active state that is not an alert (presence, motion).
 const RS_KINDS = {
   leak: { on: "mdi:water-alert", off: "mdi:water-check" },
@@ -113,7 +171,7 @@ class RoomSensorsCard extends RcCard {
   _stateText(kind, on) {
     if (kind === "leak") return this._t(on ? "leak_on" : "leak_off");
     if (RS_KINDS[kind].info) return this._t(`${kind}_${on ? "on" : "off"}`);
-    if (this._lang() === "fr" && RS_KINDS[kind].fem) return this._t(on ? "open_f" : "closed_f");
+    if (RS_KINDS[kind].fem && RS_I18N[this._lang()]?.open_f) return this._t(on ? "open_f" : "closed_f");
     return this._t(on ? "open" : "closed");
   }
 

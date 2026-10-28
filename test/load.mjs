@@ -65,7 +65,7 @@ export const load = () => {
   const code = [read("shared"), ...cards.map((c) => `{\n${read(c)}}\n`)].join("\n");
   return vm.runInContext(
     `${code}
-    ({ RcCard, rcCleanName, rcIsPlug, rcIsLightSwitch, rcMatchSensor, rcMatchLight, rcMatchPlug, rcEsc, rcMemo,
+    ({ RcCard, RC_I18N, rcCleanName, rcIsPlug, rcIsLightSwitch, rcMatchSensor, rcMatchLight, rcMatchPlug, rcEsc, rcMemo,
        rcPowerSensors, rcCall, rcInDialog, RC_HOLD_MS, customElements, window, cards: Object.fromEntries(${JSON.stringify([...cards, "room-environment-mini-card", "room-sensors-mini-card"])}.map((t) => [t, customElements.get(t)])) })`,
     ctx,
   );

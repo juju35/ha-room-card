@@ -178,7 +178,7 @@ test("shared strings fall back per language before English", () => {
   card._config = { language: "fr" };
   assert.equal(card._t("turn_all_off"), "Tout éteindre");
   assert.equal(card._t("no_lights"), "Aucune lumière");
-  card._config = { language: "de" };
+  card._config = { language: "it" };
   assert.equal(card._t("err_config"), "Set `area` or `entities`");
 });
 
