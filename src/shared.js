@@ -522,7 +522,8 @@ class RcCard extends HTMLElement {
       this._pressing = true;
       clearTimeout(timer);
       timer = setTimeout(() => {
-        if (mode) return;
+        // The card may have been detached mid-press (nothing else clears this timer): no hold on a dead node.
+        if (mode || !this.isConnected) return;
         mode = "hold";
         // The press is settled (no tap): the details may open over the tile, so its pointerup may never come.
         this._released();

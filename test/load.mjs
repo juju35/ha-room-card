@@ -31,6 +31,7 @@ export const load = () => {
   class HTMLElement {
     constructor() {
       this.style = {};
+      this.isConnected = true;
     }
     attachShadow() {
       this.shadowRoot = fakeNode();

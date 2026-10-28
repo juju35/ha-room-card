@@ -62,6 +62,15 @@ test("a hold still opens more-info and releases the render lock", async () => {
   assert.equal(card._pressing, false);
 });
 
+test("a card detached mid-press never fires its hold", async () => {
+  const t = pressSetup();
+  const { card, tile, calls } = t;
+  tile.fire("pointerdown");
+  card.isConnected = false; // the card leaves the document before the hold delay
+  await new Promise((r) => setTimeout(r, rc.RC_HOLD_MS + 50));
+  assert.deepEqual(calls, []);
+});
+
 test("room discovery is cached on the registries, not on hass.states", () => {
   const card = new cards["room-switch-card"]();
   card.setConfig({ area: "kitchen" });
