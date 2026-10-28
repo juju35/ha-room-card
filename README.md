@@ -524,6 +524,22 @@ rooms:
 
 ## Screenshots
 
+### Animations
+
+One GIF per animated state, recorded from the real cards with mock data:
+
+![Open sensors blinking](screenshots/sensors-blink.gif)
+
+Open doors and windows blink (`rc-blink`) until they are closed; `blink: false` keeps them still.
+
+![Water leak alert](screenshots/sensors-alert.gif)
+
+A water leak pulses the header badge (`rc-pulse`) while the leaking sensor blinks.
+
+![Drag to dim](screenshots/lights-dim.gif)
+
+Dragging a dimmable light sideways sets its brightness, the bar and the percentage following the finger.
+
 ### Overview
 
 | Active rooms (default) | Every room (detail button) | Room details |
@@ -629,7 +645,7 @@ The card finds the rooms the way the Environment card does, area by area, and sh
 npm install
 npm run build        # bundles src/*.js into dist/ha-room-card.js and stamps the version of package.json
 npm run check        # builds and checks the bundle (run in CI)
-npm run screenshots  # renders every card with mock data into screenshots/
+npm run screenshots  # renders every card with mock data into screenshots/, and the animation GIFs (needs ffmpeg)
 ```
 
 Each card has its own source in `src/`; the build wraps each one in its own block and concatenates them into the single HACS file. `dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where HACS downloads it from.

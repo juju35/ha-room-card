@@ -15,7 +15,7 @@
     "build": "node scripts/build.mjs",
     "check": "node scripts/build.mjs && node --check dist/ha-room-card.js",
     "test": "node --test test/*.test.mjs",
-    "screenshots": "npm run build && node scripts/screenshots/sensors.mjs && node scripts/screenshots/lights.mjs && node scripts/screenshots/switch.mjs && node scripts/screenshots/environment.mjs && node scripts/screenshots/environment-overview.mjs && node scripts/screenshots/overview.mjs"
+    "screenshots": "npm run build && node scripts/screenshots/sensors.mjs && node scripts/screenshots/lights.mjs && node scripts/screenshots/switch.mjs && node scripts/screenshots/environment.mjs && node scripts/screenshots/environment-overview.mjs && node scripts/screenshots/overview.mjs && node scripts/screenshots/animations.mjs"
   },
   "license": "MIT",
   "devDependencies": {

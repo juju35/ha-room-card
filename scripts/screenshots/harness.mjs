@@ -8,7 +8,7 @@ export const root = fileURLToPath(new URL("../..", import.meta.url));
 const cardJs = readFileSync(`${root}dist/ha-room-card.js`, "utf8");
 
 // Every mdi:* icon the cards or the mock data can use, as SVG paths for the <ha-icon> stand-in.
-const iconsFor = (extra) => {
+export const iconsFor = (extra) => {
   const icons = {};
   for (const name of new Set([...cardJs.match(/mdi:[a-z0-9-]+/g), ...extra])) {
     const key = `mdi${name.slice(4).replace(/(^|-)([a-z0-9])/g, (_, __, c) => c.toUpperCase())}`;
@@ -69,41 +69,53 @@ export const pair = (file, extra = {}) => [
   { file: `${file}-dark`, theme: "dark", ...extra },
 ];
 
+export const launch = () => chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
+
+// A page ready to host a card: theme variables, the <ha-*> stand-ins and the card bundle loaded.
+// A new page per shot: the card's script declares top-level names, which cannot be evaluated twice in one page.
+export const openPage = async (browser, { theme, width, icons = {}, label = "" }) => {
+  const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1000, height: 2000 } });
+  page.on("pageerror", (err) => console.error(`pageerror${label ? ` (${label})` : ""}: ${err.message}`));
+  await page.setContent(pageHtml(theme, width));
+  await page.addScriptTag({ content: haElements(icons) });
+  await page.addScriptTag({ content: cardJs });
+  return page;
+};
+
+// Creates the card in the page, with `open` (a selector) clicked once rendered.
+export const mountCard = (page, { tag, hass, config, dark = false, open = null }) =>
+  page.evaluate(
+    ({ tag, hass, config, dark, open }) => {
+      const el = document.createElement(tag);
+      el.setConfig({ type: `custom:${tag}`, ...config });
+      el.hass = { ...hass, language: hass.language, themes: { darkMode: dark }, callService: async () => {} };
+      document.getElementById("root").appendChild(el);
+      // A mouse click (detail 1), not a keyboard one: no focus ring left in the shot.
+      if (open) el.shadowRoot.querySelector(open).dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true, detail: 1 }));
+    },
+    { tag, hass, config, dark, open },
+  );
+
+// The card on the theme background, with the body's 16px padding around it.
+export const cardClip = async (page, width) => {
+  const box = await page.locator("#root").boundingBox();
+  return { x: 0, y: 0, width: width + 32, height: Math.ceil(box.height) + 32 };
+};
+
 // Renders each shot of `shots` ({ file, theme, ... }) into screenshots/<prefix>-<file>.png.
 // `setup(shot, lang)` returns { hass, config, open? } for that shot; every shot is in English.
 export const shoot = async ({ prefix, tag, shots, setup, icons = [] }) => {
   const iconMap = iconsFor(icons);
-  const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
+  const browser = await launch();
   for (const s of shots) {
-    // A new page per shot: the card's script declares top-level names, which cannot be evaluated twice in one page.
-    const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1000, height: 2000 } });
-    page.on("pageerror", (err) => console.error(`pageerror (${prefix}-${s.file}): ${err.message}`));
     const lang = "en";
     const width = widthFor(tag, s);
     const { hass, config, open } = setup(s, lang);
-    await page.setContent(pageHtml(s.theme, width));
-    await page.addScriptTag({ content: haElements(iconMap) });
-    await page.addScriptTag({ content: cardJs });
-    await page.evaluate(
-      ({ tag, hass, config, dark, open }) => {
-        const el = document.createElement(tag);
-        el.setConfig({ type: `custom:${tag}`, ...config });
-        el.hass = { ...hass, language: hass.language, themes: { darkMode: dark }, callService: async () => {} };
-        document.getElementById("root").appendChild(el);
-        // A mouse click (detail 1), not a keyboard one: no focus ring left in the shot.
-        if (open) el.shadowRoot.querySelector(open).dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true, detail: 1 }));
-      },
-      { tag, hass, config, dark: s.theme === "dark", open },
-    );
+    const page = await openPage(browser, { theme: s.theme, width, icons: iconMap, label: `${prefix}-${s.file}` });
+    await mountCard(page, { tag, hass, config, dark: s.theme === "dark", open });
     await page.waitForTimeout(400);
     const out = `screenshots/${prefix}-${s.file}.png`;
-    // The card on the theme background, with the body's 16px padding around it.
-    const box = await page.locator("#root").boundingBox();
-    await page.screenshot({
-      path: `${root}${out}`,
-      clip: { x: 0, y: 0, width: width + 32, height: Math.ceil(box.height) + 32 },
-      animations: "disabled",
-    });
+    await page.screenshot({ path: `${root}${out}`, clip: await cardClip(page, width), animations: "disabled" });
     console.log(out);
     await page.close();
   }
