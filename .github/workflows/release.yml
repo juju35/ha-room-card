@@ -10,6 +10,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -39,6 +43,8 @@ jobs:
       - name: Check build and notes
         if: steps.version.outputs.exists == 'false'
         run: |
+          npm ci
+          npm test
           npm run check
           .github/scripts/release-notes.sh "${{ steps.version.outputs.version }}" > notes.md
           test -s notes.md
