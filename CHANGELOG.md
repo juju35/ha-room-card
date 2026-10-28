@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.16.1 - 2026-10-28
+### Fixes
+- Environment overview editor: the **exclude** field only listed the first sensor of each averaged reading; it now lists every sensor behind the reading, so a second thermometer skewing a mean can be excluded from the editor.
+- Press and hold: a card removed mid-press (dashboard change, view switch) no longer opens a more-info dialog 500 ms later.
+
+### Maintenance
+- Shared helpers for the power-sensor lookup (now memoized per entity registry instead of rescanned on every render), the `navigation_path` wiring, the mini cards' zoom button and the overviews' room grid; shared editor strings move to the common i18n table.
+- README: new **Animations** section with three GIFs (open sensors blinking, water-leak badge pulsing, drag-to-dim), and the manual HACS install path updated for HACS 2.
+- CI: releases are gated on the tests, a new **Screenshots** workflow refreshes the README images, `hacs/action` is pinned on a release tag, and the unused ruff tooling is gone.
+
 ## 1.16.0 - 2026-10-26
 ### Fixes
 - Overview: on a room both leaking *and* with a single opening, the tile's openings chip always used the plural i18n key `open_many`, showing "1 ouvertures" in French instead of "1 ouverture". The key is now chosen by count (`open > 1 ? open_many : open_one`), as everywhere else in the code.
