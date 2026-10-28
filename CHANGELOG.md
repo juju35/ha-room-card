@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.17.0 - 2026-10-28
+### Changes
+- German and Spanish translations: every card (sensors, lights, plugs, environment, overviews) and its visual editor now speak German (`de`) and Spanish (`es`), picked from the Home Assistant language or forced with `language: de` / `language: es`; **Deutsch** and **Español** join the editor's language selector. In Spanish, doors and windows take the feminine state (*Abierta* / *Cerrada*), as in French.
+
 ## 1.16.1 - 2026-10-28
 ### Fixes
 - Environment overview editor: the **exclude** field only listed the first sensor of each averaged reading; it now lists every sensor behind the reading, so a second thermometer skewing a mean can be excluded from the editor.

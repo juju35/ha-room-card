@@ -1,6 +1,6 @@
 {
   "name": "ha-room-card",
-  "version": "1.16.1",
+  "version": "1.17.0",
   "description": "Compact Lovelace cards for Home Assistant, room by room: sensors, lights, plugs, environment readings and an overview of every room.",
   "repository": {
     "type": "git",
