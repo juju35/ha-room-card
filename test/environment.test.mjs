@@ -225,6 +225,28 @@ test("the overview averages the first temperature of each room", () => {
   assert.equal(card._average(card._collect(), "humidity", 0), "48");
 });
 
+test("the overview averages rooms in different temperature units in one unit", () => {
+  // Salon in °F (70 °F = 21.1 °C), Cuisine in °C (20 °C): about 20.6 °C, not 45.0.
+  const hass = makeHass({ temp: 70, tempUnit: "°F" });
+  const card = overview({}, hass);
+  assert.equal(card._average(card._collect(), "temperature", 1), "20,6");
+  // Home Assistant's unit system wins when it is known: the same rooms in °F.
+  hass.config = { unit_system: { temperature: "°F" } };
+  const f = overview({}, hass);
+  assert.equal(f._average(f._collect(), "temperature", 1), "69,0");
+  // Every room in °F with no unit system known: the mean stays in °F.
+  const allF = makeHass({ temp: 70, tempUnit: "°F" });
+  allF.states["sensor.kitchen_temperature"] = st("sensor.kitchen_temperature", 68, "temperature", "°F", "Cuisine Température");
+  const g = overview({}, allF);
+  assert.equal(g._average(g._collect(), "temperature", 1), "69,0");
+  // A room whose thermometer is unavailable counts for nothing, whatever the unit system.
+  allF.states["sensor.kitchen_temperature"] = { ...allF.states["sensor.kitchen_temperature"], state: "unavailable" };
+  allF.config = { unit_system: { temperature: "°C" } };
+  const u = overview({}, allF);
+  assert.equal(u._average(u._collect(), "temperature", 1), "21,1");
+  assert.equal(u._average(u._collect(), "humidity", 0), "48");
+});
+
 test("a bathroom tolerates more humidity: 61 % is comfortable there, not in the living room", () => {
   const bath = st("sensor.bath_humidity", 61, "humidity", "%", "Salle de bain Humidité");
   const hass = makeHass({ hum: 61 }, { "sensor.bath_humidity": bath });
