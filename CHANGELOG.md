@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.17.4 - 2026-10-29
+### Fixes
+- Visual editors: the help text of *Rooms* on the Environment overview now mentions the per-room `thresholds`, and the help text of *Entities* on the Plugs card mentions `power` (the entity of the plug's power sensor), two keys the cards already read but the editor did not tell about.
+
 ## 1.17.3 - 2026-10-29
 ### Fixes
 - Environment overview: the header's average temperature no longer mixes °C and °F when rooms report in different units (e.g. one thermometer shown in °F): each room's temperature is converted to Home Assistant's unit system (or, if unknown, to the first room's unit) before the mean, so 70 °F and 20 °C average to about 20.6°, not 45°.
