@@ -13,6 +13,8 @@
 ### Maintenance
 - CI: the Screenshots workflow checks out fork pull requests safely, fails clearly when its apt installs fail three times, and re-runs on `package.json` / `package-lock.json` changes; the `playwright` range matches the lock.
 - CHANGELOG: every section is dated.
+- Overviews: the room tap, the open room's fold / unfold and the outside-click folding are shared by the Overview and the Environment overview (one `rcRoomsPanel` mixin) instead of duplicated; same behaviour, now tested for both.
+- CI: the screenshots commit, pushed with `GITHUB_TOKEN` (which starts no `pull_request` run), now re-runs Lint, Validate and HACS on the pull request branch through `workflow_dispatch`.
 
 ## 1.17.0 - 2026-10-28
 ### Changes
