@@ -653,3 +653,48 @@ test("an outside click cancels the Overview's confirmation before folding the ro
   card._onOutside({ composedPath: () => [{ localName: "hui-view" }] });
   assert.deepEqual(order, ["confirm", "fold"]);
 });
+
+test("the Plugs card's confirmation shows the room's current power, not the one seen when the room was unfolded", () => {
+  const { overview, nodes } = overviewSetup({ plugs_off_button: true, language: "en" }, withWatts(12));
+  overview._toggle("kitchen");
+  const plugs = overview._details.find((el) => el._config.type === "custom:room-switch-card");
+  assert.ok(plugs, "the Plugs card is in the room details");
+  overview.hass = withWatts(1500); // same entities: the panel is kept, not rebuilt
+  assert.equal(overview._rooms[0].watts, 1500);
+  plugs._confirmOff(["switch.coffee_plug"]);
+  const box = nodes[".confirm"].innerHTML;
+  assert.match(box, /Kitchen · 1[.,]5 kW/);
+  assert.doesNotMatch(box, /12 W/);
+});
+
+test("the Plugs card's confirmation still lists its plugs once the room is no longer among the rooms shown", () => {
+  const { overview, nodes } = overviewSetup({ plugs_off_button: true, language: "en" }, withWatts(12));
+  overview._toggle("kitchen");
+  const plugs = overview._details.find((el) => el._config.type === "custom:room-switch-card");
+  overview._rooms = []; // e.g. compact mode, the room went idle in between
+  plugs._confirmOff(["switch.coffee_plug"]);
+  assert.match(nodes[".confirm"].innerHTML, /Coffee plug/);
+  assert.match(nodes[".confirm"].innerHTML, /Kitchen/);
+});
+
+// The kitchen with a light and a plug, and with or without its (closed) door sensor.
+const doorHass = (door) => {
+  const h = makeHass();
+  for (const id of door ? ["binary_sensor.diag_door"] : ["binary_sensor.door", "binary_sensor.diag_door"]) {
+    delete h.entities[id];
+    delete h.states[id];
+  }
+  return h;
+};
+
+test("a door sensor added to an idle room updates the header and tile from 'all quiet' to 'all closed'", () => {
+  const { overview, nodes } = overviewSetup({ language: "en" }, doorHass(false));
+  assert.match(nodes[".head"].innerHTML, /All quiet/);
+  assert.match(nodes[".grid"].innerHTML, /All quiet/);
+  overview.hass = doorHass(true); // registry change only: the door is closed, no aggregate moves
+  assert.match(nodes[".head"].innerHTML, /All closed/);
+  assert.match(nodes[".grid"].innerHTML, /All closed/);
+  overview.hass = doorHass(false); // and back when it is removed
+  assert.match(nodes[".head"].innerHTML, /All quiet/);
+  assert.match(nodes[".grid"].innerHTML, /All quiet/);
+});
