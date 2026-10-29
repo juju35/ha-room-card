@@ -613,3 +613,43 @@ test("Spanish light tiles take the feminine state, plugs the masculine", () => {
   plugs._config = { language: "es" };
   assert.equal(plugs._t("on"), "Encendido");
 });
+
+test("both overviews unfold and fold a room the same way, and fold it on an outside click", () => {
+  for (const tag of ["room-overview-card", "room-environment-overview-card"]) {
+    const card = new (rc.customElements.get(tag))();
+    const panel = { ...fakeNode(), innerHTML: "<x>", hidden: false };
+    card.shadowRoot = { ...fakeNode(), querySelector: (s) => (s === ".panel" ? panel : null) };
+    let renders = 0;
+    card._render = () => renders++;
+    card._rooms = card._items = [{ id: "kitchen" }, { id: "office" }];
+    card._panelArea = "stale";
+    card._tap("kitchen");
+    assert.equal(card._openArea, "kitchen", tag);
+    assert.equal(card._panelArea, null, tag);
+    assert.equal(renders, 1, tag);
+    card._details = [{}];
+    card._detail = {};
+    card._tap("kitchen"); // same tile again: folded back
+    assert.equal(card._openArea, null, tag);
+    assert.equal(panel.hidden, true, tag);
+    assert.equal(panel.innerHTML, "", tag);
+    assert.ok(tag === "room-overview-card" ? card._details.length === 0 : card._detail === null, tag);
+    card._openArea = "office";
+    card._onOutside({ composedPath: () => [{ localName: "hui-view" }] });
+    assert.equal(card._openArea, null, tag);
+    card._panelArea = "office";
+    card.setConfig({});
+    assert.equal(card._panelArea, null, tag);
+  }
+});
+
+test("an outside click cancels the Overview's confirmation before folding the room", () => {
+  const card = new cards["room-overview-card"]();
+  const order = [];
+  card._confirm = [{ id: "switch.coffee_plug" }];
+  card._closeConfirm = () => order.push("confirm");
+  card._toggle = () => order.push("fold");
+  card._openArea = "kitchen";
+  card._onOutside({ composedPath: () => [{ localName: "hui-view" }] });
+  assert.deepEqual(order, ["confirm", "fold"]);
+});

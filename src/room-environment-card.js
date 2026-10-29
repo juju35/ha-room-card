@@ -622,7 +622,7 @@ const REO_I18N = {
 // Readings always shown on a room tile; the others only when they need a look.
 const REO_MAIN = ["temperature", "humidity", "co2"];
 
-class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
+class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
   static tag = "room-environment-overview-card";
   static i18n = REO_I18N;
   static needsArea = false;
@@ -632,32 +632,9 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
     return {};
   }
 
-  constructor() {
-    super();
-    // A click anywhere else folds the open room back, and returns to the rooms needing a look.
-    this._onOutside = (ev) => {
-      if (!rcOutside(this, ev)) return;
-      if (this._openArea) this._toggle(null);
-      rcUnzoom(this);
-    };
-  }
-
-  setConfig(config) {
-    this._panelArea = null;
-    super.setConfig(config);
-  }
-
   set hass(hass) {
     super.hass = hass;
     if (this._detail) this._detail.hass = hass;
-  }
-
-  connectedCallback() {
-    document.addEventListener("click", this._onOutside, true);
-  }
-
-  disconnectedCallback() {
-    document.removeEventListener("click", this._onOutside, true);
   }
 
   getCardSize() {
@@ -774,21 +751,12 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
     });
   }
 
-  _tap(aid) {
-    const x = this._items.find((r) => r.id === aid);
-    if (x?.navigation_path) rcNavigate(x.navigation_path);
-    else this._toggle(this._openArea === aid ? null : aid);
+  // rcRoomsPanel hooks: the tiles shown, and the room's Environment card dropped on fold.
+  _shownRooms() {
+    return this._items;
   }
 
-  _toggle(aid) {
-    this._openArea = aid;
-    this._sig = null;
-    this._render();
-    if (aid) return;
-    const panel = this.shadowRoot.querySelector(".panel");
-    panel.hidden = true;
-    panel.innerHTML = "";
-    this._panelArea = null;
+  _clearPanel() {
     this._detail = null;
   }
 

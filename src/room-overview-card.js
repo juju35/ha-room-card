@@ -152,7 +152,7 @@ const RO_I18N = {
 const RO_CLOSED_GUARD_MS = 400;
 
 // ── Card ─────────────────────────────────────────────────────────────────────
-class RoomOverviewCard extends RcCard {
+class RoomOverviewCard extends rcRoomsPanel(RcCard) {
   static tag = "room-overview-card";
   static i18n = RO_I18N;
   static defaults = {
@@ -172,13 +172,6 @@ class RoomOverviewCard extends RcCard {
 
   constructor() {
     super();
-    // A click anywhere else folds the open room back, and returns to the rooms needing attention.
-    this._onOutside = (ev) => {
-      if (!rcOutside(this, ev)) return;
-      if (this._confirm) this._closeConfirm();
-      if (this._openArea) this._toggle(null);
-      rcUnzoom(this);
-    };
     // Escape closes the confirmation popup (as Cancel), wherever the focus is.
     this._onKey = (ev) => {
       if (ev.key !== "Escape" || !this._confirm) return;
@@ -187,23 +180,13 @@ class RoomOverviewCard extends RcCard {
     };
   }
 
-  // A new config rebuilds the room details, which take part of it (language, presence, exclude, plugs_off_button).
-  setConfig(config) {
-    this._panelArea = null;
-    super.setConfig(config);
-  }
-
   set hass(hass) {
     super.hass = hass;
     for (const el of this._details || []) el.hass = hass;
   }
 
-  connectedCallback() {
-    document.addEventListener("click", this._onOutside, true);
-  }
-
   disconnectedCallback() {
-    document.removeEventListener("click", this._onOutside, true);
+    super.disconnectedCallback();
     if (this._confirm) this._closeConfirm();
     // A press cut short by the detach never gets its pointerup: end it, or the header stays frozen.
     if (this._pressing) this._released();
@@ -480,26 +463,18 @@ class RoomOverviewCard extends RcCard {
     return this._closedAt != null && Date.now() - this._closedAt < RO_CLOSED_GUARD_MS;
   }
 
-  _tap(aid) {
-    const x = this._rooms.find((r) => r.id === aid);
-    if (x?.navigation_path) {
-      rcNavigate(x.navigation_path);
-      return;
-    }
-    this._toggle(this._openArea === aid ? null : aid);
+  // rcRoomsPanel hooks: the tiles shown, the room details dropped on fold, and the confirmation closed by an outside
+  // click (as Cancel) before the open room folds back.
+  _shownRooms() {
+    return this._rooms;
   }
 
-  _toggle(aid) {
-    this._openArea = aid;
-    this._panelArea = null;
-    this._sig = null;
-    this._render();
-    const panel = this.shadowRoot.querySelector(".panel");
-    panel.hidden = !aid;
-    if (!aid) {
-      panel.innerHTML = "";
-      this._details = [];
-    }
+  _clearPanel() {
+    this._details = [];
+  }
+
+  _beforeFold() {
+    if (this._confirm) this._closeConfirm();
   }
 
   // Details of the open room: the room-* cards when installed, a plain list otherwise.
