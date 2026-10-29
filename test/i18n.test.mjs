@@ -47,3 +47,16 @@ test("Spanish doors and windows take the feminine state", () => {
   card._config = { language: "de" };
   assert.equal(card._stateText("door", true), "Offen");
 });
+
+test("Editor help texts name every documented key: rooms[].thresholds, entities[].power", () => {
+  const reo = rc.customElements.get("room-environment-overview-card");
+  const plugs = rc.cards["room-switch-card"];
+  for (const lang of LANGS) {
+    const t = (card, key) => card.i18n[lang]?.[key] ?? rc.RC_I18N[lang][key];
+    assert.match(t(reo, "ed_rooms_helper"), /thresholds/, `environment overview rooms helper (${lang})`);
+    assert.match(t(plugs, "ed_entities_helper"), /\bpower\b/, `plugs entities helper (${lang})`);
+    // The other cards keep the shared help texts: no power on lights or sensors, no thresholds on the Overview.
+    assert.doesNotMatch(t(rc.cards["room-lights-card"], "ed_entities_helper"), /power/, `lights (${lang})`);
+    assert.doesNotMatch(t(rc.customElements.get("room-overview-card"), "ed_rooms_helper"), /thresholds/, `overview (${lang})`);
+  }
+});
