@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.17.3 - 2026-10-29
+### Fixes
+- Environment overview: the header's average temperature no longer mixes °C and °F when rooms report in different units (e.g. one thermometer shown in °F): each room's temperature is converted to Home Assistant's unit system (or, if unknown, to the first room's unit) before the mean, so 70 °F and 20 °C average to about 20.6°, not 45°.
+
 ## 1.17.2 - 2026-10-29
 ### Fixes
 - Overview: the confirmation opened from the room details' Plugs card (with `plugs_off_button: true`) now shows the room's current power, instead of the power it drew when the room was unfolded.
