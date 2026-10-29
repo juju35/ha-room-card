@@ -675,10 +675,14 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
     return rcCompact(this) ? rooms.filter((x) => x.rank >= RE_RANK.warn || x.id === this._openArea) : rooms;
   }
 
-  // Mean of the rooms' readings of `kind` (each room counting once), formatted with `digits`.
+  // Mean of the rooms' readings of `kind` (each room counting once), formatted with `digits`. Each room's reading is
+  // in its own sensor's unit: temperatures are converted to Home Assistant's unit system (or, unknown, to the first
+  // room's unit) before the mean, so a room in °F and one in °C do not mix.
   _average(rooms, kind, digits) {
-    const values = rooms.map((x) => x.items.find((i) => i.kind === kind)?.num).filter((v) => v != null);
-    if (!values.length) return null;
+    const readings = rooms.map((x) => x.items.find((i) => i.kind === kind)).filter((i) => i?.num != null);
+    if (!readings.length) return null;
+    const target = this._hass?.config?.unit_system?.[kind] ?? readings[0].unit;
+    const values = readings.map((i) => reConvert(kind, i.num, i.unit, target));
     const mean = values.reduce((t, v) => t + v, 0) / values.length;
     return this._formatNumber(mean, digits);
   }
