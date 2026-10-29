@@ -22,6 +22,7 @@ const RW_I18N = {
     ed_include: "Plugs and switches to add",
     ed_include_helper: "From another room or without one, or a switch not recognised as a plug",
     ed_exclude: "Plugs to exclude",
+    ed_entities_helper: "Replaces the automatic discovery: entity IDs, or {entity, name, icon, power}, power being the entity of its power sensor",
   },
   fr: {
     title: "Prises",
@@ -40,6 +41,7 @@ const RW_I18N = {
     ed_include: "Prises et interrupteurs à ajouter",
     ed_include_helper: "D'une autre pièce ou sans pièce, ou un interrupteur non reconnu comme prise",
     ed_exclude: "Prises à exclure",
+    ed_entities_helper: "Remplace la découverte automatique : des identifiants d'entités, ou {entity, name, icon, power}, power étant l'entité de son capteur de puissance",
   },
   de: {
     title: "Steckdosen",
@@ -58,6 +60,7 @@ const RW_I18N = {
     ed_include: "Hinzuzufügende Steckdosen und Schalter",
     ed_include_helper: "Aus einem anderen Raum oder ohne Raum, oder ein Schalter, der nicht als Steckdose erkannt wird",
     ed_exclude: "Auszuschließende Steckdosen",
+    ed_entities_helper: "Ersetzt die automatische Erkennung: Entitäts-IDs oder {entity, name, icon, power}, wobei power die Entität ihres Leistungssensors ist",
   },
   es: {
     title: "Enchufes",
@@ -76,6 +79,7 @@ const RW_I18N = {
     ed_include: "Enchufes e interruptores a añadir",
     ed_include_helper: "De otra habitación o sin habitación, o un interruptor no reconocido como enchufe",
     ed_exclude: "Enchufes a excluir",
+    ed_entities_helper: "Sustituye la detección automática: IDs de entidad, o {entity, name, icon, power}, siendo power la entidad de su sensor de potencia",
   },
 };
 

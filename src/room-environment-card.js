@@ -571,6 +571,7 @@ const REO_I18N = {
     ed_zoom_helper: "Only the rooms with a reading outside the comfort range show; the button shows every room. Off: every room, always",
     ed_sort_state: "Rooms needing a look first",
     ed_exclude_helper: "Left out of the tiles, the averages and the room details",
+    ed_rooms_helper: "Order and overrides: a list of {area, name, icon, navigation_path, thresholds}, thresholds applying to that room only",
   },
   fr: {
     ...RE_I18N.fr,
@@ -586,6 +587,7 @@ const REO_I18N = {
     ed_zoom_helper: "Seules les pièces avec une mesure hors de la plage de confort s'affichent ; le bouton affiche toutes les pièces. Désactivé : toujours toutes les pièces",
     ed_sort_state: "Pièces à surveiller en premier",
     ed_exclude_helper: "Ignorés dans les tuiles, les moyennes et le détail des pièces",
+    ed_rooms_helper: "Ordre et personnalisation : une liste de {area, name, icon, navigation_path, thresholds}, thresholds ne valant que pour cette pièce",
   },
   de: {
     ...RE_I18N.de,
@@ -601,6 +603,7 @@ const REO_I18N = {
     ed_zoom_helper: "Nur Räume mit einem Messwert außerhalb des Komfortbereichs werden angezeigt; die Schaltfläche zeigt alle Räume. Aus: immer alle Räume",
     ed_sort_state: "Räume, die Aufmerksamkeit brauchen, zuerst",
     ed_exclude_helper: "Bei den Kacheln, den Durchschnitten und den Raumdetails nicht berücksichtigt",
+    ed_rooms_helper: "Reihenfolge und Anpassungen: eine Liste von {area, name, icon, navigation_path, thresholds}, wobei thresholds nur für diesen Raum gilt",
   },
   es: {
     ...RE_I18N.es,
@@ -616,6 +619,7 @@ const REO_I18N = {
     ed_zoom_helper: "Solo se muestran las habitaciones con una lectura fuera del rango de confort; el botón muestra todas las habitaciones. Desactivado: siempre todas las habitaciones",
     ed_sort_state: "Primero las habitaciones que requieren atención",
     ed_exclude_helper: "Se ignoran en los mosaicos, las medias y el detalle de las habitaciones",
+    ed_rooms_helper: "Orden y personalización: una lista de {area, name, icon, navigation_path, thresholds}, aplicándose thresholds solo a esa habitación",
   },
 };
 
