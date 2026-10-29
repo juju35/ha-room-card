@@ -47,3 +47,11 @@ test("rcPowerSensors finds a device's power sensor and follows new states", () =
   const h2 = { ...h, states: { ...h.states, "sensor.coffee_power": { ...h.states["sensor.coffee_power"], state: "30" } } };
   assert.equal(rc.rcPowerSensors(h2).d1, "sensor.coffee_power");
 });
+
+test("rcPowerSensors finds a power sensor whose state arrives after the first render, registry unchanged", () => {
+  const h = makeHass();
+  const late = { ...h.states };
+  delete late["sensor.coffee_power"];
+  assert.equal(rc.rcPowerSensors({ ...h, states: late }).d1, undefined);
+  assert.equal(rc.rcPowerSensors(h).d1, "sensor.coffee_power");
+});

@@ -79,7 +79,7 @@ const RS_I18N = {
     now: "gerade eben",
     min: "{n} Min.",
     hour: "{n} Std.",
-    day: "{n} T.",
+    day: "{n} Tg.",
     ed_only_alerts: "Inaktive Sensoren ausblenden",
     ed_only_alerts_helper: "Nur offene, leckende oder erkennende Sensoren bleiben sichtbar",
     ed_hide_when_clear: "Karte im Ruhezustand ausblenden",
@@ -166,6 +166,22 @@ class RoomSensorsCard extends RcCard {
 
   _candidate(id) {
     return rcMatchSensor(this._hass, id, { presence: this._config.presence, cameras: this._cameras });
+  }
+
+  // The "since" labels move with the clock, not only with the states: redrawn every minute while the card is shown
+  // (the signature skips the redraw when no label changed; never during a press).
+  connectedCallback() {
+    super.connectedCallback?.();
+    clearInterval(this._clock);
+    this._clock = setInterval(() => {
+      if (!this._pressing && !this._dragging) this._render();
+    }, 60000);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback?.();
+    clearInterval(this._clock);
+    this._clock = null;
   }
 
   _stateText(kind, on) {

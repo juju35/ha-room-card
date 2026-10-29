@@ -72,7 +72,7 @@ const RW_I18N = {
     ed_hide_when_off_helper: "La tarjeta solo aparece cuando hay un enchufe encendido",
     ed_show_power: "Mostrar el consumo",
     ed_show_power_helper: "Leído del sensor de potencia de cada enchufe",
-    ed_all_off_button_helper: "Al tocar la píldora de estado se apagan todos los enchufes de la tarjeta",
+    ed_all_off_button_helper: "Al tocar el indicador de estado se apagan todos los enchufes de la tarjeta",
     ed_include: "Enchufes e interruptores a añadir",
     ed_include_helper: "De otra habitación o sin habitación, o un interruptor no reconocido como enchufe",
     ed_exclude: "Enchufes a excluir",

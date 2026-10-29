@@ -128,6 +128,36 @@ test("the Overview's plugs_off_button reaches the Plugs card of the room details
   assert.equal(plugsCard({ plugs_off_button: true })._config.all_off_button, true);
 });
 
+test("the Plugs card of the room details turns its plugs off only through the Overview's confirmation", () => {
+  const overview = new cards["room-overview-card"]();
+  const panel = fakeNode();
+  overview.shadowRoot = { ...fakeNode(), querySelector: (s) => (s === ".panel" ? panel : null) };
+  overview._config = { ...cards["room-overview-card"].defaults, plugs_off_button: true };
+  const calls = [];
+  const hass = { ...makeHass(), callService: (...a) => calls.push(a) };
+  overview._hass = hass;
+  overview._rooms = overview._collect();
+  overview._openArea = "kitchen";
+  const asked = [];
+  overview._openConfirm = (plugs) => asked.push(plugs);
+  overview._fillPanel();
+  const plugs = panel.children.find((el) => el._config.type === "custom:room-switch-card");
+  // Re-render the Plugs card with a shadow root that hands out its status pill, then tap the pill.
+  const listeners = {};
+  const pill = { addEventListener: (type, fn) => (listeners[type] = fn) };
+  plugs.shadowRoot = { ...fakeNode(), querySelector: (s) => (s === ".pill.action" ? pill : null) };
+  plugs._sig = null;
+  plugs.hass = hass;
+  assert.ok(listeners.click, "the all-off pill is wired");
+  listeners.click({ stopPropagation() {} });
+  assert.equal(calls.length, 0, "nothing turned off before confirming");
+  assert.equal(asked.length, 1);
+  assert.deepEqual(
+    [...asked[0]].map((e) => [e.id, e.room]),
+    [["switch.coffee_plug", "Kitchen"]],
+  );
+});
+
 test("holding Enter on a tile toggles once, not on every key repeat", () => {
   const t = pressSetup();
   const key = (repeat) => t.tile.fire("keydown", { key: "Enter", repeat });
@@ -546,4 +576,40 @@ test("each visual editor offers every option of its card", () => {
   has("room-environment-mini-card", room, ["navigation_path", "columns", "only_alerts", "show_gauge", "zoom", "thresholds", "entities", "language"]);
   has("room-overview-card", {}, ["title", "columns", "sort", "presence", "zoom", "all_off_button", "plugs_off_button", "exclude_areas", "rooms", "language"]);
   has("room-environment-overview-card", {}, ["title", "columns", "sort", "zoom", "exclude_areas", "thresholds", "rooms", "language"]);
+});
+
+test("the editor's labels follow a language change", () => {
+  const editor = new (rc.customElements.get("room-switch-card-editor"))();
+  editor.appendChild = () => {};
+  editor.setConfig({ language: "en" });
+  editor.hass = makeHass();
+  const label = () => editor._form.computeLabel({ name: "show_power" });
+  assert.equal(label(), "Show power draw");
+  editor.setConfig({ language: "fr" });
+  assert.equal(label(), "Afficher la consommation");
+});
+
+test("the sensors card redraws its \"since\" labels every minute, and stops once detached", () => {
+  const card = new cards["room-sensors-card"]();
+  card.attachShadow();
+  card.setConfig({ area: "kitchen" });
+  card.connectedCallback();
+  let label = "5 min";
+  card._ago = () => label;
+  card.hass = makeHass(); // the diagnostic door is open
+  assert.match(card.shadowRoot.innerHTML, /5 min/);
+  label = "6 min";
+  rc.window.tick();
+  assert.match(card.shadowRoot.innerHTML, /6 min/, "redrawn without a new hass");
+  card.disconnectedCallback();
+  assert.equal(rc.window.intervals.size, 0);
+});
+
+test("Spanish light tiles take the feminine state, plugs the masculine", () => {
+  const lights = new cards["room-lights-card"]();
+  lights._config = { language: "es" };
+  assert.equal(lights._t("on"), "Encendida");
+  const plugs = new cards["room-switch-card"]();
+  plugs._config = { language: "es" };
+  assert.equal(plugs._t("on"), "Encendido");
 });

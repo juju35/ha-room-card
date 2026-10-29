@@ -59,6 +59,18 @@ export const load = () => {
   sandbox.fire = (type, ev) => {
     for (const fn of winListeners[type] || []) fn(ev);
   };
+  // Interval timers (the sensors card's minute clock) are kept, not run: fired by hand with window.tick().
+  const intervals = new Map();
+  let nextInterval = 0;
+  sandbox.setInterval = (fn) => {
+    intervals.set(++nextInterval, fn);
+    return nextInterval;
+  };
+  sandbox.clearInterval = (id) => intervals.delete(id);
+  sandbox.tick = () => {
+    for (const fn of intervals.values()) fn();
+  };
+  sandbox.intervals = intervals;
   sandbox.window = sandbox;
   const ctx = vm.createContext(sandbox);
   const cards = ["room-sensors-card", "room-lights-card", "room-switch-card", "room-environment-card", "room-overview-card"];

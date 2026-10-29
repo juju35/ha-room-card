@@ -7,6 +7,9 @@
 const RL_I18N = {
   en: {
     title: "Lights",
+    // Light tiles: feminine where "light" is ("1 encendida" / "Encendida · 50 %").
+    on: "On",
+    off: "Off",
     all_off: "All off",
     on_one: "{n} on",
     on_many: "{n} on",
@@ -25,6 +28,8 @@ const RL_I18N = {
   },
   fr: {
     title: "Lumières",
+    on: "Allumée",
+    off: "Éteinte",
     all_off: "Tout est éteint",
     on_one: "{n} allumée",
     on_many: "{n} allumées",
@@ -43,6 +48,8 @@ const RL_I18N = {
   },
   de: {
     title: "Lichter",
+    on: "An",
+    off: "Aus",
     all_off: "Alles aus",
     on_one: "{n} an",
     on_many: "{n} an",
@@ -61,6 +68,8 @@ const RL_I18N = {
   },
   es: {
     title: "Luces",
+    on: "Encendida",
+    off: "Apagada",
     all_off: "Todo apagado",
     on_one: "{n} encendida",
     on_many: "{n} encendidas",
@@ -72,7 +81,7 @@ const RL_I18N = {
     ed_hide_when_off_helper: "La tarjeta solo aparece cuando hay una luz encendida",
     ed_show_brightness: "Mostrar y ajustar el brillo",
     ed_show_brightness_helper: "Desliza una luz hacia un lado para ajustar su brillo",
-    ed_all_off_button_helper: "Al tocar la píldora de estado se apagan todas las luces de la tarjeta",
+    ed_all_off_button_helper: "Al tocar el indicador de estado se apagan todas las luces de la tarjeta",
     ed_include: "Luces a añadir",
     ed_include_helper: "De otra habitación o sin habitación",
     ed_exclude: "Luces a excluir",

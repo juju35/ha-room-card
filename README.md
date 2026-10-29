@@ -227,7 +227,7 @@ rooms:
 | `presence` | ❌ | `true` | Include the presence and motion sensors (camera detections are always left out) |
 | `zoom` | ❌ | `true` | Show only the rooms with something open, on or detected, with a detail button showing every room; `false` shows every room, always |
 | `all_off_button` | ❌ | `true` | Tapping the lights chip of the header turns every light the card counts off |
-| `plugs_off_button` | ❌ | `false` | Tapping the plugs chip of the header opens a confirmation listing every plug the card counts that is on, and turns them off on OK (Cancel, Escape or a tap outside do nothing); the Plugs card of the room details gets its turn-everything-off pill too. Off by default: a plug may feed a camera or a network switch, leave those out with `exclude` |
+| `plugs_off_button` | ❌ | `false` | Tapping the plugs chip of the header opens a confirmation listing every plug the card counts that is on, and turns them off on OK (Cancel, Escape or a tap outside do nothing); the Plugs card of the room details gets its turn-everything-off pill too, behind the same confirmation. Off by default: a plug may feed a camera or a network switch, leave those out with `exclude` |
 | `exclude_areas` | ❌ | — | Rooms left out; the visual editor only offers the rooms the card finds |
 | `exclude` | ❌ | — | Entities left out of the tiles, the totals and the room details; the visual editor only offers the entities the card counts in the rooms it shows |
 | `rooms` | ❌ | — | Room order and overrides, see below; the other rooms follow |
