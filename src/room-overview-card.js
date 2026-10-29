@@ -275,13 +275,14 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     const rooms = this._collect();
     this._rooms = rooms;
 
-    const parts = rooms.map((x) => [x.id, x.name, x.icon, x.leaks, x.open, x.occupied, x.lightsOn, x.plugsOn, x.watts && Math.round(x.watts)]);
+    // The sensor count too: a door added to an idle room turns "All quiet" into "All closed" without any state change.
+    const parts = rooms.map((x) => [x.id, x.name, x.icon, x.leaks, x.open, x.occupied, x.lightsOn, x.plugsOn, x.watts && Math.round(x.watts), x.sensors.length]);
     // The plain list of the open room (no room card installed) shows every entity's state.
     const shown = this._fallback && rooms.find((x) => x.id === this._openArea);
     const list = shown
       ? [...shown.sensors, ...shown.presence, ...shown.lights, ...shown.plugs].map((e) => [e.id, e.st.state, e.st.attributes.friendly_name])
       : null;
-    if (!this._changed([this._openArea, this._zoomed, parts, list])) return;
+    if (!this._changed([this._openArea, this._zoomed, this._anySensors, parts, list])) return;
 
     if (!this.shadowRoot.querySelector("ha-card")) {
       this.shadowRoot.innerHTML = `
@@ -408,7 +409,9 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
   }
 
   // Plugs `ids` of room `x` turned off from the room details: listed and confirmed like the header's plugs chip.
+  // The room is looked up again: `x` is the one seen when the details were built, its power long out of date.
   _confirmPlugs(ids, x) {
+    x = this._rooms?.find((r) => r.id === x.id) ?? x;
     const plugs = ids
       .map((id) => {
         const known = x.plugs.find((e) => e.id === id);
