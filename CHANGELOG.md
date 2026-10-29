@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.17.2 - 2026-10-29
+### Fixes
+- Overview: the confirmation opened from the room details' Plugs card (with `plugs_off_button: true`) now shows the room's current power, instead of the power it drew when the room was unfolded.
+- Overview: a door or window sensor added to an idle room now switches the header and the room tile from "All quiet" to "All closed" (and back when removed) at once, instead of at the next visible change.
+
 ## 1.17.1 - 2026-10-29
 ### Fixes
 - Environment overview: in the compact view, the header's average temperature and humidity (and the room count) froze while only hidden, comfortable rooms changed; they now follow every room.
