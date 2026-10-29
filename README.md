@@ -39,7 +39,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - **Tap** the lights chip of the header to turn every light the card counts off (`all_off_button`), and the plugs chip to turn every plug off once confirmed in a popup listing them (`plugs_off_button`, off by default: a plug may feed a camera or a network switch)
 - **Tap** a room to unfold its details at the top of the card: the Sensors, Lights and Plugs cards of that room; tap it again or anywhere else to fold it back
 - Automatic discovery: every area with door, window, leak or presence sensors, lights or plugs becomes a room, with an icon picked from its name
-- Same rules as the room cards: camera detections, configuration entities and light groups are skipped, light switches count as lights
+- Same rules as the room cards: hidden entities and camera detections are skipped, and so are light groups and the configuration and diagnostic entities of lights and plugs (door, window, leak and presence sensors count whatever their category); light switches count as lights
 - Only the rooms with something open, on or detected show; the **detail** button (top right) shows every room, and back, as does a click anywhere else (`zoom: false`: every room, always, no button); `sort: state` lists the rooms needing attention first
 
 ### Sensors
@@ -605,7 +605,7 @@ The card goes through every entity with an area (set on the entity or on its dev
 - **Lights**: every `light` except light groups, and every `switch` whose name contains *lumière*, *lampe*, *lamp*, *light*, *veilleuse* or *guirlande*
 - **Plugs**: every other `switch` with device class `outlet`, or whose name contains *prise*, *plug*, *outlet* or *socket*, with the power sensor of the same device
 
-Hidden entities and configuration or diagnostic entities are skipped. A room is shown when it has at least one of them.
+Hidden entities are skipped, and so are the configuration and diagnostic entities of lights and plugs (an indicator LED, say); door, window, leak and presence sensors count whatever their entity category, like on the Sensors card. A room is shown when it has at least one of them.
 
 A tile shows the most important state of the room: a wet leak sensor, then open doors and windows, then presence, otherwise *All closed* (or *All quiet* for a room without door or window sensors). The details of a room are the Sensors, Lights and Plugs cards of that area, for the kinds of entities the room has.
 
