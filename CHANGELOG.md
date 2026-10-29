@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.17.1 - 2026-10-29
+### Fixes
+- Environment overview: in the compact view, the header's average temperature and humidity (and the room count) froze while only hidden, comfortable rooms changed; they now follow every room.
+- Environment cards: sensors of one kind reporting in different units are no longer averaged together: a VOC sensor in µg/m³ and one in ppb make two readings, each on its own scale, and a °F thermometer is converted before being averaged with a °C one.
+- Overview: with `plugs_off_button: true`, the turn-everything-off pill of the room details' Plugs card now asks for the same confirmation as the header's plugs chip, instead of turning the plugs off at once.
+- Plugs: a power sensor that had no state yet when the dashboard opened (integration still loading after a restart) is now picked up as soon as it reports, instead of after the next entity registry change.
+- Visual editors: switching the language now translates the field labels and help texts too, not only the select options.
+- Sensors card: the "since" labels (*5 min*, *2 h*…) now move every minute, even when no state changes.
+- Translations: Spanish light tiles say *Encendida* / *Apagada* (feminine, like the header's "1 encendida"); Spanish "indicador de estado" and "conmutador de red", German day abbreviation "Tg.".
+
+### Maintenance
+- CI: the Screenshots workflow checks out fork pull requests safely, fails clearly when its apt installs fail three times, and re-runs on `package.json` / `package-lock.json` changes; the `playwright` range matches the lock.
+- CHANGELOG: every section is dated.
+
 ## 1.17.0 - 2026-10-28
 ### Changes
 - German and Spanish translations: every card (sensors, lights, plugs, environment, overviews) and its visual editor now speak German (`de`) and Spanish (`es`), picked from the Home Assistant language or forced with `language: de` / `language: es`; **Deutsch** and **Español** join the editor's language selector. In Spanish, doors and windows take the feminine state (*Abierta* / *Cerrada*), as in French.
