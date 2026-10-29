@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { load } from "./load.mjs";
+import { fakeNode, load } from "./load.mjs";
 
 const rc = load();
 const Card = rc.cards["room-environment-card"];
@@ -337,4 +337,36 @@ test("noise: conversation and TV are quiet, 70 dB noisy, 85 dB very noisy", () =
   assert.equal(sev(62), "ok");
   assert.equal(sev(72), "warn");
   assert.equal(sev(88), "alert");
+});
+
+test("the overview header follows the averages of hidden rooms in the compact view", () => {
+  const card = new (rc.customElements.get("room-environment-overview-card"))();
+  const nodes = {};
+  const node = () => ({ ...fakeNode(), style: { setProperty() {} }, querySelector: (s) => (nodes[s] ||= node()) });
+  card.attachShadow();
+  card.shadowRoot.querySelector = (s) => (s === "ha-card" && !card.shadowRoot.innerHTML ? null : (nodes[s] ||= node()));
+  card.setConfig({ zoom: true });
+  card.hass = makeHass(); // every room comfortable: no room shown in the compact view
+  assert.match(nodes[".head"].innerHTML, /20,7°/);
+  card.hass = makeHass({ temp: 23.4 }); // only a hidden room changes
+  assert.match(nodes[".head"].innerHTML, /21,7°/);
+});
+
+test("sensors of one kind in different units are not averaged together", () => {
+  const ugm3 = st("sensor.lr_voc", 200, "volatile_organic_compounds", "µg/m³", "Salon COV");
+  const ppb = st("sensor.lr_voc_ppb", 700, "volatile_organic_compounds_parts", "ppb", "Salon COV ppb");
+  const card = render({}, makeHass({}, { "sensor.lr_voc": ugm3, "sensor.lr_voc_ppb": ppb }));
+  const voc = [...card._items].filter((i) => i.kind === "voc");
+  assert.deepEqual(
+    voc.map((i) => [i.num, i.unit, i.sev]),
+    [
+      [200, "µg/m³", "ok"],
+      [700, "ppb", "alert"],
+    ],
+  );
+  // Temperatures convert: 21.4 °C and 71.6 °F (22 °C) make 21.7 °C.
+  const f = st("sensor.lr_temp_f", 71.6, "temperature", "°F", "Salon Température F");
+  const temps = [...render({}, makeHass({}, { "sensor.lr_temp_f": f }))._items].filter((i) => i.kind === "temperature");
+  assert.equal(temps.length, 1);
+  assert.equal(temps[0].value, "21,7 °C");
 });

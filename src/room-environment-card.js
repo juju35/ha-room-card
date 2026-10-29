@@ -264,6 +264,15 @@ const reScale = (kind, unit, custom) => {
   return { scale: k.scale, gauge: k.gauge };
 };
 
+// `value` of `kind` from unit `from` to unit `to`: only temperatures convert (°C ⇄ °F), other kinds are grouped
+// by unit before any mean.
+const reConvert = (kind, value, from, to) => {
+  if (kind !== "temperature") return value;
+  const f = (u) => /F$/.test(u || "");
+  if (f(from) === f(to)) return value;
+  return f(to) ? (value * 9) / 5 + 32 : ((value - 32) * 5) / 9;
+};
+
 // Band of a value: 0 alert low, 1 warn low, 2 comfortable, 3 warn high, 4 alert high.
 const reBand = (v, [al, wl, wh, ah]) => {
   if (al !== null && v < al) return 0;
@@ -308,11 +317,11 @@ class RoomEnvironmentCard extends RcCard {
   // `name` / `icon` overrides; a mean is formatted with the kind's precision.
   _reading(kind, members, room) {
     const k = RE_KINDS[kind];
-    const values = members.map((m) => Number.parseFloat(m.st.state));
-    const value = values.reduce((t, v) => t + v, 0) / values.length;
     const [first] = members;
     const single = members.length === 1;
     const unit = first.st.attributes.unit_of_measurement;
+    const values = members.map((m) => reConvert(kind, Number.parseFloat(m.st.state), m.st.attributes.unit_of_measurement, unit));
+    const value = values.reduce((t, v) => t + v, 0) / values.length;
     const item = {
       id: first.e.entity,
       ids: members.map((m) => m.e.entity),
@@ -365,7 +374,17 @@ class RoomEnvironmentCard extends RcCard {
       const kind = reKindOf(st);
       if (kind && !rcUnavailable(st) && Number.isFinite(Number.parseFloat(st.state))) (byKind[kind] ||= []).push({ e, st });
     }
-    return RE_ORDER.filter((kind) => byKind[kind]).map((kind) => this._reading(kind, byKind[kind], room));
+    // A mean only makes sense in one unit: temperatures are converted to the first sensor's unit (°C / °F), other
+    // kinds are split by unit (VOC in µg/m³ and in ppb cannot be converted), one reading per unit.
+    return RE_ORDER.filter((kind) => byKind[kind]).flatMap((kind) => {
+      const byUnit = new Map();
+      for (const m of byKind[kind]) {
+        const unit = kind === "temperature" ? "" : (m.st.attributes.unit_of_measurement ?? "");
+        if (!byUnit.has(unit)) byUnit.set(unit, []);
+        byUnit.get(unit).push(m);
+      }
+      return [...byUnit.values()].map((members) => this._reading(kind, members, room));
+    });
   }
 
   // Number in full, unit small and muted ("°" for a temperature) to keep the chips short.
@@ -696,7 +715,12 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
   _draw(rooms) {
     const c = this._config;
     const parts = rooms.map((x) => [x.id, x.name, x.icon, x.status, x.items.map((i) => [i.id, i.state, i.sev, i.cold])]);
-    if (!this._changed([this._openArea, this._zoomed, parts])) return;
+    // The header averages and the room count cover every room, shown or not (a comfortable room is hidden in the
+    // compact view): they belong in the signature, or the header freezes while only hidden rooms change.
+    const all = this._everyRoom || [];
+    const temp = this._average(all, "temperature", 1);
+    const hum = this._average(all, "humidity", 0);
+    if (!this._changed([this._openArea, this._zoomed, this._total, temp, hum, parts])) return;
 
     if (!this.shadowRoot.querySelector("ha-card")) {
       this.shadowRoot.innerHTML = `
@@ -709,7 +733,6 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
       this.shadowRoot.querySelector(".head").addEventListener("click", (ev) => rcZoomClick(this, ev));
     }
 
-    const all = this._everyRoom || [];
     const worst = this._worst(rooms.map((x) => x.worst).filter(Boolean));
     const level = worst ? (worst.cold || worst.sev === "info" ? "cold" : worst.sev) : "ok";
     const toCheck = rooms.filter((x) => x.rank >= RE_RANK.warn).length;
@@ -720,8 +743,6 @@ class RoomEnvironmentOverviewCard extends RoomEnvironmentCard {
         : worst
           ? worst.word
           : this._t("comfortable");
-    const temp = this._average(all, "temperature", 1);
-    const hum = this._average(all, "humidity", 0);
     // One chip for the home averages: "21,0° · 53 %".
     const avgText = [temp && `${temp}°`, hum && `${hum} %`].filter(Boolean).join(" · ");
     const avg = avgText
