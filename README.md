@@ -609,7 +609,7 @@ The card goes through every entity with an area (set on the entity or on its dev
 - **Sensors**: `binary_sensor` with device class `moisture`, `door`, `window`, `opening` or `garage_door`
 - **Presence**: `binary_sensor` with device class `occupancy`, `presence` or `motion`, except the ones of a device that has a `camera` entity
 - **Lights**: every `light` except light groups, and every `switch` whose name contains *lumière*, *lampe*, *lamp*, *light*, *veilleuse* or *guirlande*
-- **Plugs**: every other `switch` with device class `outlet`, or whose name contains *prise*, *plug*, *outlet* or *socket*, with the power sensor of the same device
+- **Plugs**: every other `switch` with device class `outlet`, or whose name contains *prise*, *multiprise*, *plug*, *outlet* or *socket*, with the power sensor of the same device
 
 Hidden entities are skipped, and so are the configuration and diagnostic entities of lights and plugs (an indicator LED, say); door, window, leak and presence sensors count whatever their entity category, like on the Sensors card. A room is shown when it has at least one of them.
 
