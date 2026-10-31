@@ -85,9 +85,11 @@ jobs:
         if: steps.push.outputs.pushed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          # Passed through the environment, never expanded into the script: a branch name cannot inject commands.
+          HEAD_REF: ${{ github.head_ref }}
         run: |
           for wf in lint.yml validate.yml hacs.yml; do
-            [ -f ".github/workflows/$wf" ] && gh workflow run "$wf" --ref "${{ github.head_ref }}"
+            [ -f ".github/workflows/$wf" ] && gh workflow run "$wf" --ref "$HEAD_REF"
           done
       - name: Upload screenshots (manual run)
         if: github.event_name == 'workflow_dispatch'
