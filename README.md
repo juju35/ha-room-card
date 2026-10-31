@@ -528,15 +528,21 @@ rooms:
 
 One GIF per animated state, recorded from the real cards with mock data:
 
-![Open sensors blinking](screenshots/sensors-blink.gif)
+| Light | Dark |
+|---|---|
+| ![Open sensors blinking](screenshots/sensors-blink.gif) | ![Open sensors blinking, dark theme](screenshots/sensors-blink-dark.gif) |
 
 Open doors and windows blink (`rc-blink`) until they are closed; `blink: false` keeps them still.
 
-![Water leak alert](screenshots/sensors-alert.gif)
+| Light | Dark |
+|---|---|
+| ![Water leak alert](screenshots/sensors-alert.gif) | ![Water leak alert, dark theme](screenshots/sensors-alert-dark.gif) |
 
 A water leak pulses the header badge (`rc-pulse`) while the leaking sensor blinks.
 
-![Drag to dim](screenshots/lights-dim.gif)
+| Light | Dark |
+|---|---|
+| ![Drag to dim](screenshots/lights-dim.gif) | ![Drag to dim, dark theme](screenshots/lights-dim-dark.gif) |
 
 Dragging a dimmable light sideways sets its brightness, the bar and the percentage following the finger.
 
