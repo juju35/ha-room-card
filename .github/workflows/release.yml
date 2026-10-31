@@ -2,6 +2,7 @@ name: Release
 
 # Publishes a GitHub release whenever main carries a version that has no tag yet:
 # bump "version" in package.json, add its CHANGELOG.md section, push, and the release follows.
+# The release job waits for Lint, Validate and HACS Validation to pass on the same commit.
 on:
   push:
     branches: [main]
@@ -15,7 +16,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  lint:
+    uses: ./.github/workflows/lint.yml
+    permissions:
+      contents: read
+
+  validate:
+    uses: ./.github/workflows/validate.yml
+    permissions:
+      contents: read
+
+  hacs:
+    uses: ./.github/workflows/hacs.yml
+    permissions:
+      contents: read
+
   release:
+    needs: [lint, validate, hacs]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
