@@ -96,69 +96,77 @@ const lightsHass = (pct) => {
 // ── The GIFs ─────────────────────────────────────────────────────────────────
 const browser = await launch();
 
-// Open sensors: their icons blink (rc-blink, one 1.5 s cycle).
-{
-  const page = await openPage(browser, { theme: "light", width: WIDTH, icons: iconsFor([]), label: "sensors-blink" });
-  await mountCard(page, {
-    tag: "room-sensors-card",
-    hass: sensorsHass({ "binary_sensor.kitchen_door": [true, 12], "binary_sensor.living_room_window": [true, 5] }),
-    config: { area: "living_room" },
-  });
-  await page.waitForTimeout(300);
-  const dir = mkdtempSync(join(tmpdir(), "rc-frames-"));
-  await recordCycle(page, dir, 1.5);
-  encode(dir, "screenshots/sensors-blink.gif");
-  rmSync(dir, { recursive: true });
-  await page.close();
-}
+// Every GIF is recorded in both themes with the same setup: <name>.gif light, <name>-dark.gif dark.
+for (const theme of ["light", "dark"]) {
+  const dark = theme === "dark";
+  const suffix = dark ? "-dark" : "";
 
-// Water leak: the header badge pulses (rc-pulse) while the leaking sensor blinks (one 1.6 s cycle).
-{
-  const page = await openPage(browser, { theme: "light", width: WIDTH, icons: iconsFor([]), label: "sensors-alert" });
-  await mountCard(page, {
-    tag: "room-sensors-card",
-    hass: sensorsHass({ "binary_sensor.sink_leak": [true, 3], "binary_sensor.kitchen_door": [true, 12] }),
-    config: { area: "living_room" },
-  });
-  await page.waitForTimeout(300);
-  const dir = mkdtempSync(join(tmpdir(), "rc-frames-"));
-  await recordCycle(page, dir, 1.6);
-  encode(dir, "screenshots/sensors-alert.gif");
-  rmSync(dir, { recursive: true });
-  await page.close();
-}
-
-// Drag to dim: a real pointer drag across the dimmable light, the brightness bar following the finger.
-{
-  const page = await openPage(browser, {
-    theme: "light",
-    width: WIDTH,
-    icons: iconsFor(["mdi:ceiling-light", "mdi:lightbulb-night"]),
-    label: "lights-dim",
-  });
-  await mountCard(page, { tag: "room-lights-card", hass: lightsHass(30), config: { area: "living_room" } });
-  await page.waitForTimeout(300);
-  const dir = mkdtempSync(join(tmpdir(), "rc-frames-"));
-  const clip = await cardClip(page, WIDTH);
-  const box = await page.locator("room-lights-card .tile").first().boundingBox();
-  const y = box.y + box.height / 2;
-  const at = (pct) => box.x + (box.width * pct) / 100;
-  let frame = 0;
-  const grab = () => page.screenshot({ path: join(dir, frameName(frame++)), clip, animations: "allow" });
-  await page.mouse.move(at(30), y);
-  await grab();
-  await page.mouse.down();
-  // The first move clears the hold timer (more than 8 px sideways), then the bar follows each step.
-  for (let pct = 34; pct <= 86; pct += 4) {
-    await page.mouse.move(at(pct), y);
-    await grab();
+  // Open sensors: their icons blink (rc-blink, one 1.5 s cycle).
+  {
+    const page = await openPage(browser, { theme, width: WIDTH, icons: iconsFor([]), label: `sensors-blink${suffix}` });
+    await mountCard(page, {
+      tag: "room-sensors-card",
+      hass: sensorsHass({ "binary_sensor.kitchen_door": [true, 12], "binary_sensor.living_room_window": [true, 5] }),
+      config: { area: "living_room" },
+      dark,
+    });
+    await page.waitForTimeout(300);
+    const dir = mkdtempSync(join(tmpdir(), "rc-frames-"));
+    await recordCycle(page, dir, 1.5);
+    encode(dir, `screenshots/sensors-blink${suffix}.gif`);
+    rmSync(dir, { recursive: true });
+    await page.close();
   }
-  await page.mouse.up();
-  // Hold the final level for a beat before the GIF loops.
-  for (let i = 0; i < 6; i++) await grab();
-  encode(dir, "screenshots/lights-dim.gif");
-  rmSync(dir, { recursive: true });
-  await page.close();
+
+  // Water leak: the header badge pulses (rc-pulse) while the leaking sensor blinks (one 1.6 s cycle).
+  {
+    const page = await openPage(browser, { theme, width: WIDTH, icons: iconsFor([]), label: `sensors-alert${suffix}` });
+    await mountCard(page, {
+      tag: "room-sensors-card",
+      hass: sensorsHass({ "binary_sensor.sink_leak": [true, 3], "binary_sensor.kitchen_door": [true, 12] }),
+      config: { area: "living_room" },
+      dark,
+    });
+    await page.waitForTimeout(300);
+    const dir = mkdtempSync(join(tmpdir(), "rc-frames-"));
+    await recordCycle(page, dir, 1.6);
+    encode(dir, `screenshots/sensors-alert${suffix}.gif`);
+    rmSync(dir, { recursive: true });
+    await page.close();
+  }
+
+  // Drag to dim: a real pointer drag across the dimmable light, the brightness bar following the finger.
+  {
+    const page = await openPage(browser, {
+      theme,
+      width: WIDTH,
+      icons: iconsFor(["mdi:ceiling-light", "mdi:lightbulb-night"]),
+      label: `lights-dim${suffix}`,
+    });
+    await mountCard(page, { tag: "room-lights-card", hass: lightsHass(30), config: { area: "living_room" }, dark });
+    await page.waitForTimeout(300);
+    const dir = mkdtempSync(join(tmpdir(), "rc-frames-"));
+    const clip = await cardClip(page, WIDTH);
+    const box = await page.locator("room-lights-card .tile").first().boundingBox();
+    const y = box.y + box.height / 2;
+    const at = (pct) => box.x + (box.width * pct) / 100;
+    let frame = 0;
+    const grab = () => page.screenshot({ path: join(dir, frameName(frame++)), clip, animations: "allow" });
+    await page.mouse.move(at(30), y);
+    await grab();
+    await page.mouse.down();
+    // The first move clears the hold timer (more than 8 px sideways), then the bar follows each step.
+    for (let pct = 34; pct <= 86; pct += 4) {
+      await page.mouse.move(at(pct), y);
+      await grab();
+    }
+    await page.mouse.up();
+    // Hold the final level for a beat before the GIF loops.
+    for (let i = 0; i < 6; i++) await grab();
+    encode(dir, `screenshots/lights-dim${suffix}.gif`);
+    rmSync(dir, { recursive: true });
+    await page.close();
+  }
 }
 
 await browser.close();
