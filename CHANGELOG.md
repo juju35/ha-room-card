@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.17.8 - 2026-11-01
+### Fixes
+- Overview: on a narrow card (6 columns of a Sections view, about 245 to 340 px) the title no longer disappears and the detail button no longer slides out of the card: the header's totals (occupied rooms, lights, plugs) move to a line of their own under the title, power icons included.
+- Every card: the header title always keeps a few letters (ending with "…") and the status pill shrinks with an ellipsis instead of pushing the buttons out; below 200 px (mini cards at 4 columns) the status shows as its coloured dot, its text kept in the tooltip and for screen readers.
+- Mini cards zoomed in at 4 columns: the full card's header uses the mini badge size and leaves out its side chip (presence, shown on its tile anyway), so the title, status and zoom button fit.
+- Mini cards: a long sensor name in a chip now ends with "…" inside the card instead of being cut off at its edge.
+- Environment card: on a narrow card (two tiles in 260 px or less) the tiles drop their icon so that the reading (*1,380 ppm*, *24.6 °*) is shown in full.
+- Serbian: counts now use the right form for 1, 2-4 and 5+ (*2 uključene*, *5 uključenih*, *Isključiti ove 2 utičnice?*) instead of "uključeno/ih"; a light's state is neuter (*Uključeno*, like *svetlo*); the editors' exclusion lists read *Izostavi …* rather than "… za isključivanje" (which read as "to turn off").
+
+### Maintenance
+- CI: Biome 2.6.4 for the pre-commit hook, `biome.json` and the Lint workflow.
+- Screenshots: the `ha-icon` stand-in takes its display from a `:host` rule, like Home Assistant's, so the cards' rules hiding an icon apply in the captures.
+- Changelog: 1.17.5 is dated 2026-11-01, the day it was released.
+
 ## 1.17.7 - 2026-11-01
 ### Features
 - Added Italian, Dutch, European Portuguese and Polish translations (`it`, `nl`, `pt`, `pl`) for every card and visual editor, with *Italiano*, *Nederlands*, *Português (Portugal)* and *Polski* in the editor's language list. `pt-BR` uses the European Portuguese texts.
@@ -11,7 +25,7 @@
 ### Fixes
 - Language: a full language tag the cards have is now used as is (`sr-Latn` when Home Assistant is in Serbian Latin), else its base language (`fr-FR` → `fr`, `de-CH` → `de`), else English.
 
-## 1.17.5 - 2026-10-29
+## 1.17.5 - 2026-11-01
 ### Fixes
 - Overview: the room details (Sensors, Lights, Plugs) are now separated by a line; in Home Assistant the three cards ran together with no visible separation.
 
