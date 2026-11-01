@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { makeHass } from "./hass.mjs";
 import { load } from "./load.mjs";
 
 const rc = load();
-const LANGS = ["en", "fr", "de", "es", "sr", "sr-Latn"];
+const LANGS = ["en", "fr", "de", "es", "sr", "sr-Latn", "it", "nl", "pt", "pl"];
 // Gendered states, only in the languages where doors and windows are feminine.
 const GENDERED = ["open_f", "closed_f"];
 
@@ -14,7 +15,7 @@ const tables = [
 const vars = (s) => (Array.isArray(s) ? s.join("|") : s).match(/\{\w+\}/g)?.sort() ?? [];
 
 for (const [name, i18n] of tables) {
-  test(`I18N parity: ${name} has en, fr, de, es, sr and sr-Latn with the keys of en`, () => {
+  test(`I18N parity: ${name} has every language with the keys of en`, () => {
     assert.deepEqual(Object.keys(i18n), LANGS);
     const ref = Object.keys(i18n.en).sort();
     for (const lang of LANGS.slice(1)) {
@@ -25,6 +26,9 @@ for (const [name, i18n] of tables) {
         assert.equal(typeof tr, typeof en, `${name}.${lang}.${k}`);
         if (Array.isArray(en)) assert.equal(tr.length, en.length, `${name}.${lang}.${k}`);
         assert.deepEqual(vars(tr), vars(en), `${name}.${lang}.${k} placeholders`);
+        // Blank only where English is blank (the unused bands of b_air, b_noise, i_co2…).
+        const blanks = (s) => (Array.isArray(s) ? s : [s]).map((x) => x.trim() === "");
+        assert.deepEqual(blanks(tr), blanks(en), `${name}.${lang}.${k} empty`);
       }
     }
   });
@@ -45,7 +49,13 @@ test("Language: the full tag when the card has it, else its base language, else 
   assert.equal(lang("de-CH"), "de");
   assert.equal(lang("sr-Latn"), "sr-Latn");
   assert.equal(lang("sr"), "sr");
-  assert.equal(lang("pt-BR"), "en");
+  assert.equal(lang("it-IT"), "it");
+  assert.equal(lang("nl-BE"), "nl");
+  assert.equal(lang("pt"), "pt");
+  // Brazilian Portuguese falls back to European Portuguese, on purpose.
+  assert.equal(lang("pt-BR"), "pt");
+  assert.equal(lang("pl-PL"), "pl");
+  assert.equal(lang("ja"), "en");
   // The card's language wins over Home Assistant's, then hass.locale over hass.language.
   assert.equal(rc.rcLang(rc.RC_I18N, { locale: { language: "fr" } }, { language: "sr-Latn" }), "sr-Latn");
   assert.equal(rc.rcLang(rc.RC_I18N, { locale: { language: "de" }, language: "fr" }, {}), "de");
@@ -61,13 +71,52 @@ test("Serbian is picked in Cyrillic or Latin script", () => {
   assert.equal(card._t("turn_all_off"), "Искључи све");
 });
 
-test("Spanish doors and windows take the feminine state", () => {
+test("Italian, Dutch, Portuguese and Polish are picked from Home Assistant", () => {
+  const card = new rc.cards["room-switch-card"]();
+  card._config = {};
+  const t = (language) => {
+    card._hass = { locale: { language } };
+    return card._t("turn_all_off");
+  };
+  assert.equal(t("it-IT"), "Spegni tutto");
+  assert.equal(t("nl-BE"), "Alles uitschakelen");
+  assert.equal(t("pt-PT"), "Desligar tudo");
+  assert.equal(t("pl-PL"), "Wyłącz wszystko");
+});
+
+test("The editor offers every language, each in its own name", () => {
+  const editor = new (rc.customElements.get("room-switch-card-editor"))();
+  editor.appendChild = () => {};
+  editor.setConfig({ area: "kitchen" });
+  editor.hass = makeHass();
+  const find = (items) => items.flatMap((x) => (x.name === "language" ? [x] : x.schema ? find(x.schema) : []));
+  // Copied out of the sandbox's realm, for deepEqual.
+  const options = [...find([...editor._form.schema])[0].selector.select.options];
+  assert.deepEqual(
+    options.map((o) => o.value),
+    ["", ...LANGS],
+  );
+  assert.deepEqual(
+    options.slice(-4).map((o) => o.label),
+    ["Italiano", "Nederlands", "Português", "Polski"],
+  );
+});
+
+test("Spanish, Italian and Portuguese doors and windows take the feminine state", () => {
   const card = new rc.cards["room-sensors-card"]();
   card._config = { language: "es" };
   assert.equal(card._stateText("window", true), "Abierta");
   assert.equal(card._stateText("garage", false), "Cerrado");
   card._config = { language: "de" };
   assert.equal(card._stateText("door", true), "Offen");
+  // Italian and Portuguese too (porta, finestra, janela); Dutch and Polish need no gender.
+  card._config = { language: "it" };
+  assert.equal(card._stateText("window", true), "Aperta");
+  assert.equal(card._stateText("garage", false), "Chiuso");
+  card._config = { language: "pt" };
+  assert.equal(card._stateText("door", false), "Fechada");
+  card._config = { language: "pl" };
+  assert.equal(card._stateText("door", true), "Otwarte");
 });
 
 test("Editor help texts name every documented key: rooms[].thresholds, entities[].power", () => {
