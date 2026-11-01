@@ -2,7 +2,7 @@
 
 ## 1.17.7 - 2026-11-01
 ### Features
-- Added Italian, Dutch, European Portuguese and Polish translations (`it`, `nl`, `pt`, `pl`) for every card and visual editor, with *Italiano*, *Nederlands*, *Português* and *Polski* in the editor's language list. Brazilian Portuguese (`pt-BR`) falls back to European Portuguese.
+- Added Italian, Dutch, European Portuguese and Polish translations (`it`, `nl`, `pt`, `pl`) for every card and visual editor, with *Italiano*, *Nederlands*, *Português (Portugal)* and *Polski* in the editor's language list. `pt-BR` uses the European Portuguese texts.
 
 ## 1.17.6 - 2026-11-01
 ### Features

@@ -98,7 +98,7 @@ test("The editor offers every language, each in its own name", () => {
   );
   assert.deepEqual(
     options.slice(-4).map((o) => o.label),
-    ["Italiano", "Nederlands", "Português", "Polski"],
+    ["Italiano", "Nederlands", "Português (Portugal)", "Polski"],
   );
 });
 

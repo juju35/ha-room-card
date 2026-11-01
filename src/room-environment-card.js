@@ -506,10 +506,12 @@ class RoomEnvironmentCard extends RcCard {
   }
 
   _formatNumber(value, digits, unit) {
-    // HA's full locale (pt-BR, de-CH) when it is the card's language, else the card's resolved language.
+    // HA's full locale (pt-BR, de-CH) when it is the card's language, else the card's resolved language. HA's `pt`
+    // is European Portuguese, which Intl reads as Brazilian: it becomes `pt-PT`.
     const lang = this._lang();
     const ha = this._hass?.locale?.language || this._hass?.language;
-    const locale = !lang.includes("-") && ha?.split("-")[0] === lang ? ha : lang;
+    const full = !lang.includes("-") && ha?.split("-")[0] === lang ? ha : lang;
+    const locale = full === "pt" ? "pt-PT" : full;
     const n = new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
     return unit ? `${n} ${unit}` : n;
   }

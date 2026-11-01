@@ -676,7 +676,7 @@ The cards auto-detect the language from your Home Assistant settings. Currently 
 | Srpski (latinica) | `sr-Latn` |
 | Italiano | `it` |
 | Nederlands | `nl` |
-| Português | `pt` |
+| Português (Portugal) | `pt` |
 | Polski | `pl` |
 
 A regional variant uses its base language (`fr-FR` → `fr`, `de-CH` → `de`, and `pt-BR` → `pt`, European Portuguese); a language without translations falls back to English.
