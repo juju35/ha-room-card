@@ -52,8 +52,10 @@ customElements.define("ha-icon", class extends HTMLElement {
   attributeChangedCallback() { this._draw(); }
   _draw() {
     const path = ICONS[(this.getAttribute("icon") || "").replace("mdi:", "")] || "";
-    this.style.display = "inline-flex";
-    this.innerHTML = '<svg viewBox="0 0 24 24" style="width:var(--mdc-icon-size,24px);height:var(--mdc-icon-size,24px);fill:currentColor"><path d="' + path + '"/></svg>';
+    // Like Home Assistant's <ha-icon>: its display comes from its own :host rule, which the card's styles override
+    // (".head button.chip .off { display: none }"); an inline style would win over them.
+    if (!this.shadowRoot) this.attachShadow({ mode: "open" });
+    this.shadowRoot.innerHTML = '<style>:host{display:inline-flex}</style><svg viewBox="0 0 24 24" style="width:var(--mdc-icon-size,24px);height:var(--mdc-icon-size,24px);fill:currentColor"><path d="' + path + '"/></svg>';
   }
 });`;
 
