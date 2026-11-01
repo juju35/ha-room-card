@@ -7,7 +7,7 @@
 - Mini cards: the smallest width in a Sections view is now 6 columns (was 4: about 104-121 px on a phone, where the zoom button left the card). Zoomed in on a phone, the full card's header uses the mini badge size and leaves out its side chip (presence, shown on its tile anyway), so the title, status and zoom button fit.
 - Mini cards: a long sensor name in a chip now ends with "…" inside the card instead of being cut off at its edge.
 - Sensors, lights, plugs and environment cards: a reading is never cut any more (*1,380 ppm*, *24.6 °*, *Open for 12 min*): on a narrow tile it goes on to a second line, and a card of 260 px or less (6 columns on a phone) shows one tile per row; under 200 px the environment tiles also drop their icon.
-- Overview and environment overview: in a wrapper sized by its content (layout-card, button-card, a grid's `auto` column) the card no longer shrinks to a sliver; it still shrinks with its column in a grid card or a horizontal stack.
+- Overview and environment overview: in a wrapper sized by its content (layout-card, button-card, a grid's `auto` column) the card no longer shrinks to a sliver. Every card shrinks with its column in a grid card, a horizontal stack or a layout-card `1fr 1fr` grid, wrapped or not, instead of overflowing it.
 - Focus: after the plugs confirmation opens or the zoom button is redrawn, the focus moves without scrolling the dashboard.
 - Serbian: counts now use the right form for 1, 2-4 and 5+ (*2 uključene*, *5 uključenih*, *Isključiti ove 2 utičnice?*) instead of "uključeno/ih"; a light's state is neuter (*Uključeno*, like *svetlo*); the editors' exclusion lists read *Izostavi …* rather than "… za isključivanje" (which read as "to turn off").
 
@@ -16,6 +16,7 @@
 - Screenshots: the `ha-icon` stand-in takes its display from a `:host` rule, like Home Assistant's, so the cards' rules hiding an icon apply in the captures.
 - Changelog: 1.17.5 is dated 2026-11-01, the day it was released.
 - Screenshots: a capture or an animation is only rewritten when its decoded pixels change (PNG and GIF bytes vary from one run or machine to the next), and the GIFs use a fixed palette and ordered dithering, so an unchanged picture no longer shows up as a change to commit.
+- Tests: every card is rendered in Chromium (when installed) in an inline-block, a grid's `auto` column and a `1fr 1fr` grid at 320, 360 and 500 px, directly and wrapped in a `<div>`; the screenshot comparison is checked on every colour channel, not only the alpha.
 
 ## 1.17.7 - 2026-11-01
 ### Features
