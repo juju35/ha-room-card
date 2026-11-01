@@ -1012,7 +1012,7 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
     }
 
     getGridOptions() {
-      return { columns: 12, min_columns: 4, rows: "auto" };
+      return { columns: 12, min_columns: 6, rows: "auto" };
     }
 
     _draw(items) {
@@ -1290,8 +1290,15 @@ const RC_BASE_STYLES = `
     --rc-plug: var(--state-switch-on-color, var(--primary-color, #03a9f4));
     --rc-idle: var(--secondary-text-color, #9e9e9e);
     --rc-na: var(--disabled-color, #9e9e9e);
+    /* The natural width below is also the card's min-content width: without this, a grid's 1fr column (grid card,
+       layout-card) or a horizontal stack could not shrink the card under it, and it would overflow. */
+    min-width: 0;
   }
-  ha-card { padding: 12px; overflow: hidden; container-type: inline-size; }
+  /* The card answers its own width (container queries). That containment drops its content from its natural width: in
+     a wrapper sized by its content (inline-block, a grid's auto column, a flex row: layout-card, button-card…) it would
+     shrink to its padding. contain-intrinsic-inline-size gives it back a natural width there; it changes nothing
+     where the card is given its width (Sections, masonry, stacks, 1fr columns: the host's min-width: 0 above). */
+  ha-card { padding: 12px; overflow: hidden; container-type: inline-size; contain-intrinsic-inline-size: 320px; }
   ha-card.lvl-alert { box-shadow: 0 0 0 1px color-mix(in srgb, var(--rc-alert) 45%, transparent), var(--ha-card-box-shadow, none); }
 
   .head { display: flex; align-items: center; gap: 10px; }
@@ -1303,19 +1310,30 @@ const RC_BASE_STYLES = `
   .lvl-alert .badge { animation: rc-pulse 1.6s ease-in-out infinite; }
   /* Narrow header: the title keeps a few letters (never 0 px), the status pill shrinks and ellipsises, the icon buttons
      (zoom, power) never shrink; under 200 px the pill is only its coloured dot, its text kept for screen readers. */
-  .title { flex: 1 1 auto; min-width: 5ch; font-size: 16px; font-weight: 500; color: var(--primary-text-color);
+  .title { flex: 1 1 0; min-width: 5ch; font-size: 16px; font-weight: 500; color: var(--primary-text-color);
            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .pill { all: unset; flex: 0 1 auto; min-width: 0; max-width: 50%; box-sizing: border-box; position: relative;
+  .pill { all: unset; flex: 0 1 auto; min-width: 0; box-sizing: border-box; position: relative;
           display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 500;
           padding: 1px 8px; border-radius: 999px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
   .pt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pill ha-icon { flex: none; }
+  /* A card this narrow (6 columns of the Sections view on a phone): the title is at its few letters already, so the
+     status pill goes to a line of its own under it, where its whole label fits, rather than end with "…". */
+  @container (max-width: 260px) {
+    .head { flex-wrap: wrap; row-gap: 4px; }
+    .head::after { content: ""; order: 1; flex: 1 0 100%; }
+    .head > .pill { order: 2; margin-left: 50px; max-width: calc(100% - 50px); }
+  }
   @container (max-width: 200px) {
+    /* Under 200 px the pill is only its dot again: back on the title's line. */
+    .head { flex-wrap: nowrap; }
+    .head::after { content: none; }
+    .head > .pill { order: 0; margin-left: 0; max-width: none; }
     .head > .pill .pt, .st .pt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
     .head > .pill:not(.action), .st { flex: none; padding: 0; width: 18px; height: 18px; justify-content: center; background: none; }
     .head > .pill:not(.action)::before, .st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
     .head > .pill.action { padding: 1px 4px; }
-    /* A full card this narrow (a zoomed-in mini card at 4 columns): a smaller badge, no side chip in the header. */
+    /* A full card this narrow (6 columns of the Sections view on a phone): a smaller badge, no side chip in the header. */
     .head { gap: 6px; }
     .head > .badge { width: 32px; height: 32px; }
     .head > .badge ha-icon { --mdc-icon-size: 20px; }
@@ -1343,8 +1361,10 @@ const RC_BASE_STYLES = `
   .txt { display: flex; flex-direction: column; min-width: 0; }
   .name { font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--primary-text-color);
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .state { font-size: 11px; line-height: 1.2; color: var(--secondary-text-color);
-           white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* A reading is never cut: on a narrow tile it goes on to a second line (the name, a label, keeps its ellipsis). */
+  .state { font-size: 11px; line-height: 1.2; color: var(--secondary-text-color); overflow-wrap: break-word; }
+  /* A card this narrow (a phone, 6 columns of the Sections view): one tile per row, whatever the columns option. */
+  @container (max-width: 260px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 
   @keyframes rc-blink { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
   @keyframes rc-pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 45%, transparent) }
@@ -1408,7 +1428,7 @@ const RC_MINI_STYLES = `${RC_ZOOM_STYLES}
   .body { flex: 1; min-width: 0; min-height: 32px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
   .mini .head { gap: 8px; }
   .mini .title { line-height: 1.25; }
-  .st { flex: 0 1 auto; min-width: 0; max-width: 50%; position: relative; display: inline-flex; align-items: center;
+  .st { flex: 0 1 auto; min-width: 0; position: relative; display: inline-flex; align-items: center;
         margin-left: auto; font-size: 11px; font-weight: 500; color: var(--c); }
   .rs { display: flex; flex-wrap: wrap; gap: 2px 4px; margin-left: -4px; }
   .rs:empty { display: none; }

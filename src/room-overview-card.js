@@ -705,9 +705,14 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       .hchips { flex: none; display: flex; align-items: center; gap: inherit; }
       /* Narrow card: the chips go to a line of their own under the title, which keeps the first line (title, status,
          detail button) readable; they wrap there if they still do not fit. */
-      @container (max-width: 340px) {
+      @container (max-width: 420px) {
         .head { gap: 6px; flex-wrap: wrap; }
         .hchips { order: 1; flex: 1 0 100%; flex-wrap: wrap; box-sizing: border-box; padding-left: 46px; }
+      }
+      /* The overview's pill keeps its place on the title's line: its chips have the second line already. */
+      @container (max-width: 260px) {
+        .head::after { content: none; }
+        .head > .pill { order: 0; margin-left: 0; max-width: none; }
       }
 
       .confirm[hidden] { display: none; }
