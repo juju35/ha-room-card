@@ -1290,15 +1290,17 @@ const RC_BASE_STYLES = `
     --rc-plug: var(--state-switch-on-color, var(--primary-color, #03a9f4));
     --rc-idle: var(--secondary-text-color, #9e9e9e);
     --rc-na: var(--disabled-color, #9e9e9e);
-    /* The natural width below is also the card's min-content width: without this, a grid's 1fr column (grid card,
-       layout-card) or a horizontal stack could not shrink the card under it, and it would overflow. */
+    display: block;
     min-width: 0;
   }
   /* The card answers its own width (container queries). That containment drops its content from its natural width: in
      a wrapper sized by its content (inline-block, a grid's auto column, a flex row: layout-card, button-card…) it would
-     shrink to its padding. contain-intrinsic-inline-size gives it back a natural width there; it changes nothing
-     where the card is given its width (Sections, masonry, stacks, 1fr columns: the host's min-width: 0 above). */
-  ha-card { padding: 12px; overflow: hidden; container-type: inline-size; contain-intrinsic-inline-size: 320px; }
+     shrink to its padding. The empty grid below (no height) gives the host a natural width of 344 px there, as a
+     preferred width only: its column is minmax(0, …), so the card still shrinks to its column in a grid card, a
+     horizontal stack or a 1fr column, even wrapped in a <div> (hui-card in layout-card). contain-intrinsic-inline-size
+     or a min-width in px would be a minimum there, and the card would overflow. */
+  :host::before { content: ""; display: grid; grid-template-columns: minmax(0, 344px); height: 0; }
+  ha-card { padding: 12px; overflow: hidden; container-type: inline-size; }
   ha-card.lvl-alert { box-shadow: 0 0 0 1px color-mix(in srgb, var(--rc-alert) 45%, transparent), var(--ha-card-box-shadow, none); }
 
   .head { display: flex; align-items: center; gap: 10px; }

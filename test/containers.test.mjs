@@ -33,7 +33,8 @@ for (const w of [320, 600]) {
 for (const w of [320, 360, 500]) CONTEXTS.push([`grid 1fr 1fr ${w}`, w, "display:grid;grid-template-columns:1fr 1fr;gap:8px", 2]);
 
 const st = (entity_id, state, attributes) => ({ entity_id, state, attributes, last_changed: "2026-01-01T00:00:00Z" });
-const base = makeHass();
+// Serialisable (handed to the page): the page adds callService itself.
+const { callService: _, ...base } = makeHass();
 const hass = {
   ...base,
   language: "en",
@@ -43,7 +44,6 @@ const hass = {
     ...base.states,
     "sensor.kitchen_temperature": st("sensor.kitchen_temperature", "21.4", { device_class: "temperature", unit_of_measurement: "°C" }),
   },
-  callService() {},
 };
 const TAGS = [
   "room-sensors-card",
