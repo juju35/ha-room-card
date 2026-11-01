@@ -698,3 +698,16 @@ test("a door sensor added to an idle room updates the header and tile from 'all 
   assert.match(nodes[".head"].innerHTML, /All quiet/);
   assert.match(nodes[".grid"].innerHTML, /All quiet/);
 });
+
+// The room cards unfolded in an overview's panel are custom elements with no display of their own: inline, they wrap
+// their block <ha-card>, and the separator drawn by `.panel > * + *` (border-top) only paints on an empty first line
+// box, so the Sensors, Lights and Plugs cards ran together with no line between them.
+test("the room cards unfolded in an overview's panel are blocks, so their separator spans the panel", () => {
+  const rules = (css) => [...css.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*)\}/g)];
+  const blockChildren = (css) =>
+    rules(css).some(([, sel, body]) => sel.split(",").some((s) => s.trim() === ".panel > *") && /\bdisplay:\s*block\b/.test(body));
+  for (const tag of ["room-overview-card", "room-environment-overview-card"]) {
+    const card = rc.customElements.get(tag);
+    assert.ok(blockChildren(`${rc.RC_BASE_STYLES}${card.styles}`), tag);
+  }
+});
