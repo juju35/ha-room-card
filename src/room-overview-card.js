@@ -138,6 +138,7 @@ const RO_I18N = {
     turn_lights_off: "Искључи сва светла",
     turn_plugs_off: "Искључи све утичнице",
     confirm_plugs_one: "Искључити ову утичницу?",
+    confirm_plugs_few: "Искључити ове {n} утичнице?",
     confirm_plugs_many: "Искључити ових {n} утичница?",
     turn_off: "Искључи",
     cancel: "Откажи",
@@ -156,7 +157,7 @@ const RO_I18N = {
     ed_plugs_off_button: "Дугме „Искључи све утичнице“",
     ed_plugs_off_button_helper: "Додир на чип за утичнице у заглављу приказује листу свих укључених утичница које картица броји и искључује их након потврде; такође доступно на картици утичница у детаљима просторије. Подразумевано искључено: утичница може напајати камеру или мрежни свич",
     ed_sort_state: "Прво просторије које захтевају пажњу",
-    ed_exclude: "Ентитети за искључивање",
+    ed_exclude: "Изостави ентитете",
     ed_exclude_helper: "Изостављено из плочица, укупних вредности и детаља просторије",
   },
   "sr-Latn": {
@@ -168,6 +169,7 @@ const RO_I18N = {
     turn_lights_off: "Isključi sva svetla",
     turn_plugs_off: "Isključi sve utičnice",
     confirm_plugs_one: "Isključiti ovu utičnicu?",
+    confirm_plugs_few: "Isključiti ove {n} utičnice?",
     confirm_plugs_many: "Isključiti ovih {n} utičnica?",
     turn_off: "Isključi",
     cancel: "Otkaži",
@@ -186,7 +188,7 @@ const RO_I18N = {
     ed_plugs_off_button: "Dugme „Isključi sve utičnice“",
     ed_plugs_off_button_helper: "Dodir na čip za utičnice u zaglavlju prikazuje listu svih uključenih utičnica koje kartica broji i isključuje ih nakon potvrde; takođe dostupno na kartici utičnica u detaljima prostorije. Podrazumevano isključeno: utičnica može napajati kameru ili mrežni svič",
     ed_sort_state: "Prvo prostorije koje zahtevaju pažnju",
-    ed_exclude: "Entiteti za isključivanje",
+    ed_exclude: "Izostavi entitete",
     ed_exclude_helper: "Izostavljeno iz pločica, ukupnih vrednosti i detalja prostorije",
   },
   it: {
@@ -540,7 +542,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       const s = this._roomState(x);
       // Chips only add what the state line does not already say.
       const chips = [
-        x.leaks && x.open ? chip("warn", "mdi:door-open", this._t(x.open > 1 ? "open_many" : "open_one", { n: x.open }), String(x.open)) : "",
+        x.leaks && x.open ? chip("warn", "mdi:door-open", this._tn("open", x.open), String(x.open)) : "",
         x.occupied && s.lvl !== "info" ? chip("info", "mdi:account", this._t("presence")) : "",
         x.lightsOn ? chip("light", "mdi:lightbulb", this._t("lights_on"), String(x.lightsOn)) : "",
         x.plugsOn
@@ -597,7 +599,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       <div class="backdrop" data-action="backdrop">
         <div class="modal" role="dialog" aria-modal="true" aria-label="${rcEsc(this._t("turn_plugs_off"))}">
           <h3>${rcEsc(this._t("turn_plugs_off"))}</h3>
-          <div class="hint">${rcEsc(this._t(n > 1 ? "confirm_plugs_many" : "confirm_plugs_one", { n }))}</div>
+          <div class="hint">${rcEsc(this._tn("confirm_plugs", n))}</div>
           <div class="modal-list">${items}</div>
           <div class="modal-actions">
             <button class="act cancel" data-action="cancel">${rcEsc(this._t("cancel"))}</button>

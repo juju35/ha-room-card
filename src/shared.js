@@ -359,7 +359,8 @@ const RC_I18N = {
     all_closed: "Све је затворено",
     all_quiet: "Све је мирно",
     open_one: "{n} отворено",
-    open_many: "{n} отворено/их",
+    open_few: "{n} отворена",
+    open_many: "{n} отворених",
     leak: "Цурење воде",
     unavailable: "Недоступно",
     on: "Укључено",
@@ -390,13 +391,14 @@ const RC_I18N = {
     rooms_check: "Само собе које захтевају пажњу",
     ed_sort: "Сортирање",
     ed_sort_name: "По имену",
-    ed_exclude_areas: "Собе за искључивање",
+    ed_exclude_areas: "Изостави собе",
   },
   "sr-Latn": {
     all_closed: "Sve je zatvoreno",
     all_quiet: "Sve je mirno",
     open_one: "{n} otvoreno",
-    open_many: "{n} otvoreno/ih",
+    open_few: "{n} otvorena",
+    open_many: "{n} otvorenih",
     leak: "Curenje vode",
     unavailable: "Nedostupno",
     on: "Uključeno",
@@ -427,7 +429,7 @@ const RC_I18N = {
     rooms_check: "Samo sobe koje zahtevaju pažnju",
     ed_sort: "Sortiranje",
     ed_sort_name: "Po imenu",
-    ed_exclude_areas: "Sobe za isključivanje",
+    ed_exclude_areas: "Izostavi sobe",
   },
   it: {
     all_closed: "Tutto chiuso",
@@ -592,6 +594,22 @@ const rcT = (i18n, lang, key, vars = {}) => {
   return s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
 };
 
+// Plural key for `n` items: `<base>_one`, `<base>_few` or `<base>_many` (the "other" form), from the CLDR category of
+// `n` in `lang` (Serbian 1 / 2-4 / 5+, 21 / 22…). `_few` is optional: without it, `_many` is used. A `_one` text without
+// {n} ("Turn this plug off?") only means exactly one.
+const rcPluralKey = (i18n, lang, base, n) => {
+  let cat;
+  try {
+    cat = new Intl.PluralRules(lang).select(n);
+  } catch {
+    cat = n === 1 ? "one" : "other";
+  }
+  const text = (k) => i18n[lang]?.[k] ?? RC_I18N[lang]?.[k];
+  if (cat === "one" && (n === 1 || text(`${base}_one`)?.includes("{n}"))) return `${base}_one`;
+  if (cat === "few" && text(`${base}_few`) != null) return `${base}_few`;
+  return `${base}_many`;
+};
+
 const rcEsc = (s) =>
   String(s ?? "").replace(
     /[&<>"']/g,
@@ -697,6 +715,11 @@ class RcCard extends HTMLElement {
     return rcT(this.constructor.i18n, this._lang(), key, vars);
   }
 
+  // `<base>_one` / `_few` / `_many` for `n`, with {n} filled in.
+  _tn(base, n, vars) {
+    return this._t(rcPluralKey(this.constructor.i18n, this._lang(), base, n), { ...vars, n });
+  }
+
   _areaOf(id) {
     const e = this._hass.entities?.[id];
     if (!e) return undefined;
@@ -752,7 +775,7 @@ class RcCard extends HTMLElement {
   // or window sensors (`closable`), `idle` otherwise.
   _openingStatus(leaks, open, closable, idle = "all_quiet") {
     if (leaks) return this._t("leak");
-    if (open) return this._t(open > 1 ? "open_many" : "open_one", { n: open });
+    if (open) return this._tn("open", open);
     return this._t(closable ? "all_closed" : idle);
   }
 
@@ -937,7 +960,7 @@ class RcToggleCard extends RcCard {
     this._shown = shown.length;
     const [onIcon, offIcon] = this.constructor.headIcons;
     const status = lit.length
-      ? this._t(lit.length > 1 ? "on_many" : "on_one", { n: lit.length })
+      ? this._tn("on", lit.length)
       : this._t(items.length ? "all_off" : this.constructor.emptyKey);
     const head = this._head({
       icon: lit.length ? onIcon : offIcon,
