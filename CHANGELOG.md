@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.17.6 - 2026-11-01
+### Features
+- Serbian translations, in Cyrillic (`sr`) and Latin (`sr-Latn`) script, for every card and visual editor, with both options in the editor's language list. Serbian translations by @cpmarexel2f (#35)
+
+### Fixes
+- Language: a full language tag the cards have is now used as is (`sr-Latn` when Home Assistant is in Serbian Latin), else its base language (`fr-FR` → `fr`, `de-CH` → `de`), else English.
+
 ## 1.17.5 - 2026-10-29
 ### Fixes
 - Overview: the room details (Sensors, Lights, Plugs) are now separated by a line; in Home Assistant the three cards ran together with no visible separation.

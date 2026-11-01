@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { load } from "./load.mjs";
 
 const rc = load();
-const LANGS = ["en", "fr", "de", "es"];
+const LANGS = ["en", "fr", "de", "es", "sr", "sr-Latn"];
 // Gendered states, only in the languages where doors and windows are feminine.
 const GENDERED = ["open_f", "closed_f"];
 
@@ -14,10 +14,10 @@ const tables = [
 const vars = (s) => (Array.isArray(s) ? s.join("|") : s).match(/\{\w+\}/g)?.sort() ?? [];
 
 for (const [name, i18n] of tables) {
-  test(`I18N parity: ${name} has en, fr, de and es with the keys of en`, () => {
+  test(`I18N parity: ${name} has en, fr, de, es, sr and sr-Latn with the keys of en`, () => {
     assert.deepEqual(Object.keys(i18n), LANGS);
     const ref = Object.keys(i18n.en).sort();
-    for (const lang of ["fr", "de", "es"]) {
+    for (const lang of LANGS.slice(1)) {
       const keys = Object.keys(i18n[lang]).filter((k) => !GENDERED.includes(k));
       assert.deepEqual(keys.sort(), ref, `${name}.${lang}`);
       for (const k of ref) {
@@ -37,6 +37,28 @@ test("German and Spanish are picked from the config or Home Assistant", () => {
   card._config = {};
   card._hass = { locale: { language: "es-ES" } };
   assert.equal(card._t("turn_all_off"), "Apagar todo");
+});
+
+test("Language: the full tag when the card has it, else its base language, else English", () => {
+  const lang = (language) => rc.rcLang(rc.RC_I18N, { locale: { language } }, {});
+  assert.equal(lang("fr-FR"), "fr");
+  assert.equal(lang("de-CH"), "de");
+  assert.equal(lang("sr-Latn"), "sr-Latn");
+  assert.equal(lang("sr"), "sr");
+  assert.equal(lang("pt-BR"), "en");
+  // The card's language wins over Home Assistant's, then hass.locale over hass.language.
+  assert.equal(rc.rcLang(rc.RC_I18N, { locale: { language: "fr" } }, { language: "sr-Latn" }), "sr-Latn");
+  assert.equal(rc.rcLang(rc.RC_I18N, { locale: { language: "de" }, language: "fr" }, {}), "de");
+  assert.equal(rc.rcLang(rc.RC_I18N, { language: "es-ES" }, {}), "es");
+});
+
+test("Serbian is picked in Cyrillic or Latin script", () => {
+  const card = new rc.cards["room-switch-card"]();
+  card._config = {};
+  card._hass = { locale: { language: "sr-Latn" } };
+  assert.equal(card._t("turn_all_off"), "Isključi sve");
+  card._hass = { locale: { language: "sr" } };
+  assert.equal(card._t("turn_all_off"), "Искључи све");
 });
 
 test("Spanish doors and windows take the feminine state", () => {
