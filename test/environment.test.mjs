@@ -392,3 +392,18 @@ test("sensors of one kind in different units are not averaged together", () => {
   assert.equal(temps.length, 1);
   assert.equal(temps[0].value, "21,7 °C");
 });
+
+test("numbers use European Portuguese for HA's pt, keep pt-BR, and follow the language option", () => {
+  const card = new Card();
+  const fmt = (locale) => new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(12345.6);
+  const at = (language, config = {}) => {
+    card._hass = { locale: { language }, language };
+    card._config = config;
+    return card._formatNumber(12345.6, 1);
+  };
+  assert.notEqual(fmt("pt-PT"), fmt("pt-BR"));
+  assert.equal(at("pt"), fmt("pt-PT"));
+  assert.equal(at("pt-BR"), fmt("pt-BR"));
+  assert.equal(at("pt", { language: "de" }), fmt("de"));
+  assert.equal(at("de", { language: "pt" }), fmt("pt-PT"));
+});

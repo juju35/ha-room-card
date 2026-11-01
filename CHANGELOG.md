@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.17.7 - 2026-11-01
+### Features
+- Added Italian, Dutch, European Portuguese and Polish translations (`it`, `nl`, `pt`, `pl`) for every card and visual editor, with *Italiano*, *Nederlands*, *Português (Portugal)* and *Polski* in the editor's language list. `pt-BR` uses the European Portuguese texts.
+
 ## 1.17.6 - 2026-11-01
 ### Features
 - Serbian translations, in Cyrillic (`sr`) and Latin (`sr-Latn`) script, for every card and visual editor, with both options in the editor's language list. Serbian translations by @cpmarexel2f (#35)
