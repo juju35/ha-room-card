@@ -1311,10 +1311,15 @@ const RC_BASE_STYLES = `
   .pt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pill ha-icon { flex: none; }
   @container (max-width: 200px) {
-    .pill .pt, .st .pt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-    .pill:not(.action), .st { flex: none; padding: 0; width: 18px; height: 18px; justify-content: center; background: none; }
-    .pill:not(.action)::before, .st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
-    .pill.action { padding: 1px 4px; }
+    .head > .pill .pt, .st .pt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .head > .pill:not(.action), .st { flex: none; padding: 0; width: 18px; height: 18px; justify-content: center; background: none; }
+    .head > .pill:not(.action)::before, .st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+    .head > .pill.action { padding: 1px 4px; }
+    /* A full card this narrow (a zoomed-in mini card at 4 columns): a smaller badge, no side chip in the header. */
+    .head { gap: 6px; }
+    .head > .badge { width: 32px; height: 32px; }
+    .head > .badge ha-icon { --mdc-icon-size: 20px; }
+    .head > .chip { display: none; }
   }
   .pill.action { cursor: pointer; }
   .pill.action:hover { background: color-mix(in srgb, var(--c) 24%, transparent); }

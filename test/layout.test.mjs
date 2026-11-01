@@ -74,8 +74,12 @@ test("Header: the title keeps a few letters and the status pill shrinks with an 
 
 test("Header: under 200 px the status is only its coloured dot, its text kept for screen readers", () => {
   const narrow = container(BASE, 200, ".pill");
-  assert.match(narrow, /\.pill \.pt, \.st \.pt \{[^}]*clip-path: inset\(50%\)/);
-  assert.match(narrow, /\.pill:not\(\.action\)::before, \.st::before \{[^}]*border-radius: 50%[^}]*background: var\(--c\)/);
+  assert.match(narrow, /\.head > \.pill \.pt, \.st \.pt \{[^}]*clip-path: inset\(50%\)/);
+  assert.match(narrow, /\.head > \.pill:not\(\.action\)::before, \.st::before \{[^}]*border-radius: 50%[^}]*background: var\(--c\)/);
+  // Only the header's pill: the mini cards' chips are ".r.pill" too, and must keep their name.
+  for (const sel of narrow.split("}").flatMap((r) => r.split("{")[0].split(",")).map((x) => x.trim())) {
+    if (sel.includes(".pill")) assert.ok(sel.startsWith(".head > .pill"), `${sel} would hit the mini chips`);
+  }
   for (const tag of ["room-lights-card", "room-sensors-mini-card"]) {
     const card = new cards[tag]();
     card.setConfig({ area: "kitchen" });
