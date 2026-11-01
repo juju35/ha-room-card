@@ -242,20 +242,22 @@ const overviewSetup = (options = {}, hass = makeHass()) => {
       fire(type, ev = {}) {
         for (const fn of on[type] || []) fn({ button: 0, stopPropagation() {}, ...ev });
       },
-      focus() {
+      focus(options) {
         focused.push(this);
+        focusOptions.push(options);
       },
       querySelector: (s) => (nodes[s] ||= node()),
     };
   };
   const focused = [];
+  const focusOptions = [];
   overview.attachShadow();
   // No <ha-card> until the first render has written the skeleton, so that the card wires its listeners.
   overview.shadowRoot.querySelector = (s) => (s === "ha-card" && !overview.shadowRoot.innerHTML ? null : (nodes[s] ||= node()));
   const calls = [];
   overview.setConfig({ ...options });
   overview.hass = { ...hass, callService: (...a) => calls.push(JSON.parse(JSON.stringify(a))) };
-  return { overview, nodes, calls, focused };
+  return { overview, nodes, calls, focused, focusOptions };
 };
 
 // Event target inside the header: `kind` is the data-kind of the chip it belongs to, or null.
@@ -364,6 +366,22 @@ test("confirming turns off the plugs listed, rooms and entities excluded spared,
   clickOn(nodes[".confirm"], confirmTarget("ok"));
   assert.deepEqual(calls, [["homeassistant", "turn_off", { entity_id: ["switch.coffee_plug"] }]]);
   assert.equal(nodes[".confirm"].hidden, true);
+});
+
+// The focus is handed back after a render (the popup's OK button, the zoom button redrawn after a keyboard press): it
+// must not scroll the dashboard to the card (a phone user scrolled away, or the card half off-screen, jumps).
+test("focus handed back after a render never scrolls the page", () => {
+  const { nodes, focused, focusOptions } = overviewSetup({ plugs_off_button: true }, plugsHass());
+  clickOn(nodes[".head"], chipTarget("plugs"));
+  assert.equal(focused.at(-1), nodes[".primary"]);
+  assert.deepEqual({ ...focusOptions.at(-1) }, { preventScroll: true }, "the popup's OK button");
+
+  const zoomed = overviewSetup({}, makeHass());
+  const zoomTarget = { closest: (s) => (s === ".zoom" ? {} : null) };
+  zoomed.nodes[".head"].fire("click", { target: zoomTarget, detail: 0 });
+  assert.equal(zoomed.overview._zoomed, true);
+  assert.equal(zoomed.focused.at(-1), zoomed.nodes[".zoom"], "keyboard press: the redrawn zoom button keeps the focus");
+  assert.deepEqual({ ...zoomed.focusOptions.at(-1) }, { preventScroll: true }, "the zoom button");
 });
 
 test("the lights chip turns the lights off at once, without confirmation", () => {
