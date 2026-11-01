@@ -1,7 +1,7 @@
 // Shared by the screenshot scripts: theme variables, <ha-card> / <ha-icon> stand-ins, and the render loop.
 import { chromium } from "playwright";
 import * as mdi from "@mdi/js";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 export const root = fileURLToPath(new URL("../..", import.meta.url));
@@ -108,6 +108,33 @@ export const cardClip = async (page, width) => {
   return { x: 0, y: 0, width: width + 32, height: Math.ceil(box.height) + 32 };
 };
 
+// Writes a PNG screenshot to `path` only when its pixels differ from the file already there. PNG encoding is not
+// byte-stable from one run (or machine) to the next: comparing bytes would commit pictures that did not change.
+// Both images are decoded by the page's browser (no colour conversion, no premultiplication) and compared pixel by pixel.
+export const writeIfChanged = async (page, path, png) => {
+  if (existsSync(path)) {
+    const same = await page.evaluate(
+      async ([a, b]) => {
+        const pixels = async (b64) => {
+          const blob = await (await fetch(`data:image/png;base64,${b64}`)).blob();
+          const bmp = await createImageBitmap(blob, { colorSpaceConversion: "none", premultiplyAlpha: "none" });
+          const ctx = new OffscreenCanvas(bmp.width, bmp.height).getContext("2d");
+          ctx.drawImage(bmp, 0, 0);
+          return { w: bmp.width, h: bmp.height, d: ctx.getImageData(0, 0, bmp.width, bmp.height).data };
+        };
+        const [x, y] = await Promise.all([pixels(a), pixels(b)]);
+        if (x.w !== y.w || x.h !== y.h) return false;
+        for (let i = 0; i < x.d.length; i++) if (x.d[i] !== y.d[i]) return false;
+        return true;
+      },
+      [readFileSync(path).toString("base64"), png.toString("base64")],
+    );
+    if (same) return false;
+  }
+  writeFileSync(path, png);
+  return true;
+};
+
 // Renders each shot of `shots` ({ file, theme, ... }) into screenshots/<prefix>-<file>.png.
 // `setup(shot, lang)` returns { hass, config, open? } for that shot; every shot is in English.
 export const shoot = async ({ prefix, tag, shots, setup, icons = [] }) => {
@@ -121,8 +148,8 @@ export const shoot = async ({ prefix, tag, shots, setup, icons = [] }) => {
     await mountCard(page, { tag, hass, config, dark: s.theme === "dark", open });
     await page.waitForTimeout(400);
     const out = `screenshots/${prefix}-${s.file}.png`;
-    await page.screenshot({ path: `${root}${out}`, clip: await cardClip(page, width), animations: "disabled" });
-    console.log(out);
+    const png = await page.screenshot({ clip: await cardClip(page, width), animations: "disabled" });
+    console.log(`${out}${(await writeIfChanged(page, `${root}${out}`, png)) ? "" : " (unchanged)"}`);
     await page.close();
   }
   await browser.close();
