@@ -5,12 +5,14 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 export const root = fileURLToPath(new URL("../..", import.meta.url));
-const cardJs = readFileSync(`${root}dist/ha-room-card.js`, "utf8");
+// Read on first use: the tests import writeIfChanged without a built bundle.
+let bundle;
+const cardJs = () => (bundle ??= readFileSync(`${root}dist/ha-room-card.js`, "utf8"));
 
 // Every mdi:* icon the cards or the mock data can use, as SVG paths for the <ha-icon> stand-in.
 export const iconsFor = (extra) => {
   const icons = {};
-  for (const name of new Set([...cardJs.match(/mdi:[a-z0-9-]+/g), ...extra])) {
+  for (const name of new Set([...cardJs().match(/mdi:[a-z0-9-]+/g), ...extra])) {
     const key = `mdi${name.slice(4).replace(/(^|-)([a-z0-9])/g, (_, __, c) => c.toUpperCase())}`;
     if (mdi[key]) icons[name.slice(4)] = mdi[key];
   }
@@ -84,7 +86,7 @@ export const openPage = async (browser, { theme, width, icons = {}, label = "" }
   page.on("pageerror", (err) => console.error(`pageerror${label ? ` (${label})` : ""}: ${err.message}`));
   await page.setContent(pageHtml(theme, width));
   await page.addScriptTag({ content: haElements(icons) });
-  await page.addScriptTag({ content: cardJs });
+  await page.addScriptTag({ content: cardJs() });
   return page;
 };
 

@@ -167,21 +167,31 @@ test("Mini cards: 6 columns at least (at 4, ~104-121 px on a phone, the zoom but
 });
 
 // layout-card, button-card, a grid's `auto` column: the container query's inline-size containment drops the content
-// from the card's natural width, which fell to its padding (~26 px).
-test("Cards keep a natural width in a wrapper sized by its content", () => {
-  const card = decls(BASE, "ha-card");
-  assert.equal(card["container-type"], "inline-size");
-  assert.match(card["contain-intrinsic-inline-size"] || "", /^\d+px$/);
-  assert.ok(Number.parseInt(card["contain-intrinsic-inline-size"], 10) >= 280);
+// from the card's natural width, which fell to its padding (~26 px). The natural width comes from an empty grid on
+// :host::before whose column is minmax(0, N px): a preferred width, never a minimum.
+test("Cards keep a natural width in a wrapper sized by its content, from :host::before", () => {
+  const css = BASE.replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.equal(decls(css, "ha-card")["container-type"], "inline-size");
+  assert.equal(decls(css, ":host").display, "block");
+  const before = decls(css, ":host::before");
+  assert.equal(before.content, '""');
+  assert.equal(before.display, "grid");
+  assert.equal(before.height, "0");
+  const m = (before["grid-template-columns"] || "").match(/^minmax\(0, (\d+)px\)$/);
+  assert.ok(m, `grid-template-columns: ${before["grid-template-columns"]}`);
+  assert.ok(Number(m[1]) >= 280 && Number(m[1]) <= 360);
 });
 
-// That natural width is also the card's min-content width: in a grid's 1fr columns (grid card, layout-card) or a
-// horizontal stack, two cards at 320-500 px overflowed by up to 380 px until the host was allowed to shrink.
-test("Cards shrink in a 1fr column or a horizontal stack: the host's min-width is 0, never a px width", () => {
+// contain-intrinsic-inline-size (or a min-width in px) is also a min-content width: in a grid's 1fr columns (grid
+// card, layout-card) or a horizontal stack, the card refused to shrink and overflowed by up to 380 px — and the
+// host's min-width: 0 did not help once the card sat in a <div> (hui-card in layout-card).
+test("Cards shrink in a 1fr column, even wrapped in a div: no intrinsic size, no px min-width on the host", () => {
   const host = decls(BASE.replace(/\/\*[\s\S]*?\*\//g, ""), ":host");
   assert.equal(host["min-width"], "0");
   for (const [tag, card] of Object.entries(cards)) {
-    assert.doesNotMatch(`${BASE}${card.styles || ""}`, /:host\s*\{[^}]*min-width:\s*\d+px/, tag);
+    const css = `${BASE}${card.styles || ""}`.replace(/\/\*[\s\S]*?\*\//g, "");
+    assert.doesNotMatch(css, /:host\s*\{[^}]*min-width:\s*\d+px/, tag);
+    assert.doesNotMatch(css, /contain-intrinsic-/, tag);
   }
 });
 
