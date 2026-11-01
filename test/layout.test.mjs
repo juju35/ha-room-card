@@ -208,3 +208,30 @@ test("Header under 260 px: the status pill goes to a line of its own instead of 
   // The overview keeps its pill on the first line: its chips have the second one.
   assert.match(container(cards["room-overview-card"].styles, 260, ".head::after"), /\.head > \.pill \{ order: 0;/);
 });
+
+// The overviews' room tiles at 6 columns of a phone (~156-178 px): two tiles per row (three with `columns: 3`) left
+// the room name 0-3 letters and pushed a chip out of its tile, and `overflow-wrap: break-word` broke the state inside
+// its words ("Pr|es|en|ce"). One room per row under 260 px whatever `columns` says, at most two under 340 px; the
+// state wraps between words only, a word too long for its line ending with "…" (rendered in containers.test.mjs).
+test("Overviews: one room per row under 260 px, at most two under 340 px; the state wraps between words", () => {
+  const grid = rc.RC_ROOM_GRID_STYLES;
+  assert.match(container(grid, 260, ".grid"), /\.grid\.grid \{ grid-template-columns: minmax\(0, 1fr\); \}/);
+  assert.match(container(grid, 340, ".grid"), /\.grid:not\(\.fixed\) \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\); \}/);
+  const state = decls(grid, ".room .state");
+  assert.equal(state["overflow-wrap"], "normal");
+  assert.equal(state.overflow, "hidden");
+  assert.equal(state["text-overflow"], "ellipsis");
+  for (const tag of ["room-overview-card", "room-environment-overview-card"]) assert.ok(rc.customElements.get(tag).styles.includes(grid), tag);
+  // `columns` 1 or 2 is kept under 340 px; 3 and more go down to two there.
+  const grids = {};
+  for (const columns of [undefined, 1, 2, 3, 6]) {
+    const overview = new cards["room-overview-card"]();
+    const classes = new Set();
+    const node = { classList: { toggle: (c, on) => (on ? classes.add(c) : classes.delete(c)) }, style: { setProperty() {} }, innerHTML: "" };
+    overview._config = { columns };
+    overview._t = (k) => k;
+    overview._roomGrid(node, [], () => "");
+    grids[columns] = classes.has("fixed");
+  }
+  assert.deepEqual(grids, { undefined: false, 1: true, 2: true, 3: false, 6: false });
+});

@@ -116,4 +116,121 @@ for (const tag of TAGS) {
   });
 }
 
+// The overviews' room tiles at a phone's 6 columns of the Sections view (~156-178 px) and above: two (or the `columns`
+// option's) tiles per row left the name 0-3 letters ("B…"), pushed a chip 4-34 px out of its tile and broke the state
+// inside its words ("Pr|es|en|ce"). Every name keeps 4 letters, every chip stays in its tile, the state wraps between
+// words (a word too long for its line ends with "…").
+const ROOMS = [
+  ["living_room", "Living room", [["binary_sensor.patio_door", "door", "on"], ["light.living_room", "light", "on"], ["switch.tv_plug", "outlet", "on", 1240]]],
+  ["kitchen", "Kitchen", [["binary_sensor.sink_leak", "moisture", "on"], ["light.kitchen", "light", "on"]]],
+  ["bedroom_2", "Bedroom 2", [["binary_sensor.bedroom_presence", "occupancy", "on"]]],
+];
+const ENV_ROOMS = [
+  ["living_room", "Living room", { temperature: [24.6, "°C"], humidity: [66, "%"], carbon_dioxide: [1380, "ppm"] }],
+  ["kitchen", "Kitchen", { temperature: [22.8, "°C"], humidity: [58, "%"], carbon_dioxide: [1180, "ppm"] }],
+  ["bathroom", "Bathroom", { temperature: [23.5, "°C"], humidity: [74, "%"] }],
+];
+const roomsHass = (lang) => {
+  const h = { language: lang, locale: { language: lang }, areas: {}, devices: {}, entities: {}, states: {} };
+  for (const [area_id, name, items] of ROOMS) {
+    h.areas[area_id] = { area_id, name };
+    for (const [id, kind, state, watts] of items) {
+      h.entities[id] = { area_id };
+      h.states[id] = st(id, state, kind === "light" ? { friendly_name: id } : { device_class: kind, friendly_name: id });
+      if (watts) {
+        const p = `sensor.${id.split(".")[1]}_power`;
+        h.devices[`d_${id}`] = { area_id };
+        h.entities[id] = { device_id: `d_${id}` };
+        h.entities[p] = { device_id: `d_${id}` };
+        h.states[p] = st(p, String(watts), { device_class: "power", unit_of_measurement: "W" });
+      }
+    }
+  }
+  for (const [area_id, name, values] of ENV_ROOMS) {
+    h.areas[area_id] = { area_id, name };
+    for (const [device_class, [v, unit]] of Object.entries(values)) {
+      const id = `sensor.${area_id}_${device_class}`;
+      h.entities[id] = { area_id };
+      h.states[id] = st(id, String(v), { device_class, unit_of_measurement: unit, friendly_name: id });
+    }
+  }
+  return h;
+};
+
+for (const tag of ["room-overview-card", "room-environment-overview-card"]) {
+  test(`${tag}: room tiles keep a readable name, their chips and an unbroken state at phone widths`, { skip: !browser && "no Chromium" }, async () => {
+    const page = await browser.newPage({ viewport: { width: 1000, height: 800 } });
+    const errors = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    try {
+      await page.setContent('<!doctype html><body style="margin:0;font-family:Arial,sans-serif"></body>');
+      await page.addScriptTag({ content: HA });
+      await page.addScriptTag({ content: source });
+      const runs = [];
+      for (const lang of ["en", "pl", "sr-Latn"]) for (const config of [{}, { columns: 3 }]) for (const width of [156, 178, 245, 320]) runs.push({ lang, config, width, hass: roomsHass(lang) });
+      const problems = await page.evaluate(
+        async ({ tag, runs }) => {
+          const cards = runs.map(({ config, width, hass }) => {
+            const outer = document.body.appendChild(document.createElement("div"));
+            outer.style.width = `${width}px`;
+            const card = outer.appendChild(document.createElement(tag));
+            card.setConfig({ type: `custom:${tag}`, ...config });
+            card.hass = { ...hass, callService() {} };
+            return card;
+          });
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+          const range = document.createRange();
+          const charBox = (node, i) => {
+            range.setStart(node, i);
+            range.setEnd(node, i + 1);
+            return range.getClientRects()[0];
+          };
+          return runs.flatMap(({ lang, config, width }, k) => {
+            const where = `${lang} ${JSON.stringify(config)} ${width} px`;
+            const root = cards[k].shadowRoot;
+            const card = root.querySelector("ha-card").getBoundingClientRect();
+            const out = [];
+            const tiles = [...root.querySelectorAll(".room")];
+            if (!tiles.length) out.push(`${where}: no room tile`);
+            for (const tile of tiles) {
+              const box = tile.getBoundingClientRect();
+              if (box.left < card.left - 0.5 || box.right > card.right + 0.5) out.push(`${where}: a tile leaves the card`);
+              // Letters of the name shown whole, left of its "…" when it has one.
+              const name = tile.querySelector(".name");
+              const end = name.getBoundingClientRect().right - (name.scrollWidth > name.clientWidth + 1 ? 8 : -0.5);
+              let shown = 0;
+              for (let i = 0; i < name.textContent.length; i++) if (charBox(name.firstChild, i)?.right <= end) shown++;
+              if (shown < Math.min(4, name.textContent.length)) out.push(`${where}: "${name.textContent}" shows ${shown} letters`);
+              for (const chip of tile.querySelectorAll(".chips > *")) {
+                const c = chip.getBoundingClientRect();
+                const past = Math.max(c.right - box.right, box.left - c.left, c.bottom - box.bottom);
+                if (past > 0.5) out.push(`${where}: chip "${chip.textContent.trim()}" ${past.toFixed(1)} px out of its tile`);
+              }
+              // The state's lines: a new line starts after a space only.
+              const state = tile.querySelector(".state");
+              const text = state.firstChild;
+              let top = null;
+              for (let i = 0; text && i < text.length; i++) {
+                const t = charBox(text, i)?.top;
+                if (t == null) continue;
+                if (top != null && t > top + 2 && !/\s/.test(text.data[i - 1]) && !/\s/.test(text.data[i]))
+                  out.push(`${where}: "${text.data}" broken inside a word, before "${text.data.slice(i)}"`);
+                top = t;
+              }
+              if (state.scrollWidth > state.clientWidth + 1 && getComputedStyle(state).textOverflow !== "ellipsis")
+                out.push(`${where}: "${state.textContent}" cut without "…"`);
+            }
+            return out;
+          });
+        },
+        { tag, runs },
+      );
+      assert.deepEqual(errors, []);
+      assert.deepEqual(problems, []);
+    } finally {
+      await page.close();
+    }
+  });
+}
+
 test.after(() => browser?.close());
