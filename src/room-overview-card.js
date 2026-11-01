@@ -295,7 +295,7 @@ const RO_I18N = {
     sensors: "Czujniki",
     lights: "Światła",
     plugs: "Gniazdka",
-    ed_title_helper: "Pozostaw puste, aby użyć „Dom”",
+    ed_title_helper: "Pozostaw puste, aby użyć nazwy „Dom”",
     ed_columns_helper: "Puste: 3 lub 2 na wąskich ekranach",
     ed_presence: "Uwzględnij czujniki obecności",
     ed_presence_helper: "Czujniki obecności i ruchu, bez kamer",

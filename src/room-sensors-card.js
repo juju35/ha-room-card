@@ -210,7 +210,7 @@ const RS_I18N = {
   nl: {
     ed_columns_helper: "Minikaart: kolommen van de vergrote weergave",
     title: "Sensoren",
-    no_sensors: "Geen sensor",
+    no_sensors: "Geen sensoren",
     leak_on: "Lek!",
     leak_off: "Droog",
     open: "Open",

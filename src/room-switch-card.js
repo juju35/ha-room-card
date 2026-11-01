@@ -145,7 +145,7 @@ const RW_I18N = {
     all_off: "Alles uit",
     on_one: "{n} aan",
     on_many: "{n} aan",
-    no_plugs: "Geen stekker",
+    no_plugs: "Geen stekkers",
     ed_navigation_path_helper: "Dashboard dat opent bij een tik op de titel, bijv. /energy",
     ed_only_on: "Uitgeschakelde stekkers verbergen",
     ed_only_on_helper: "Alleen ingeschakelde stekkers blijven zichtbaar",
@@ -180,7 +180,7 @@ const RW_I18N = {
   },
   pl: {
     title: "Gniazdka",
-    all_off: "Wszystko wyłączone",
+    all_off: "Wyłączone",
     on_one: "Włączone: {n}",
     on_many: "Włączone: {n}",
     no_plugs: "Brak gniazdek",

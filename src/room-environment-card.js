@@ -239,7 +239,7 @@ const RE_I18N = {
   nl: {
     ed_columns_helper: "Minikaart: kolommen van de vergrote weergave",
     title: "Omgeving",
-    no_sensors: "Geen sensor",
+    no_sensors: "Geen sensoren",
     comfortable: "Comfortabel",
     k_temperature: "Temperatuur",
     k_humidity: "Luchtvochtigheid",
@@ -506,7 +506,11 @@ class RoomEnvironmentCard extends RcCard {
   }
 
   _formatNumber(value, digits, unit) {
-    const n = new Intl.NumberFormat(this._lang(), { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
+    // HA's full locale (pt-BR, de-CH) when it is the card's language, else the card's resolved language.
+    const lang = this._lang();
+    const ha = this._hass?.locale?.language || this._hass?.language;
+    const locale = !lang.includes("-") && ha?.split("-")[0] === lang ? ha : lang;
+    const n = new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
     return unit ? `${n} ${unit}` : n;
   }
 
@@ -909,7 +913,7 @@ const REO_I18N = {
     no_rooms: "Brak pomieszczeń z czujnikami środowiskowymi",
     readings: "Odczyty",
     averages: "Średnia temperatura i wilgotność",
-    ed_title_helper: "Pozostaw puste, aby użyć „Klimat wewnętrzny”",
+    ed_title_helper: "Pozostaw puste, aby użyć nazwy „Klimat wewnętrzny”",
     ed_columns_helper: "Puste: 3 lub 2 na wąskich ekranach",
     ed_zoom: "Przycisk szczegółów",
     ed_zoom_helper: "Wyświetlane są tylko pomieszczenia z odczytem poza zakresem komfortu; przycisk pokazuje wszystkie pomieszczenia. Wyłączone: zawsze wszystkie pomieszczenia",

@@ -431,7 +431,7 @@ const RC_I18N = {
   },
   it: {
     all_closed: "Tutto chiuso",
-    all_quiet: "Tutto tranquillo",
+    all_quiet: "Tutto calmo",
     open_one: "{n} apertura",
     open_many: "{n} aperture",
     leak: "Perdita d'acqua",
@@ -541,8 +541,8 @@ const RC_I18N = {
     ed_exclude_areas: "Divisões a excluir",
   },
   pl: {
-    all_closed: "Wszystko zamknięte",
-    all_quiet: "Wszystko spokojnie",
+    all_closed: "Zamknięte",
+    all_quiet: "Spokojnie",
     open_one: "Otwarte: {n}",
     open_many: "Otwarte: {n}",
     leak: "Wyciek wody",
