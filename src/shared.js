@@ -185,7 +185,7 @@ const rcZoomClick = (card, ev) => {
   card._zoomed = !card._zoomed;
   card._sig = null;
   card._render();
-  if (ev.detail === 0) card.shadowRoot.querySelector(".zoom")?.focus();
+  if (ev.detail === 0) card.shadowRoot.querySelector(".zoom")?.focus({ preventScroll: true });
   return true;
 };
 

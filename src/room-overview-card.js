@@ -610,7 +610,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       </div>`;
     box.hidden = false;
     window.addEventListener("keydown", this._onKey);
-    box.querySelector(".primary")?.focus();
+    box.querySelector(".primary")?.focus({ preventScroll: true });
   }
 
   _closeConfirm() {
