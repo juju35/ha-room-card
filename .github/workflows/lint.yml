@@ -28,9 +28,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # One Biome version everywhere: read from the pre-commit hook, which Dependabot bumps; the hook's npm package
+      # and the biome.json schema must carry the same version.
+      - name: Read Biome version from .pre-commit-config.yaml
+        id: biome-version
+        run: |
+          version=$(awk '/biomejs\/pre-commit/ {f=1} f && /rev:/ {gsub(/"/, ""); sub(/.*rev:[ ]*v?/, ""); print; exit}' .pre-commit-config.yaml)
+          test -n "$version"
+          grep -qF "@biomejs/biome@$version" .pre-commit-config.yaml || { echo "::error file=.pre-commit-config.yaml::additional_dependencies is not @biomejs/biome@$version"; exit 1; }
+          grep -qF "schemas/$version/schema.json" biome.json || { echo "::error file=biome.json::\$schema is not Biome $version"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2
         with:
-          version: 2.6.2
+          version: ${{ steps.biome-version.outputs.version }}
       - run: biome ci --reporter=github .
   duplication:
     name: Duplication (jscpd)
