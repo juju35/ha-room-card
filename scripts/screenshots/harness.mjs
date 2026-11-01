@@ -38,8 +38,12 @@ customElements.define("ha-card", class extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" }).innerHTML =
-      "<style>:host{display:block;background:var(--card-background-color);border-radius:12px;" +
-      "border:1px solid var(--divider-color);color:var(--primary-text-color);overflow:hidden}</style><slot></slot>";
+      // Like Home Assistant's <ha-card>: the --ha-card-* variables win (the overviews' panel sets them for the room
+      // cards it unfolds: no border, no background), the theme's colours otherwise.
+      "<style>:host{display:block;background:var(--ha-card-background,var(--card-background-color));" +
+      "border-radius:var(--ha-card-border-radius,12px);border-style:solid;border-width:var(--ha-card-border-width,1px);" +
+      "border-color:var(--ha-card-border-color,var(--divider-color));box-shadow:var(--ha-card-box-shadow,none);" +
+      "color:var(--primary-text-color);overflow:hidden}</style><slot></slot>";
   }
 });
 customElements.define("ha-icon", class extends HTMLElement {
