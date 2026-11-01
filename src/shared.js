@@ -1124,6 +1124,9 @@ const RC_ROOM_GRID_STYLES = `
            --ha-card-background: transparent; --card-background-color: transparent;
            --ha-card-box-shadow: none; --ha-card-border-width: 0; }
   .panel[hidden] { display: none; }
+  /* The unfolded room cards are custom elements with no display of their own: inline, the separator between them
+     (border-top) would only paint on an empty first line box around their block <ha-card>. */
+  .panel > * { display: block; }
   @media (prefers-reduced-motion: reduce) { .room { animation: none; transition: none; } }
 `;
 
