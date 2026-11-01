@@ -225,36 +225,6 @@ test("the Overview stays unfolded when clicking inside a more-info dialog", () =
   assert.equal(folded, 1);
 });
 
-test("the Overview's plain list is redrawn when an entity of the open room becomes unavailable", () => {
-  const overview = new cards["room-overview-card"]();
-  // Nodes keyed by selector, so the render finds the same elements again.
-  const nodes = {};
-  const node = () => ({ ...fakeNode(), style: { setProperty() {} }, querySelector: (s) => (nodes[s] ||= node()) });
-  overview.shadowRoot = node();
-  nodes["ha-card"] = node();
-  overview._config = { ...cards["room-overview-card"].defaults };
-  overview._hass = makeHass();
-  const realGet = rc.customElements.get;
-  rc.customElements.get = (t) => (t.startsWith("room-") && t !== "room-overview-card" ? undefined : realGet(t));
-  try {
-    overview._toggle("kitchen");
-    assert.equal(overview._fallback, true);
-    let fills = 0;
-    const fill = overview._fillFallback.bind(overview);
-    overview._fillFallback = (...a) => {
-      fills++;
-      fill(...a);
-    };
-    const h = makeHass();
-    h.states["binary_sensor.door"] = { ...h.states["binary_sensor.door"], state: "unavailable" };
-    overview.hass = h; // aggregates unchanged: the door was closed, it is now unavailable
-    assert.equal(fills, 1);
-    assert.match(nodes[".panel"].innerHTML, /Indisponible/);
-  } finally {
-    rc.customElements.get = realGet;
-  }
-});
-
 // An Overview whose shadow-root nodes are kept by selector and record their listeners, so that the header can be
 // clicked and pressed by hand. `calls` collects the service calls.
 const overviewSetup = (options = {}, hass = makeHass()) => {
@@ -697,4 +667,41 @@ test("a door sensor added to an idle room updates the header and tile from 'all 
   overview.hass = doorHass(false); // and back when it is removed
   assert.match(nodes[".head"].innerHTML, /All quiet/);
   assert.match(nodes[".grid"].innerHTML, /All quiet/);
+});
+
+// The room cards unfolded in an overview's panel are custom elements with no display of their own: inline, they wrap
+// their block <ha-card>, and the separator drawn by `.panel > * + *` (border-top) only paints on an empty first line
+// box, so the Sensors, Lights and Plugs cards ran together with no line between them.
+test("the room cards unfolded in an overview's panel are blocks, so their separator spans the panel", () => {
+  const rules = (css) => [...css.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*)\}/g)];
+  const blockChildren = (css) =>
+    rules(css).some(([, sel, body]) => sel.split(",").some((s) => s.trim() === ".panel > *") && /\bdisplay:\s*block\b/.test(body));
+  for (const tag of ["room-overview-card", "room-environment-overview-card"]) {
+    const card = rc.customElements.get(tag);
+    assert.ok(blockChildren(`${rc.RC_BASE_STYLES}${card.styles}`), tag);
+  }
+});
+
+// The open room shows its room cards (one per kind it has), and they, not a plain list, follow the states: an entity
+// becoming unavailable leaves the panel as is and reaches the room card through its hass.
+test("the Overview unfolds a room into its room cards, kept and fed with every hass update", () => {
+  const { overview, nodes } = overviewSetup({ language: "en" });
+  overview._toggle("kitchen");
+  const tags = overview._details.map((el) => el._config.type);
+  assert.deepEqual([...tags], ["custom:room-sensors-card", "custom:room-lights-card", "custom:room-switch-card"]);
+  assert.deepEqual([...nodes[".panel"].children], [...overview._details]);
+  const before = [...overview._details];
+  const h = makeHass();
+  h.states["binary_sensor.door"] = { ...h.states["binary_sensor.door"], state: "unavailable" };
+  overview.hass = h;
+  assert.deepEqual([...overview._details], before, "same cards, not rebuilt");
+  for (const el of overview._details) assert.equal(el._hass, h);
+});
+
+test("the Overview only unfolds the room cards of the kinds a room has", () => {
+  const h = makeHass();
+  for (const id of Object.keys(h.states)) if (!id.startsWith("light.")) delete h.states[id];
+  const { overview } = overviewSetup({ language: "en", zoom: false }, h);
+  overview._toggle("kitchen");
+  assert.deepEqual([...overview._details.map((el) => el._config.type)], ["custom:room-lights-card"]);
 });

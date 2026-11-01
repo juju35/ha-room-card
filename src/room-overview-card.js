@@ -23,10 +23,6 @@ const RO_I18N = {
     sensors: "Sensors",
     lights: "Lights",
     plugs: "Plugs",
-    open: "Open",
-    closed: "Closed",
-    detected: "Detected",
-    clear: "Clear",
     ed_title_helper: "Leave empty for “Home”",
     ed_columns_helper: "Empty: 3, or 2 on narrow screens",
     ed_presence: "Include presence sensors",
@@ -58,10 +54,6 @@ const RO_I18N = {
     sensors: "Capteurs",
     lights: "Lumières",
     plugs: "Prises",
-    open: "Ouvert",
-    closed: "Fermé",
-    detected: "Détectée",
-    clear: "Aucune",
     ed_title_helper: "Laisser vide pour « Maison »",
     ed_columns_helper: "Vide : 3, ou 2 sur les écrans étroits",
     ed_presence: "Inclure les capteurs de présence",
@@ -93,10 +85,6 @@ const RO_I18N = {
     sensors: "Sensoren",
     lights: "Lichter",
     plugs: "Steckdosen",
-    open: "Offen",
-    closed: "Geschlossen",
-    detected: "Erkannt",
-    clear: "Frei",
     ed_title_helper: "Leer lassen für „Zuhause“",
     ed_columns_helper: "Leer: 3, oder 2 auf schmalen Bildschirmen",
     ed_presence: "Anwesenheitssensoren einbeziehen",
@@ -127,10 +115,6 @@ const RO_I18N = {
     sensors: "Sensores",
     lights: "Luces",
     plugs: "Enchufes",
-    open: "Abierto",
-    closed: "Cerrado",
-    detected: "Detectada",
-    clear: "Ninguna",
     ed_title_helper: "Déjalo vacío para «Casa»",
     ed_columns_helper: "Vacío: 3, o 2 en pantallas estrechas",
     ed_presence: "Incluir los sensores de presencia",
@@ -277,12 +261,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
 
     // The sensor count too: a door added to an idle room turns "All quiet" into "All closed" without any state change.
     const parts = rooms.map((x) => [x.id, x.name, x.icon, x.leaks, x.open, x.occupied, x.lightsOn, x.plugsOn, x.watts && Math.round(x.watts), x.sensors.length]);
-    // The plain list of the open room (no room card installed) shows every entity's state.
-    const shown = this._fallback && rooms.find((x) => x.id === this._openArea);
-    const list = shown
-      ? [...shown.sensors, ...shown.presence, ...shown.lights, ...shown.plugs].map((e) => [e.id, e.st.state, e.st.attributes.friendly_name])
-      : null;
-    if (!this._changed([this._openArea, this._zoomed, this._anySensors, parts, list])) return;
+    if (!this._changed([this._openArea, this._zoomed, this._anySensors, parts])) return;
 
     if (!this.shadowRoot.querySelector("ha-card")) {
       this.shadowRoot.innerHTML = `
@@ -480,20 +459,17 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     if (this._confirm) this._closeConfirm();
   }
 
-  // Details of the open room: the room-* cards when installed, a plain list otherwise.
+  // Details of the open room: its room-sensors, room-lights and room-switch cards (same bundle, always defined; a room
+  // only exists with at least one entity, so at least one of them is shown).
   _fillPanel() {
     const x = this._rooms.find((r) => r.id === this._openArea);
     const panel = this.shadowRoot.querySelector(".panel");
     panel.hidden = false;
     const key = JSON.stringify([x.id, x.sensors.length, x.presence.length, x.lights.length, x.plugs.length]);
-    if (this._panelArea === key) {
-      if (this._fallback) this._fillFallback(panel, x);
-      return;
-    }
+    if (this._panelArea === key) return;
     this._panelArea = key;
     panel.innerHTML = "";
     this._details = [];
-    this._fallback = false;
 
     const parts = [
       ["room-sensors-card", x.sensors.length + x.presence.length, { title: this._t("sensors"), presence: this._config.presence }],
@@ -515,34 +491,6 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       el.hass = this._hass;
       panel.appendChild(el);
       this._details.push(el);
-    }
-    if (!this._details.length) {
-      this._fallback = true;
-      this._fillFallback(panel, x);
-    }
-  }
-
-  _fillFallback(panel, x) {
-    const row = (e, kind) => {
-      const st = e.st;
-      const on = st.state === "on";
-      const text = rcUnavailable(st)
-        ? this._t("unavailable")
-        : kind === "sensor"
-          ? this._t(on ? "open" : "closed")
-          : kind === "presence"
-            ? this._t(on ? "detected" : "clear")
-            : this._t(on ? "on" : "off");
-      return `<button class="row${on ? " on" : ""}" data-id="${rcEsc(e.id)}"><span>${rcEsc(st.attributes.friendly_name || e.id)}</span><span>${rcEsc(text)}</span></button>`;
-    };
-    panel.innerHTML = `<div class="list">${[
-      ...x.sensors.map((e) => row(e, "sensor")),
-      ...x.presence.map((e) => row(e, "presence")),
-      ...x.lights.map((e) => row(e, "toggle")),
-      ...x.plugs.map((e) => row(e, "toggle")),
-    ].join("")}</div>`;
-    for (const el of panel.querySelectorAll(".row")) {
-      el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id));
     }
   }
 
@@ -606,12 +554,6 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       .chips { gap: 3px; margin-top: 4px; }
 
       .panel > * + * { border-top: 1px solid var(--divider-color, rgba(127,127,127,.15)); }
-      .list { display: flex; flex-direction: column; padding: 4px; }
-      .row { all: unset; cursor: pointer; display: flex; justify-content: space-between; gap: 8px; padding: 6px 8px; border-radius: 8px;
-             font-size: 13px; color: var(--primary-text-color); }
-      .row span:last-child { color: var(--secondary-text-color); font-size: 12px; }
-      .row.on span:last-child { color: var(--rc-warn); }
-      .row:hover { background: color-mix(in srgb, var(--rc-idle) 12%, transparent); }
 
       @media (prefers-reduced-motion: reduce) { .room .ic { animation: none; } }
     `;
