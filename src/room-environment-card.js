@@ -676,6 +676,12 @@ class RoomEnvironmentCard extends RcCard {
              background: color-mix(in srgb, var(--t) 16%, transparent); }
     .gauge > span { display: block; height: 100%; border-radius: inherit; background: var(--t); transition: width .4s; }
     @media (prefers-reduced-motion: reduce) { .gauge > span { transition: none; } }
+    /* Narrow card (two tiles in 260 px): the reading wins the room of the tile's icon. */
+    @container (max-width: 260px) {
+      .tile { padding-left: 8px; }
+      .tile .ic { display: none; }
+      .gauge { left: 8px; }
+    }
   `;
 }
 
@@ -1042,7 +1048,7 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
       <div class="badge"><ha-icon icon="${this._headIcon(worst)}"></ha-icon></div>
       <div class="title">${rcEsc(c.title || this._t("title"))}</div>
       ${avg}
-      <div class="pill">${rcEsc(status)}</div>
+      <div class="pill" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></div>
       ${rcZoomButton(this)}`;
 
     this._roomGrid(card.querySelector(".grid"), rooms, (x) => {

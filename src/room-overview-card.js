@@ -515,27 +515,28 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       `<button class="chip ${cls} action" data-kind="${kind}" title="${rcEsc(label)}"><ha-icon icon="${icon}"></ha-icon><span>${rcEsc(text)}</span><ha-icon class="off" icon="${offIcon}"></ha-icon></button>`;
     const plugText = watts != null ? rcWatts(watts) : String(plugs);
 
+    // The header chips, in one group: on a narrow card it goes to its own line under the title.
+    const headChips = [
+      occupied ? chip("info", "mdi:account", this._t("rooms_occupied"), String(occupied)) : "",
+      lights
+        ? c.all_off_button !== false
+          ? offChip("light", "lights", "mdi:lightbulb", this._t("turn_lights_off"), String(lights), "mdi:power")
+          : chip("light", "mdi:lightbulb", this._t("lights_on"), String(lights))
+        : "",
+      plugs
+        ? c.plugs_off_button
+          ? offChip("plug", "plugs", "mdi:power-socket-fr", this._t("turn_plugs_off"), plugText, "mdi:power-plug-off")
+          : chip("plug", "mdi:power-socket-fr", this._t("plugs_on"), plugText)
+        : "",
+    ].join("");
+
     const card = this.shadowRoot.querySelector("ha-card");
     card.className = `lvl-${level}`;
     card.querySelector(".head").innerHTML = `
       <div class="badge"><ha-icon icon="${headIcon}"></ha-icon></div>
       <div class="title">${rcEsc(c.title || this._t("title"))}</div>
-      ${occupied ? chip("info", "mdi:account", this._t("rooms_occupied"), String(occupied)) : ""}
-      ${
-        lights
-          ? c.all_off_button !== false
-            ? offChip("light", "lights", "mdi:lightbulb", this._t("turn_lights_off"), String(lights), "mdi:power")
-            : chip("light", "mdi:lightbulb", this._t("lights_on"), String(lights))
-          : ""
-      }
-      ${
-        plugs
-          ? c.plugs_off_button
-            ? offChip("plug", "plugs", "mdi:power-socket-fr", this._t("turn_plugs_off"), plugText, "mdi:power-plug-off")
-            : chip("plug", "mdi:power-socket-fr", this._t("plugs_on"), plugText)
-          : ""
-      }
-      <div class="pill">${rcEsc(status)}</div>
+      ${headChips ? `<div class="hchips">${headChips}</div>` : ""}
+      <div class="pill" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></div>
       ${rcZoomButton(this)}`;
 
     this._roomGrid(card.querySelector(".grid"), rooms, (x) => {
@@ -701,10 +702,12 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       /* A 32 px tall touch target around the 20 px header chips, without changing how they look. */
       .head button.chip { position: relative; }
       .head button.chip::before { content: ""; position: absolute; inset: -6px -3px; }
-      /* Narrow card: the header keeps the title readable (the power icons go, the chips stay tappable). */
+      .hchips { flex: none; display: flex; align-items: center; gap: inherit; }
+      /* Narrow card: the chips go to a line of their own under the title, which keeps the first line (title, status,
+         detail button) readable; they wrap there if they still do not fit. */
       @container (max-width: 340px) {
-        .head { gap: 6px; }
-        .head button.chip .off { display: none; }
+        .head { gap: 6px; flex-wrap: wrap; }
+        .hchips { order: 1; flex: 1 0 100%; flex-wrap: wrap; box-sizing: border-box; padding-left: 46px; }
       }
 
       .confirm[hidden] { display: none; }

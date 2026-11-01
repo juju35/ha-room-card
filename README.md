@@ -35,7 +35,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 
 - One compact tile per room, coloured by what matters most: *Water leak* (red, blinking), *1 open* (orange), *Presence* (blue), otherwise *All closed* / *All quiet*
 - Small chips on each tile for the lights that are on, the plugs that are on with their power draw, and presence when an alert is already shown
-- Header with the home status and totals: occupied rooms, lights on, power drawn by the plugs
+- Header with the home status and totals: occupied rooms, lights on, power drawn by the plugs; on a narrow card (6 columns of a Sections view) the totals move to a line of their own under the title
 - **Tap** the lights chip of the header to turn every light the card counts off (`all_off_button`), and the plugs chip to turn every plug off once confirmed in a popup listing them (`plugs_off_button`, off by default: a plug may feed a camera or a network switch)
 - **Tap** a room to unfold its details at the top of the card: the Sensors, Lights and Plugs cards of that room; tap it again or anywhere else to fold it back
 - Automatic discovery: every area with door, window, leak or presence sensors, lights or plugs becomes a room, with an icon picked from its name

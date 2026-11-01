@@ -443,7 +443,7 @@ test("the sensors mini card: a named pill for each open sensor, quiet ones hidde
   assert.match(html, /class="r on pill"[^>]*data-id="binary_sensor.door"/);
   assert.match(html, /<span>Door<\/span>/);
   assert.equal((html.match(/class="r /g) || []).length, 2); // the door and the (open) diagnostic door
-  assert.match(html, /class="st">2 ouvertures</); // the diagnostic door sensor is open too
+  assert.match(html, /class="pt">2 ouvertures</); // the diagnostic door sensor is open too
   assert.equal(card.getCardSize(), 1);
   card._zoomed = true;
   card._sig = null;

@@ -812,8 +812,8 @@ class RcCard extends HTMLElement {
         <div class="badge"><ha-icon icon="${rcEsc(icon)}"></ha-icon></div>
         <div class="title">${rcEsc(title)}</div>
         ${chips}
-        <button class="pill${allOff ? " action" : ""}" ${allOff ? `title="${rcEsc(this._t("turn_all_off"))}"` : "disabled"}>
-          ${allOff ? '<ha-icon icon="mdi:power"></ha-icon>' : ""}${rcEsc(status)}
+        <button class="pill${allOff ? " action" : ""}" title="${rcEsc(allOff ? this._t("turn_all_off") : status)}"${allOff ? "" : " disabled"}>
+          ${allOff ? '<ha-icon icon="mdi:power"></ha-icon>' : ""}<span class="pt">${rcEsc(status)}</span>
         </button>
       </div>`;
   }
@@ -1040,7 +1040,7 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
             <div class="body">
               <div class="head${nav ? " nav" : ""}"${nav ? ' role="link" tabindex="0"' : ""}>
                 <div class="title">${rcEsc(c.title || this._areaName() || this._t("title"))}</div>
-                <span class="st">${rcEsc(status)}</span>
+                <span class="st" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></span>
               </div>
               <div class="rs">${chips}</div>
             </div>
@@ -1291,7 +1291,7 @@ const RC_BASE_STYLES = `
     --rc-idle: var(--secondary-text-color, #9e9e9e);
     --rc-na: var(--disabled-color, #9e9e9e);
   }
-  ha-card { padding: 12px; overflow: hidden; }
+  ha-card { padding: 12px; overflow: hidden; container-type: inline-size; }
   ha-card.lvl-alert { box-shadow: 0 0 0 1px color-mix(in srgb, var(--rc-alert) 45%, transparent), var(--ha-card-box-shadow, none); }
 
   .head { display: flex; align-items: center; gap: 10px; }
@@ -1301,10 +1301,21 @@ const RC_BASE_STYLES = `
            background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
   .badge ha-icon { --mdc-icon-size: 24px; }
   .lvl-alert .badge { animation: rc-pulse 1.6s ease-in-out infinite; }
-  .title { flex: 1; min-width: 0; font-size: 16px; font-weight: 500; color: var(--primary-text-color);
+  /* Narrow header: the title keeps a few letters (never 0 px), the status pill shrinks and ellipsises, the icon buttons
+     (zoom, power) never shrink; under 200 px the pill is only its coloured dot, its text kept for screen readers. */
+  .title { flex: 1 1 auto; min-width: 5ch; font-size: 16px; font-weight: 500; color: var(--primary-text-color);
            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .pill { all: unset; flex: none; display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 500;
+  .pill { all: unset; flex: 0 1 auto; min-width: 0; max-width: 50%; box-sizing: border-box; position: relative;
+          display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 500;
           padding: 1px 8px; border-radius: 999px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
+  .pt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pill ha-icon { flex: none; }
+  @container (max-width: 200px) {
+    .pill .pt, .st .pt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .pill:not(.action), .st { flex: none; padding: 0; width: 18px; height: 18px; justify-content: center; background: none; }
+    .pill:not(.action)::before, .st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+    .pill.action { padding: 1px 4px; }
+  }
   .pill.action { cursor: pointer; }
   .pill.action:hover { background: color-mix(in srgb, var(--c) 24%, transparent); }
   .pill.action:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
@@ -1391,14 +1402,18 @@ const RC_MINI_STYLES = `${RC_ZOOM_STYLES}
   .mini .badge ha-icon { --mdc-icon-size: 20px; }
   .body { flex: 1; min-width: 0; min-height: 32px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
   .mini .head { gap: 8px; }
-  .mini .title { flex: 0 1 auto; line-height: 1.25; }
-  .st { flex: none; margin-left: auto; font-size: 11px; font-weight: 500; color: var(--c); }
+  .mini .title { line-height: 1.25; }
+  .st { flex: 0 1 auto; min-width: 0; max-width: 50%; position: relative; display: inline-flex; align-items: center;
+        margin-left: auto; font-size: 11px; font-weight: 500; color: var(--c); }
   .rs { display: flex; flex-wrap: wrap; gap: 2px 4px; margin-left: -4px; }
   .rs:empty { display: none; }
+  /* A chip never runs past the card: a long name ends with an ellipsis. */
   .r { all: unset; cursor: pointer; display: inline-flex; align-items: baseline; gap: 1px; padding: 0 5px 0 4px;
+       box-sizing: border-box; min-width: 0; max-width: 100%; overflow: hidden;
        border-radius: 999px; font-size: 12px; font-weight: 500; line-height: 18px; white-space: nowrap; --t: var(--rc-ok);
        color: var(--primary-text-color); }
-  .r ha-icon { --mdc-icon-size: 13px; color: var(--t); align-self: center; margin-right: 2px; }
+  .r ha-icon { --mdc-icon-size: 13px; flex: none; color: var(--t); align-self: center; margin-right: 2px; }
+  .r > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .r.pill { color: var(--t); background: color-mix(in srgb, var(--t) 14%, transparent); }
   .r:hover { background: color-mix(in srgb, var(--t) 20%, var(--secondary-background-color, transparent)); }
   .r:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
