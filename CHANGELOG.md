@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.17.5 - 2026-10-29
+### Fixes
+- Overview: the room details (Sensors, Lights, Plugs) are now separated by a line; in Home Assistant the three cards ran together with no visible separation.
+
+### Maintenance
+- Overview: the plain-list fallback for the room details (meant for a missing room card, which the bundle always ships) is removed, with its unused translations.
+- Screenshots: the `ha-card` stand-in honours the `--ha-card-*` variables like Home Assistant's, so the room-details captures show what the dashboard draws.
+- CI: one Biome version (2.6.3) for the pre-commit hook, `biome.json` and the Lint workflow, which now reads it from `.pre-commit-config.yaml`.
+
 ## 1.17.4 - 2026-10-29
 ### Fixes
 - Visual editors: the help text of *Rooms* on the Environment overview now mentions the per-room `thresholds`, and the help text of *Entities* on the Plugs card mentions `power` (the entity of the plug's power sensor), two keys the cards already read but the editor did not tell about.
