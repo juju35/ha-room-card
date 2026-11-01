@@ -1,5 +1,5 @@
 // Narrow headers: the CSS rules that keep the title readable and every button inside the card at the cards' smallest
-// widths (6 columns of the Sections view for the full cards and the overviews, 4 for the mini cards). There is no
+// widths (6 columns of the Sections view for every card, mini cards included). There is no
 // browser in the test run: the rules are checked here, the rendering itself in Chromium (see the pull request).
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -57,15 +57,18 @@ const container = (css, px, needle) => {
 const BASE = rc.RC_BASE_STYLES;
 const styles = (tag) => `${BASE}${cards[tag].styles}`;
 
-test("Header: the title keeps a few letters and the status pill shrinks with an ellipsis", () => {
+// The title takes what the status pill leaves (flex-basis 0), never under 4 letters: with `flex: 1 1 auto` a long
+// title took its share of the shrinking from the pill too, "Ready" ending "Re…" on a 320 px card.
+test("Header: the status pill keeps its whole label, the title takes what is left (never under 4 letters)", () => {
   const title = decls(BASE, ".title");
-  assert.equal(title.flex, "1 1 auto");
-  assert.match(title["min-width"], /^\d+(\.\d+)?ch$/, "the title never falls to 0 px");
+  assert.equal(title.flex, "1 1 0");
+  const [, ch] = title["min-width"].match(/^(\d+(?:\.\d+)?)ch$/) || [];
+  assert.ok(Number(ch) >= 4, "the title never falls under 4 letters");
   assert.equal(title["text-overflow"], "ellipsis");
   const pill = decls(BASE, ".pill");
   assert.equal(pill.flex, "0 1 auto");
   assert.equal(pill["min-width"], "0");
-  assert.equal(pill["max-width"], "50%");
+  assert.equal(pill["max-width"], undefined, "cut only when the room is really missing, not past half the header");
   const text = decls(BASE, ".pt");
   assert.equal(text["text-overflow"], "ellipsis");
   assert.equal(text.overflow, "hidden");
@@ -100,8 +103,8 @@ test("Mini cards: the status ellipsises instead of pushing out the title and the
   const st = decls(css, ".st");
   assert.equal(st.flex, "0 1 auto");
   assert.equal(st["min-width"], "0");
-  assert.equal(st["max-width"], "50%");
-  assert.equal(decls(css, ".mini .title").flex, undefined, "the mini title keeps the shared flex: 1 1 auto");
+  assert.equal(st["max-width"], undefined);
+  assert.equal(decls(css, ".mini .title").flex, undefined, "the mini title keeps the shared flex: 1 1 0");
 });
 
 test("Mini cards: a chip with a long name ends with an ellipsis inside the card", () => {
@@ -122,7 +125,9 @@ test("Mini cards: a chip with a long name ends with an ellipsis inside the card"
 
 test("Overview: on a narrow card the header chips go to a line of their own", () => {
   const css = styles("room-overview-card");
-  const narrow = container(css, 340, ".hchips");
+  // Up to 420 px: just above 340 px (a phone in masonry, 367-410 px) the chips stayed beside the title and the
+  // status pill took all the shrinking ("Water leak" down to "…").
+  const narrow = container(css, 420, ".hchips");
   assert.match(narrow, /\.head \{[^}]*flex-wrap: wrap/);
   assert.match(narrow, /\.hchips \{[^}]*flex: 1 0 100%/);
   assert.equal(decls(css, ".hchips").flex, "none");
@@ -139,8 +144,57 @@ test("Overview with nothing on: no empty chips group", () => {
   assert.doesNotMatch(overviewWith({}, h), /hchips/);
 });
 
-test("Environment card under 260 px: the tile icon gives its room to the reading", () => {
-  const narrow = container(styles("room-environment-card"), 260, ".ic");
+test("Environment card under 200 px: the tile icon gives its room to the reading", () => {
+  const narrow = container(styles("room-environment-card"), 200, ".ic");
   assert.match(narrow, /\.tile \.ic \{ display: none; \}/);
   assert.match(narrow, /\.gauge \{ left: 8px; \}/);
+});
+
+// Phone width: 6 columns of the Sections view are ~156-178 px, a masonry phone card ~300-370 px.
+test("Tiles: a reading is never cut, it wraps; one tile per row on a card under 260 px", () => {
+  const state = decls(BASE, ".state");
+  assert.equal(state["text-overflow"], undefined, "no ellipsis on the reading");
+  assert.notEqual(state["white-space"], "nowrap");
+  assert.equal(state["overflow-wrap"], "break-word");
+  assert.equal(decls(BASE, ".name")["text-overflow"], "ellipsis", "the name, a label, keeps its ellipsis");
+  assert.match(container(BASE, 260, ".grid"), /\.grid \{ grid-template-columns: minmax\(0, 1fr\); \}/);
+});
+
+test("Mini cards: 6 columns at least (at 4, ~104-121 px on a phone, the zoom button left the card)", () => {
+  for (const tag of ["room-sensors-mini-card", "room-environment-mini-card"]) {
+    assert.equal(new cards[tag]().getGridOptions().min_columns, 6, tag);
+  }
+});
+
+// layout-card, button-card, a grid's `auto` column: the container query's inline-size containment drops the content
+// from the card's natural width, which fell to its padding (~26 px).
+test("Cards keep a natural width in a wrapper sized by its content", () => {
+  const card = decls(BASE, "ha-card");
+  assert.equal(card["container-type"], "inline-size");
+  assert.match(card["contain-intrinsic-inline-size"] || "", /^\d+px$/);
+  assert.ok(Number.parseInt(card["contain-intrinsic-inline-size"], 10) >= 280);
+});
+
+// That natural width is also the card's min-content width: in a grid's 1fr columns (grid card, layout-card) or a
+// horizontal stack, two cards at 320-500 px overflowed by up to 380 px until the host was allowed to shrink.
+test("Cards shrink in a 1fr column or a horizontal stack: the host's min-width is 0, never a px width", () => {
+  const host = decls(BASE.replace(/\/\*[\s\S]*?\*\//g, ""), ":host");
+  assert.equal(host["min-width"], "0");
+  for (const [tag, card] of Object.entries(cards)) {
+    assert.doesNotMatch(`${BASE}${card.styles || ""}`, /:host\s*\{[^}]*min-width:\s*\d+px/, tag);
+  }
+});
+
+// At 6 columns on a phone (~234-245 px) the title is at its few letters already: "Włączone: 4 · 1.3 kW",
+// "Do sprawdzenia: 1" or "Otwarte: 2" ended with "…". The pill goes to a line of its own, under the title.
+test("Header under 260 px: the status pill goes to a line of its own instead of being cut", () => {
+  const narrow = container(BASE, 260, ".head::after");
+  assert.match(narrow, /\.head \{[^}]*flex-wrap: wrap/);
+  assert.match(narrow, /\.head::after \{[^}]*flex: 1 0 100%/);
+  assert.match(narrow, /\.head > \.pill \{[^}]*order: 2/);
+  // Under 200 px it is only its dot again, back on the title's line.
+  const dot = container(BASE, 200, ".head::after");
+  assert.match(dot, /\.head::after \{ content: none; \}/);
+  // The overview keeps its pill on the first line: its chips have the second one.
+  assert.match(container(cards["room-overview-card"].styles, 260, ".head::after"), /\.head > \.pill \{ order: 0;/);
 });
