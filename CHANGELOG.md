@@ -2,17 +2,20 @@
 
 ## 1.17.8 - 2026-11-01
 ### Fixes
-- Overview: on a narrow card (6 columns of a Sections view, about 245 to 340 px) the title no longer disappears and the detail button no longer slides out of the card: the header's totals (occupied rooms, lights, plugs) move to a line of their own under the title, power icons included.
-- Every card: the header title always keeps a few letters (ending with "…") and the status pill shrinks with an ellipsis instead of pushing the buttons out; below 200 px (mini cards at 4 columns) the status shows as its coloured dot, its text kept in the tooltip and for screen readers.
-- Mini cards zoomed in at 4 columns: the full card's header uses the mini badge size and leaves out its side chip (presence, shown on its tile anyway), so the title, status and zoom button fit.
+- Overview: on a narrow card (6 columns of a Sections view, or a phone in a masonry view: up to about 445 px) the title no longer disappears, the status (*Water leak*) is no longer cut down to "…" and the detail button no longer slides out of the card: the header's totals (occupied rooms, lights, plugs) move to a line of their own under the title, power icons included.
+- Every card: the status pill shows its whole label (*Ready*, *Water leak*) whenever there is room for it, the title giving way first; the title always keeps a few letters (ending with "…"), and the pill only shrinks with an ellipsis when the room really runs out, instead of pushing the buttons out. On a card of 260 px or less (6 columns on a phone) the pill moves to a line of its own under the title, where its whole label fits (*Włączone: 4 · 1.3 kW*, *Za wilgotno +2*). Below 200 px the status shows as its coloured dot, its text kept in the tooltip and for screen readers.
+- Mini cards: the smallest width in a Sections view is now 6 columns (was 4: about 104-121 px on a phone, where the zoom button left the card). Zoomed in on a phone, the full card's header uses the mini badge size and leaves out its side chip (presence, shown on its tile anyway), so the title, status and zoom button fit.
 - Mini cards: a long sensor name in a chip now ends with "…" inside the card instead of being cut off at its edge.
-- Environment card: on a narrow card (two tiles in 260 px or less) the tiles drop their icon so that the reading (*1,380 ppm*, *24.6 °*) is shown in full.
+- Sensors, lights, plugs and environment cards: a reading is never cut any more (*1,380 ppm*, *24.6 °*, *Open for 12 min*): on a narrow tile it goes on to a second line, and a card of 260 px or less (6 columns on a phone) shows one tile per row; under 200 px the environment tiles also drop their icon.
+- Overview and environment overview: in a wrapper sized by its content (layout-card, button-card, a grid's `auto` column) the card no longer shrinks to a sliver; it still shrinks with its column in a grid card or a horizontal stack.
+- Focus: after the plugs confirmation opens or the zoom button is redrawn, the focus moves without scrolling the dashboard.
 - Serbian: counts now use the right form for 1, 2-4 and 5+ (*2 uključene*, *5 uključenih*, *Isključiti ove 2 utičnice?*) instead of "uključeno/ih"; a light's state is neuter (*Uključeno*, like *svetlo*); the editors' exclusion lists read *Izostavi …* rather than "… za isključivanje" (which read as "to turn off").
 
 ### Maintenance
 - CI: Biome 2.6.4 for the pre-commit hook, `biome.json` and the Lint workflow.
 - Screenshots: the `ha-icon` stand-in takes its display from a `:host` rule, like Home Assistant's, so the cards' rules hiding an icon apply in the captures.
 - Changelog: 1.17.5 is dated 2026-11-01, the day it was released.
+- Screenshots: a capture or an animation is only rewritten when its decoded pixels change (PNG and GIF bytes vary from one run or machine to the next), and the GIFs use a fixed palette and ordered dithering, so an unchanged picture no longer shows up as a change to commit.
 
 ## 1.17.7 - 2026-11-01
 ### Features
