@@ -19,7 +19,14 @@ for (const [name, i18n] of tables) {
     assert.deepEqual(Object.keys(i18n), LANGS);
     const ref = Object.keys(i18n.en).sort();
     for (const lang of LANGS.slice(1)) {
-      const keys = Object.keys(i18n[lang]).filter((k) => !GENDERED.includes(k));
+      // `_few` (Serbian 2-4) is optional, next to a `_one` / `_many` pair, with the same placeholders.
+      const few = Object.keys(i18n[lang]).filter((k) => k.endsWith("_few"));
+      for (const k of few) {
+        const base = k.slice(0, -4);
+        assert.ok(`${base}_many` in i18n.en && `${base}_one` in i18n.en, `${name}.${lang}.${k} has no _one / _many pair`);
+        assert.deepEqual(vars(i18n[lang][k]), vars(i18n.en[`${base}_many`]), `${name}.${lang}.${k} placeholders`);
+      }
+      const keys = Object.keys(i18n[lang]).filter((k) => !GENDERED.includes(k) && !few.includes(k));
       assert.deepEqual(keys.sort(), ref, `${name}.${lang}`);
       for (const k of ref) {
         const [en, tr] = [i18n.en[k], i18n[lang][k]];
