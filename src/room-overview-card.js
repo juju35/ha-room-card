@@ -23,10 +23,6 @@ const RO_I18N = {
     sensors: "Sensors",
     lights: "Lights",
     plugs: "Plugs",
-    open: "Open",
-    closed: "Closed",
-    detected: "Detected",
-    clear: "Clear",
     ed_title_helper: "Leave empty for “Home”",
     ed_columns_helper: "Empty: 3, or 2 on narrow screens",
     ed_presence: "Include presence sensors",
@@ -58,10 +54,6 @@ const RO_I18N = {
     sensors: "Capteurs",
     lights: "Lumières",
     plugs: "Prises",
-    open: "Ouvert",
-    closed: "Fermé",
-    detected: "Détectée",
-    clear: "Aucune",
     ed_title_helper: "Laisser vide pour « Maison »",
     ed_columns_helper: "Vide : 3, ou 2 sur les écrans étroits",
     ed_presence: "Inclure les capteurs de présence",
@@ -93,10 +85,6 @@ const RO_I18N = {
     sensors: "Sensoren",
     lights: "Lichter",
     plugs: "Steckdosen",
-    open: "Offen",
-    closed: "Geschlossen",
-    detected: "Erkannt",
-    clear: "Frei",
     ed_title_helper: "Leer lassen für „Zuhause“",
     ed_columns_helper: "Leer: 3, oder 2 auf schmalen Bildschirmen",
     ed_presence: "Anwesenheitssensoren einbeziehen",
@@ -127,10 +115,6 @@ const RO_I18N = {
     sensors: "Sensores",
     lights: "Luces",
     plugs: "Enchufes",
-    open: "Abierto",
-    closed: "Cerrado",
-    detected: "Detectada",
-    clear: "Ninguna",
     ed_title_helper: "Déjalo vacío para «Casa»",
     ed_columns_helper: "Vacío: 3, o 2 en pantallas estrechas",
     ed_presence: "Incluir los sensores de presencia",
@@ -144,6 +128,186 @@ const RO_I18N = {
     ed_sort_state: "Primero las habitaciones que requieren atención",
     ed_exclude: "Entidades a excluir",
     ed_exclude_helper: "Se ignoran en los mosaicos, los totales y el detalle de las habitaciones",
+  },
+  sr: {
+    title: "Кућа",
+    presence: "Присутност",
+    no_rooms: "Нема просторија са сензорима, светлима или утичницама",
+    lights_on: "Светла укључена",
+    plugs_on: "Утичнице укључене",
+    turn_lights_off: "Искључи сва светла",
+    turn_plugs_off: "Искључи све утичнице",
+    confirm_plugs_one: "Искључити ову утичницу?",
+    confirm_plugs_many: "Искључити ових {n} утичница?",
+    turn_off: "Искључи",
+    cancel: "Откажи",
+    rooms_occupied: "Заузете просторије",
+    sensors: "Сензори",
+    lights: "Светла",
+    plugs: "Утичнице",
+    ed_title_helper: "Остави празно за „Кућа“",
+    ed_columns_helper: "Празно: 3, или 2 на уским екранима",
+    ed_presence: "Укључи сензоре присутности",
+    ed_presence_helper: "Сензори присутности и покрета, камере су искључене",
+    ed_zoom: "Дугме за детаље",
+    ed_zoom_helper: "Приказују се само просторије у којима је нешто отворено, укључено или детектовано; дугме приказује све просторије. Искључено: све просторије, увек",
+    ed_all_off_button: "Дугме „Искључи сва светла“",
+    ed_all_off_button_helper: "Додир на чип за светла у заглављу искључује сва светла која картица броји",
+    ed_plugs_off_button: "Дугме „Искључи све утичнице“",
+    ed_plugs_off_button_helper: "Додир на чип за утичнице у заглављу приказује листу свих укључених утичница које картица броји и искључује их након потврде; такође доступно на картици утичница у детаљима просторије. Подразумевано искључено: утичница може напајати камеру или мрежни свич",
+    ed_sort_state: "Прво просторије које захтевају пажњу",
+    ed_exclude: "Ентитети за искључивање",
+    ed_exclude_helper: "Изостављено из плочица, укупних вредности и детаља просторије",
+  },
+  "sr-Latn": {
+    title: "Kuća",
+    presence: "Prisutnost",
+    no_rooms: "Nema prostorija sa senzorima, svetlima ili utičnicama",
+    lights_on: "Svetla uključena",
+    plugs_on: "Utičnice uključene",
+    turn_lights_off: "Isključi sva svetla",
+    turn_plugs_off: "Isključi sve utičnice",
+    confirm_plugs_one: "Isključiti ovu utičnicu?",
+    confirm_plugs_many: "Isključiti ovih {n} utičnica?",
+    turn_off: "Isključi",
+    cancel: "Otkaži",
+    rooms_occupied: "Zauzete prostorije",
+    sensors: "Senzori",
+    lights: "Svetla",
+    plugs: "Utičnice",
+    ed_title_helper: "Ostavi prazno za „Kuća“",
+    ed_columns_helper: "Prazno: 3, ili 2 na uskim ekranima",
+    ed_presence: "Uključi senzore prisutnosti",
+    ed_presence_helper: "Senzori prisutnosti i pokreta, kamere su isključene",
+    ed_zoom: "Dugme za detalje",
+    ed_zoom_helper: "Prikazuju se samo prostorije u kojima je nešto otvoreno, uključeno ili detektovano; dugme prikazuje sve prostorije. Isključeno: sve prostorije, uvek",
+    ed_all_off_button: "Dugme „Isključi sva svetla“",
+    ed_all_off_button_helper: "Dodir na čip za svetla u zaglavlju isključuje sva svetla koja kartica broji",
+    ed_plugs_off_button: "Dugme „Isključi sve utičnice“",
+    ed_plugs_off_button_helper: "Dodir na čip za utičnice u zaglavlju prikazuje listu svih uključenih utičnica koje kartica broji i isključuje ih nakon potvrde; takođe dostupno na kartici utičnica u detaljima prostorije. Podrazumevano isključeno: utičnica može napajati kameru ili mrežni svič",
+    ed_sort_state: "Prvo prostorije koje zahtevaju pažnju",
+    ed_exclude: "Entiteti za isključivanje",
+    ed_exclude_helper: "Izostavljeno iz pločica, ukupnih vrednosti i detalja prostorije",
+  },
+  it: {
+    title: "Casa",
+    presence: "Presenza",
+    no_rooms: "Nessuna stanza con sensori, luci o prese",
+    lights_on: "Luci accese",
+    plugs_on: "Prese accese",
+    turn_lights_off: "Spegni tutte le luci",
+    turn_plugs_off: "Spegni tutte le prese",
+    confirm_plugs_one: "Spegnere questa presa?",
+    confirm_plugs_many: "Spegnere queste {n} prese?",
+    turn_off: "Spegni",
+    cancel: "Annulla",
+    rooms_occupied: "Stanze occupate",
+    sensors: "Sensori",
+    lights: "Luci",
+    plugs: "Prese",
+    ed_title_helper: "Lascia vuoto per «Casa»",
+    ed_columns_helper: "Vuoto: 3, o 2 sugli schermi stretti",
+    ed_presence: "Includi i sensori di presenza",
+    ed_presence_helper: "Sensori di presenza e di movimento, telecamere escluse",
+    ed_zoom: "Pulsante dettagli",
+    ed_zoom_helper: "Vengono mostrate solo le stanze con qualcosa di aperto, acceso o rilevato; il pulsante mostra tutte le stanze. Disattivato: sempre tutte le stanze",
+    ed_all_off_button: "Pulsante «Spegni tutte le luci»",
+    ed_all_off_button_helper: "Toccando il chip delle luci nell'intestazione si spengono tutte le luci contate dalla scheda",
+    ed_plugs_off_button: "Pulsante «Spegni tutte le prese»",
+    ed_plugs_off_button_helper: "Toccando il chip delle prese nell'intestazione si elencano le prese accese contate dalla scheda, che vengono spente dopo la conferma; anche nella scheda Prese dei dettagli della stanza. Disattivato per impostazione predefinita: una presa può alimentare una telecamera o uno switch di rete",
+    ed_sort_state: "Prima le stanze che richiedono attenzione",
+    ed_exclude: "Entità da escludere",
+    ed_exclude_helper: "Ignorate nei riquadri, nei totali e nei dettagli delle stanze",
+  },
+  nl: {
+    title: "Thuis",
+    presence: "Aanwezigheid",
+    no_rooms: "Geen ruimte met sensoren, lampen of stekkers",
+    lights_on: "Lampen aan",
+    plugs_on: "Stekkers aan",
+    turn_lights_off: "Alle lampen uitschakelen",
+    turn_plugs_off: "Alle stekkers uitschakelen",
+    confirm_plugs_one: "Deze stekker uitschakelen?",
+    confirm_plugs_many: "Deze {n} stekkers uitschakelen?",
+    turn_off: "Uitschakelen",
+    cancel: "Annuleren",
+    rooms_occupied: "Bezette ruimtes",
+    sensors: "Sensoren",
+    lights: "Lampen",
+    plugs: "Stekkers",
+    ed_title_helper: "Leeg laten voor “Thuis”",
+    ed_columns_helper: "Leeg: 3, of 2 op smalle schermen",
+    ed_presence: "Aanwezigheidssensoren meenemen",
+    ed_presence_helper: "Aanwezigheids- en bewegingssensoren, zonder camera's",
+    ed_zoom: "Detailknop",
+    ed_zoom_helper: "Alleen ruimtes waar iets open, aan of gedetecteerd is worden getoond; de knop toont alle ruimtes. Uit: altijd alle ruimtes",
+    ed_all_off_button: "Knop “Alle lampen uitschakelen”",
+    ed_all_off_button_helper: "Een tik op de lampenchip in de koptekst schakelt alle lampen uit die de kaart telt",
+    ed_plugs_off_button: "Knop “Alle stekkers uitschakelen”",
+    ed_plugs_off_button_helper: "Een tik op de stekkerchip in de koptekst toont alle ingeschakelde stekkers die de kaart telt en schakelt ze na bevestiging uit; ook op de kaart Stekkers in de ruimtedetails. Standaard uit: een stekker kan een camera of een netwerkswitch voeden",
+    ed_sort_state: "Ruimtes die aandacht nodig hebben eerst",
+    ed_exclude: "Uit te sluiten entiteiten",
+    ed_exclude_helper: "Niet meegeteld in de tegels, de totalen en de ruimtedetails",
+  },
+  pt: {
+    title: "Casa",
+    presence: "Presença",
+    no_rooms: "Nenhuma divisão com sensores, luzes ou tomadas",
+    lights_on: "Luzes acesas",
+    plugs_on: "Tomadas ligadas",
+    turn_lights_off: "Apagar todas as luzes",
+    turn_plugs_off: "Desligar todas as tomadas",
+    confirm_plugs_one: "Desligar esta tomada?",
+    confirm_plugs_many: "Desligar estas {n} tomadas?",
+    turn_off: "Desligar",
+    cancel: "Cancelar",
+    rooms_occupied: "Divisões ocupadas",
+    sensors: "Sensores",
+    lights: "Luzes",
+    plugs: "Tomadas",
+    ed_title_helper: "Deixe vazio para «Casa»",
+    ed_columns_helper: "Vazio: 3, ou 2 em ecrãs estreitos",
+    ed_presence: "Incluir os sensores de presença",
+    ed_presence_helper: "Sensores de presença e de movimento, sem câmaras",
+    ed_zoom: "Botão de detalhe",
+    ed_zoom_helper: "Só são mostradas as divisões com algo aberto, ligado ou detetado; o botão mostra todas as divisões. Desativado: sempre todas as divisões",
+    ed_all_off_button: "Botão «Apagar todas as luzes»",
+    ed_all_off_button_helper: "Tocar no chip das luzes do cabeçalho apaga todas as luzes contadas pelo cartão",
+    ed_plugs_off_button: "Botão «Desligar todas as tomadas»",
+    ed_plugs_off_button_helper: "Tocar no chip das tomadas do cabeçalho lista as tomadas ligadas contadas pelo cartão e desliga-as após confirmação; também no cartão Tomadas do detalhe das divisões. Desativado por predefinição: uma tomada pode alimentar uma câmara ou um switch de rede",
+    ed_sort_state: "Primeiro as divisões que precisam de atenção",
+    ed_exclude: "Entidades a excluir",
+    ed_exclude_helper: "Ignoradas nos mosaicos, nos totais e no detalhe das divisões",
+  },
+  pl: {
+    title: "Dom",
+    presence: "Obecność",
+    no_rooms: "Brak pomieszczeń z czujnikami, światłami lub gniazdkami",
+    lights_on: "Włączone światła",
+    plugs_on: "Włączone gniazdka",
+    turn_lights_off: "Wyłącz wszystkie światła",
+    turn_plugs_off: "Wyłącz wszystkie gniazdka",
+    confirm_plugs_one: "Wyłączyć to gniazdko?",
+    confirm_plugs_many: "Wyłączyć te gniazdka ({n})?",
+    turn_off: "Wyłącz",
+    cancel: "Anuluj",
+    rooms_occupied: "Zajęte pomieszczenia",
+    sensors: "Czujniki",
+    lights: "Światła",
+    plugs: "Gniazdka",
+    ed_title_helper: "Pozostaw puste, aby użyć nazwy „Dom”",
+    ed_columns_helper: "Puste: 3 lub 2 na wąskich ekranach",
+    ed_presence: "Uwzględnij czujniki obecności",
+    ed_presence_helper: "Czujniki obecności i ruchu, bez kamer",
+    ed_zoom: "Przycisk szczegółów",
+    ed_zoom_helper: "Wyświetlane są tylko pomieszczenia, w których coś jest otwarte, włączone lub wykryte; przycisk pokazuje wszystkie pomieszczenia. Wyłączone: zawsze wszystkie pomieszczenia",
+    ed_all_off_button: "Przycisk „Wyłącz wszystkie światła”",
+    ed_all_off_button_helper: "Dotknięcie chipa świateł w nagłówku wyłącza wszystkie światła liczone przez kartę",
+    ed_plugs_off_button: "Przycisk „Wyłącz wszystkie gniazdka”",
+    ed_plugs_off_button_helper: "Dotknięcie chipa gniazdek w nagłówku wyświetla listę włączonych gniazdek liczonych przez kartę i wyłącza je po potwierdzeniu; także na karcie Gniazdka w szczegółach pomieszczenia. Domyślnie wyłączone: gniazdko może zasilać kamerę lub switch sieciowy",
+    ed_sort_state: "Najpierw pomieszczenia wymagające uwagi",
+    ed_exclude: "Encje do wykluczenia",
+    ed_exclude_helper: "Pomijane w kafelkach, sumach i szczegółach pomieszczeń",
   },
 };
 
@@ -277,12 +441,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
 
     // The sensor count too: a door added to an idle room turns "All quiet" into "All closed" without any state change.
     const parts = rooms.map((x) => [x.id, x.name, x.icon, x.leaks, x.open, x.occupied, x.lightsOn, x.plugsOn, x.watts && Math.round(x.watts), x.sensors.length]);
-    // The plain list of the open room (no room card installed) shows every entity's state.
-    const shown = this._fallback && rooms.find((x) => x.id === this._openArea);
-    const list = shown
-      ? [...shown.sensors, ...shown.presence, ...shown.lights, ...shown.plugs].map((e) => [e.id, e.st.state, e.st.attributes.friendly_name])
-      : null;
-    if (!this._changed([this._openArea, this._zoomed, this._anySensors, parts, list])) return;
+    if (!this._changed([this._openArea, this._zoomed, this._anySensors, parts])) return;
 
     if (!this.shadowRoot.querySelector("ha-card")) {
       this.shadowRoot.innerHTML = `
@@ -480,20 +639,17 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     if (this._confirm) this._closeConfirm();
   }
 
-  // Details of the open room: the room-* cards when installed, a plain list otherwise.
+  // Details of the open room: its room-sensors, room-lights and room-switch cards (same bundle, always defined; a room
+  // only exists with at least one entity, so at least one of them is shown).
   _fillPanel() {
     const x = this._rooms.find((r) => r.id === this._openArea);
     const panel = this.shadowRoot.querySelector(".panel");
     panel.hidden = false;
     const key = JSON.stringify([x.id, x.sensors.length, x.presence.length, x.lights.length, x.plugs.length]);
-    if (this._panelArea === key) {
-      if (this._fallback) this._fillFallback(panel, x);
-      return;
-    }
+    if (this._panelArea === key) return;
     this._panelArea = key;
     panel.innerHTML = "";
     this._details = [];
-    this._fallback = false;
 
     const parts = [
       ["room-sensors-card", x.sensors.length + x.presence.length, { title: this._t("sensors"), presence: this._config.presence }],
@@ -515,34 +671,6 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       el.hass = this._hass;
       panel.appendChild(el);
       this._details.push(el);
-    }
-    if (!this._details.length) {
-      this._fallback = true;
-      this._fillFallback(panel, x);
-    }
-  }
-
-  _fillFallback(panel, x) {
-    const row = (e, kind) => {
-      const st = e.st;
-      const on = st.state === "on";
-      const text = rcUnavailable(st)
-        ? this._t("unavailable")
-        : kind === "sensor"
-          ? this._t(on ? "open" : "closed")
-          : kind === "presence"
-            ? this._t(on ? "detected" : "clear")
-            : this._t(on ? "on" : "off");
-      return `<button class="row${on ? " on" : ""}" data-id="${rcEsc(e.id)}"><span>${rcEsc(st.attributes.friendly_name || e.id)}</span><span>${rcEsc(text)}</span></button>`;
-    };
-    panel.innerHTML = `<div class="list">${[
-      ...x.sensors.map((e) => row(e, "sensor")),
-      ...x.presence.map((e) => row(e, "presence")),
-      ...x.lights.map((e) => row(e, "toggle")),
-      ...x.plugs.map((e) => row(e, "toggle")),
-    ].join("")}</div>`;
-    for (const el of panel.querySelectorAll(".row")) {
-      el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id));
     }
   }
 
@@ -606,12 +734,6 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       .chips { gap: 3px; margin-top: 4px; }
 
       .panel > * + * { border-top: 1px solid var(--divider-color, rgba(127,127,127,.15)); }
-      .list { display: flex; flex-direction: column; padding: 4px; }
-      .row { all: unset; cursor: pointer; display: flex; justify-content: space-between; gap: 8px; padding: 6px 8px; border-radius: 8px;
-             font-size: 13px; color: var(--primary-text-color); }
-      .row span:last-child { color: var(--secondary-text-color); font-size: 12px; }
-      .row.on span:last-child { color: var(--rc-warn); }
-      .row:hover { background: color-mix(in srgb, var(--rc-idle) 12%, transparent); }
 
       @media (prefers-reduced-motion: reduce) { .room .ic { animation: none; } }
     `;
