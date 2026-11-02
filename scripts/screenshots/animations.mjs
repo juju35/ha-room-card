@@ -3,7 +3,7 @@
 // CSS animations are paused and stepped frame by frame — each one by a fraction of its own cycle, so every GIF
 // loops cleanly whatever the machine's speed; the brightness drag is driven step by step with real pointer events.
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { copyFileSync, existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { cardClip, iconsFor, launch, mountCard, openPage, root } from "./harness.mjs";
@@ -13,13 +13,27 @@ const WIDTH = 460;
 
 const frameName = (i) => `f${String(i).padStart(3, "0")}.png`;
 
+// Every decoded frame (RGBA) and its timing, as ffmpeg's per-frame MD5 list: equal lists, same animation.
+const decodedFrames = (file) =>
+  execFileSync("ffmpeg", ["-loglevel", "error", "-i", file, "-pix_fmt", "rgba", "-f", "framemd5", "-"], { encoding: "utf8" })
+    .split("\n")
+    .filter((line) => line && !line.startsWith("#"))
+    .join("\n");
+
+// A deterministic GIF: frames stepped in paused animations (never the clock), the palette computed from those frames
+// only, ordered (Bayer) dithering, bit-exact muxing. The file in place is only replaced when its decoded frames differ:
+// GIF bytes can still vary with the ffmpeg build, and an unchanged animation must not show up as a change to commit.
 const encode = (dir, out) => {
+  const gif = join(dir, "out.gif");
   execFileSync("ffmpeg", [
     "-y", "-loglevel", "error", "-framerate", String(FPS), "-i", join(dir, "f%03d.png"),
     "-vf", `scale=${WIDTH + 32}:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=bayer:bayer_scale=4`,
-    "-loop", "0", `${root}${out}`,
+    "-fflags", "+bitexact", "-flags", "+bitexact", "-loop", "0", gif,
   ]);
-  console.log(out);
+  const target = `${root}${out}`;
+  const same = existsSync(target) && decodedFrames(target) === decodedFrames(gif);
+  if (!same) copyFileSync(gif, target);
+  console.log(`${out}${same ? " (unchanged)" : ""}`);
 };
 
 // Steps every CSS animation of the page to `frac` of its own cycle: a GIF of one cycle loops seamlessly even when
@@ -151,7 +165,8 @@ for (const theme of ["light", "dark"]) {
     const y = box.y + box.height / 2;
     const at = (pct) => box.x + (box.width * pct) / 100;
     let frame = 0;
-    const grab = () => page.screenshot({ path: join(dir, frameName(frame++)), clip, animations: "allow" });
+    // Transitions finished before each shot (the bar's width eases in .4 s): a frame never depends on the timing.
+    const grab = () => page.screenshot({ path: join(dir, frameName(frame++)), clip, animations: "disabled" });
     await page.mouse.move(at(30), y);
     await grab();
     await page.mouse.down();

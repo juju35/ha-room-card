@@ -147,7 +147,7 @@ const RS_I18N = {
     ed_blink: "Треперење упозорења",
     ed_include: "Сензори за додавање",
     ed_include_helper: "Из друге просторије или без ње",
-    ed_exclude: "Сензори за искључивање",
+    ed_exclude: "Изостави сензоре",
   },
   "sr-Latn": {
     ed_columns_helper: "Mini kartica: kolone u uvećanom prikazu",
@@ -175,7 +175,7 @@ const RS_I18N = {
     ed_blink: "Treperenje upozorenja",
     ed_include: "Senzori za dodavanje",
     ed_include_helper: "Iz druge prostorije ili bez nje",
-    ed_exclude: "Senzori za isključivanje",
+    ed_exclude: "Izostavi senzore",
   },
   it: {
     ed_columns_helper: "Mini scheda: colonne della vista ingrandita",

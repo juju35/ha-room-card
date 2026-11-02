@@ -168,7 +168,7 @@ const RE_I18N = {
     ed_show_gauge_helper: "Танка линија испод сваког очитавања, обојена у зависности од нивоа",
     ed_include: "Сензори за додавање",
     ed_include_helper: "Из друге просторије или без ње",
-    ed_exclude: "Сензори за искључивање",
+    ed_exclude: "Изостави сензоре",
   },
   "sr-Latn": {
     ed_columns_helper: "Mini kartica: kolone u uvećanom prikazu",
@@ -201,7 +201,7 @@ const RE_I18N = {
     ed_show_gauge_helper: "Tanka linija ispod svakog očitavanja, obojena u zavisnosti od nivoa",
     ed_include: "Senzori za dodavanje",
     ed_include_helper: "Iz druge prostorije ili bez nje",
-    ed_exclude: "Senzori za isključivanje",
+    ed_exclude: "Izostavi senzore",
   },
   it: {
     ed_columns_helper: "Mini scheda: colonne della vista ingrandita",
@@ -676,6 +676,12 @@ class RoomEnvironmentCard extends RcCard {
              background: color-mix(in srgb, var(--t) 16%, transparent); }
     .gauge > span { display: block; height: 100%; border-radius: inherit; background: var(--t); transition: width .4s; }
     @media (prefers-reduced-motion: reduce) { .gauge > span { transition: none; } }
+    /* Very narrow card (a phone, 6 columns: one tile per row of ~130 px): the reading wins the room of the tile's icon. */
+    @container (max-width: 200px) {
+      .tile { padding-left: 8px; }
+      .tile .ic { display: none; }
+      .gauge { left: 8px; }
+    }
   `;
 }
 
@@ -1026,7 +1032,7 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
     const status = !this._total
       ? this._t("no_rooms")
       : toCheck
-        ? this._t(toCheck > 1 ? "check_many" : "check_one", { n: toCheck })
+        ? this._tn("check", toCheck)
         : worst
           ? worst.word
           : this._t("comfortable");
@@ -1042,7 +1048,7 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
       <div class="badge"><ha-icon icon="${this._headIcon(worst)}"></ha-icon></div>
       <div class="title">${rcEsc(c.title || this._t("title"))}</div>
       ${avg}
-      <div class="pill">${rcEsc(status)}</div>
+      <div class="pill" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></div>
       ${rcZoomButton(this)}`;
 
     this._roomGrid(card.querySelector(".grid"), rooms, (x) => {

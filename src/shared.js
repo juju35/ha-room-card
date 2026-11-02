@@ -185,7 +185,7 @@ const rcZoomClick = (card, ev) => {
   card._zoomed = !card._zoomed;
   card._sig = null;
   card._render();
-  if (ev.detail === 0) card.shadowRoot.querySelector(".zoom")?.focus();
+  if (ev.detail === 0) card.shadowRoot.querySelector(".zoom")?.focus({ preventScroll: true });
   return true;
 };
 
@@ -359,7 +359,8 @@ const RC_I18N = {
     all_closed: "Све је затворено",
     all_quiet: "Све је мирно",
     open_one: "{n} отворено",
-    open_many: "{n} отворено/их",
+    open_few: "{n} отворена",
+    open_many: "{n} отворених",
     leak: "Цурење воде",
     unavailable: "Недоступно",
     on: "Укључено",
@@ -390,13 +391,14 @@ const RC_I18N = {
     rooms_check: "Само собе које захтевају пажњу",
     ed_sort: "Сортирање",
     ed_sort_name: "По имену",
-    ed_exclude_areas: "Собе за искључивање",
+    ed_exclude_areas: "Изостави собе",
   },
   "sr-Latn": {
     all_closed: "Sve je zatvoreno",
     all_quiet: "Sve je mirno",
     open_one: "{n} otvoreno",
-    open_many: "{n} otvoreno/ih",
+    open_few: "{n} otvorena",
+    open_many: "{n} otvorenih",
     leak: "Curenje vode",
     unavailable: "Nedostupno",
     on: "Uključeno",
@@ -427,7 +429,7 @@ const RC_I18N = {
     rooms_check: "Samo sobe koje zahtevaju pažnju",
     ed_sort: "Sortiranje",
     ed_sort_name: "Po imenu",
-    ed_exclude_areas: "Sobe za isključivanje",
+    ed_exclude_areas: "Izostavi sobe",
   },
   it: {
     all_closed: "Tutto chiuso",
@@ -592,6 +594,22 @@ const rcT = (i18n, lang, key, vars = {}) => {
   return s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
 };
 
+// Plural key for `n` items: `<base>_one`, `<base>_few` or `<base>_many` (the "other" form), from the CLDR category of
+// `n` in `lang` (Serbian 1 / 2-4 / 5+, 21 / 22…). `_few` is optional: without it, `_many` is used. A `_one` text without
+// {n} ("Turn this plug off?") only means exactly one.
+const rcPluralKey = (i18n, lang, base, n) => {
+  let cat;
+  try {
+    cat = new Intl.PluralRules(lang).select(n);
+  } catch {
+    cat = n === 1 ? "one" : "other";
+  }
+  const text = (k) => i18n[lang]?.[k] ?? RC_I18N[lang]?.[k];
+  if (cat === "one" && (n === 1 || text(`${base}_one`)?.includes("{n}"))) return `${base}_one`;
+  if (cat === "few" && text(`${base}_few`) != null) return `${base}_few`;
+  return `${base}_many`;
+};
+
 const rcEsc = (s) =>
   String(s ?? "").replace(
     /[&<>"']/g,
@@ -697,6 +715,11 @@ class RcCard extends HTMLElement {
     return rcT(this.constructor.i18n, this._lang(), key, vars);
   }
 
+  // `<base>_one` / `_few` / `_many` for `n`, with {n} filled in.
+  _tn(base, n, vars) {
+    return this._t(rcPluralKey(this.constructor.i18n, this._lang(), base, n), { ...vars, n });
+  }
+
   _areaOf(id) {
     const e = this._hass.entities?.[id];
     if (!e) return undefined;
@@ -752,7 +775,7 @@ class RcCard extends HTMLElement {
   // or window sensors (`closable`), `idle` otherwise.
   _openingStatus(leaks, open, closable, idle = "all_quiet") {
     if (leaks) return this._t("leak");
-    if (open) return this._t(open > 1 ? "open_many" : "open_one", { n: open });
+    if (open) return this._tn("open", open);
     return this._t(closable ? "all_closed" : idle);
   }
 
@@ -771,7 +794,8 @@ class RcCard extends HTMLElement {
   // details kept in step with the rooms shown.
   _roomGrid(grid, rooms, tile) {
     const cols = Number(this._config.columns);
-    grid.classList.toggle("fixed", cols >= 1);
+    // A `columns` of 1 or 2 holds on a narrow card; 3 and more go down to two under 340 px, one under 260 px.
+    grid.classList.toggle("fixed", cols >= 1 && cols <= 2);
     grid.style.setProperty("--cols", String(Math.min(6, Math.max(1, cols || 3))));
     // Every room idle with the "hide idle rooms" option: the header alone says it all.
     const idle = !rooms.length && this._total > 0;
@@ -789,8 +813,8 @@ class RcCard extends HTMLElement {
         <div class="badge"><ha-icon icon="${rcEsc(icon)}"></ha-icon></div>
         <div class="title">${rcEsc(title)}</div>
         ${chips}
-        <button class="pill${allOff ? " action" : ""}" ${allOff ? `title="${rcEsc(this._t("turn_all_off"))}"` : "disabled"}>
-          ${allOff ? '<ha-icon icon="mdi:power"></ha-icon>' : ""}${rcEsc(status)}
+        <button class="pill${allOff ? " action" : ""}" title="${rcEsc(allOff ? this._t("turn_all_off") : status)}"${allOff ? "" : " disabled"}>
+          ${allOff ? '<ha-icon icon="mdi:power"></ha-icon>' : ""}<span class="pt">${rcEsc(status)}</span>
         </button>
       </div>`;
   }
@@ -937,7 +961,7 @@ class RcToggleCard extends RcCard {
     this._shown = shown.length;
     const [onIcon, offIcon] = this.constructor.headIcons;
     const status = lit.length
-      ? this._t(lit.length > 1 ? "on_many" : "on_one", { n: lit.length })
+      ? this._tn("on", lit.length)
       : this._t(items.length ? "all_off" : this.constructor.emptyKey);
     const head = this._head({
       icon: lit.length ? onIcon : offIcon,
@@ -989,7 +1013,7 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
     }
 
     getGridOptions() {
-      return { columns: 12, min_columns: 4, rows: "auto" };
+      return { columns: 12, min_columns: 6, rows: "auto" };
     }
 
     _draw(items) {
@@ -1017,7 +1041,7 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
             <div class="body">
               <div class="head${nav ? " nav" : ""}"${nav ? ' role="link" tabindex="0"' : ""}>
                 <div class="title">${rcEsc(c.title || this._areaName() || this._t("title"))}</div>
-                <span class="st">${rcEsc(status)}</span>
+                <span class="st" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></span>
               </div>
               <div class="rs">${chips}</div>
             </div>
@@ -1267,8 +1291,17 @@ const RC_BASE_STYLES = `
     --rc-plug: var(--state-switch-on-color, var(--primary-color, #03a9f4));
     --rc-idle: var(--secondary-text-color, #9e9e9e);
     --rc-na: var(--disabled-color, #9e9e9e);
+    display: block;
+    min-width: 0;
   }
-  ha-card { padding: 12px; overflow: hidden; }
+  /* The card answers its own width (container queries). That containment drops its content from its natural width: in
+     a wrapper sized by its content (inline-block, a grid's auto column, a flex row: layout-card, button-card…) it would
+     shrink to its padding. The empty grid below (no height) gives the host a natural width of 344 px there, as a
+     preferred width only: its column is minmax(0, …), so the card still shrinks to its column in a grid card, a
+     horizontal stack or a 1fr column, even wrapped in a <div> (hui-card in layout-card). contain-intrinsic-inline-size
+     or a min-width in px would be a minimum there, and the card would overflow. */
+  :host::before { content: ""; display: grid; grid-template-columns: minmax(0, 344px); height: 0; }
+  ha-card { padding: 12px; overflow: hidden; container-type: inline-size; }
   ha-card.lvl-alert { box-shadow: 0 0 0 1px color-mix(in srgb, var(--rc-alert) 45%, transparent), var(--ha-card-box-shadow, none); }
 
   .head { display: flex; align-items: center; gap: 10px; }
@@ -1278,10 +1311,37 @@ const RC_BASE_STYLES = `
            background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
   .badge ha-icon { --mdc-icon-size: 24px; }
   .lvl-alert .badge { animation: rc-pulse 1.6s ease-in-out infinite; }
-  .title { flex: 1; min-width: 0; font-size: 16px; font-weight: 500; color: var(--primary-text-color);
+  /* Narrow header: the title keeps a few letters (never 0 px), the status pill shrinks and ellipsises, the icon buttons
+     (zoom, power) never shrink; under 200 px the pill is only its coloured dot, its text kept for screen readers. */
+  .title { flex: 1 1 0; min-width: 5ch; font-size: 16px; font-weight: 500; color: var(--primary-text-color);
            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .pill { all: unset; flex: none; display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 500;
+  .pill { all: unset; flex: 0 1 auto; min-width: 0; box-sizing: border-box; position: relative;
+          display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 500;
           padding: 1px 8px; border-radius: 999px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
+  .pt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pill ha-icon { flex: none; }
+  /* A card this narrow (6 columns of the Sections view on a phone): the title is at its few letters already, so the
+     status pill goes to a line of its own under it, where its whole label fits, rather than end with "…". */
+  @container (max-width: 260px) {
+    .head { flex-wrap: wrap; row-gap: 4px; }
+    .head::after { content: ""; order: 1; flex: 1 0 100%; }
+    .head > .pill { order: 2; margin-left: 50px; max-width: calc(100% - 50px); }
+  }
+  @container (max-width: 200px) {
+    /* Under 200 px the pill is only its dot again: back on the title's line. */
+    .head { flex-wrap: nowrap; }
+    .head::after { content: none; }
+    .head > .pill { order: 0; margin-left: 0; max-width: none; }
+    .head > .pill .pt, .st .pt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .head > .pill:not(.action), .st { flex: none; padding: 0; width: 18px; height: 18px; justify-content: center; background: none; }
+    .head > .pill:not(.action)::before, .st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+    .head > .pill.action { padding: 1px 4px; }
+    /* A full card this narrow (6 columns of the Sections view on a phone): a smaller badge, no side chip in the header. */
+    .head { gap: 6px; }
+    .head > .badge { width: 32px; height: 32px; }
+    .head > .badge ha-icon { --mdc-icon-size: 20px; }
+    .head > .chip { display: none; }
+  }
   .pill.action { cursor: pointer; }
   .pill.action:hover { background: color-mix(in srgb, var(--c) 24%, transparent); }
   .pill.action:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
@@ -1304,8 +1364,10 @@ const RC_BASE_STYLES = `
   .txt { display: flex; flex-direction: column; min-width: 0; }
   .name { font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--primary-text-color);
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .state { font-size: 11px; line-height: 1.2; color: var(--secondary-text-color);
-           white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* A reading is never cut: on a narrow tile it goes on to a second line (the name, a label, keeps its ellipsis). */
+  .state { font-size: 11px; line-height: 1.2; color: var(--secondary-text-color); overflow-wrap: break-word; }
+  /* A card this narrow (a phone, 6 columns of the Sections view): one tile per row, whatever the columns option. */
+  @container (max-width: 260px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 
   @keyframes rc-blink { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
   @keyframes rc-pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 45%, transparent) }
@@ -1328,6 +1390,9 @@ const RC_ZOOM_STYLES = `
 const RC_ROOM_GRID_STYLES = `
   .grid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
   @container (max-width: 340px) { .grid:not(.fixed) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  /* A card this narrow (6 columns of the Sections view on a phone): one room per row, whatever the columns option. Two
+     left the name a letter or two ("B…") and pushed a chip out of its tile. */
+  @container (max-width: 260px) { .grid.grid { grid-template-columns: minmax(0, 1fr); } }
   .grid[hidden] { display: none; }
   .room { all: unset; box-sizing: border-box; cursor: pointer; min-width: 0;
           display: grid; grid-template-columns: 26px minmax(0, 1fr); grid-template-areas: "ic name" "ic state" "chips chips";
@@ -1345,7 +1410,9 @@ const RC_ROOM_GRID_STYLES = `
   .room.lvl-ok .ic { color: var(--primary-text-color); background: color-mix(in srgb, var(--rc-idle) 14%, transparent); }
   .room .ic ha-icon { --mdc-icon-size: 15px; }
   .room .name { grid-area: name; }
-  .room .state { grid-area: state; }
+  /* The state (a sentence: "Water leak", "Too humid +1") wraps between its words only; a word too long for its line
+     ends with "…" rather than being broken ("Pr|es|en|ce"). */
+  .room .state { grid-area: state; overflow-wrap: normal; overflow: hidden; text-overflow: ellipsis; }
   .room:not(.lvl-ok) .state { color: var(--t); }
   .chips { grid-area: chips; display: flex; flex-wrap: wrap; }
   .chips:empty { display: none; }
@@ -1368,14 +1435,18 @@ const RC_MINI_STYLES = `${RC_ZOOM_STYLES}
   .mini .badge ha-icon { --mdc-icon-size: 20px; }
   .body { flex: 1; min-width: 0; min-height: 32px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
   .mini .head { gap: 8px; }
-  .mini .title { flex: 0 1 auto; line-height: 1.25; }
-  .st { flex: none; margin-left: auto; font-size: 11px; font-weight: 500; color: var(--c); }
+  .mini .title { line-height: 1.25; }
+  .st { flex: 0 1 auto; min-width: 0; position: relative; display: inline-flex; align-items: center;
+        margin-left: auto; font-size: 11px; font-weight: 500; color: var(--c); }
   .rs { display: flex; flex-wrap: wrap; gap: 2px 4px; margin-left: -4px; }
   .rs:empty { display: none; }
+  /* A chip never runs past the card: a long name ends with an ellipsis. */
   .r { all: unset; cursor: pointer; display: inline-flex; align-items: baseline; gap: 1px; padding: 0 5px 0 4px;
+       box-sizing: border-box; min-width: 0; max-width: 100%; overflow: hidden;
        border-radius: 999px; font-size: 12px; font-weight: 500; line-height: 18px; white-space: nowrap; --t: var(--rc-ok);
        color: var(--primary-text-color); }
-  .r ha-icon { --mdc-icon-size: 13px; color: var(--t); align-self: center; margin-right: 2px; }
+  .r ha-icon { --mdc-icon-size: 13px; flex: none; color: var(--t); align-self: center; margin-right: 2px; }
+  .r > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .r.pill { color: var(--t); background: color-mix(in srgb, var(--t) 14%, transparent); }
   .r:hover { background: color-mix(in srgb, var(--t) 20%, var(--secondary-background-color, transparent)); }
   .r:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }

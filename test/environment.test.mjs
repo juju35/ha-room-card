@@ -155,7 +155,7 @@ test("the mini card shows one chip per reading with a short unit, and the status
   assert.equal((html.match(/class="r /g) || []).length, 5);
   assert.match(html, /<span>21,4<\/span><small>°<\/small>/);
   assert.match(html, /class="r s-warn pill k-co2"/);
-  assert.match(html, /class="st">Aérer</);
+  assert.match(html, /class="pt">Aérer</);
   assert.match(html, /lvl-warn/);
   assert.equal(card.getCardSize(), 1);
 });
@@ -340,7 +340,7 @@ test("outdoors, temperature, humidity and noise are information only, unless thr
   assert.equal(of(card, "noise").sev, "ok");
   assert.equal(of(card, "co2").sev, "warn", "other readings keep their thresholds");
   // The status pill (the tiles' tooltips may still say "Frais" or "Bruyant", as information).
-  const pill = head(card).match(/<button class="pill"[^>]*>([^<]*)/)[1].trim();
+  const pill = head(card).match(/<button class="pill"[^>]*>\s*<span class="pt">([^<]*)/)[1].trim();
   assert.equal(pill, "Aérer");
   // The user's own thresholds still apply outdoors.
   assert.equal(of(render({ thresholds: { temperature: [5, 10, 30, 35] } }, hass), "temperature").sev, "ok");
