@@ -222,7 +222,7 @@ rooms:
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `title` | ❌ | `Home` | Card title |
-| `columns` | ❌ | `3` | Number of room columns (1–6); when empty, 3, or 2 on narrow screens |
+| `columns` | ❌ | `3` | Number of room columns (1–6); on a card of 340 px or less at most 2, and 1 at 260 px or less (6 columns of a Sections view on a phone) |
 | `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing attention first (leak, open, presence, something on) |
 | `presence` | ❌ | `true` | Include the presence and motion sensors (camera detections are always left out) |
 | `zoom` | ❌ | `true` | Show only the rooms with something open, on or detected, with a detail button showing every room; `false` shows every room, always |
@@ -513,7 +513,7 @@ rooms:
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `title` | ❌ | `Indoor climate` | Card title |
-| `columns` | ❌ | `3` | Number of room columns (1–6); when empty, 3, or 2 on narrow screens |
+| `columns` | ❌ | `3` | Number of room columns (1–6); on a card of 340 px or less at most 2, and 1 at 260 px or less (6 columns of a Sections view on a phone) |
 | `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing a look first |
 | `zoom` | ❌ | `true` | Show only the rooms with a reading outside the comfort range, with a detail button showing every room; `false` shows every room, always |
 | `thresholds` | ❌ | See [Thresholds](#thresholds) | Comfort limits per kind, also used by the unfolded room |
