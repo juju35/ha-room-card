@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+### Fixes
+- Mini cards: the header icon keeps its full size (40 px, icon 24 px) in the compact view, like the full card.
+
 ## 1.17.8 - 2026-11-01
 ### Fixes
 - Overview: on a narrow card (6 columns of a Sections view, or a phone in a masonry view: up to about 445 px) the title no longer disappears, the status (*Water leak*) is no longer cut down to "…" and the detail button no longer slides out of the card: the header's totals (occupied rooms, lights, plugs) move to a line of their own under the title, power icons included.
