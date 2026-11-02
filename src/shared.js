@@ -1431,9 +1431,9 @@ const RC_MINI_STYLES = `${RC_ZOOM_STYLES}
   /* The badge sits 12px from the card's top-left corner, like the other ha-* cards, beside the title and the readings. */
   ha-card:has(.mini) { padding: 12px; }
   .mini { display: flex; align-items: flex-start; gap: 10px; }
-  .mini .badge { width: 32px; height: 32px; }
-  .mini .badge ha-icon { --mdc-icon-size: 20px; }
-  .body { flex: 1; min-width: 0; min-height: 32px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+  /* The badge keeps the full card's size (40 px, icon 24 px): the body is at least as tall, a lone title line centred
+     beside it. */
+  .body { flex: 1; min-width: 0; min-height: 40px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
   .mini .head { gap: 8px; }
   .mini .title { line-height: 1.25; }
   .st { flex: 0 1 auto; min-width: 0; position: relative; display: inline-flex; align-items: center;

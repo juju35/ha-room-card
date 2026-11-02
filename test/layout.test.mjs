@@ -107,6 +107,17 @@ test("Mini cards: the status ellipsises instead of pushing out the title and the
   assert.equal(decls(css, ".mini .title").flex, undefined, "the mini title keeps the shared flex: 1 1 0");
 });
 
+test("Mini cards: the header badge keeps the full card's size", () => {
+  for (const tag of ["room-sensors-mini-card", "room-lights-mini-card", "room-switch-mini-card", "room-environment-mini-card"]) {
+    if (!cards[tag]) continue;
+    const css = cards[tag].styles;
+    assert.doesNotMatch(css, /\.mini[^{}]*\.badge[^{]*\{/, `${tag}: no mini-only badge rule`);
+  }
+  assert.equal(decls(BASE, ".badge").width, "40px");
+  assert.equal(decls(BASE, ".badge ha-icon")["--mdc-icon-size"], "24px");
+  assert.equal(decls(styles("room-sensors-mini-card"), ".body")["min-height"], "40px", "a lone title line centred beside the badge");
+});
+
 test("Mini cards: a chip with a long name ends with an ellipsis inside the card", () => {
   const css = styles("room-sensors-mini-card");
   const r = decls(css, ".r");
