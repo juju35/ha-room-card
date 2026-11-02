@@ -794,7 +794,8 @@ class RcCard extends HTMLElement {
   // details kept in step with the rooms shown.
   _roomGrid(grid, rooms, tile) {
     const cols = Number(this._config.columns);
-    grid.classList.toggle("fixed", cols >= 1);
+    // A `columns` of 1 or 2 holds on a narrow card; 3 and more go down to two under 340 px, one under 260 px.
+    grid.classList.toggle("fixed", cols >= 1 && cols <= 2);
     grid.style.setProperty("--cols", String(Math.min(6, Math.max(1, cols || 3))));
     // Every room idle with the "hide idle rooms" option: the header alone says it all.
     const idle = !rooms.length && this._total > 0;
@@ -1389,6 +1390,9 @@ const RC_ZOOM_STYLES = `
 const RC_ROOM_GRID_STYLES = `
   .grid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
   @container (max-width: 340px) { .grid:not(.fixed) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  /* A card this narrow (6 columns of the Sections view on a phone): one room per row, whatever the columns option. Two
+     left the name a letter or two ("B…") and pushed a chip out of its tile. */
+  @container (max-width: 260px) { .grid.grid { grid-template-columns: minmax(0, 1fr); } }
   .grid[hidden] { display: none; }
   .room { all: unset; box-sizing: border-box; cursor: pointer; min-width: 0;
           display: grid; grid-template-columns: 26px minmax(0, 1fr); grid-template-areas: "ic name" "ic state" "chips chips";
@@ -1406,7 +1410,9 @@ const RC_ROOM_GRID_STYLES = `
   .room.lvl-ok .ic { color: var(--primary-text-color); background: color-mix(in srgb, var(--rc-idle) 14%, transparent); }
   .room .ic ha-icon { --mdc-icon-size: 15px; }
   .room .name { grid-area: name; }
-  .room .state { grid-area: state; }
+  /* The state (a sentence: "Water leak", "Too humid +1") wraps between its words only; a word too long for its line
+     ends with "…" rather than being broken ("Pr|es|en|ce"). */
+  .room .state { grid-area: state; overflow-wrap: normal; overflow: hidden; text-overflow: ellipsis; }
   .room:not(.lvl-ok) .state { color: var(--t); }
   .chips { grid-area: chips; display: flex; flex-wrap: wrap; }
   .chips:empty { display: none; }
