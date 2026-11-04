@@ -2,7 +2,7 @@
 
 ## 1.17.10 - 2026-11-04
 ### Features
-- Added Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Irish, Slovak, Czech, Slovenian, Maltese, Latvian and Greek translations (`ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `ga`, `sk`, `cs`, `sl`, `mt`, `lv`, `el`) for every card and visual editor, with *Română*, *Dansk*, *Svenska*, *Български*, *Русский*, *Українська*, *Magyar*, *Gaeilge*, *Slovenčina*, *Čeština*, *Slovenščina*, *Malti*, *Latviešu* and *Ελληνικά* in the editor's language list. Romanian doors and windows take the feminine state (*Deschisă*, *Închisă*).
+- Added Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek translations (`ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv`, `el`) for every card and visual editor, with *Română*, *Dansk*, *Svenska*, *Български*, *Русский*, *Українська*, *Magyar*, *Slovenčina*, *Čeština*, *Slovenščina*, *Latviešu* and *Ελληνικά* in the editor's language list. Romanian doors and windows take the feminine state (*Deschisă*, *Închisă*).
 
 ## 1.17.9 - 2026-11-02
 ### Fixes

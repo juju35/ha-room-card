@@ -6,7 +6,7 @@ import { load } from "./load.mjs";
 const rc = load();
 const LANGS = [
   "en", "fr", "de", "es", "sr", "sr-Latn", "it", "nl", "pt", "pl",
-  "ro", "da", "sv", "bg", "ru", "uk", "hu", "ga", "sk", "cs", "sl", "mt", "lv", "el",
+  "ro", "da", "sv", "bg", "ru", "uk", "hu", "sk", "cs", "sl", "lv", "el",
 ];
 // Gendered states, only in the languages where doors and windows are feminine.
 const GENDERED = ["open_f", "closed_f"];
@@ -100,7 +100,7 @@ test("Italian, Dutch, Portuguese and Polish are picked from Home Assistant", () 
   assert.equal(t("pl-PL"), "Wyłącz wszystko");
 });
 
-test("Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Irish, Slovak, Czech, Slovenian, Maltese, Latvian and Greek are picked from Home Assistant", () => {
+test("Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek are picked from Home Assistant", () => {
   const card = new rc.cards["room-switch-card"]();
   card._config = {};
   const t = (language) => {
@@ -114,11 +114,9 @@ test("Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Irish
   assert.equal(t("ru-RU"), "Выключить всё");
   assert.equal(t("uk-UA"), "Вимкнути все");
   assert.equal(t("hu-HU"), "Minden kikapcsolása");
-  assert.equal(t("ga-IE"), "Múch gach rud");
   assert.equal(t("sk-SK"), "Vypnúť všetko");
   assert.equal(t("cs-CZ"), "Vypnout vše");
   assert.equal(t("sl-SI"), "Izklopi vse");
-  assert.equal(t("mt-MT"), "Itfi kollox");
   assert.equal(t("lv-LV"), "Izslēgt visu");
   assert.equal(t("el-GR"), "Απενεργοποίηση όλων");
 });
@@ -140,8 +138,8 @@ test("The editor offers every language, each in its own name", () => {
     ["Italiano", "Nederlands", "Português (Portugal)", "Polski"],
   );
   assert.deepEqual(
-    options.slice(-14).map((o) => o.label),
-    ["Română", "Dansk", "Svenska", "Български", "Русский", "Українська", "Magyar", "Gaeilge", "Slovenčina", "Čeština", "Slovenščina", "Malti", "Latviešu", "Ελληνικά"],
+    options.slice(-12).map((o) => o.label),
+    ["Română", "Dansk", "Svenska", "Български", "Русский", "Українська", "Magyar", "Slovenčina", "Čeština", "Slovenščina", "Latviešu", "Ελληνικά"],
   );
 });
 
