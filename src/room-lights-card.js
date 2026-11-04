@@ -269,7 +269,7 @@ const RL_I18N = {
     ed_exclude: "Lampor att utesluta",
   },
   bg: {
-    title: "Осветление",
+    title: "Светлини",
     on: "Включена",
     off: "Изключена",
     all_off: "Всичко е изключено",
@@ -409,7 +409,7 @@ const RL_I18N = {
     ed_exclude: "Izpuščene luči",
   },
   lv: {
-    title: "Apgaismojums",
+    title: "Gaismas",
     on: "Ieslēgts",
     off: "Izslēgts",
     all_off: "Viss izslēgts",

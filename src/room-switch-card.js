@@ -219,7 +219,7 @@ const RW_I18N = {
     ed_entities_helper: "Înlocuiește detectarea automată: ID-uri de entitate sau {entity, name, icon, power}, power fiind entitatea senzorului său de putere",
   },
   da: {
-    title: "Stikkontakter",
+    title: "Stik",
     all_off: "Alt slukket",
     on_one: "{n} tændt",
     on_many: "{n} tændte",
@@ -314,7 +314,7 @@ const RW_I18N = {
     ed_entities_helper: "Замінює автоматичне виявлення: ID сутностей або {entity, name, icon, power}, де power — сутність її датчика потужності",
   },
   hu: {
-    title: "Konnektorok",
+    title: "Aljzatok",
     all_off: "Minden kikapcsolva",
     on_one: "{n} bekapcsolva",
     on_many: "{n} bekapcsolva",
@@ -390,7 +390,7 @@ const RW_I18N = {
     ed_entities_helper: "Nadomesti samodejno zaznavanje: ID-ji entitet ali {entity, name, icon, power}, kjer je power entiteta njenega senzorja moči",
   },
   lv: {
-    title: "Kontaktligzdas",
+    title: "Ligzdas",
     all_off: "Viss izslēgts",
     on_one: "Ieslēgtas: {n}",
     on_many: "Ieslēgtas: {n}",

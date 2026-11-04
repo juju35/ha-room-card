@@ -167,7 +167,7 @@ for (const tag of ["room-overview-card", "room-environment-overview-card"]) {
       await page.addScriptTag({ content: HA });
       await page.addScriptTag({ content: source });
       const runs = [];
-      for (const lang of ["en", "pl", "sr-Latn"]) for (const config of [{}, { columns: 3 }]) for (const width of [156, 178, 245, 320]) runs.push({ lang, config, width, hass: roomsHass(lang) });
+      for (const lang of ["en", "pl", "sr-Latn", "uk", "hu", "lv"]) for (const config of [{}, { columns: 3 }]) for (const width of [156, 178, 245, 320]) runs.push({ lang, config, width, hass: roomsHass(lang) });
       const problems = await page.evaluate(
         async ({ tag, runs }) => {
           const cards = runs.map(({ config, width, hass }) => {
