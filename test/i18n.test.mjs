@@ -4,7 +4,10 @@ import { makeHass } from "./hass.mjs";
 import { load } from "./load.mjs";
 
 const rc = load();
-const LANGS = ["en", "fr", "de", "es", "sr", "sr-Latn", "it", "nl", "pt", "pl"];
+const LANGS = [
+  "en", "fr", "de", "es", "sr", "sr-Latn", "it", "nl", "pt", "pl",
+  "ro", "da", "sv", "bg", "ru", "uk", "hu", "sk", "cs", "sl", "lv", "el",
+];
 // Gendered states, only in the languages where doors and windows are feminine.
 const GENDERED = ["open_f", "closed_f"];
 
@@ -62,6 +65,12 @@ test("Language: the full tag when the card has it, else its base language, else 
   // Brazilian Portuguese falls back to European Portuguese, on purpose.
   assert.equal(lang("pt-BR"), "pt");
   assert.equal(lang("pl-PL"), "pl");
+  assert.equal(lang("ro-RO"), "ro");
+  assert.equal(lang("da-DK"), "da");
+  assert.equal(lang("sv-FI"), "sv");
+  assert.equal(lang("ru-RU"), "ru");
+  assert.equal(lang("uk-UA"), "uk");
+  assert.equal(lang("el-CY"), "el");
   assert.equal(lang("ja"), "en");
   // The card's language wins over Home Assistant's, then hass.locale over hass.language.
   assert.equal(rc.rcLang(rc.RC_I18N, { locale: { language: "fr" } }, { language: "sr-Latn" }), "sr-Latn");
@@ -91,6 +100,27 @@ test("Italian, Dutch, Portuguese and Polish are picked from Home Assistant", () 
   assert.equal(t("pl-PL"), "Wyłącz wszystko");
 });
 
+test("Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek are picked from Home Assistant", () => {
+  const card = new rc.cards["room-switch-card"]();
+  card._config = {};
+  const t = (language) => {
+    card._hass = { locale: { language } };
+    return card._t("turn_all_off");
+  };
+  assert.equal(t("ro-RO"), "Oprește tot");
+  assert.equal(t("da-DK"), "Sluk alt");
+  assert.equal(t("sv-SE"), "Stäng av allt");
+  assert.equal(t("bg-BG"), "Изключи всичко");
+  assert.equal(t("ru-RU"), "Выключить всё");
+  assert.equal(t("uk-UA"), "Вимкнути все");
+  assert.equal(t("hu-HU"), "Minden kikapcsolása");
+  assert.equal(t("sk-SK"), "Vypnúť všetko");
+  assert.equal(t("cs-CZ"), "Vypnout vše");
+  assert.equal(t("sl-SI"), "Izklopi vse");
+  assert.equal(t("lv-LV"), "Izslēgt visu");
+  assert.equal(t("el-GR"), "Απενεργοποίηση όλων");
+});
+
 test("The editor offers every language, each in its own name", () => {
   const editor = new (rc.customElements.get("room-switch-card-editor"))();
   editor.appendChild = () => {};
@@ -104,12 +134,16 @@ test("The editor offers every language, each in its own name", () => {
     ["", ...LANGS],
   );
   assert.deepEqual(
-    options.slice(-4).map((o) => o.label),
+    options.slice(7, 11).map((o) => o.label),
     ["Italiano", "Nederlands", "Português (Portugal)", "Polski"],
+  );
+  assert.deepEqual(
+    options.slice(-12).map((o) => o.label),
+    ["Română", "Dansk", "Svenska", "Български", "Русский", "Українська", "Magyar", "Slovenčina", "Čeština", "Slovenščina", "Latviešu", "Ελληνικά"],
   );
 });
 
-test("Spanish, Italian and Portuguese doors and windows take the feminine state", () => {
+test("Spanish, Italian, Portuguese and Romanian doors and windows take the feminine state", () => {
   const card = new rc.cards["room-sensors-card"]();
   card._config = { language: "es" };
   assert.equal(card._stateText("window", true), "Abierta");
@@ -124,6 +158,12 @@ test("Spanish, Italian and Portuguese doors and windows take the feminine state"
   assert.equal(card._stateText("door", false), "Fechada");
   card._config = { language: "pl" };
   assert.equal(card._stateText("door", true), "Otwarte");
+  // Romanian too (ușă, fereastră); the other new languages use one form.
+  card._config = { language: "ro" };
+  assert.equal(card._stateText("window", true), "Deschisă");
+  assert.equal(card._stateText("garage", false), "Închis");
+  card._config = { language: "cs" };
+  assert.equal(card._stateText("door", true), "Otevřeno");
 });
 
 test("Editor help texts name every documented key: rooms[].thresholds, entities[].power", () => {
