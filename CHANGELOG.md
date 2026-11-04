@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.17.11 - 2026-11-04
+
+### Documentation
+- README: images and links use absolute URLs, so the screenshots, icons, badges and links display in HACS (relative paths broke there).
+- README: screenshots get a display size, so cards no longer show oversized in HACS and on GitHub.
+
 ## 1.17.10 - 2026-11-04
 ### Features
 - Added Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek translations (`ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv`, `el`) for every card and visual editor, with *Română*, *Dansk*, *Svenska*, *Български*, *Русский*, *Українська*, *Magyar*, *Slovenčina*, *Čeština*, *Slovenščina*, *Latviešu* and *Ελληνικά* in the editor's language list. Romanian doors and windows take the feminine state (*Deschisă*, *Închisă*).
