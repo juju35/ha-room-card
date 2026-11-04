@@ -74,6 +74,11 @@ test("1 is singular and the other counts plural in every language", () => {
   const one = { en: "1 on", fr: "1 allumée", de: "1 an", es: "1 encendida", it: "1 accesa", nl: "1 aan", pt: "1 acesa", pl: "Włączone: 1" };
   const two = { en: "2 on", fr: "2 allumées", de: "2 an", es: "2 encendidas", it: "2 accese", nl: "2 aan", pt: "2 acesas", pl: "Włączone: 2" };
   const many = { en: "21 on", fr: "21 allumées", de: "21 an", es: "21 encendidas", it: "21 accese", nl: "21 aan", pt: "21 acesas", pl: "Włączone: 21" };
+  // The new languages: a plural form in da, sv, bg, el; "Label: {n}" where 21 is singular (ru, uk, lv) or the
+  // forms are many (ro, ga, sk, cs, sl, mt), and hu keeps the singular after a number.
+  Object.assign(one, { da: "1 tændt", sv: "1 tänd", bg: "1 включена", el: "1 αναμμένο", ru: "Включено: 1", hu: "1 bekapcsolva", lv: "Ieslēgti: 1" });
+  Object.assign(two, { da: "2 tændte", sv: "2 tända", bg: "2 включени", el: "2 αναμμένα", ru: "Включено: 2", hu: "2 bekapcsolva", lv: "Ieslēgti: 2" });
+  Object.assign(many, { da: "21 tændte", sv: "21 tända", bg: "21 включени", el: "21 αναμμένα", ru: "Включено: 21", hu: "21 bekapcsolva", lv: "Ieslēgti: 21" });
   for (const language of Object.keys(one)) {
     assert.equal(status("room-lights-card", "light", language, 1), one[language], language);
     assert.equal(status("room-lights-card", "light", language, 2), two[language], language);

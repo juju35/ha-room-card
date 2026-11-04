@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.17.10 - 2026-11-04
+### Features
+- Added Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Irish, Slovak, Czech, Slovenian, Maltese, Latvian and Greek translations (`ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `ga`, `sk`, `cs`, `sl`, `mt`, `lv`, `el`) for every card and visual editor, with *Română*, *Dansk*, *Svenska*, *Български*, *Русский*, *Українська*, *Magyar*, *Gaeilge*, *Slovenčina*, *Čeština*, *Slovenščina*, *Malti*, *Latviešu* and *Ελληνικά* in the editor's language list. Romanian doors and windows take the feminine state (*Deschisă*, *Închisă*).
+
 ## 1.17.9 - 2026-11-02
 ### Fixes
 - Mini cards: the header icon keeps its full size (40 px, icon 24 px) in the compact view, like the full card.
