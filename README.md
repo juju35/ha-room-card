@@ -25,7 +25,7 @@ Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, pl
 
 | Every room | Sensors | Lights | Plugs | Environment |
 |---|---|---|---|---|
-| ![Overview](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all.png) | ![Sensors](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open.png) | ![Lights](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on.png) | ![Plugs](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on.png) | ![Environment](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-stuffy.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all.png" alt="Overview" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open.png" alt="Sensors" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on.png" alt="Lights" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on.png" alt="Plugs" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-stuffy.png" alt="Environment" width="400"> |
 
 All the cards share the same look (header with a status pill, compact tiles), a visual editor in the dashboard UI covering every option (lists and maps such as `entities`, `thresholds` and `rooms` in its folded **Advanced** section, as YAML), English, French, German, Spanish, Serbian (Cyrillic and Latin), Italian, Dutch, European Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek labels following the Home Assistant language, light and dark themes, and come in a single HACS download with no dependency.
 
@@ -532,19 +532,19 @@ One GIF per animated state, recorded from the real cards with mock data:
 
 | Light | Dark |
 |---|---|
-| ![Open sensors blinking](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-blink.gif) | ![Open sensors blinking, dark theme](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-blink-dark.gif) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-blink.gif" alt="Open sensors blinking" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-blink-dark.gif" alt="Open sensors blinking, dark theme" width="400"> |
 
 Open doors and windows blink (`rc-blink`) until they are closed; `blink: false` keeps them still.
 
 | Light | Dark |
 |---|---|
-| ![Water leak alert](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-alert.gif) | ![Water leak alert, dark theme](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-alert-dark.gif) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-alert.gif" alt="Water leak alert" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-alert-dark.gif" alt="Water leak alert, dark theme" width="400"> |
 
 A water leak pulses the header badge (`rc-pulse`) while the leaking sensor blinks.
 
 | Light | Dark |
 |---|---|
-| ![Drag to dim](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-dim.gif) | ![Drag to dim, dark theme](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-dim-dark.gif) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-dim.gif" alt="Drag to dim" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-dim-dark.gif" alt="Drag to dim, dark theme" width="400"> |
 
 Dragging a dimmable light sideways sets its brightness, the bar and the percentage following the finger.
 
@@ -552,55 +552,55 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 
 | Active rooms (default) | Every room (detail button) | Room details |
 |---|---|---|
-| ![Active rooms](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-active.png) | ![Every room](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all.png) | ![Room details](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-details.png) |
-| ![Active rooms dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-active-dark.png) | ![Every room dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all-dark.png) | ![Room details dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-details-dark.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-active.png" alt="Active rooms" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all.png" alt="Every room" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-details.png" alt="Room details" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-active-dark.png" alt="Active rooms dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all-dark.png" alt="Every room dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-details-dark.png" alt="Room details dark" width="400"> |
 
 ### Sensors
 
 | A door open | Water leak |
 |---|---|
-| ![A door open](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open.png) | ![Water leak](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-leak.png) |
-| ![A door open dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open-dark.png) | ![Water leak dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-leak-dark.png) |
-| ![Mini a door open](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-open.png) | ![Mini water leak](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-leak.png) |
-| ![Mini a door open dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-open-dark.png) | ![Mini water leak dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-leak-dark.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open.png" alt="A door open" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-leak.png" alt="Water leak" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open-dark.png" alt="A door open dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-leak-dark.png" alt="Water leak dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-open.png" alt="Mini a door open" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-leak.png" alt="Mini water leak" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-open-dark.png" alt="Mini a door open dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-leak-dark.png" alt="Mini water leak dark" width="400"> |
 
 | Mini card zoomed in | |
 |---|---|
-| ![Mini zoomed in](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-zoom.png) | ![Mini zoomed in dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-zoom-dark.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-zoom.png" alt="Mini zoomed in" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-zoom-dark.png" alt="Mini zoomed in dark" width="400"> |
 
 ### Lights
 
 | Lights on | All off |
 |---|---|
-| ![Lights on](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on.png) | ![All off](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-off.png) |
-| ![Lights on dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on-dark.png) | ![All off dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-off-dark.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on.png" alt="Lights on" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-off.png" alt="All off" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on-dark.png" alt="Lights on dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-off-dark.png" alt="All off dark" width="400"> |
 
 ### Plugs
 
 | Plugs on | All off |
 |---|---|
-| ![Plugs on](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on.png) | ![All off](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-off.png) |
-| ![Plugs on dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on-dark.png) | ![All off dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-off-dark.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on.png" alt="Plugs on" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-off.png" alt="All off" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on-dark.png" alt="Plugs on dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-off-dark.png" alt="All off dark" width="400"> |
 
 ### Environment
 
 | Comfortable | Stuffy room |
 |---|---|
-| ![Comfortable](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-comfort.png) | ![Stuffy room](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-stuffy.png) |
-| ![Comfortable dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-comfort-dark.png) | ![Stuffy room dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-stuffy-dark.png) |
-| ![Mini comfortable](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-comfort.png) | ![Mini stuffy room](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-stuffy.png) |
-| ![Mini comfortable dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-comfort-dark.png) | ![Mini stuffy room dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-stuffy-dark.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-comfort.png" alt="Comfortable" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-stuffy.png" alt="Stuffy room" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-comfort-dark.png" alt="Comfortable dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-stuffy-dark.png" alt="Stuffy room dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-comfort.png" alt="Mini comfortable" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-stuffy.png" alt="Mini stuffy room" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-comfort-dark.png" alt="Mini comfortable dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-stuffy-dark.png" alt="Mini stuffy room dark" width="400"> |
 
 | Mini card zoomed in | |
 |---|---|
-| ![Mini zoomed in](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-zoom.png) | ![Mini zoomed in dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-zoom-dark.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-zoom.png" alt="Mini zoomed in" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-zoom-dark.png" alt="Mini zoomed in dark" width="400"> |
 
 ### Environment overview
 
 | Rooms to check (default) | Every room (detail button) | Room details |
 |---|---|---|
-| ![Rooms to check](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-overview-check.png) | ![Every room](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-overview-all.png) | ![Room details](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-overview-details.png) |
-| ![Rooms to check dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-overview-check-dark.png) | ![Every room dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-overview-all-dark.png) | ![Room details dark](https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-overview-details-dark.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-overview-check.png" alt="Rooms to check" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-overview-all.png" alt="Every room" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-overview-details.png" alt="Room details" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-overview-check-dark.png" alt="Rooms to check dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-overview-all-dark.png" alt="Every room dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-overview-details-dark.png" alt="Room details dark" width="400"> |
 
 ## How it works
 
