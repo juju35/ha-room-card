@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.18.0 - 2026-11-07
+
+### Features
+- New Lights mini card (`custom:room-lights-mini-card`): the lights of a room on two lines, with how many are on out of the total (*2/4 on*), a button to turn them all off and a zoom to the full Lights card.
+- New Plugs mini card (`custom:room-switch-mini-card`): the plugs of a room on two lines, with how many are on out of the total, their power draw (*2/4 on · 1.2 kW*), an optional button to turn them all off and a zoom to the full Plugs card.
+
 ## 1.17.11 - 2026-11-04
 
 ### Documentation

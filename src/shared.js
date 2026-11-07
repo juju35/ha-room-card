@@ -1284,16 +1284,19 @@ class RcCard extends HTMLElement {
         ${tiles ? `<div class="grid" style="--cols:${this._cols()}">${tiles}</div>` : ""}
       </ha-card>`;
     const root = this.shadowRoot;
-    root.querySelector(".pill.action")?.addEventListener("click", (ev) => {
-      ev.stopPropagation();
-      const ids = (this._items || []).filter((i) => i.on).map((i) => i.id);
-      if (!ids.length) return;
-      // A host card may ask first (the Overview confirms before turning plugs off); otherwise off at once.
-      if (this._confirmOff) this._confirmOff(ids);
-      else rcCall(this._hass, "homeassistant", "turn_off", { entity_id: ids });
-    });
+    root.querySelector(".pill.action")?.addEventListener("click", (ev) => this._allOff(ev));
     if (this._config.navigation_path) rcBindNav(root.querySelector(".head"), this._config.navigation_path);
     for (const el of root.querySelectorAll(".tile")) this._bindTile(el, (this._items || []).find((i) => i.id === el.dataset.id));
+  }
+
+  // The "turn everything off" button of the header (full card) or of the status (mini card).
+  _allOff(ev) {
+    ev.stopPropagation();
+    const ids = (this._items || []).filter((i) => i.on).map((i) => i.id);
+    if (!ids.length) return;
+    // A host card may ask first (the Overview confirms before turning plugs off); otherwise off at once.
+    if (this._confirmOff) this._confirmOff(ids);
+    else rcCall(this._hass, "homeassistant", "turn_off", { entity_id: ids });
   }
 
   // Tap, hold for more-info, and an optional horizontal drag ({ move(x), end(x) }).
@@ -1393,27 +1396,36 @@ class RcToggleCard extends RcCard {
     return "";
   }
 
-  _draw(items) {
+  // What the header shows, on the full card and the mini card: level, icon, status (`ofTotal`: *2/5 on*) and whether
+  // the "turn everything off" button is there. Null when nothing changed, or when the card hides itself.
+  _summary(items, ofTotal = false) {
     const c = this._config;
     const lit = items.filter((i) => i.on);
     const level = lit.length ? "on" : "off";
-
-    if (!this._changed(items.map((i) => this._sigOf(i)))) return;
-    if (this._hide(c.hide_when_off && level === "off")) return;
+    if (!this._changed([ofTotal, items.map((i) => this._sigOf(i))])) return null;
+    if (this._hide(c.hide_when_off && level === "off")) return null;
 
     const shown = c.only_on ? items.filter((i) => i.on || i.unavailable) : items;
     this._shown = shown.length;
     const [onIcon, offIcon] = this.constructor.headIcons;
+    const n = ofTotal ? `${lit.length}/${items.length}` : lit.length;
     const status = lit.length
-      ? this._tn("on", lit.length)
+      ? this._t(rcPluralKey(this.constructor.i18n, this._lang(), "on", lit.length), { n })
       : this._t(items.length ? "all_off" : this.constructor.emptyKey);
-    const head = this._head({
+    return {
+      level,
+      shown,
       icon: lit.length ? onIcon : offIcon,
-      title: c.title || this._areaName() || this._t("title"),
       status: status + this._statusExtra(lit),
       allOff: c.all_off_button && lit.length > 0,
-    });
-    this._paint(level, head, shown.map((i) => this._tileOf(i)).join(""));
+    };
+  }
+
+  _draw(items) {
+    const s = this._summary(items);
+    if (!s) return;
+    const head = this._head({ ...s, title: this._config.title || this._areaName() || this._t("title") });
+    this._paint(s.level, head, s.shown.map((i) => this._tileOf(i)).join(""));
   }
 }
 
@@ -1474,9 +1486,13 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
       this._addZoom();
     }
 
-    _paintMini({ level, icon, status, chips, cls = "" }) {
+    _paintMini({ level, icon, status, chips, cls = "", allOff = false }) {
       const c = this._config;
       const nav = c.navigation_path;
+      // With `allOff` the status is the "turn everything off" button, like the full card's pill.
+      const st = allOff
+        ? `<button class="st action" title="${rcEsc(this._t("turn_all_off"))}"><ha-icon icon="mdi:power"></ha-icon><span class="pt">${rcEsc(status)}</span></button>`
+        : `<span class="st" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></span>`;
       this.shadowRoot.innerHTML = `
         <style>${RC_BASE_STYLES}${this.constructor.styles}</style>
         <ha-card class="lvl-${level}${cls}">
@@ -1485,7 +1501,7 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
             <div class="body">
               <div class="head${nav ? " nav" : ""}"${nav ? ' role="link" tabindex="0"' : ""}>
                 <div class="title">${rcEsc(c.title || this._areaName() || this._t("title"))}</div>
-                <span class="st" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></span>
+                ${st}
               </div>
               <div class="rs">${chips}</div>
             </div>
@@ -1493,6 +1509,7 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
         </ha-card>`;
       const root = this.shadowRoot;
       if (nav) rcBindNav(root.querySelector(".head"), nav);
+      root.querySelector(".st.action")?.addEventListener("click", (ev) => this._allOff(ev));
       for (const el of root.querySelectorAll(".r")) el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id));
     }
 
@@ -1508,6 +1525,32 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
       button.innerHTML = `<ha-icon icon="${rcZoomIcon(this)}"></ha-icon>`;
       button.addEventListener("click", (ev) => rcZoomClick(this, ev));
       head.appendChild(button);
+    }
+  };
+
+// Lights and plugs mini cards: the status counts what is on out of the total (*2/5 on*), with the full card's
+// "turn everything off" button; then a tinted pill (icon and name) for each entity on, its icon alone for the others.
+// The subclass may implement `_chipExtra(item)`, shown after the name (a plug's power draw).
+const rcToggleMini = (Base, tag, styles) =>
+  class extends rcMini(Base, tag, `${RC_TOGGLE_MINI_STYLES}${styles}`) {
+    _chipExtra() {
+      return "";
+    }
+
+    _drawMini(items) {
+      const s = this._summary(items, true);
+      if (!s) return;
+      const chips = s.shown
+        .map((i) => {
+          const cls = i.unavailable ? " na" : i.on ? " on pill" : " off";
+          const style = i.on && i.color ? ` style="--t:${rcEsc(i.color)}"` : "";
+          return `
+          <button class="r${cls}" data-id="${rcEsc(i.id)}"${style} title="${rcEsc(i.name)} — ${rcEsc(i.state)}">
+            <ha-icon icon="${rcEsc(i.icon)}"></ha-icon>${i.on ? `<span>${rcEsc(i.name)}</span>${this._chipExtra(i)}` : ""}
+          </button>`;
+        })
+        .join("");
+      this._paintMini({ level: s.level, icon: s.icon, status: s.status, chips, allOff: s.allOff });
     }
   };
 
@@ -1839,6 +1882,26 @@ const RC_ZOOM_STYLES = `
   .zoom ha-icon { --mdc-icon-size: 16px; }
   .zoom:hover { background: color-mix(in srgb, var(--rc-idle) 16%, transparent); color: var(--primary-text-color); }
   .zoom:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
+`;
+
+// Lights and plugs mini cards: the "turn everything off" status (not filled: tinted on hover, like the zoom button)
+// and the chips of the entities that are off (icon alone, grey).
+const RC_TOGGLE_MINI_STYLES = `
+  .st.action { all: unset; flex: 0 1 auto; min-width: 0; box-sizing: border-box; position: relative; cursor: pointer;
+               display: inline-flex; align-items: center; gap: 3px; margin-left: auto; padding: 1px 6px; border-radius: 999px;
+               font-size: 11px; font-weight: 500; color: var(--c); }
+  .st.action ha-icon { --mdc-icon-size: 12px; flex: none; }
+  .st.action:hover { background: color-mix(in srgb, var(--c) 14%, transparent); }
+  .st.action:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+  @container (max-width: 200px) {
+    .st.action { width: auto; height: auto; padding: 1px 4px; }
+    .st.action::before { content: none; }
+  }
+  .r.off, .r.na { padding: 0 3px; }
+  .r.off ha-icon, .r.na ha-icon { margin-right: 0; }
+  .r.off { --t: var(--rc-idle); }
+  .r.na  { --t: var(--rc-na); opacity: .7; }
+  .r small { flex: none; font-size: 10px; font-weight: 400; opacity: .8; margin-left: 4px; }
 `;
 
 // The overviews' room grid: the tiles, their icon, chips row, empty state and details panel. Each overview sets the

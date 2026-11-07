@@ -7,6 +7,7 @@
 const RW_I18N = {
   en: {
     title: "Plugs",
+    ed_columns_helper: "Mini card: columns of the zoomed-in view",
     all_off: "All off",
     on_one: "{n} on",
     on_many: "{n} on",
@@ -26,6 +27,7 @@ const RW_I18N = {
   },
   fr: {
     title: "Prises",
+    ed_columns_helper: "Mini-carte : colonnes de la vue zoomée",
     all_off: "Tout est éteint",
     on_one: "{n} allumée",
     on_many: "{n} allumées",
@@ -45,6 +47,7 @@ const RW_I18N = {
   },
   de: {
     title: "Steckdosen",
+    ed_columns_helper: "Mini-Karte: Spalten der vergrößerten Ansicht",
     all_off: "Alles aus",
     on_one: "{n} an",
     on_many: "{n} an",
@@ -64,6 +67,7 @@ const RW_I18N = {
   },
   es: {
     title: "Enchufes",
+    ed_columns_helper: "Minitarjeta: columnas de la vista ampliada",
     all_off: "Todo apagado",
     on_one: "{n} encendido",
     on_many: "{n} encendidos",
@@ -83,6 +87,7 @@ const RW_I18N = {
   },
   sr: {
     title: "Утичнице",
+    ed_columns_helper: "Мини картица: колоне у увећаном приказу",
     all_off: "Све искључено",
     on_one: "{n} укључена",
     on_few: "{n} укључене",
@@ -104,6 +109,7 @@ const RW_I18N = {
   },
   "sr-Latn": {
     title: "Utičnice",
+    ed_columns_helper: "Mini kartica: kolone u uvećanom prikazu",
     all_off: "Sve isključeno",
     on_one: "{n} uključena",
     on_few: "{n} uključene",
@@ -125,6 +131,7 @@ const RW_I18N = {
   },
   it: {
     title: "Prese",
+    ed_columns_helper: "Mini scheda: colonne della vista ingrandita",
     all_off: "Tutto spento",
     on_one: "{n} accesa",
     on_many: "{n} accese",
@@ -144,6 +151,7 @@ const RW_I18N = {
   },
   nl: {
     title: "Stekkers",
+    ed_columns_helper: "Minikaart: kolommen van de vergrote weergave",
     all_off: "Alles uit",
     on_one: "{n} aan",
     on_many: "{n} aan",
@@ -163,6 +171,7 @@ const RW_I18N = {
   },
   pt: {
     title: "Tomadas",
+    ed_columns_helper: "Minicartão: colunas da vista ampliada",
     all_off: "Tudo desligado",
     on_one: "{n} ligada",
     on_many: "{n} ligadas",
@@ -182,6 +191,7 @@ const RW_I18N = {
   },
   pl: {
     title: "Gniazdka",
+    ed_columns_helper: "Minikarta: kolumny widoku powiększonego",
     all_off: "Wyłączone",
     on_one: "Włączone: {n}",
     on_many: "Włączone: {n}",
@@ -201,6 +211,7 @@ const RW_I18N = {
   },
   ro: {
     title: "Prize",
+    ed_columns_helper: "Mini-card: coloanele vizualizării mărite",
     all_off: "Totul oprit",
     on_one: "Pornite: {n}",
     on_many: "Pornite: {n}",
@@ -220,6 +231,7 @@ const RW_I18N = {
   },
   da: {
     title: "Stik",
+    ed_columns_helper: "Minikort: kolonner i den forstørrede visning",
     all_off: "Alt slukket",
     on_one: "{n} tændt",
     on_many: "{n} tændte",
@@ -239,6 +251,7 @@ const RW_I18N = {
   },
   sv: {
     title: "Uttag",
+    ed_columns_helper: "Minikort: kolumner i inzoomad vy",
     all_off: "Allt avstängt",
     on_one: "{n} på",
     on_many: "{n} på",
@@ -258,6 +271,7 @@ const RW_I18N = {
   },
   bg: {
     title: "Контакти",
+    ed_columns_helper: "Мини карта: колони в увеличения изглед",
     all_off: "Всичко е изключено",
     on_one: "{n} включен",
     on_many: "{n} включени",
@@ -277,6 +291,7 @@ const RW_I18N = {
   },
   ru: {
     title: "Розетки",
+    ed_columns_helper: "Мини-карточка: столбцы развёрнутого вида",
     all_off: "Всё выключено",
     on_one: "Включено: {n}",
     on_many: "Включено: {n}",
@@ -296,6 +311,7 @@ const RW_I18N = {
   },
   uk: {
     title: "Розетки",
+    ed_columns_helper: "Міні-картка: стовпці розгорнутого вигляду",
     all_off: "Усе вимкнено",
     on_one: "Увімкнено: {n}",
     on_many: "Увімкнено: {n}",
@@ -315,6 +331,7 @@ const RW_I18N = {
   },
   hu: {
     title: "Aljzatok",
+    ed_columns_helper: "Mini kártya: a nagyított nézet oszlopai",
     all_off: "Minden kikapcsolva",
     on_one: "{n} bekapcsolva",
     on_many: "{n} bekapcsolva",
@@ -334,6 +351,7 @@ const RW_I18N = {
   },
   sk: {
     title: "Zásuvky",
+    ed_columns_helper: "Minikarta: stĺpce priblíženého zobrazenia",
     all_off: "Všetko vypnuté",
     on_one: "Zapnuté: {n}",
     on_many: "Zapnuté: {n}",
@@ -353,6 +371,7 @@ const RW_I18N = {
   },
   cs: {
     title: "Zásuvky",
+    ed_columns_helper: "Minikarta: sloupce přiblíženého zobrazení",
     all_off: "Vše vypnuto",
     on_one: "Zapnuto: {n}",
     on_many: "Zapnuto: {n}",
@@ -372,6 +391,7 @@ const RW_I18N = {
   },
   sl: {
     title: "Vtičnice",
+    ed_columns_helper: "Mini kartica: stolpci povečanega pogleda",
     all_off: "Vse izklopljeno",
     on_one: "Vklopljeno: {n}",
     on_many: "Vklopljeno: {n}",
@@ -391,6 +411,7 @@ const RW_I18N = {
   },
   lv: {
     title: "Ligzdas",
+    ed_columns_helper: "Mini karte: palielinātā skata kolonnas",
     all_off: "Viss izslēgts",
     on_one: "Ieslēgtas: {n}",
     on_many: "Ieslēgtas: {n}",
@@ -410,6 +431,7 @@ const RW_I18N = {
   },
   el: {
     title: "Πρίζες",
+    ed_columns_helper: "Μίνι κάρτα: στήλες της μεγεθυμένης προβολής",
     all_off: "Όλα σβηστά",
     on_one: "{n} ενεργή",
     on_many: "{n} ενεργές",
@@ -526,4 +548,33 @@ rcRegister(
   RoomSwitchCardEditor,
   "Room Switch Card",
   "Smart plugs of a room with their power draw: tap to toggle, hold for details",
+);
+
+// ── Mini card ────────────────────────────────────────────────────────────────
+// The room on two lines: the badge, title and status (*2/4 on · 1.2 kW*, with the button turning every plug off
+// when `all_off_button` is set), then a pill with its name and power draw for each plug that is on, the icon alone
+// for the others. The zoom button switches to the full Plugs card and back. `columns` only shapes the zoomed-in view.
+class RoomSwitchMiniCard extends rcToggleMini(RoomSwitchCard, "room-switch-mini-card", ".r.on { --t: var(--rc-plug); }") {
+  _chipExtra(i) {
+    return i.watts != null ? `<small>${rcEsc(rcWatts(i.watts))}</small>` : "";
+  }
+}
+
+const RoomSwitchMiniCardEditor = rcEditor({
+  card: RoomSwitchMiniCard,
+  helpers: ["title", "navigation_path", "columns", "only_on", "hide_when_off", "show_power", "all_off_button", "zoom", "include", ...RC_ADVANCED_HELPERS],
+  schema: (lang, hass, config) => [
+    ...rcAreaFields(true),
+    ...rcBooleans("only_on", "hide_when_off", "show_power", "all_off_button", "zoom"),
+    ...rcIncludeField(RoomSwitchMiniCard, hass, config),
+    ...rcExcludeField(RoomSwitchMiniCard, hass, config),
+    ...rcAdvanced(RW_I18N, lang, "entities", "language"),
+  ],
+});
+
+rcRegister(
+  RoomSwitchMiniCard,
+  RoomSwitchMiniCardEditor,
+  "Room Switch Mini Card",
+  "The plugs of a room on two lines: how many are on, their power draw, and a zoom to the full card",
 );
