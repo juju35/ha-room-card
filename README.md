@@ -1,6 +1,6 @@
 # ha-room-card
 
-[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![Marketplace](https://img.shields.io/badge/Marketplace-Custom-41BDF5.svg)](https://www.home-assistant.io/integrations/marketplace/)
 [![HACS Validation](https://github.com/juju35/ha-room-card/actions/workflows/hacs.yml/badge.svg)](https://github.com/juju35/ha-room-card/actions/workflows/hacs.yml)
 [![Validate](https://github.com/juju35/ha-room-card/actions/workflows/validate.yml/badge.svg)](https://github.com/juju35/ha-room-card/actions/workflows/validate.yml)
 [![Lint](https://github.com/juju35/ha-room-card/actions/workflows/lint.yml/badge.svg)](https://github.com/juju35/ha-room-card/actions/workflows/lint.yml)
@@ -10,7 +10,7 @@
 
 Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, plugs, environment readings, and an overview of every room. Add a card, pick a room, it finds the entities by itself.
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-room-card&category=plugin)
+[![Open your Home Assistant instance and open a repository inside the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-room-card&category=plugin)
 
 | Card | Type | What it shows |
 |---|---|---|
@@ -27,7 +27,7 @@ Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, pl
 |---|---|---|---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all.png" alt="Overview" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open.png" alt="Sensors" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on.png" alt="Lights" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on.png" alt="Plugs" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-stuffy.png" alt="Environment" width="400"> |
 
-All the cards share the same look (header with a status pill, compact tiles), a visual editor in the dashboard UI covering every option (lists and maps such as `entities`, `thresholds` and `rooms` in its folded **Advanced** section, as YAML), English, French, German, Spanish, Serbian (Cyrillic and Latin), Italian, Dutch, European Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek labels following the Home Assistant language, light and dark themes, and come in a single HACS download with no dependency.
+All the cards share the same look (header with a status pill, compact tiles), a visual editor in the dashboard UI covering every option (lists and maps such as `entities`, `thresholds` and `rooms` in its folded **Advanced** section, as YAML), English, French, German, Spanish, Serbian (Cyrillic and Latin), Italian, Dutch, European Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek labels following the Home Assistant language, light and dark themes, and come in a single Marketplace install with no dependency.
 
 ## Features
 
@@ -136,20 +136,20 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 
 ## Installation
 
-### Via HACS (recommended)
+### Via the Marketplace (recommended)
 
 Click the button below to add the repository directly:
 
-[![Add to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-room-card&category=plugin)
+[![Add to the Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-room-card&category=plugin)
 
 Or manually:
 
-1. Open HACS → **⋮** → **Custom repositories**
+1. Open **Settings → Marketplace → Add from link** (top right; this needs a GitHub account connected)
 2. Add `https://github.com/juju35/ha-room-card` — Category: **Dashboard** (Lovelace)
-3. Search for **Room Cards** and install it
+3. Open **Room Cards** and click **Install**
 4. Clear your browser cache and refresh
 
-HACS registers the dashboard resource for you; the single file provides every card.
+The Marketplace registers the dashboard resource for you; the single file provides every card.
 
 ### Manual
 
@@ -162,7 +162,7 @@ HACS registers the dashboard resource for you; the single file provides every ca
 
 ### Coming from room-sensors-card, room-lights-card or room-switch-card
 
-Remove the old repository and its resource from HACS, then install this one: the card types are unchanged, so your dashboards keep working as they are.
+Uninstall the old repository (and its resource) in **Settings → Marketplace**, then install this one: the card types are unchanged, so your dashboards keep working as they are.
 
 ## Configuration
 
@@ -656,7 +656,7 @@ npm run check        # builds and checks the bundle (run in CI)
 npm run screenshots  # renders every card with mock data into screenshots/, and the animation GIFs (needs ffmpeg)
 ```
 
-Each card has its own source in `src/`; the build wraps each one in its own block and concatenates them into the single HACS file. `dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where HACS downloads it from.
+Each card has its own source in `src/`; the build wraps each one in its own block and concatenates them into the single file the Marketplace installs. `dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where the Marketplace installs it from.
 
 ### Releasing
 
