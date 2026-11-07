@@ -381,18 +381,20 @@ In addition to the [common options](#common-options):
 
 ### Lights mini
 
-Same options as the [Lights card](#lights), plus `zoom`; `columns` and `show_brightness` only shape the zoomed-in view:
+Same options as the [Lights card](#lights), `all_off_button` included (the power button on the status), plus:
+
+| Option | Required | Default | Description |
+|---|---|---|---|
+| `zoom` | ❌ | `true` | Zoom button switching to the full Lights card and back (`columns` and `show_brightness` only shape that view) |
+
+For example, a living room showing only the lights that are on, the title opening the lights dashboard:
 
 ```yaml
 type: custom:room-lights-mini-card
 area: living_room
+navigation_path: /light
 only_on: true
-zoom: true
 ```
-
-| Option | Required | Default | Description |
-|---|---|---|---|
-| `zoom` | ❌ | `true` | Zoom button switching to the full Lights card and back |
 
 ### Plugs
 
@@ -443,18 +445,21 @@ In addition to the [common options](#common-options):
 
 ### Plugs mini
 
-Same options as the [Plugs card](#plugs), plus `zoom`; `columns` only shapes the zoomed-in view:
+Same options as the [Plugs card](#plugs), `show_power` included (the total in the status, each plug's draw on its chip), plus:
+
+| Option | Required | Default | Description |
+|---|---|---|---|
+| `zoom` | ❌ | `true` | Zoom button switching to the full Plugs card and back (`columns` only shapes that view) |
+
+For example, with the power button on the status, leaving out the router plug:
 
 ```yaml
 type: custom:room-switch-mini-card
 area: living_room
 all_off_button: true
-zoom: true
+exclude:
+  - switch.living_room_router
 ```
-
-| Option | Required | Default | Description |
-|---|---|---|---|
-| `zoom` | ❌ | `true` | Zoom button switching to the full Plugs card and back |
 
 ### Environment
 
