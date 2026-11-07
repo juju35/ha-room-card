@@ -109,7 +109,7 @@ test("Mini cards: the status ellipsises instead of pushing out the title and the
 
 test("Mini cards: the header badge keeps the full card's size", () => {
   for (const tag of ["room-sensors-mini-card", "room-lights-mini-card", "room-switch-mini-card", "room-environment-mini-card"]) {
-    if (!cards[tag]) continue;
+    assert.ok(cards[tag], tag);
     const css = cards[tag].styles;
     assert.doesNotMatch(css, /\.mini[^{}]*\.badge[^{]*\{/, `${tag}: no mini-only badge rule`);
   }
@@ -172,7 +172,7 @@ test("Tiles: a reading is never cut, it wraps; one tile per row on a card under 
 });
 
 test("Mini cards: 6 columns at least (at 4, ~104-121 px on a phone, the zoom button left the card)", () => {
-  for (const tag of ["room-sensors-mini-card", "room-environment-mini-card"]) {
+  for (const tag of ["room-sensors-mini-card", "room-environment-mini-card", "room-lights-mini-card", "room-switch-mini-card"]) {
     assert.equal(new cards[tag]().getGridOptions().min_columns, 6, tag);
   }
 });

@@ -7,6 +7,7 @@
 const RL_I18N = {
   en: {
     title: "Lights",
+    ed_columns_helper: "Mini card: columns of the zoomed-in view",
     // Light tiles: feminine where "light" is ("1 encendida" / "Encendida · 50 %").
     on: "On",
     off: "Off",
@@ -28,6 +29,7 @@ const RL_I18N = {
   },
   fr: {
     title: "Lumières",
+    ed_columns_helper: "Mini-carte : colonnes de la vue zoomée",
     on: "Allumée",
     off: "Éteinte",
     all_off: "Tout est éteint",
@@ -48,6 +50,7 @@ const RL_I18N = {
   },
   de: {
     title: "Lichter",
+    ed_columns_helper: "Mini-Karte: Spalten der vergrößerten Ansicht",
     on: "An",
     off: "Aus",
     all_off: "Alles aus",
@@ -68,6 +71,7 @@ const RL_I18N = {
   },
   es: {
     title: "Luces",
+    ed_columns_helper: "Minitarjeta: columnas de la vista ampliada",
     on: "Encendida",
     off: "Apagada",
     all_off: "Todo apagado",
@@ -88,6 +92,7 @@ const RL_I18N = {
   },
   sr: {
     title: "Светла",
+    ed_columns_helper: "Мини картица: колоне у увећаном приказу",
     on: "Укључено",
     off: "Искључено",
     all_off: "Све искључено",
@@ -109,6 +114,7 @@ const RL_I18N = {
   },
   "sr-Latn": {
     title: "Svetla",
+    ed_columns_helper: "Mini kartica: kolone u uvećanom prikazu",
     on: "Uključeno",
     off: "Isključeno",
     all_off: "Sve isključeno",
@@ -130,6 +136,7 @@ const RL_I18N = {
   },
   it: {
     title: "Luci",
+    ed_columns_helper: "Mini scheda: colonne della vista ingrandita",
     on: "Accesa",
     off: "Spenta",
     all_off: "Tutto spento",
@@ -150,6 +157,7 @@ const RL_I18N = {
   },
   nl: {
     title: "Lampen",
+    ed_columns_helper: "Minikaart: kolommen van de vergrote weergave",
     on: "Aan",
     off: "Uit",
     all_off: "Alles uit",
@@ -170,6 +178,7 @@ const RL_I18N = {
   },
   pt: {
     title: "Luzes",
+    ed_columns_helper: "Minicartão: colunas da vista ampliada",
     on: "Acesa",
     off: "Apagada",
     all_off: "Tudo apagado",
@@ -190,6 +199,7 @@ const RL_I18N = {
   },
   pl: {
     title: "Światła",
+    ed_columns_helper: "Minikarta: kolumny widoku powiększonego",
     on: "Włączone",
     off: "Wyłączone",
     all_off: "Wyłączone",
@@ -210,6 +220,7 @@ const RL_I18N = {
   },
   ro: {
     title: "Lumini",
+    ed_columns_helper: "Mini-card: coloanele vizualizării mărite",
     on: "Aprinsă",
     off: "Stinsă",
     all_off: "Totul stins",
@@ -230,6 +241,7 @@ const RL_I18N = {
   },
   da: {
     title: "Lys",
+    ed_columns_helper: "Minikort: kolonner i den forstørrede visning",
     on: "Tændt",
     off: "Slukket",
     all_off: "Alt slukket",
@@ -250,6 +262,7 @@ const RL_I18N = {
   },
   sv: {
     title: "Lampor",
+    ed_columns_helper: "Minikort: kolumner i inzoomad vy",
     on: "På",
     off: "Av",
     all_off: "Allt släckt",
@@ -270,6 +283,7 @@ const RL_I18N = {
   },
   bg: {
     title: "Светлини",
+    ed_columns_helper: "Мини карта: колони в увеличения изглед",
     on: "Включена",
     off: "Изключена",
     all_off: "Всичко е изключено",
@@ -290,6 +304,7 @@ const RL_I18N = {
   },
   ru: {
     title: "Освещение",
+    ed_columns_helper: "Мини-карточка: столбцы развёрнутого вида",
     on: "Включено",
     off: "Выключено",
     all_off: "Всё выключено",
@@ -310,6 +325,7 @@ const RL_I18N = {
   },
   uk: {
     title: "Освітлення",
+    ed_columns_helper: "Міні-картка: стовпці розгорнутого вигляду",
     on: "Увімкнено",
     off: "Вимкнено",
     all_off: "Усе вимкнено",
@@ -330,6 +346,7 @@ const RL_I18N = {
   },
   hu: {
     title: "Világítás",
+    ed_columns_helper: "Mini kártya: a nagyított nézet oszlopai",
     on: "Be",
     off: "Ki",
     all_off: "Minden kikapcsolva",
@@ -350,6 +367,7 @@ const RL_I18N = {
   },
   sk: {
     title: "Svetlá",
+    ed_columns_helper: "Minikarta: stĺpce priblíženého zobrazenia",
     on: "Zapnuté",
     off: "Vypnuté",
     all_off: "Všetko vypnuté",
@@ -370,6 +388,7 @@ const RL_I18N = {
   },
   cs: {
     title: "Světla",
+    ed_columns_helper: "Minikarta: sloupce přiblíženého zobrazení",
     on: "Zapnuto",
     off: "Vypnuto",
     all_off: "Vše vypnuto",
@@ -390,6 +409,7 @@ const RL_I18N = {
   },
   sl: {
     title: "Luči",
+    ed_columns_helper: "Mini kartica: stolpci povečanega pogleda",
     on: "Vklopljeno",
     off: "Izklopljeno",
     all_off: "Vse izklopljeno",
@@ -410,6 +430,7 @@ const RL_I18N = {
   },
   lv: {
     title: "Gaismas",
+    ed_columns_helper: "Mini karte: palielinātā skata kolonnas",
     on: "Ieslēgts",
     off: "Izslēgts",
     all_off: "Viss izslēgts",
@@ -430,6 +451,7 @@ const RL_I18N = {
   },
   el: {
     title: "Φώτα",
+    ed_columns_helper: "Μίνι κάρτα: στήλες της μεγεθυμένης προβολής",
     on: "Αναμμένο",
     off: "Σβηστό",
     all_off: "Όλα σβηστά",
@@ -587,4 +609,30 @@ rcRegister(
   RoomLightsCardEditor,
   "Room Lights Card",
   "Lights of a room: tap to toggle, drag to dim, turn everything off from the header",
+);
+
+// ── Mini card ────────────────────────────────────────────────────────────────
+// The room on two lines: the badge, title and status (*2/4 on*, with the button turning every light off), then a
+// pill tinted with its colour for each light that is on, the icon alone for the others. The zoom button switches to
+// the full Lights card (tap to toggle, drag to dim) and back. `columns` and `show_brightness` only shape the
+// zoomed-in view.
+class RoomLightsMiniCard extends rcToggleMini(RoomLightsCard, "room-lights-mini-card", ".r.on { --t: var(--rc-light); }") {}
+
+const RoomLightsMiniCardEditor = rcEditor({
+  card: RoomLightsMiniCard,
+  helpers: ["title", "navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "include", ...RC_ADVANCED_HELPERS],
+  schema: (lang, hass, config) => [
+    ...rcAreaFields(true),
+    ...rcBooleans("only_on", "hide_when_off", "all_off_button", "zoom", "show_brightness"),
+    ...rcIncludeField(RoomLightsMiniCard, hass, config),
+    ...rcExcludeField(RoomLightsMiniCard, hass, config),
+    ...rcAdvanced(RL_I18N, lang, "entities", "language"),
+  ],
+});
+
+rcRegister(
+  RoomLightsMiniCard,
+  RoomLightsMiniCardEditor,
+  "Room Lights Mini Card",
+  "The lights of a room on two lines: how many are on, a button to turn them all off, and a zoom to the full card",
 );

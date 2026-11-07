@@ -18,7 +18,9 @@ Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, pl
 | [Sensors](#sensors) | `custom:room-sensors-card` | Leak, door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open. |
 | [Sensors mini](#sensors-mini) | `custom:room-sensors-mini-card` | The same sensors on two lines, with a zoom to the full card. |
 | [Lights](#lights) | `custom:room-lights-card` | Lights of a room: tap to toggle, drag to dim, turn everything off from the header. |
+| [Lights mini](#lights-mini) | `custom:room-lights-mini-card` | The same lights on two lines: how many are on, a button to turn them all off, a zoom to the full card. |
 | [Plugs](#plugs) | `custom:room-switch-card` | Smart plugs of a room with their power draw: what is on comes first, the most power-hungry first. |
+| [Plugs mini](#plugs-mini) | `custom:room-switch-mini-card` | The same plugs on two lines: how many are on and their power draw, with a zoom to the full card. |
 | [Environment](#environment) | `custom:room-environment-card` | Temperature, humidity, air quality, noise and light level of a room, coloured by comfort. |
 | [Environment mini](#environment-mini) | `custom:room-environment-mini-card` | The same readings on a single line, for a compact dashboard. |
 | [Environment overview](#environment-overview) | `custom:room-environment-overview-card` | The indoor climate of every room at a glance; tap a room to unfold its readings. |
@@ -80,6 +82,17 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Tap the title to open a dashboard (`navigation_path`)
 - Automatic discovery from the area, or an explicit list with name and icon overrides (custom icon sets supported)
 
+### Lights mini
+
+`custom:room-lights-mini-card` — The lights of a room on two lines, for a compact dashboard; zoom in to toggle and dim them.
+
+- Room badge coloured like the Lights card, the title and the status on the first line: *All off*, or how many lights are on out of the total (*2/4 on*)
+- The status doubles as a power button turning every light of the room off (`all_off_button`, on by default)
+- On the second line, a pill tinted with its colour and showing its name for each light that is on, the icon alone for the others (`only_on` hides them)
+- **Zoom** button (top right) switches the card to the full [Lights card](#lights) — tap to toggle, drag to dim — and back, as does a click anywhere else (`zoom: false` removes it)
+- Same discovery and options as the Lights card: `only_on`, `hide_when_off`, `include` / `exclude`, `navigation_path`
+- Tap a light to open its details
+
 ### Plugs
 
 `custom:room-switch-card` — Smart plugs of a room with their power draw: what is on comes first, the most power-hungry first.
@@ -94,6 +107,17 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Show only the plugs that are on (`only_on`), or hide the whole card when everything is off (`hide_when_off`)
 - Tap the title to open a dashboard (`navigation_path`)
 - Automatic discovery from the area, or an explicit list with name, icon and power sensor overrides
+
+### Plugs mini
+
+`custom:room-switch-mini-card` — The plugs of a room on two lines, for a compact dashboard; zoom in to toggle them.
+
+- Room badge coloured like the Plugs card, the title and the status on the first line: *All off*, or how many plugs are on out of the total and their power draw (*2/4 on · 1.2 kW*)
+- With `all_off_button: true`, the status doubles as a power button turning every plug of the room off (off by default, like the Plugs card)
+- On the second line, a pill with its name and power draw for each plug that is on (*Coffee Machine 1.2 kW*), the icon alone for the others (`only_on` hides them)
+- **Zoom** button (top right) switches the card to the full [Plugs card](#plugs) and back, as does a click anywhere else (`zoom: false` removes it)
+- Same discovery and options as the Plugs card: `only_on`, `hide_when_off`, `show_power`, `include` / `exclude`, `navigation_path`
+- Tap a plug to open its details
 
 ### Environment
 
@@ -355,6 +379,21 @@ In addition to the [common options](#common-options):
 |---|---|---|---|
 | `show_brightness` | ❌ | `true` | Brightness bar and drag-to-dim on dimmable lights |
 
+### Lights mini
+
+Same options as the [Lights card](#lights), plus `zoom`; `columns` and `show_brightness` only shape the zoomed-in view:
+
+```yaml
+type: custom:room-lights-mini-card
+area: living_room
+only_on: true
+zoom: true
+```
+
+| Option | Required | Default | Description |
+|---|---|---|---|
+| `zoom` | ❌ | `true` | Zoom button switching to the full Lights card and back |
+
 ### Plugs
 
 Minimal:
@@ -401,6 +440,21 @@ In addition to the [common options](#common-options):
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `show_power` | ❌ | `true` | Power draw of each plug and total in the header |
+
+### Plugs mini
+
+Same options as the [Plugs card](#plugs), plus `zoom`; `columns` only shapes the zoomed-in view:
+
+```yaml
+type: custom:room-switch-mini-card
+area: living_room
+all_off_button: true
+zoom: true
+```
+
+| Option | Required | Default | Description |
+|---|---|---|---|
+| `zoom` | ❌ | `true` | Zoom button switching to the full Plugs card and back |
 
 ### Environment
 
@@ -574,6 +628,12 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on.png" alt="Lights on" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-off.png" alt="All off" width="400"> |
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-on-dark.png" alt="Lights on dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-off-dark.png" alt="All off dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-mini-on.png" alt="Mini lights on" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-mini-off.png" alt="Mini all off" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-mini-on-dark.png" alt="Mini lights on dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-mini-off-dark.png" alt="Mini all off dark" width="400"> |
+
+| Mini card zoomed in | |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-mini-zoom.png" alt="Mini zoomed in" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-mini-zoom-dark.png" alt="Mini zoomed in dark" width="400"> |
 
 ### Plugs
 
@@ -581,6 +641,12 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on.png" alt="Plugs on" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-off.png" alt="All off" width="400"> |
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-on-dark.png" alt="Plugs on dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-off-dark.png" alt="All off dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-mini-on.png" alt="Mini plugs on" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-mini-off.png" alt="Mini all off" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-mini-on-dark.png" alt="Mini plugs on dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-mini-off-dark.png" alt="Mini all off dark" width="400"> |
+
+| Mini card zoomed in | |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-mini-zoom.png" alt="Mini zoomed in" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-mini-zoom-dark.png" alt="Mini zoomed in dark" width="400"> |
 
 ### Environment
 

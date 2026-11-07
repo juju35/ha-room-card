@@ -493,6 +493,80 @@ test("the sensors mini card hides quiet sensors, and shows them once zoomed in",
   assert.equal(card._config.only_alerts, undefined, "the config itself is left alone");
 });
 
+// The kitchen with a second light, off: one light on out of two.
+const twoLights = () => {
+  const h = makeHass();
+  h.entities["light.lamp"] = { area_id: "kitchen" };
+  h.states["light.lamp"] = { entity_id: "light.lamp", state: "off", attributes: { friendly_name: "Lamp" } };
+  return h;
+};
+
+test("the lights mini card: on out of the total, a named pill for each light on, the icon alone for the others", () => {
+  const card = new cards["room-lights-mini-card"]();
+  card.setConfig({ area: "kitchen", language: "en" });
+  card.hass = twoLights();
+  let html = card.shadowRoot.innerHTML;
+  assert.match(html, /class="mini"/);
+  assert.match(html, /class="pt">1\/2 on</);
+  assert.match(html, /class="r on pill" data-id="light.ceiling"[^>]*>\s*<ha-icon[^>]*><\/ha-icon><span>Ceiling light<\/span>/);
+  assert.match(html, /class="r off" data-id="light.lamp"[^>]*>\s*<ha-icon[^>]*><\/ha-icon>\s*<\/button>/);
+  assert.match(html, /class="st action" title="Turn everything off"/, "all_off_button is on by default for lights");
+  assert.equal(card.getCardSize(), 1);
+  card._zoomed = true;
+  card._sig = null;
+  card._render();
+  html = card.shadowRoot.innerHTML;
+  assert.doesNotMatch(html, /class="mini"/);
+  assert.match(html, /class="pt">1 on</, "the full card counts without the total");
+  assert.match(html, /class="tile on/);
+});
+
+test("the lights mini card turns every light that is on off from its status", () => {
+  const calls = [];
+  const card = new cards["room-lights-mini-card"]();
+  card.setConfig({ area: "kitchen" });
+  card.hass = { ...twoLights(), callService: (...a) => calls.push(JSON.parse(JSON.stringify(a))) };
+  let stopped = false;
+  card._allOff({ stopPropagation: () => (stopped = true) });
+  assert.ok(stopped, "the click does not reach the title (navigation_path)");
+  assert.deepEqual(calls, [["homeassistant", "turn_off", { entity_id: ["light.ceiling"] }]]);
+});
+
+test("the lights mini card: no off button when all is off or all_off_button is false, only_on and hide_when_off apply", () => {
+  const card = new cards["room-lights-mini-card"]();
+  card.setConfig({ area: "kitchen", all_off_button: false, only_on: true });
+  card.hass = twoLights();
+  let html = card.shadowRoot.innerHTML;
+  assert.doesNotMatch(html, /st action/);
+  assert.match(html, /<span class="st"/);
+  assert.doesNotMatch(html, /data-id="light.lamp"/, "only_on hides the lights that are off");
+  const h = twoLights();
+  h.states["light.ceiling"] = { ...h.states["light.ceiling"], state: "off" };
+  card.setConfig({ area: "kitchen", language: "en" });
+  card.hass = h;
+  html = card.shadowRoot.innerHTML;
+  assert.match(html, /class="pt">All off</);
+  assert.doesNotMatch(html, /st action/);
+  card.setConfig({ area: "kitchen", hide_when_off: true });
+  assert.equal(card.style.display, "none");
+  assert.equal(card.getCardSize(), 0);
+});
+
+test("the plugs mini card: on out of the total with the power draw, each plug on with its own", () => {
+  const card = new cards["room-switch-mini-card"]();
+  card.setConfig({ area: "kitchen", language: "en", include: ["switch.relay"] });
+  card.hass = makeHass();
+  const html = card.shadowRoot.innerHTML;
+  assert.match(html, /class="pt">1\/2 on · 12 W</);
+  assert.match(html, /data-id="switch.coffee_plug"[^>]*>\s*<ha-icon[^>]*><\/ha-icon><span>Coffee<\/span><small>12 W<\/small>/);
+  assert.match(html, /class="r off" data-id="switch.relay"/);
+  assert.doesNotMatch(html, /st action/, "all_off_button is off by default for plugs");
+  card.setConfig({ area: "kitchen", all_off_button: true });
+  assert.match(card.shadowRoot.innerHTML, /class="st action"/);
+  card.setConfig({ area: "kitchen", show_power: false });
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /<small>|W</);
+});
+
 test("the Overview only shows active rooms until its detail button shows them all", () => {
   const h = makeHass();
   h.areas.office = { area_id: "office", name: "Office" };
@@ -560,6 +634,8 @@ test("each visual editor offers every option of its card", () => {
   has("room-sensors-mini-card", room, ["navigation_path", "columns", "hide_when_clear", "presence", "blink", "zoom", "entities", "language"]);
   has("room-lights-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "entities", "language"]);
   has("room-switch-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_power", "all_off_button", "entities", "language"]);
+  has("room-lights-mini-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "entities", "language"]);
+  has("room-switch-mini-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_power", "all_off_button", "zoom", "entities", "language"]);
   has("room-environment-card", room, ["navigation_path", "columns", "only_alerts", "show_gauge", "thresholds", "entities", "language"]);
   has("room-environment-mini-card", room, ["navigation_path", "columns", "only_alerts", "show_gauge", "zoom", "thresholds", "entities", "language"]);
   has("room-overview-card", {}, ["title", "columns", "sort", "presence", "zoom", "all_off_button", "plugs_off_button", "exclude_areas", "rooms", "language"]);
