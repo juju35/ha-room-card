@@ -799,3 +799,98 @@ test("the Overview only unfolds the room cards of the kinds a room has", () => {
   overview._toggle("kitchen");
   assert.deepEqual([...overview._details.map((el) => el._config.type)], ["custom:room-lights-card"]);
 });
+
+// The kitchen with its door sensor unavailable (the diagnostic door left out: it is open).
+const deadDoor = (state = "unavailable") => {
+  const h = makeHass();
+  h.states["binary_sensor.door"] = { ...h.states["binary_sensor.door"], state };
+  return h;
+};
+
+test("an unavailable door sensor is no all-clear: the card warns, counts it and never hides", () => {
+  for (const tag of ["room-sensors-card", "room-sensors-mini-card"]) {
+    const card = new cards[tag]();
+    card.setConfig({ entities: ["binary_sensor.door"], hide_when_clear: true, language: "en" });
+    card.hass = deadDoor();
+    assert.notEqual(card.style.display, "none", `${tag} shown`);
+    assert.match(card.shadowRoot.innerHTML, /lvl-warn/, tag);
+    assert.match(card.shadowRoot.innerHTML, /class="pt">1 unavailable</, tag);
+    card.hass = deadDoor("unknown");
+    assert.match(card.shadowRoot.innerHTML, /class="pt">1 unavailable</, `${tag} unknown`);
+    card.hass = deadDoor("off");
+    assert.equal(card.style.display, "none", `${tag} hidden once it reports closed`);
+  }
+});
+
+test("an unavailable presence sensor alone does not warn", () => {
+  const h = makeHass();
+  h.entities["binary_sensor.motion"] = { area_id: "kitchen" };
+  h.states["binary_sensor.motion"] = { entity_id: "binary_sensor.motion", state: "unavailable", attributes: { device_class: "motion" } };
+  const card = new cards["room-sensors-card"]();
+  card.setConfig({ entities: ["binary_sensor.door", "binary_sensor.motion"], language: "en" });
+  card.hass = h;
+  assert.match(card.shadowRoot.innerHTML, /lvl-ok/);
+  assert.match(card.shadowRoot.innerHTML, /All closed/);
+});
+
+test("the Overview keeps a room with an unavailable sensor among the rooms needing a look, and warns", () => {
+  const h = deadDoor();
+  h.states["binary_sensor.diag_door"] = { ...h.states["binary_sensor.diag_door"], state: "off" };
+  h.states["light.ceiling"] = { ...h.states["light.ceiling"], state: "off" };
+  h.states["switch.coffee_plug"] = { ...h.states["switch.coffee_plug"], state: "off" };
+  const { nodes } = overviewSetup({ language: "en" }, h);
+  assert.match(nodes[".grid"].innerHTML, /data-area="kitchen"/);
+  assert.match(nodes[".grid"].innerHTML, /class="room lvl-warn/);
+  assert.match(nodes[".grid"].innerHTML, /1 unavailable/);
+  assert.match(nodes[".head"].innerHTML, /1 unavailable/);
+});
+
+test("from the keyboard: Shift+Enter and the context-menu key open the details, arrows step a drag", () => {
+  const t = pressSetup();
+  t.tile.fire("keydown", { key: "Enter", shiftKey: true });
+  t.tile.fire("keydown", { key: "ContextMenu" });
+  t.tile.fire("keydown", { key: "ContextMenu", repeat: true });
+  assert.deepEqual(t.calls, ["hold", "hold"]);
+  t.tile.fire("keydown", { key: "ArrowRight" }); // no drag on this tile: nothing
+  assert.deepEqual(t.calls, ["hold", "hold"]);
+  const tile = fakeTile();
+  const steps = [];
+  t.card._bindPress(tile, { onTap() {}, onHold() {}, drag: { move() {}, end() {}, step: (d) => steps.push(d) } });
+  tile.fire("keydown", { key: "ArrowRight" });
+  tile.fire("keydown", { key: "ArrowLeft" });
+  assert.deepEqual(steps, [10, -10]);
+});
+
+test("the arrow keys dim a dimmable light by 10 %, within 1-100 %", () => {
+  const card = new cards["room-lights-card"]();
+  card.setConfig({ area: "kitchen" });
+  const calls = [];
+  const h = makeHass({ callService: (...a) => calls.push(a) });
+  h.states["light.ceiling"] = {
+    ...h.states["light.ceiling"],
+    attributes: { friendly_name: "Ceiling", brightness: 242, supported_color_modes: ["brightness"] },
+  };
+  card.hass = h;
+  const item = card._items.find((i) => i.id === "light.ceiling");
+  assert.ok(item.dimmable);
+  const tile = fakeTile();
+  const state = { textContent: "" };
+  tile.querySelector = (s) => (s === ".state" ? state : { style: {} });
+  card._bindTile(tile, item);
+  tile.fire("keydown", { key: "ArrowRight" });
+  tile.fire("keydown", { key: "ArrowRight" });
+  tile.fire("keydown", { key: "ArrowLeft" });
+  assert.deepEqual(
+    calls.map((c) => c[2].brightness_pct),
+    [100, 90],
+    "95 % → 100 %, a second step up does nothing, then 90 %",
+  );
+  assert.match(state.textContent, /90 %/);
+});
+
+test("powers follow the card's language", () => {
+  assert.equal(rc.rcWatts(1234, "en"), "1.2 kW");
+  assert.equal(rc.rcWatts(1234, "fr"), "1,2 kW");
+  assert.equal(rc.rcWatts(12345, "de"), "12 kW");
+  assert.equal(rc.rcWatts(80.4, "fr"), "80 W");
+});

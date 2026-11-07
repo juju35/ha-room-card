@@ -501,7 +501,7 @@ class RoomSwitchCard extends RcToggleCard {
         };
         item.state = unavailable
           ? this._t("unavailable")
-          : `${this._t(on ? "on" : "off")}${on && watts != null ? ` · ${rcWatts(watts)}` : ""}`;
+          : `${this._t(on ? "on" : "off")}${on && watts != null ? ` · ${rcWatts(watts, this._lang())}` : ""}`;
         return item;
       })
       .sort((a, b) => b.on - a.on || (b.watts ?? -1) - (a.watts ?? -1) || a.name.localeCompare(b.name));
@@ -518,7 +518,7 @@ class RoomSwitchCard extends RcToggleCard {
   // Total power of the plugs that are on, when at least one of them reports it.
   _statusExtra(lit) {
     if (!lit.some((i) => i.watts != null)) return "";
-    return ` · ${rcWatts(lit.reduce((t, i) => t + (i.watts ?? 0), 0))}`;
+    return ` · ${rcWatts(lit.reduce((t, i) => t + (i.watts ?? 0), 0), this._lang())}`;
   }
 
   static styles = `
@@ -556,7 +556,7 @@ rcRegister(
 // for the others. The zoom button switches to the full Plugs card and back. `columns` only shapes the zoomed-in view.
 class RoomSwitchMiniCard extends rcToggleMini(RoomSwitchCard, "room-switch-mini-card", ".r.on { --t: var(--rc-plug); }") {
   _chipExtra(i) {
-    return i.watts != null ? `<small>${rcEsc(rcWatts(i.watts))}</small>` : "";
+    return i.watts != null ? `<small>${rcEsc(rcWatts(i.watts, this._lang()))}</small>` : "";
   }
 }
 

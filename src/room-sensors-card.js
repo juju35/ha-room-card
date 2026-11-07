@@ -744,27 +744,31 @@ class RoomSensorsCard extends RcCard {
       .sort((a, b) => this._rank(b) - this._rank(a) || a.name.localeCompare(b.name));
   }
 
-  // State of the room, shared by the full and the mini card.
+  // State of the room, shared by the full and the mini card. An unavailable leak or opening sensor is no all-clear:
+  // it warns (*2 unavailable*) like an open one.
   _summary(items) {
     const leaks = items.filter((i) => i.kind === "leak" && i.on).length;
     const open = items.filter((i) => i.kind !== "leak" && !i.info && i.on).length;
+    const unavail = items.filter((i) => !i.info && i.unavailable).length;
+    const warn = open || unavail;
     return {
       leaks,
       open,
       occupied: items.some((i) => i.info && i.on),
-      level: leaks ? "alert" : open ? "warn" : "ok",
-      icon: leaks ? "mdi:water-alert" : open ? "mdi:shield-alert-outline" : "mdi:shield-home-outline",
+      level: leaks ? "alert" : warn ? "warn" : "ok",
+      icon: leaks ? "mdi:water-alert" : warn ? "mdi:shield-alert-outline" : "mdi:shield-home-outline",
       status: this._openingStatus(
         leaks,
         open,
         items.some((i) => i.kind !== "leak" && !i.info),
         items.length ? "all_quiet" : "no_sensors",
+        unavail,
       ),
     };
   }
 
   // The summary and the sensors to draw, or null when nothing changed since `parts` were last drawn or the card is
-  // hidden (`hide_when_clear`: only when everything is closed and dry, and nobody is there).
+  // hidden (`hide_when_clear`: only when everything is closed, dry and reporting, and nobody is there).
   _visible(items, parts) {
     const c = this._config;
     const sum = this._summary(items);
