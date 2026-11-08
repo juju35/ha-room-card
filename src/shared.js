@@ -212,6 +212,8 @@ const RC_I18N = {
     all_quiet: "All quiet",
     open_one: "{n} open",
     open_many: "{n} open",
+    unavail_one: "{n} unavailable",
+    unavail_many: "{n} unavailable",
     leak: "Water leak",
     unavailable: "Unavailable",
     on: "On",
@@ -249,6 +251,8 @@ const RC_I18N = {
     all_quiet: "Tout est calme",
     open_one: "{n} ouverture",
     open_many: "{n} ouvertures",
+    unavail_one: "{n} indisponible",
+    unavail_many: "{n} indisponibles",
     leak: "Fuite d'eau",
     unavailable: "Indisponible",
     on: "Allumée",
@@ -286,6 +290,8 @@ const RC_I18N = {
     all_quiet: "Alles ruhig",
     open_one: "{n} offen",
     open_many: "{n} offen",
+    unavail_one: "{n} nicht verfügbar",
+    unavail_many: "{n} nicht verfügbar",
     leak: "Wasserleck",
     unavailable: "Nicht verfügbar",
     on: "An",
@@ -323,6 +329,8 @@ const RC_I18N = {
     all_quiet: "Todo tranquilo",
     open_one: "{n} abierto",
     open_many: "{n} abiertos",
+    unavail_one: "{n} no disponible",
+    unavail_many: "{n} no disponibles",
     leak: "Fuga de agua",
     unavailable: "No disponible",
     on: "Encendido",
@@ -361,6 +369,8 @@ const RC_I18N = {
     open_one: "{n} отворено",
     open_few: "{n} отворена",
     open_many: "{n} отворених",
+    unavail_one: "Недоступно: {n}",
+    unavail_many: "Недоступно: {n}",
     leak: "Цурење воде",
     unavailable: "Недоступно",
     on: "Укључено",
@@ -399,6 +409,8 @@ const RC_I18N = {
     open_one: "{n} otvoreno",
     open_few: "{n} otvorena",
     open_many: "{n} otvorenih",
+    unavail_one: "Nedostupno: {n}",
+    unavail_many: "Nedostupno: {n}",
     leak: "Curenje vode",
     unavailable: "Nedostupno",
     on: "Uključeno",
@@ -436,6 +448,8 @@ const RC_I18N = {
     all_quiet: "Tutto calmo",
     open_one: "{n} apertura",
     open_many: "{n} aperture",
+    unavail_one: "{n} non disponibile",
+    unavail_many: "{n} non disponibili",
     leak: "Perdita d'acqua",
     unavailable: "Non disponibile",
     on: "Accesa",
@@ -473,6 +487,8 @@ const RC_I18N = {
     all_quiet: "Alles rustig",
     open_one: "{n} open",
     open_many: "{n} open",
+    unavail_one: "{n} niet beschikbaar",
+    unavail_many: "{n} niet beschikbaar",
     leak: "Waterlek",
     unavailable: "Niet beschikbaar",
     on: "Aan",
@@ -510,6 +526,8 @@ const RC_I18N = {
     all_quiet: "Tudo calmo",
     open_one: "{n} abertura",
     open_many: "{n} aberturas",
+    unavail_one: "{n} indisponível",
+    unavail_many: "{n} indisponíveis",
     leak: "Fuga de água",
     unavailable: "Indisponível",
     on: "Ligada",
@@ -547,6 +565,8 @@ const RC_I18N = {
     all_quiet: "Spokojnie",
     open_one: "Otwarte: {n}",
     open_many: "Otwarte: {n}",
+    unavail_one: "Niedostępne: {n}",
+    unavail_many: "Niedostępne: {n}",
     leak: "Wyciek wody",
     unavailable: "Niedostępne",
     on: "Włączone",
@@ -584,6 +604,8 @@ const RC_I18N = {
     all_quiet: "Totul liniștit",
     open_one: "Deschise: {n}",
     open_many: "Deschise: {n}",
+    unavail_one: "Indisponibile: {n}",
+    unavail_many: "Indisponibile: {n}",
     leak: "Scurgere",
     unavailable: "Indisponibil",
     on: "Pornită",
@@ -621,6 +643,8 @@ const RC_I18N = {
     all_quiet: "Alt roligt",
     open_one: "{n} åben",
     open_many: "{n} åbne",
+    unavail_one: "{n} utilgængelig",
+    unavail_many: "{n} utilgængelige",
     leak: "Vandlækage",
     unavailable: "Utilgængelig",
     on: "Tændt",
@@ -658,6 +682,8 @@ const RC_I18N = {
     all_quiet: "Allt lugnt",
     open_one: "{n} öppen",
     open_many: "{n} öppna",
+    unavail_one: "{n} ej tillgänglig",
+    unavail_many: "{n} ej tillgängliga",
     leak: "Vattenläcka",
     unavailable: "Ej tillgänglig",
     on: "På",
@@ -695,6 +721,8 @@ const RC_I18N = {
     all_quiet: "Всичко е спокойно",
     open_one: "Отворени: {n}",
     open_many: "Отворени: {n}",
+    unavail_one: "Недостъпни: {n}",
+    unavail_many: "Недостъпни: {n}",
     leak: "Теч на вода",
     unavailable: "Недостъпно",
     on: "Включен",
@@ -732,6 +760,8 @@ const RC_I18N = {
     all_quiet: "Всё спокойно",
     open_one: "Открыто: {n}",
     open_many: "Открыто: {n}",
+    unavail_one: "Недоступно: {n}",
+    unavail_many: "Недоступно: {n}",
     leak: "Протечка",
     unavailable: "Недоступно",
     on: "Включено",
@@ -769,6 +799,8 @@ const RC_I18N = {
     all_quiet: "Усе спокійно",
     open_one: "Відчинено: {n}",
     open_many: "Відчинено: {n}",
+    unavail_one: "Недоступно: {n}",
+    unavail_many: "Недоступно: {n}",
     leak: "Витік води",
     unavailable: "Недоступно",
     on: "Увімкнено",
@@ -806,6 +838,8 @@ const RC_I18N = {
     all_quiet: "Minden nyugodt",
     open_one: "{n} nyitva",
     open_many: "{n} nyitva",
+    unavail_one: "{n} nem elérhető",
+    unavail_many: "{n} nem elérhető",
     leak: "Vízszivárgás",
     unavailable: "Nem elérhető",
     on: "Be",
@@ -843,6 +877,8 @@ const RC_I18N = {
     all_quiet: "Všetko pokojné",
     open_one: "Otvorené: {n}",
     open_many: "Otvorené: {n}",
+    unavail_one: "Nedostupné: {n}",
+    unavail_many: "Nedostupné: {n}",
     leak: "Únik vody",
     unavailable: "Nedostupné",
     on: "Zapnuté",
@@ -880,6 +916,8 @@ const RC_I18N = {
     all_quiet: "Vše v klidu",
     open_one: "Otevřeno: {n}",
     open_many: "Otevřeno: {n}",
+    unavail_one: "Nedostupné: {n}",
+    unavail_many: "Nedostupné: {n}",
     leak: "Únik vody",
     unavailable: "Nedostupné",
     on: "Zapnuto",
@@ -917,6 +955,8 @@ const RC_I18N = {
     all_quiet: "Vse mirno",
     open_one: "Odprto: {n}",
     open_many: "Odprto: {n}",
+    unavail_one: "Ni na voljo: {n}",
+    unavail_many: "Ni na voljo: {n}",
     leak: "Puščanje vode",
     unavailable: "Ni na voljo",
     on: "Vklopljeno",
@@ -954,6 +994,8 @@ const RC_I18N = {
     all_quiet: "Viss mierīgi",
     open_one: "Atvērti: {n}",
     open_many: "Atvērti: {n}",
+    unavail_one: "Nav pieejami: {n}",
+    unavail_many: "Nav pieejami: {n}",
     leak: "Ūdens noplūde",
     unavailable: "Nav pieejams",
     on: "Ieslēgts",
@@ -991,6 +1033,8 @@ const RC_I18N = {
     all_quiet: "Όλα ήσυχα",
     open_one: "{n} ανοιχτό",
     open_many: "{n} ανοιχτά",
+    unavail_one: "Μη διαθέσιμα: {n}",
+    unavail_many: "Μη διαθέσιμα: {n}",
     leak: "Διαρροή νερού",
     unavailable: "Μη διαθέσιμο",
     on: "Ενεργή",
@@ -1062,7 +1106,18 @@ const rcEsc = (s) =>
 
 const rcEscRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-const rcWatts = (w) => (w >= 1000 ? `${(w / 1000).toFixed(w >= 10000 ? 0 : 1)} kW` : `${Math.round(w)} W`);
+// A power in the card's language (*1,2 kW* in French), from `lang` (defaults to the browser's).
+const rcWatts = (w, lang) => {
+  const kw = w >= 1000;
+  const digits = kw && w < 10000 ? 1 : 0;
+  let text;
+  try {
+    text = new Intl.NumberFormat(lang, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(kw ? w / 1000 : w);
+  } catch {
+    text = (kw ? w / 1000 : w).toFixed(digits);
+  }
+  return `${text} ${kw ? "kW" : "W"}`;
+};
 
 // Strips a prefix, a suffix and the area name from an entity name, then capitalises it.
 const rcCleanName = (name, areaName, prefix, suffix) => {
@@ -1215,11 +1270,13 @@ class RcCard extends HTMLElement {
     return hidden;
   }
 
-  // Status of a set of opening and leak sensors: a leak, then the open ones, then "All closed" when there are door
-  // or window sensors (`closable`), `idle` otherwise.
-  _openingStatus(leaks, open, closable, idle = "all_quiet") {
+  // Status of a set of opening and leak sensors: a leak, then the open ones, then the unavailable ones (`unavail`: a
+  // sensor that cannot report is no all-clear), then "All closed" when there are door or window sensors (`closable`),
+  // `idle` otherwise.
+  _openingStatus(leaks, open, closable, idle = "all_quiet", unavail = 0) {
     if (leaks) return this._t("leak");
     if (open) return this._tn("open", open);
+    if (unavail) return this._tn("unavail", unavail);
     return this._t(closable ? "all_closed" : idle);
   }
 
@@ -1277,6 +1334,8 @@ class RcCard extends HTMLElement {
   }
 
   _paint(level, head, tiles, extraClass = "") {
+    // The tile with the keyboard focus keeps it through the redraw (a toggle or a brightness step from the keyboard).
+    const focused = this.shadowRoot.activeElement?.dataset?.id;
     this.shadowRoot.innerHTML = `
       <style>${RC_BASE_STYLES}${this.constructor.styles}</style>
       <ha-card class="lvl-${level}${extraClass}">
@@ -1286,7 +1345,10 @@ class RcCard extends HTMLElement {
     const root = this.shadowRoot;
     root.querySelector(".pill.action")?.addEventListener("click", (ev) => this._allOff(ev));
     if (this._config.navigation_path) rcBindNav(root.querySelector(".head"), this._config.navigation_path);
-    for (const el of root.querySelectorAll(".tile")) this._bindTile(el, (this._items || []).find((i) => i.id === el.dataset.id));
+    for (const el of root.querySelectorAll(".tile")) {
+      this._bindTile(el, (this._items || []).find((i) => i.id === el.dataset.id));
+      if (focused && el.dataset.id === focused) el.focus({ preventScroll: true });
+    }
   }
 
   // The "turn everything off" button of the header (full card) or of the status (mini card).
@@ -1299,7 +1361,8 @@ class RcCard extends HTMLElement {
     else rcCall(this._hass, "homeassistant", "turn_off", { entity_id: ids });
   }
 
-  // Tap, hold for more-info, and an optional horizontal drag ({ move(x), end(x) }).
+  // Tap, hold for more-info, and an optional horizontal drag ({ move(x), end(x), step(delta) }). From the keyboard:
+  // Enter / Space tap, Shift+Enter or the context-menu key open the details, ←/→ step the drag by ∓/±10.
   _bindPress(el, { onTap, onHold, drag }) {
     let start = null;
     let mode = null; // null | "hold" | "drag"
@@ -1364,9 +1427,15 @@ class RcCard extends HTMLElement {
     el.addEventListener("pointercancel", (ev) => end(ev, true));
     el.addEventListener("contextmenu", (ev) => ev.preventDefault());
     el.addEventListener("keydown", (ev) => {
-      if (ev.key === "Enter" || ev.key === " ") {
+      if ((ev.key === "Enter" && ev.shiftKey) || ev.key === "ContextMenu") {
+        ev.preventDefault();
+        if (!ev.repeat) onHold();
+      } else if (ev.key === "Enter" || ev.key === " ") {
         ev.preventDefault();
         if (!ev.repeat) onTap();
+      } else if (drag?.step && (ev.key === "ArrowLeft" || ev.key === "ArrowRight")) {
+        ev.preventDefault();
+        drag.step(ev.key === "ArrowRight" ? 10 : -10);
       }
     });
   }

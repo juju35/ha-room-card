@@ -44,18 +44,18 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - **Tap** a room to unfold its details at the top of the card: the Sensors, Lights and Plugs cards of that room; tap it again or anywhere else to fold it back
 - Automatic discovery: every area with door, window, leak or presence sensors, lights or plugs becomes a room, with an icon picked from its name
 - Same rules as the room cards: hidden entities and camera detections are skipped, and so are light groups and the configuration and diagnostic entities of lights and plugs (door, window, leak and presence sensors count whatever their category); light switches count as lights
-- Only the rooms with something open, on or detected show; the **detail** button (top right) shows every room, and back, as does a click anywhere else (`zoom: false`: every room, always, no button); `sort: state` lists the rooms needing attention first
+- Only the rooms with something open, on, detected or unavailable show; the **detail** button (top right) shows every room, and back, as does a click anywhere else (`zoom: false`: every room, always, no button); `sort: state` lists the rooms needing attention first
 
 ### Sensors
 
 `custom:room-sensors-card` — Leak, door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open.
 
-- Header with an icon and a status pill coloured by the room state: *All closed* (green), *1 open* (orange), *Water leak* (red, pulsing)
+- Header with an icon and a status pill coloured by the room state: *All closed* (green), *1 open* (orange), *Water leak* (red, pulsing); a leak or opening sensor that is unavailable is no all-clear: *1 unavailable* (orange)
 - Open sensors listed first, leaks before doors and windows, with a blinking icon and how long they have been open
 - Presence and motion sensors in blue (*Detected* / *Clear*), with a person icon next to the pill while someone is in the room; they are not alerts and never blink
 - Icon picked from the sensor: sliding door, window, door, garage door, water drop, person, motion sensor
 - Clean names: the `Sensor` / `Capteur` prefix, the area name and the trailing device-class word are removed (*Capteur Porte Fenêtre Cuisine Porte* → *Porte Fenêtre Cuisine*)
-- Show only the open or active sensors (`only_alerts`), or hide the whole card when everything is closed, dry and nobody is there (`hide_when_clear`)
+- Show only the open or active sensors (`only_alerts`), or hide the whole card when everything is closed, dry, reporting and nobody is there (`hide_when_clear`)
 - Tap a sensor to open its details
 - Automatic discovery from the area, or an explicit list with name and icon overrides
 
@@ -75,7 +75,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 
 - Header with an icon and a status pill: *All off*, or *2 on* with a power button that turns every light of the room off
 - Lights that are on listed first, tinted with their actual colour, brightness shown as a bar behind the tile
-- **Tap** a light to toggle it, **drag** it sideways to set its brightness, **hold** it to open its details
+- **Tap** a light to toggle it, **drag** it sideways to set its brightness, **hold** it to open its details; from the keyboard: Enter or Space toggles, Shift+Enter or the context-menu key opens the details, ← / → dim by 10 %
 - Lights and light switches: a `switch` whose name says it drives a light (*Lumière Canapé*, *Desk Lamp*) is picked up too
 - Clean names: the `Lumière` / `Light` prefix and the area name are removed (*Lumière Canapé* → *Canapé*)
 - Show only the lights that are on (`only_on`), or hide the whole card when everything is off (`hide_when_off`)
@@ -100,7 +100,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Header with an icon and a status pill: *All off*, or *3 on · 1.2 kW*
 - Power draw of each plug, read from the power sensor of the same device, and the total in the header
 - Plugs that are on listed first, the most power-hungry first
-- **Tap** a plug to toggle it, **hold** it to open its details
+- **Tap** a plug to toggle it, **hold** it to open its details (keyboard: Enter or Space, Shift+Enter or the context-menu key)
 - Optional power button on the status pill to turn every plug of the room off (`all_off_button`, off by default: a plug may feed a camera or a network switch)
 - Plugs found by device class `outlet`, or by a name that says so (*Prise Terrasse*, *Desk Plug*); switches driving a light are left to [room-lights-card](#lights)
 - Clean names: the `Prise` / `Plug` prefix or suffix and the area name are removed (*Prise Machine à café* → *Machine à café*)
@@ -249,7 +249,7 @@ rooms:
 |---|---|---|---|
 | `title` | ❌ | `Home` | Card title |
 | `columns` | ❌ | `3` | Number of room columns (1–6); on a card of 340 px or less at most 2, and 1 at 260 px or less (6 columns of a Sections view on a phone) |
-| `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing attention first (leak, open, presence, something on) |
+| `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing attention first (leak, open, unavailable sensor, presence, something on) |
 | `presence` | ❌ | `true` | Include the presence and motion sensors (camera detections are always left out) |
 | `zoom` | ❌ | `true` | Show only the rooms with something open, on or detected, with a detail button showing every room; `false` shows every room, always |
 | `all_off_button` | ❌ | `true` | Tapping the lights chip of the header turns every light the card counts off |
@@ -310,7 +310,7 @@ In addition to the [common options](#common-options):
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `only_alerts` | ❌ | `false` | Show only the open, leaking, active (presence detected) or unavailable sensors |
-| `hide_when_clear` | ❌ | `false` | Hide the whole card when everything is closed and dry and no presence is detected |
+| `hide_when_clear` | ❌ | `false` | Hide the whole card when everything is closed, dry and reporting and no presence is detected (never while a leak or opening sensor is unavailable) |
 | `presence` | ❌ | `true` | Include the presence and motion sensors of the area |
 | `blink` | ❌ | `true` | Blink the icon of open sensors (also stops when the system asks for reduced motion) |
 

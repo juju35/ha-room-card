@@ -549,7 +549,7 @@ class RoomLightsCard extends RcToggleCard {
     });
   }
 
-  // Tap: toggle · hold: more-info · horizontal drag on a dimmable light: brightness.
+  // Tap: toggle · hold: more-info · horizontal drag on a dimmable light: brightness (←/→ from the keyboard: ±10 %).
   _bindTile(el, item) {
     const pctAt = (x) => {
       const r = el.getBoundingClientRect();
@@ -565,6 +565,8 @@ class RoomLightsCard extends RcToggleCard {
       bar.style.width = `${pct}%`;
       el.querySelector(".state").textContent = `${this._t("on")} · ${pct} %`;
     };
+    // Brightness the keyboard steps from: the light's, until it reports the new one (the tile is then redrawn).
+    let level = item?.on ? (item.pct ?? 100) : 0;
     this._bindPress(el, {
       onTap: () => !item?.unavailable && rcCall(this._hass, "homeassistant", "toggle", { entity_id: item.id }),
       onHold: () => rcMoreInfo(this, item.id),
@@ -573,6 +575,13 @@ class RoomLightsCard extends RcToggleCard {
           ? {
               move: (x) => show(pctAt(x)),
               end: (x) => rcCall(this._hass, "light", "turn_on", { entity_id: item.id, brightness_pct: pctAt(x) }),
+              step: (delta) => {
+                const pct = Math.min(100, Math.max(1, level + delta));
+                if (item.unavailable || pct === level || (!level && delta < 0)) return;
+                level = pct;
+                show(pct);
+                rcCall(this._hass, "light", "turn_on", { entity_id: item.id, brightness_pct: pct });
+              },
             }
           : null,
     });

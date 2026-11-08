@@ -773,6 +773,8 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
           navigation_path: o.navigation_path,
           leaks: x.sensors.filter((s) => s.leak && on(s)).length,
           open: x.sensors.filter((s) => !s.leak && on(s)).length,
+          // A leak or opening sensor that cannot report is no all-clear: the room needs a look.
+          unavail: x.sensors.filter((s) => rcUnavailable(s.st)).length,
           occupied: x.presence.some(on),
           lightsOn: x.lights.filter(on).length,
           plugsOn: plugsOn.length,
@@ -780,7 +782,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
         };
       });
 
-    const rank = (x) => (x.leaks ? 4 : x.open ? 3 : x.occupied ? 2 : x.lightsOn || x.plugsOn ? 1 : 0);
+    const rank = (x) => (x.leaks ? 5 : x.open ? 4 : x.unavail ? 3 : x.occupied ? 2 : x.lightsOn || x.plugsOn ? 1 : 0);
     rcSortRooms(list, c, rank);
     this._total = list.length;
     this._anySensors = list.some((x) => x.sensors.some((e) => !e.leak));
@@ -789,7 +791,9 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
   }
 
   _roomState(x) {
-    if (x.leaks || x.open) return { lvl: x.leaks ? "alert" : "warn", text: this._openingStatus(x.leaks, x.open) };
+    if (x.leaks || x.open || x.unavail) {
+      return { lvl: x.leaks ? "alert" : "warn", text: this._openingStatus(x.leaks, x.open, false, "all_quiet", x.unavail) };
+    }
     if (x.occupied) return { lvl: "info", text: this._t("presence") };
     return { lvl: "ok", text: this._openingStatus(0, 0, x.sensors.some((e) => !e.leak)) };
   }
@@ -802,7 +806,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     this._rooms = rooms;
 
     // The sensor count too: a door added to an idle room turns "All quiet" into "All closed" without any state change.
-    const parts = rooms.map((x) => [x.id, x.name, x.icon, x.leaks, x.open, x.occupied, x.lightsOn, x.plugsOn, x.watts && Math.round(x.watts), x.sensors.length]);
+    const parts = rooms.map((x) => [x.id, x.name, x.icon, x.leaks, x.open, x.occupied, x.lightsOn, x.plugsOn, x.watts && Math.round(x.watts), x.sensors.length, x.unavail]);
     if (!this._changed([this._openArea, this._zoomed, this._anySensors, parts])) return;
 
     if (!this.shadowRoot.querySelector("ha-card")) {
@@ -860,20 +864,21 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
 
     const leaks = rooms.reduce((t, x) => t + x.leaks, 0);
     const open = rooms.reduce((t, x) => t + x.open, 0);
+    const unavail = rooms.reduce((t, x) => t + x.unavail, 0);
     const lights = rooms.reduce((t, x) => t + x.lightsOn, 0);
     const plugs = rooms.reduce((t, x) => t + x.plugsOn, 0);
     const watts = rooms.some((x) => x.watts != null) ? rooms.reduce((t, x) => t + (x.watts ?? 0), 0) : null;
     const occupied = rooms.filter((x) => x.occupied).length;
-    const level = leaks ? "alert" : open ? "warn" : "ok";
-    const status = this._openingStatus(leaks, open, this._anySensors);
-    const headIcon = leaks ? "mdi:water-alert" : open ? "mdi:home-alert-outline" : "mdi:home-outline";
+    const level = leaks ? "alert" : open || unavail ? "warn" : "ok";
+    const status = this._openingStatus(leaks, open, this._anySensors, "all_quiet", unavail);
+    const headIcon = leaks ? "mdi:water-alert" : open || unavail ? "mdi:home-alert-outline" : "mdi:home-outline";
 
     const chip = (cls, icon, label, text) =>
       `<span class="chip ${cls}" title="${rcEsc(label)}"><ha-icon icon="${icon}"></ha-icon>${text ? `<span>${rcEsc(text)}</span>` : ""}</span>`;
     // Header chip that turns everything of its kind off when tapped.
     const offChip = (cls, kind, icon, label, text, offIcon) =>
       `<button class="chip ${cls} action" data-kind="${kind}" title="${rcEsc(label)}"><ha-icon icon="${icon}"></ha-icon><span>${rcEsc(text)}</span><ha-icon class="off" icon="${offIcon}"></ha-icon></button>`;
-    const plugText = watts != null ? rcWatts(watts) : String(plugs);
+    const plugText = watts != null ? rcWatts(watts, this._lang()) : String(plugs);
 
     // The header chips, in one group: on a narrow card it goes to its own line under the title.
     const headChips = [
@@ -907,7 +912,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
         x.occupied && s.lvl !== "info" ? chip("info", "mdi:account", this._t("presence")) : "",
         x.lightsOn ? chip("light", "mdi:lightbulb", this._t("lights_on"), String(x.lightsOn)) : "",
         x.plugsOn
-          ? chip("plug", "mdi:power-socket-fr", this._t("plugs_on"), x.watts != null ? rcWatts(x.watts) : String(x.plugsOn))
+          ? chip("plug", "mdi:power-socket-fr", this._t("plugs_on"), x.watts != null ? rcWatts(x.watts, this._lang()) : String(x.plugsOn))
           : "",
       ].join("");
       return `
@@ -951,7 +956,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     const n = plugs.length;
     const items = plugs
       .map((e) => {
-        const extra = [e.room, e.watts != null ? rcWatts(e.watts) : ""].filter(Boolean).join(" · ");
+        const extra = [e.room, e.watts != null ? rcWatts(e.watts, this._lang()) : ""].filter(Boolean).join(" · ");
         return `<div class="modal-item"><span>${rcEsc(e.st.attributes.friendly_name || e.id)}</span><span>${rcEsc(extra)}</span></div>`;
       })
       .join("");

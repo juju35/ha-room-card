@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.19.0 - 2026-11-07
+
+### Features
+- Sensors card and Overview: an unavailable leak or opening sensor is no longer counted as all-clear: the room warns with *N unavailable*, `hide_when_clear` keeps the card shown, and the Overview keeps the room among those needing a look.
+- Lights and Plugs cards: from the keyboard, Shift+Enter or the context-menu key opens a tile's details, and ← / → dim a dimmable light by 10 %; the focused tile keeps the focus when the card redraws.
+- Powers follow the card's language (*1,2 kW* in French).
+
 ## 1.18.0 - 2026-11-07
 
 ### Features
