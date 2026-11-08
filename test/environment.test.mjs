@@ -130,6 +130,32 @@ test("unavailable and unknown sensors are ignored, in the mean and as tiles", ()
   assert.ok(!card._items.some((i) => i.kind === "noise"));
 });
 
+test("unavailable sensors show as one muted tile, N unavailable, that opens the first one", () => {
+  const extra = {
+    "sensor.lr_t2": st("sensor.lr_t2", "unavailable", "temperature", "°C", "T2"),
+    "sensor.lr_t3": st("sensor.lr_t3", "unknown", "temperature", "°C", "T3"),
+  };
+  const card = render({ only_alerts: true }, makeHass({ noise: "unavailable" }, extra));
+  const html = head(card);
+  assert.match(html, /class="tile na k-na" data-id="sensor.lr_noise"/);
+  assert.match(html, /3 indisponibles/);
+  assert.match(html, /Salon Bruit, T2, T3/);
+  assert.equal(card._shown, 1, "kept with only_alerts, counted in the card size");
+  assert.match(html, /lvl-ok/, "muted: the room's level does not change");
+  assert.ok(!render().shadowRoot.innerHTML.includes(`class="tile na`), "none when every sensor reports");
+});
+
+test("a room whose sensors are all unavailable says so instead of No sensor", () => {
+  const h = makeHass({ temp: "unavailable", hum: "unavailable", co2: "unavailable", noise: "unavailable", lux: "unavailable" });
+  const card = render({}, h);
+  assert.match(head(card), /class="pt">5 indisponibles</);
+  const mini = new rc.cards["room-environment-mini-card"]();
+  mini.setConfig({ area: "living_room", language: "en" });
+  mini.hass = makeHass({ noise: "unavailable" });
+  assert.match(mini.shadowRoot.innerHTML, /class="r na" data-id="sensor.lr_noise"/);
+  assert.match(mini.shadowRoot.innerHTML, /<span>1 unavailable<\/span>/);
+});
+
 test("only_alerts keeps the readings outside the comfort range", () => {
   const card = render({ only_alerts: true }, makeHass({ co2: 1600, noise: 72 }));
   assert.equal(card._shown, 2);

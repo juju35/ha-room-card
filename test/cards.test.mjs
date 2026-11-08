@@ -878,14 +878,53 @@ test("the arrow keys dim a dimmable light by 10 %, within 1-100 %", () => {
   tile.querySelector = (s) => (s === ".state" ? state : { style: {} });
   card._bindTile(tile, item);
   tile.fire("keydown", { key: "ArrowRight" });
+  assert.match(state.textContent, /100 %/, "the label follows at once");
   tile.fire("keydown", { key: "ArrowRight" });
   tile.fire("keydown", { key: "ArrowLeft" });
+  assert.match(state.textContent, /90 %/);
+  assert.deepEqual(calls, [], "nothing sent while stepping");
+  tile.fire("keyup", { key: "ArrowLeft" });
   assert.deepEqual(
     calls.map((c) => c[2].brightness_pct),
-    [100, 90],
-    "95 % → 100 %, a second step up does nothing, then 90 %",
+    [90],
+    "95 % → 100 %, a second step up does nothing, then 90 %: one call, on the key's release",
   );
-  assert.match(state.textContent, /90 %/);
+  tile.fire("keyup", { key: "ArrowLeft" });
+  assert.equal(calls.length, 1, "nothing left to send");
+});
+
+test("keyboard dimming: a held arrow steps at a limited rate, one trailing call after the pause", (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const card = new cards["room-lights-card"]();
+  card.setConfig({ area: "kitchen" });
+  const calls = [];
+  const h = makeHass({ callService: (...a) => calls.push(a) });
+  h.states["light.ceiling"] = {
+    ...h.states["light.ceiling"],
+    attributes: { friendly_name: "Ceiling", brightness: 26, supported_color_modes: ["brightness"] },
+  };
+  card.hass = h;
+  const item = card._items.find((i) => i.id === "light.ceiling");
+  const tile = fakeTile();
+  const state = { textContent: "" };
+  tile.querySelector = (s) => (s === ".state" ? state : { style: {} });
+  card._bindTile(tile, item);
+  tile.fire("keydown", { key: "ArrowRight", timeStamp: 1000 }); // 10 % → 20 %
+  for (let i = 1; i <= 10; i++) {
+    // Auto-repeat, ~30 a second: over 330 ms, two more steps.
+    tile.fire("keydown", { key: "ArrowRight", repeat: true, timeStamp: 1000 + 33 * i });
+  }
+  assert.match(state.textContent, /40 %/);
+  assert.equal(card._pressing, true, "updates wait until the call is sent");
+  assert.deepEqual(calls, []);
+  t.mock.timers.tick(299);
+  assert.deepEqual(calls, []);
+  t.mock.timers.tick(1);
+  assert.deepEqual(
+    calls.map((c) => c[2].brightness_pct),
+    [40],
+  );
+  assert.equal(card._pressing, false);
 });
 
 test("powers follow the card's language", () => {

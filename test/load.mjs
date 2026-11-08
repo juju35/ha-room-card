@@ -49,8 +49,9 @@ export const load = () => {
       removeEventListener() {},
     },
     history: { pushState() {} },
-    setTimeout,
-    clearTimeout,
+    // Looked up at each call, so a test's mock timers (t.mock.timers) apply.
+    setTimeout: (...a) => globalThis.setTimeout(...a),
+    clearTimeout: (id) => globalThis.clearTimeout(id),
   };
   // window-level listeners (Escape on the confirmation popup), fired by hand with window.fire(type, ev).
   const winListeners = {};

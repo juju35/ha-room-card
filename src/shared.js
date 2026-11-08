@@ -13,6 +13,8 @@ const RC_LIGHT_NAME = /(^|\s)(lumi[eè]re|lampe|lamp|light|veilleuse|guirlande)(
 const RC_PLUG_NAME = /(^|\s)(prise|multiprise|plug|outlet|socket)(\s|$)/i;
 const RC_HOLD_MS = 500;
 const RC_MOVE_PX = 8;
+// A held arrow key repeats some 30 times a second: one brightness step every RC_REPEAT_MS at most.
+const RC_REPEAT_MS = 150;
 
 const rcIsLightSwitch = (st) => RC_LIGHT_NAME.test(st.attributes.friendly_name || "");
 const rcIsPlug = (st) =>
@@ -1361,12 +1363,14 @@ class RcCard extends HTMLElement {
     else rcCall(this._hass, "homeassistant", "turn_off", { entity_id: ids });
   }
 
-  // Tap, hold for more-info, and an optional horizontal drag ({ move(x), end(x), step(delta) }). From the keyboard:
-  // Enter / Space tap, Shift+Enter or the context-menu key open the details, ←/→ step the drag by ∓/±10.
+  // Tap, hold for more-info, and an optional horizontal drag ({ move(x), end(x), step(delta), flush() }). From the
+  // keyboard: Enter / Space tap, Shift+Enter or the context-menu key open the details, ←/→ step the drag by ∓/±10
+  // (a held key at most every RC_REPEAT_MS), and releasing the arrow calls `flush`.
   _bindPress(el, { onTap, onHold, drag }) {
     let start = null;
     let mode = null; // null | "hold" | "drag"
     let timer = null;
+    let lastStep = 0;
     el.addEventListener("pointerdown", (ev) => {
       if (ev.button !== 0) return;
       start = { x: ev.clientX, y: ev.clientY };
@@ -1435,8 +1439,14 @@ class RcCard extends HTMLElement {
         if (!ev.repeat) onTap();
       } else if (drag?.step && (ev.key === "ArrowLeft" || ev.key === "ArrowRight")) {
         ev.preventDefault();
+        if (ev.repeat && ev.timeStamp - lastStep < RC_REPEAT_MS) return;
+        lastStep = ev.timeStamp;
         drag.step(ev.key === "ArrowRight" ? 10 : -10);
       }
+    });
+    // The arrow released: the stepped level goes out now rather than after the pause.
+    el.addEventListener("keyup", (ev) => {
+      if (ev.key === "ArrowLeft" || ev.key === "ArrowRight") drag?.flush?.();
     });
   }
 
