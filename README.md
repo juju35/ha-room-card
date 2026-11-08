@@ -75,7 +75,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 
 - Header with an icon and a status pill: *All off*, or *2 on* with a power button that turns every light of the room off
 - Lights that are on listed first, tinted with their actual colour, brightness shown as a bar behind the tile
-- **Tap** a light to toggle it, **drag** it sideways to set its brightness, **hold** it to open its details; from the keyboard: Enter or Space toggles, Shift+Enter or the context-menu key opens the details, ← / → dim by 10 %
+- **Tap** a light to toggle it, **drag** it sideways to set its brightness, **hold** it to open its details; from the keyboard: Enter or Space toggles, Shift+Enter or the context-menu key opens the details, ← / → dim by 10 % (the light is set once, when the key is released or after a short pause)
 - Lights and light switches: a `switch` whose name says it drives a light (*Lumière Canapé*, *Desk Lamp*) is picked up too
 - Clean names: the `Lumière` / `Light` prefix and the area name are removed (*Lumière Canapé* → *Canapé*)
 - Show only the lights that are on (`only_on`), or hide the whole card when everything is off (`hide_when_off`)
@@ -128,7 +128,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Each tile shows the value as Home Assistant formats it, with a thin gauge underneath; a comfort word (*Dry*, *Moderate*, *Noisy*…) is added when the reading is off, and to the light level (*Dark*, *Dim*, *Bright*)
 - Only what is outside the comfort range is tinted; cold readings are blue, the light level is information only and never alerts
 - Built-in comfort thresholds (WHO and common indoor guidelines), adjustable per kind with `thresholds`; °F and ppb sensors are handled
-- Several sensors of the same kind in a room make **one reading: their mean** (three thermometers, one *Temperature* tile); unavailable and unknown sensors are left out of it
+- Several sensors of the same kind in a room make **one reading: their mean** (three thermometers, one *Temperature* tile); unavailable and unknown sensors are left out of it and gathered in one muted *2 unavailable* tile (a chip on the mini card) listing them
 - Show only the readings outside the comfort range (`only_alerts`)
 - Tap a reading to open its details and history; tap the title to open a dashboard (`navigation_path`)
 - Automatic discovery from the area, or an explicit list with name and icon overrides
@@ -710,7 +710,7 @@ The power draw comes from the first sensor of the same device with the `power` d
 
 The card keeps every `sensor` of the area (the area set on the entity, or on its device) whose device class is `temperature`, `humidity`, `carbon_dioxide`, `pm25`, `pm10`, `volatile_organic_compounds`, `volatile_organic_compounds_parts`, `aqi`, `sound_pressure` or `illuminance`. Hidden entities and configuration or diagnostic entities (a battery or CPU temperature, say) are skipped: list another one in `exclude` if a device reports a reading that does not describe the room.
 
-The sensors of a same kind make one reading: the mean of the ones reporting a number (unavailable and unknown sensors are left out, and a kind with none left is not shown); a single sensor keeps Home Assistant's formatting, a mean is shown with one decimal for temperature and none for the others. A tap opens the details of the first sensor of the reading.
+The sensors of a same kind make one reading: the mean of the ones reporting a number (unavailable and unknown sensors are left out, and a kind with none left is not shown; they are counted in a muted *N unavailable* tile, kept with `only_alerts`, whose tap opens the first of them); a single sensor keeps Home Assistant's formatting, a mean is shown with one decimal for temperature and none for the others. A tap opens the details of the first sensor of the reading.
 
 Each reading falls in one of five bands of its [thresholds](#thresholds). The header takes the reading with the highest severity (alert, then warning, then information), the kind order breaking ties. Values are formatted by Home Assistant (number format and display precision of the entity); a tap opens the more-info dialog with its history.
 

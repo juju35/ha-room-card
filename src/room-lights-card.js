@@ -475,6 +475,8 @@ const RL_I18N = {
 // "Lumière Canapé" → "Canapé", "Séjour Veilleuse" in Séjour → "Veilleuse"
 const RL_PREFIX = /^(lumi[eè]re|lampe|light|lamp)\s+/i;
 const RL_SUFFIX = /$^/;
+// Keyboard dimming: the light is called this long after the last ←/→ step.
+const RL_KEY_MS = 300;
 
 // Brightness can be set unless the light only supports on/off.
 const rlDimmable = (st) =>
@@ -567,6 +569,17 @@ class RoomLightsCard extends RcToggleCard {
     };
     // Brightness the keyboard steps from: the light's, until it reports the new one (the tile is then redrawn).
     let level = item?.on ? (item.pct ?? 100) : 0;
+    // The keyboard steps show at once; the light gets one call, RL_KEY_MS after the last step (or on the key's release).
+    // Updates wait meanwhile, like during a drag, so a redraw does not bring the old level back.
+    let pending = null;
+    const send = () => {
+      if (!pending) return;
+      clearTimeout(pending);
+      pending = null;
+      rcCall(this._hass, "light", "turn_on", { entity_id: item.id, brightness_pct: level });
+      this._sig = null;
+      this._released(false);
+    };
     this._bindPress(el, {
       onTap: () => !item?.unavailable && rcCall(this._hass, "homeassistant", "toggle", { entity_id: item.id }),
       onHold: () => rcMoreInfo(this, item.id),
@@ -580,8 +593,11 @@ class RoomLightsCard extends RcToggleCard {
                 if (item.unavailable || pct === level || (!level && delta < 0)) return;
                 level = pct;
                 show(pct);
-                rcCall(this._hass, "light", "turn_on", { entity_id: item.id, brightness_pct: pct });
+                this._pressing = true;
+                clearTimeout(pending);
+                pending = setTimeout(send, RL_KEY_MS);
               },
+              flush: send,
             }
           : null,
     });

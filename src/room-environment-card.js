@@ -818,6 +818,8 @@ const RE_DC = Object.fromEntries(RE_ORDER.flatMap((k) => RE_KINDS[k].dc.map((dc)
 const RE_RANK = { ok: 0, info: 1, warn: 2, alert: 3 };
 
 const reKindOf = (st) => RE_DC[st?.attributes.device_class];
+// A sensor that reports a number: unavailable, unknown and other states give no reading.
+const reValid = (st) => !rcUnavailable(st) && Number.isFinite(Number.parseFloat(st.state));
 
 // Environment sensors of the card: a known device class, configuration and diagnostic entities excepted
 // (a battery or a CPU temperature, say).
@@ -962,7 +964,15 @@ class RoomEnvironmentCard extends RcCard {
   }
 
   _collect() {
-    return this._itemsOf(this._entries(), { name: this._areaName(), thresholds: this._config.thresholds });
+    const entries = this._entries();
+    // Sensors of a known kind that report no number (unavailable, unknown): no reading, but a muted *N unavailable*.
+    this._na = entries
+      .map((e) => e.entity)
+      .filter((id) => {
+        const st = this._hass.states[id];
+        return reKindOf(st) && !reValid(st);
+      });
+    return this._itemsOf(entries, { name: this._areaName(), thresholds: this._config.thresholds });
   }
 
   // The readings of `entries`, one per kind, in kind order; also used by the overview, room by room.
@@ -972,7 +982,7 @@ class RoomEnvironmentCard extends RcCard {
     for (const e of entries) {
       const st = this._hass.states[e.entity];
       const kind = reKindOf(st);
-      if (kind && !rcUnavailable(st) && Number.isFinite(Number.parseFloat(st.state))) (byKind[kind] ||= []).push({ e, st });
+      if (kind && reValid(st)) (byKind[kind] ||= []).push({ e, st });
     }
     // A mean only makes sense in one unit: temperatures are converted to the first sensor's unit (°C / °F), other
     // kinds are split by unit (VOC in µg/m³ and in ppb cannot be converted), one reading per unit.
@@ -1002,7 +1012,7 @@ class RoomEnvironmentCard extends RcCard {
   }
 
   _status(items, worst) {
-    if (!items.length) return this._t("no_sensors");
+    if (!items.length) return this._na?.length ? this._tn("unavail", this._na.length) : this._t("no_sensors");
     if (!worst) return this._t("comfortable");
     if (worst.sev === "info") return worst.word;
     const issues = items.filter((i) => RE_RANK[i.sev] >= RE_RANK.warn).length;
@@ -1022,10 +1032,12 @@ class RoomEnvironmentCard extends RcCard {
     const worst = this._worst(items);
     const level = worst ? (worst.cold ? "cold" : worst.sev) : "ok";
 
-    if (!this._changed(items.map((i) => [i.id, i.name, i.icon, i.state, i.sev, i.cold, i.pct]))) return;
+    const na = this._naItem();
+    if (!this._changed([items.map((i) => [i.id, i.name, i.icon, i.state, i.sev, i.cold, i.pct]), na?.name, na?.state]))
+      return;
 
     const shown = c.only_alerts ? items.filter((i) => i.sev !== "ok") : items;
-    this._shown = shown.length;
+    this._shown = shown.length + (na ? 1 : 0);
     const tiles = shown
       .map((i) =>
         this._tile(i, {
@@ -1038,12 +1050,26 @@ class RoomEnvironmentCard extends RcCard {
         }),
       )
       .join("");
+    const naTile = na ? this._tile(na, { cls: " k-na", state: rcEsc(na.state) }) : "";
     const head = this._head({
       icon: this._headIcon(worst),
       title: c.title || this._areaName() || this._t("title"),
       status: this._status(items, worst),
     });
-    this._paint(level === "info" ? "cold" : level, head, tiles);
+    this._paint(level === "info" ? "cold" : level, head, tiles + naTile);
+  }
+
+  // The unavailable sensors as one muted tile or chip (*2 unavailable*, their names below): a tap opens the first one.
+  _naItem() {
+    const na = this._na ?? [];
+    if (!na.length) return null;
+    return {
+      id: na[0],
+      unavailable: true,
+      name: this._tn("unavail", na.length),
+      icon: "mdi:alert-circle-outline",
+      state: na.map((id) => this._hass.states[id]?.attributes.friendly_name || id).join(", "),
+    };
   }
 
   // A tap opens the details (history graph): a reading cannot be toggled.
@@ -1062,6 +1088,8 @@ class RoomEnvironmentCard extends RcCard {
     .tile.cold    { --t: var(--rc-info); }
     .tile.k-illuminance     { --t: var(--rc-idle); }
     .tile.k-illuminance.lit { --t: var(--rc-light); }
+    /* The unavailable sensors' names on one line: the tooltip lists them all. */
+    .tile.k-na .state { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     /* Only what needs a look is tinted: comfortable readings and the light level stay neutral. */
     .tile.s-ok { background: var(--secondary-background-color, transparent); border-color: transparent; }
     .val { color: var(--primary-text-color); font-weight: 600; }
@@ -1115,13 +1143,15 @@ class RoomEnvironmentMiniCard extends rcMini(
     .r.cold    { --t: var(--rc-info); }
     .r.k-illuminance     { --t: var(--rc-idle); }
     .r.k-illuminance.lit { --t: var(--rc-light); }
+    .r.na { --t: var(--rc-na); opacity: .7; }
   `,
 ) {
   _drawMini(items) {
     const c = this._config;
     const worst = this._worst(items);
     const level = worst ? (worst.cold || worst.sev === "info" ? "cold" : worst.sev) : "ok";
-    if (!this._changed(["mini", items.map((i) => [i.id, i.icon, i.state, i.sev, i.cold])])) return;
+    const na = this._naItem();
+    if (!this._changed(["mini", items.map((i) => [i.id, i.icon, i.state, i.sev, i.cold]), na?.name, na?.state])) return;
 
     const shown = c.only_alerts ? items.filter((i) => i.sev !== "ok") : items;
     this._shown = shown.length;
@@ -1136,7 +1166,12 @@ class RoomEnvironmentMiniCard extends rcMini(
         </button>`,
       )
       .join("");
-    this._paintMini({ level, icon: this._headIcon(worst), status: this._status(items, worst), chips });
+    const naChip = na
+      ? `<button class="r na" data-id="${rcEsc(na.id)}" title="${rcEsc(na.name)} — ${rcEsc(na.state)}">
+          <ha-icon icon="${rcEsc(na.icon)}"></ha-icon><span>${rcEsc(na.name)}</span>
+        </button>`
+      : "";
+    this._paintMini({ level, icon: this._headIcon(worst), status: this._status(items, worst), chips: chips + naChip });
   }
 }
 

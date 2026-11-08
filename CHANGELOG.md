@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.20.0 - 2026-11-08
+
+### Features
+- Environment card and mini card: unavailable or unknown sensors are no longer dropped silently but shown as a muted *N unavailable* tile or chip that lists them and opens the first one.
+- Lights card: dimming with ← / → updates the bar and the label at once and sends a single brightness call when the key is released or 300 ms after the last step, and a held arrow steps at a limited pace.
+
 ## 1.19.0 - 2026-11-07
 
 ### Features
