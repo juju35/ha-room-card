@@ -1,7 +1,9 @@
 name: Clean up merged branches
 
 # Deletes the branches whose pull request was merged: right after a pull request is closed,
-# and once a week for leftovers. Branches with an open pull request or never merged are kept.
+# and once a week for leftovers. Branches with an open pull request or never merged are kept,
+# and so is a branch that got new commits after its pull request was merged (its tip is no
+# longer the merged head): those commits exist nowhere else.
 on:
   pull_request:
     types: [closed]
@@ -15,6 +17,8 @@ permissions:
 
 jobs:
   cleanup:
+    # A closed fork pull request gets a read-only token: nothing to delete there (the weekly run cleans up).
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - name: Delete merged branches
@@ -24,13 +28,14 @@ jobs:
         run: |
           owner="${REPO%%/*}"
           default=$(gh api "repos/$REPO" --jq .default_branch)
-          for branch in $(gh api "repos/$REPO/branches" --paginate --jq '.[].name'); do
+          gh api "repos/$REPO/branches" --paginate --jq '.[] | "\(.name) \(.commit.sha)"' | while read -r branch sha; do
             [ "$branch" = "$default" ] && continue
-            open=$(gh api "repos/$REPO/pulls?state=open&head=$owner:$branch" --jq length)
-            merged=$(gh api "repos/$REPO/pulls?state=closed&head=$owner:$branch" --jq '[.[] | select(.merged_at)] | length')
+            open=$(gh api --paginate "repos/$REPO/pulls?state=open&head=$owner:$branch" --jq '.[].number' | wc -l)
+            merged=$(gh api --paginate "repos/$REPO/pulls?state=closed&head=$owner:$branch" \
+              --jq ".[] | select(.merged_at and .head.sha == \"$sha\") | .number" | wc -l)
             if [ "$open" = "0" ] && [ "$merged" != "0" ]; then
               gh api -X DELETE "repos/$REPO/git/refs/heads/$branch" >/dev/null && echo "Deleted $branch" || echo "::warning::Could not delete $branch"
             else
-              echo "Kept $branch (open PRs: $open, merged PRs: $merged)"
+              echo "Kept $branch (open PRs: $open, merged at its current tip: $merged)"
             fi
           done

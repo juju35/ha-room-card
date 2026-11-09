@@ -12,6 +12,12 @@ on:
 permissions:
   contents: read
 
+# github.workflow is "Release" when called from Release: the group then stays distinct from this
+# workflow's own push run on main, so neither cancels the other.
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build & check

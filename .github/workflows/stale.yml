@@ -27,3 +27,6 @@ jobs:
           days-before-close: 7
           stale-issue-label: stale
           stale-pr-label: stale
+          # A confirmed bug or a pinned issue is not closed for lack of activity.
+          exempt-issue-labels: confirmed,pinned
+          exempt-pr-labels: pinned
