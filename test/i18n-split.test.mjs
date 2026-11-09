@@ -2,18 +2,25 @@
 // (scripts/i18n-split.mjs, whose self-check fails the build when a table does not rebuild exactly).
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readdirSync, readFileSync } from "node:fs";
-import { test } from "node:test";
+import { cpSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { after, test } from "node:test";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const MAIN = "ha-room-card.js";
 const STEM = MAIN.replace(/\.js$/, "");
-const root = new URL("../", import.meta.url);
-const dist = (f) => new URL(`dist/${f}`, root);
-
-execFileSync(process.execPath, [new URL("scripts/build.mjs", root).pathname], { stdio: "pipe" });
+// Built in a copy of the repository, so that tests reading dist/ meanwhile never see a half-written file.
+const repo = fileURLToPath(new URL("../", import.meta.url));
+const tmp = mkdtempSync(`${tmpdir()}/i18n-split-`);
+const skip = new Set(["dist", "node_modules", ".git", "screenshots"]);
+for (const f of readdirSync(repo)) if (!skip.has(f)) cpSync(`${repo}${f}`, `${tmp}/${f}`, { recursive: true });
+symlinkSync(`${repo}node_modules`, `${tmp}/node_modules`);
+after(() => rmSync(tmp, { recursive: true, force: true }));
+execFileSync(process.execPath, [`${tmp}/scripts/build.mjs`], { stdio: "pipe" });
+const dist = (f) => pathToFileURL(`${tmp}/dist/${f}`);
 const bundle = readFileSync(dist(MAIN), "utf8");
 const langs = JSON.parse(bundle.match(/const LANGS = new Set\((\[[^\]]*\])\)/)[1]);
-const files = readdirSync(new URL("dist/", root)).filter((f) => f.startsWith(`${STEM}.i18n.`));
+const files = readdirSync(`${tmp}/dist`).filter((f) => f.startsWith(`${STEM}.i18n.`));
 
 test("every language but English has its own file next to the bundle", () => {
   assert.ok(langs.length >= 4 && !langs.includes("en"), `languages: ${langs}`);

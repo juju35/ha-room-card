@@ -26,4 +26,4 @@ console.log(`Built dist/ha-room-card.js (${(out.length / 1024).toFixed(1)} KB, $
 
 // Translations: English stays in the bundle, each other language goes to dist/ha-room-card.i18n.<lang>.js,
 // fetched when a card needs it (scripts/i18n-split.mjs).
-splitDist(`${root}dist`, "ha-room-card.js", { version: pkg.version });
+if (process.argv[1] === fileURLToPath(import.meta.url)) splitDist(`${root}dist`, "ha-room-card.js", { version: pkg.version });

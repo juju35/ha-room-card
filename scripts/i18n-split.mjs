@@ -13,7 +13,7 @@
 // - the table is wrapped in `<ns>.register(<n>, …)`, which registers it and returns a proxy: the first read of
 //   a language that is not loaded yet fetches its file, fills the table in place and redraws this bundle's
 //   cards (setConfig with their current config). The page's language is fetched as soon as the bundle runs.
-// A table whose translations hold code (a function, a variable) stays whole in the bundle.
+// A table whose translations hold code (a function, a variable) or are not dictionaries stays whole in the bundle.
 // The bundle stays a classic script (no import.meta, no top-level await): it also runs injected as content.
 // After splitting, every table is rebuilt from the bundle and the language files and compared with the
 // original: the build fails on any difference.
@@ -45,7 +45,8 @@ const isData = (n) => {
 // A language value: { spreads: [table names], own: [properties] }, or null when it is not data.
 // Spreads must come first and read the same language of a named table (`...BASE.de`).
 const analyse = (value, lang) => {
-  if (value.type !== "ObjectExpression") return isData(value) ? { spreads: [], own: null } : null;
+  // Only dictionaries are split: a string or a list per language (language names, compass points) stays inline.
+  if (value.type !== "ObjectExpression") return null;
   const spreads = [];
   const own = [];
   for (const p of value.properties) {
@@ -204,8 +205,7 @@ var ${ns} = (() => {
 })();
 `;
 
-const ownText = (code, part, value) =>
-  part.own === null ? code.slice(value.start, value.end) : `{ ${part.own.map((p) => code.slice(p.start, p.end)).join(", ")} }`;
+const ownText = (code, part) => `{ ${part.own.map((p) => code.slice(p.start, p.end)).join(", ")} }`;
 
 /**
  * Splits `code` (a built bundle). Writes `<outDir>/<stem>.i18n.<lang>.js` and returns the new bundle code
@@ -226,7 +226,7 @@ export function splitI18n(code, { stem, version, outDir, aliases = [] }) {
       const lang = keyName(p);
       const part = t.parts[i];
       if (part.spreads.length) spreads[t.id] = part.spreads.map((s) => byName.get(s).id);
-      (files[lang] ||= []).push(`${JSON.stringify(String(t.id))}: ${ownText(code, part, p.value)}`);
+      (files[lang] ||= []).push(`${JSON.stringify(String(t.id))}: ${ownText(code, part)}`);
       edits.push({ start: p.value.start, end: p.value.end, text: "{}" });
     });
     edits.push({ start: t.node.end, end: t.node.end, text: ")" });
