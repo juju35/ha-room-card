@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.22.3 - 2026-11-09
+
+### Improvements
+- Environment card: a tile's tooltip gives the lowest and highest values of its 24 h curve (*Temperature — 21.4 °C · 24 h 19.8 °C – 22.6 °C*): the curve shows the trend but has no scale. A tap still opens the reading's history.
+
 ## 1.22.2 - 2026-11-09
 
 ### Fixes

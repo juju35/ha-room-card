@@ -451,6 +451,10 @@ test("24 h curves: one statistics query for the shown readings, drawn as a spark
   assert.equal(calls[0].period, "5minute");
   assert.deepEqual(JSON.stringify(calls[0].statistic_ids), JSON.stringify(ids(card)));
   assert.equal((head(card).match(/<svg class="spark"/g) || []).length, 5);
+  // The curve's lowest and highest values in the tile's tooltip (the curve itself has no scale).
+  const titles = [...head(card).matchAll(/title="([^"]*24 h[^"]*)"/g)].map((m) => m[1]);
+  assert.equal(titles.length, 5);
+  assert.ok(titles.every((t) => / · 24 h 20(\.0)?\D.* – 23(\.0)?\D/.test(t)), titles.join(" | "));
   card.hass = hass;
   assert.equal(calls.length, 1, "no refetch within 5 minutes");
 });

@@ -1322,10 +1322,10 @@ class RcCard extends HTMLElement {
       </div>`;
   }
 
-  _tile(i, { cls = "", style = "", extra = "", state = i.state }) {
+  _tile(i, { cls = "", style = "", extra = "", state = i.state, title = `${i.name} — ${i.state}` }) {
     return `
       <button class="tile ${i.unavailable ? "na" : i.on ? "on" : "off"}${cls}" data-id="${rcEsc(i.id)}"
-              ${style ? `style="${rcEsc(style)}"` : ""} title="${rcEsc(i.name)} — ${rcEsc(i.state)}">
+              ${style ? `style="${rcEsc(style)}"` : ""} title="${rcEsc(title)}">
         ${extra}
         <span class="ic"><ha-icon icon="${rcEsc(i.icon)}"></ha-icon></span>
         <span class="txt">
