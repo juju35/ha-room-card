@@ -42,27 +42,37 @@ const isData = (n) => {
   }
 };
 
-// A language value: { spreads: [table names], own: [properties] }, or null when it is not data.
+const isText = (n) =>
+  n.type === "Literal" || (n.type === "TemplateLiteral" && n.expressions.length === 0) || (n.type === "UnaryExpression" && isData(n));
+
+// A language value: { spreads: [table names], own: [text properties], inline: [nested data kept] }, or null when
+// it is not data.
 // Spreads must come first and read the same language of a named table (`...BASE.de`).
 const analyse = (value, lang) => {
   // Only dictionaries are split: a string or a list per language (language names, compass points) stays inline.
   if (value.type !== "ObjectExpression") return null;
   const spreads = [];
   const own = [];
+  const inline = [];
   for (const p of value.properties) {
     if (p.type === "SpreadElement") {
       const a = p.argument;
       const ok =
         !own.length &&
+        !inline.length &&
         a.type === "MemberExpression" &&
         a.object.type === "Identifier" &&
         ((!a.computed && a.property.name === lang) || (a.computed && a.property.type === "Literal" && a.property.value === lang));
       if (!ok) return null;
       spreads.push(a.object.name);
-    } else if (p.type === "Property" && !p.computed && p.kind === "init" && !p.method && isData(p.value)) own.push(p);
+    } else if (p.type === "Property" && !p.computed && p.kind === "init" && !p.method && isData(p.value)) {
+      // Texts move to the language file; a nested object or a list stays inline, as code may read into it
+      // (`T.fr.modes.auto`) without a fallback.
+      (isText(p.value) ? own : inline).push(p);
+    }
     else return null;
   }
-  return { spreads, own };
+  return { spreads, own, inline };
 };
 
 const findTables = (ast) => {
@@ -112,6 +122,14 @@ const plan = (tables) => {
   return { split, byName };
 };
 
+// Fills a table's language: the languages it spreads from, then its texts from the language file, then what it
+// kept inline (nested values), in the order of the source object. Shared by the bundle and the self-check.
+const COMPOSE = `(tables, own, spreads, data, lang, n) => {
+    const t = tables[n];
+    if (!t || !t[lang]) return;
+    Object.assign(t[lang], ...(spreads[n] || []).map((m) => tables[m]?.[lang] || {}), data[lang]?.[n] || {}, own[n]?.[lang] || {});
+  }`;
+
 const prelude = ({ ns, stem, version, langs, spreads, names }) => `// ── Translations loaded on demand (scripts/i18n-split.mjs) ──
 // English is inline; every other language is in ${stem}.i18n.<lang>.js next to this file, fetched when needed.
 var ${ns} = (() => {
@@ -137,20 +155,18 @@ var ${ns} = (() => {
     }
     return base;
   };
-  const resolved = (lang, n) => Object.assign({}, ...(SPREADS[n] || []).map((m) => resolved(lang, m)), data[lang][n]);
-  const fill = (lang, n) => {
-    const t = tables[n];
-    if (t && t[lang] && data[lang]?.[n]) Object.assign(t[lang], resolved(lang, n));
-  };
+  const own = [];
+  const compose = ${COMPOSE};
   const refresh = () => {
     if (typeof document === "undefined") return;
     const stack = [document.documentElement];
     while (stack.length) {
       const el = stack.pop();
       if (!el) continue;
-      if (tags.has(el.localName) && el._config && typeof el.setConfig === "function") {
+      const config = el[CONFIG] ?? el._config;
+      if (tags.has(el.localName) && config && typeof el.setConfig === "function") {
         try {
-          el.setConfig(el._config);
+          el.setConfig(config);
         } catch (_err) {
           /* the card shows its own error */
         }
@@ -167,7 +183,7 @@ var ${ns} = (() => {
     loads[lang] = import(file).then(
       (m) => {
         data[lang] = m.default;
-        for (const n of Object.keys(m.default)) fill(lang, n);
+        tables.forEach((_t, n) => compose(tables, own, SPREADS, data, lang, n));
         refresh();
       },
       (err) => console.warn(\`${stem}: "\${lang}" translations not loaded (\${err?.message ?? err}), English shown\`),
@@ -176,7 +192,12 @@ var ${ns} = (() => {
   };
   const register = (n, table) => {
     tables[n] = table;
-    for (const lang of Object.keys(data)) fill(lang, n);
+    own[n] = {};
+    for (const lang of Object.keys(table)) {
+      if (lang === "en") continue;
+      own[n][lang] = { ...table[lang] };
+      compose(tables, own, SPREADS, data, lang, n);
+    }
     return new Proxy(table, {
       get(t, k) {
         if (typeof k === "string" && k !== "en" && LANGS.has(k) && !data[k]) load(k);
@@ -184,13 +205,36 @@ var ${ns} = (() => {
       },
     });
   };
+  // Remembers the config a card was given, as given: a card may write defaults into its own copy (a name in
+  // the language of the moment), and a redraw from that copy would keep them.
+  const CONFIG = Symbol("i18n config");
+  const WRAPPED = Symbol("i18n wrapped");
+  const keepConfig = (cls) => {
+    for (let p = cls?.prototype; p && p !== Object.prototype; p = Object.getPrototypeOf(p)) {
+      const own = Object.getOwnPropertyDescriptor(p, "setConfig");
+      if (!own || typeof own.value !== "function" || own.value[WRAPPED]) continue;
+      const original = own.value;
+      const wrapped = function (config) {
+        // The outermost call holds the config as the dashboard gave it (a subclass may pass its parent another).
+        if (!this[WRAPPED]) this[CONFIG] = config;
+        this[WRAPPED] = (this[WRAPPED] || 0) + 1;
+        try {
+          return original.call(this, config);
+        } finally {
+          this[WRAPPED]--;
+        }
+      };
+      wrapped[WRAPPED] = true;
+      Object.defineProperty(p, "setConfig", { ...own, value: wrapped });
+    }
+  };
   // Records this bundle's element names, to redraw its cards once a language has loaded.
   const ce = globalThis.customElements;
   const customElements =
     ce &&
     new Proxy(ce, {
       get(t, k) {
-        if (k === "define") return (tag, cls, opts) => (tags.add(tag), t.define(tag, cls, opts));
+        if (k === "define") return (tag, cls, opts) => (tags.add(tag), keepConfig(cls), t.define(tag, cls, opts));
         const v = t[k];
         return typeof v === "function" ? v.bind(t) : v;
       },
@@ -227,7 +271,7 @@ export function splitI18n(code, { stem, version, outDir, aliases = [] }) {
       const part = t.parts[i];
       if (part.spreads.length) spreads[t.id] = part.spreads.map((s) => byName.get(s).id);
       (files[lang] ||= []).push(`${JSON.stringify(String(t.id))}: ${ownText(code, part)}`);
-      edits.push({ start: p.value.start, end: p.value.end, text: "{}" });
+      edits.push({ start: p.value.start, end: p.value.end, text: ownText(code, { own: part.inline }) });
     });
     edits.push({ start: t.node.end, end: t.node.end, text: ")" });
   }
@@ -246,6 +290,12 @@ export function splitI18n(code, { stem, version, outDir, aliases = [] }) {
   selfCheck({ code, out, split, byName, spreads, langs, outDir, stem, ns });
   return { code: out, langs, tables: split.length, kept: tables.length - split.length };
 }
+
+// Key order aside (an inline nested value comes back before the texts), the same value.
+const canon = (v) =>
+  JSON.stringify(v, (_k, x) =>
+    x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map((k) => [k, x[k]])) : x,
+  );
 
 // Rebuilds every split table from the new bundle and the language files, and compares it with the original.
 function selfCheck({ code, out, split, byName, spreads, langs, outDir, stem, ns }) {
@@ -267,7 +317,6 @@ function selfCheck({ code, out, split, byName, spreads, langs, outDir, stem, ns 
       return [l, evalWith(text.replace(/;\s*$/, ""), {})];
     }),
   );
-  const resolved = (lang, n) => Object.assign({}, ...(spreads[n] || []).map((m) => resolved(lang, m)), data[lang][n]);
   const re = new RegExp(`${ns}\\.register\\((\\d+), `, "g");
   const starts = [...out.matchAll(re)];
   if (starts.length !== split.length) throw new Error(`i18n split: ${split.length} tables, ${starts.length} registered`);
@@ -287,10 +336,17 @@ function selfCheck({ code, out, split, byName, spreads, langs, outDir, stem, ns 
   visit(ast);
   // English may spread other tables' English: bind every named split table to its original value.
   const names = Object.fromEntries(split.filter((t) => t.name).map((t) => [t.name, evalOrig(t)]));
+  const compose = evalWith(COMPOSE, {});
+  const tables = [];
+  const own = [];
   for (const t of split) {
     const rebuilt = evalWith(out.slice(wrapped[t.id].start, wrapped[t.id].end), names);
-    for (const l of Object.keys(rebuilt)) if (l !== "en" && data[l]?.[t.id]) Object.assign(rebuilt[l], resolved(l, t.id));
-    if (JSON.stringify(evalOrig(t)) !== JSON.stringify(rebuilt)) throw new Error(`i18n split: table ${t.id} (${t.name ?? "unnamed"}) does not rebuild`);
+    tables[t.id] = rebuilt;
+    own[t.id] = Object.fromEntries(Object.keys(rebuilt).filter((l) => l !== "en").map((l) => [l, { ...rebuilt[l] }]));
+    for (const l of Object.keys(own[t.id])) compose(tables, own, spreads, data, l, t.id);
+  }
+  for (const t of split) {
+    if (canon(evalOrig(t)) !== canon(tables[t.id])) throw new Error(`i18n split: table ${t.id} (${t.name ?? "unnamed"}) does not rebuild`);
   }
 }
 
