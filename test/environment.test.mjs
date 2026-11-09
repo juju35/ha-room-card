@@ -433,3 +433,37 @@ test("numbers use European Portuguese for HA's pt, keep pt-BR, and follow the la
   assert.equal(at("pt", { language: "de" }), fmt("de"));
   assert.equal(at("de", { language: "pt" }), fmt("pt-PT"));
 });
+
+test("24 h curves: one statistics query for the shown readings, drawn as a sparkline in each tile", async () => {
+  const calls = [];
+  const hass = makeHass();
+  const now = Date.now();
+  hass.callWS = async (msg) => {
+    calls.push(msg);
+    return Object.fromEntries(
+      msg.statistic_ids.map((id) => [id, [0, 1, 2, 3].map((k) => ({ start: now - (3 - k) * 3600000, mean: 20 + k }))]),
+    );
+  };
+  const card = render({}, hass);
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].type, "recorder/statistics_during_period");
+  assert.equal(calls[0].period, "5minute");
+  assert.deepEqual(JSON.stringify(calls[0].statistic_ids), JSON.stringify(ids(card)));
+  assert.equal((head(card).match(/<svg class="spark"/g) || []).length, 5);
+  card.hass = hass;
+  assert.equal(calls.length, 1, "no refetch within 5 minutes");
+});
+
+test("24 h curves off: no query, no sparkline", async () => {
+  const hass = makeHass();
+  let n = 0;
+  hass.callWS = async () => {
+    n++;
+    return {};
+  };
+  const card = render({ show_history: false }, hass);
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(n, 0);
+  assert.doesNotMatch(head(card), /class="spark"/);
+});
