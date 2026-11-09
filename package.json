@@ -21,6 +21,7 @@
   "devDependencies": {
     "@mdi/js": "^7.4.47",
     "acorn": "^8.19.0",
+    "css-tree": "^3.2.1",
     "playwright": "^1.64.1"
   }
 }
