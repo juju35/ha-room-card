@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.21.0 - 2026-11-09
+
+### Performance
+- **Translations load on demand**: the bundle keeps English only (322 KB → 146 KB) and each other language is its own `ha-room-card.i18n.<lang>.js` file next to it, fetched the first time a card needs it. Home Assistant loads every dashboard resource on every dashboard, so each page used to download and parse all 22 languages to use one. Until a language file has arrived (a few milliseconds), texts fall back to English and the cards redraw once it is there.
+
+### Maintenance
+- Build: `scripts/i18n-split.mjs` splits the built bundle and rebuilds every table from the split files to check them (the build fails on any difference); `src/` keeps every language as before.
+- Release: every file of `dist/` is attached. Manual installation copies the translation files too.
+
 ## 1.20.0 - 2026-11-08
 
 ### Features
