@@ -1183,7 +1183,8 @@ class RoomEnvironmentCard extends RcCard {
     .tile.s-warn .state, .tile.s-alert .state, .tile.cold .state { color: var(--t); }
     .tile.s-warn .val, .tile.s-alert .val, .tile.cold .val { color: inherit; }
     /* The last 24 hours behind the reading, in its level's colour, discreet. */
-    .spark { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; border-radius: inherit; }
+    /* The lower half of the tile: under the value and gauge, clear of the name and icon. */
+    .spark { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 50%; pointer-events: none; border-bottom-left-radius: inherit; border-bottom-right-radius: inherit; }
     .spark-a { fill: color-mix(in srgb, var(--t) 8%, transparent); }
     .spark-l { fill: none; stroke: color-mix(in srgb, var(--t) 35%, transparent); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
     .tile > :not(.spark):not(.gauge) { position: relative; }
