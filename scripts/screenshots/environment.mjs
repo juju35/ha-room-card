@@ -33,13 +33,34 @@ const setup = (s, lang) => {
     };
 };
 
+// Recorder mock for the 24 h curves behind the tiles: 5-minute means drifting through the day (warmer and more CO₂
+// in the evening) and ending at each reading's value now.
+const ws = `window.__ws = async (msg) => {
+  if (msg.type !== "recorder/statistics_during_period") return {};
+  // Asked from the hass setter, before the card is in the page: answer once it is.
+  await new Promise((r) => setTimeout(r, 50));
+  const states = document.querySelector("#root").firstElementChild._hass.states;
+  const step = 300000, now = Math.floor(Date.now() / step) * step, out = {};
+  msg.statistic_ids.forEach((id, k) => {
+    const v = Number(states[id]?.state);
+    if (!Number.isFinite(v)) return;
+    out[id] = Array.from({ length: 288 }, (_, i) => {
+      const a = (i / 288) * 2 * Math.PI;
+      const wave = 0.1 * Math.sin(a * 2 + k) + 0.03 * Math.sin(a * 5 + 2 * k);
+      return { start: now - (287 - i) * step, mean: v * (1 + wave * (1 - i / 287)) };
+    });
+  });
+  return out;
+};`;
+
 const shots = [...pair("comfort", { values: COMFORT }), ...pair("stuffy", { values: STUFFY })];
-await shoot({ prefix: "environment", tag: "room-environment-card", shots, setup });
+await shoot({ prefix: "environment", tag: "room-environment-card", shots, setup, ws });
 // The mini card with the five readings of a typical indoor station (PM2.5 left out): a single line of readings.
 await shoot({
   prefix: "environment-mini",
   tag: "room-environment-mini-card",
   shots: [...shots, ...pair("zoom", { values: STUFFY, zoom: true })],
+  ws,
   setup: (s, lang) => {
     const { hass, config } = setup(s, lang);
     return { hass, config: { ...config, exclude: ["sensor.living_room_pm25"] }, open: s.zoom && ".zoom" };

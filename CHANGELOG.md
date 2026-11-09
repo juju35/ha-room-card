@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.22.2 - 2026-11-09
+
+### Fixes
+- Environment card: the 24 h curve takes the lower half of its tile, under the value and gauge, instead of the whole tile where it crossed the name and the icon.
+
+### Documentation
+- The environment screenshots show the 24 h curves: the screenshot harness can now answer the recorder (`ws` option), the environment script with a day of 5-minute means.
+
 ## 1.22.1 - 2026-11-09
 
 ### Maintenance

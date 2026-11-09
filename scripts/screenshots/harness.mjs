@@ -81,11 +81,12 @@ export const launch = () => chromium.launch(process.env.CHROMIUM_PATH ? { execut
 
 // A page ready to host a card: theme variables, the <ha-*> stand-ins and the card bundle loaded.
 // A new page per shot: the card's script declares top-level names, which cannot be evaluated twice in one page.
-export const openPage = async (browser, { theme, width, icons = {}, label = "" }) => {
+// `ws`: a recorder mock, as script source defining window.__ws (the card's hass.callWS).
+export const openPage = async (browser, { theme, width, icons = {}, label = "", ws = "" }) => {
   const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1000, height: 2000 } });
   page.on("pageerror", (err) => console.error(`pageerror${label ? ` (${label})` : ""}: ${err.message}`));
   await page.setContent(pageHtml(theme, width));
-  await page.addScriptTag({ content: haElements(icons) });
+  await page.addScriptTag({ content: haElements(icons) + ws });
   await page.addScriptTag({ content: cardJs() });
   return page;
 };
@@ -96,7 +97,13 @@ export const mountCard = (page, { tag, hass, config, dark = false, open = null }
     ({ tag, hass, config, dark, open }) => {
       const el = document.createElement(tag);
       el.setConfig({ type: `custom:${tag}`, ...config });
-      el.hass = { ...hass, language: hass.language, themes: { darkMode: dark }, callService: async () => {} };
+      el.hass = {
+        ...hass,
+        language: hass.language,
+        themes: { darkMode: dark },
+        callService: async () => {},
+        ...(window.__ws ? { callWS: window.__ws } : {}),
+      };
       document.getElementById("root").appendChild(el);
       // A mouse click (detail 1), not a keyboard one: no focus ring left in the shot.
       if (open) el.shadowRoot.querySelector(open).dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true, detail: 1 }));
@@ -139,14 +146,14 @@ export const writeIfChanged = async (page, path, png) => {
 
 // Renders each shot of `shots` ({ file, theme, ... }) into screenshots/<prefix>-<file>.png.
 // `setup(shot, lang)` returns { hass, config, open? } for that shot; every shot is in English.
-export const shoot = async ({ prefix, tag, shots, setup, icons = [] }) => {
+export const shoot = async ({ prefix, tag, shots, setup, icons = [], ws = "" }) => {
   const iconMap = iconsFor(icons);
   const browser = await launch();
   for (const s of shots) {
     const lang = "en";
     const width = widthFor(tag, s);
     const { hass, config, open } = setup(s, lang);
-    const page = await openPage(browser, { theme: s.theme, width, icons: iconMap, label: `${prefix}-${s.file}` });
+    const page = await openPage(browser, { theme: s.theme, width, icons: iconMap, label: `${prefix}-${s.file}`, ws });
     await mountCard(page, { tag, hass, config, dark: s.theme === "dark", open });
     await page.waitForTimeout(400);
     const out = `screenshots/${prefix}-${s.file}.png`;
