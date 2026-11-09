@@ -12,7 +12,8 @@
 //   is rebuilt the same way once loaded;
 // - the table is wrapped in `<ns>.register(<n>, …)`, which registers it and returns a proxy: the first read of
 //   a language that is not loaded yet fetches its file, fills the table in place and redraws this bundle's
-//   cards (setConfig with their current config). The page's language is fetched as soon as the bundle runs.
+//   cards (setConfig with their current config). The page's language is fetched as soon as the bundle runs,
+//   and the elements are defined once it is in (at most 1.5 s), so a first render is already translated.
 // A table whose translations hold code (a function, a variable) or are not dictionaries stays whole in the bundle.
 // The bundle stays a classic script (no import.meta, no top-level await): it also runs injected as content.
 // After splitting, every table is rebuilt from the bundle and the language files and compared with the
@@ -22,7 +23,14 @@ import { parse } from "acorn";
 
 const LANGS = new Set(["en", "fr", "de", "es", "sr", "sr-Latn", "it", "nl", "pt", "pl", "ro", "da", "sv", "bg", "ru", "uk", "hu", "sk", "cs", "sl", "lv", "el"]);
 const keyName = (p) => (p.type === "Property" && !p.computed ? (p.key.name ?? p.key.value) : undefined);
-const parseScript = (code) => parse(code, { ecmaVersion: "latest", sourceType: "script" });
+// A card is a classic script, or a module when it imports (an integration's card sharing helpers).
+const parseScript = (code) => {
+  try {
+    return parse(code, { ecmaVersion: "latest", sourceType: "script" });
+  } catch {
+    return parse(code, { ecmaVersion: "latest", sourceType: "module" });
+  }
+};
 
 // Pure data: literals, template literals without expressions, arrays and objects of those.
 const isData = (n) => {
@@ -178,7 +186,11 @@ var ${ns} = (() => {
   const load = (lang) => {
     if (!LANGS.has(lang) || loads[lang]) return loads[lang];
     const url = baseUrl();
-    if (!url) return (loads[lang] = Promise.resolve());
+    if (!url) {
+      // Bundle injected as content (screenshot harness): no file to fetch, English stays.
+      loads[lang] = Promise.resolve();
+      return undefined;
+    }
     const file = new URL(\`${stem}.i18n.\${lang}.js?v=${version}\`, url).href;
     loads[lang] = import(file).then(
       (m) => {
@@ -193,9 +205,14 @@ var ${ns} = (() => {
   const register = (n, table) => {
     tables[n] = table;
     own[n] = {};
+    const en = table.en;
     for (const lang of Object.keys(table)) {
       if (lang === "en") continue;
       own[n][lang] = { ...table[lang] };
+      // Until its file is in, a missing text reads the English one, even where the card has no fallback.
+      if (en && typeof en === "object" && table[lang] && Object.getPrototypeOf(table[lang]) === Object.prototype) {
+        Object.setPrototypeOf(table[lang], en);
+      }
       compose(tables, own, SPREADS, data, lang, n);
     }
     return new Proxy(table, {
@@ -228,23 +245,42 @@ var ${ns} = (() => {
       Object.defineProperty(p, "setConfig", { ...own, value: wrapped });
     }
   };
+  // The page's language, fetched at once. Until it is in (at most 1.5 s), the elements are not defined yet:
+  // Home Assistant waits for a custom element and builds the card once it is defined, so the first render is
+  // already in the right language (a card built only once would otherwise keep English texts).
+  let ready = null;
+  try {
+    const page = document.documentElement.lang || "";
+    const pending = load(LANGS.has(page) ? page : page.split("-")[0]);
+    if (pending) {
+      ready = Promise.race([pending, new Promise((resolve) => setTimeout(resolve, 1500))]).then(() => {
+        ready = null;
+      });
+    }
+  } catch (_err) {
+    /* no DOM */
+  }
   // Records this bundle's element names, to redraw its cards once a language has loaded.
   const ce = globalThis.customElements;
+  const define = (t, tag, cls, opts) => {
+    if (!t.get(tag)) t.define(tag, cls, opts);
+  };
   const customElements =
     ce &&
     new Proxy(ce, {
       get(t, k) {
-        if (k === "define") return (tag, cls, opts) => (tags.add(tag), keepConfig(cls), t.define(tag, cls, opts));
+        if (k === "define") {
+          return (tag, cls, opts) => {
+            tags.add(tag);
+            keepConfig(cls);
+            if (ready) ready.then(() => define(t, tag, cls, opts));
+            else t.define(tag, cls, opts);
+          };
+        }
         const v = t[k];
         return typeof v === "function" ? v.bind(t) : v;
       },
     });
-  try {
-    const page = document.documentElement.lang || "";
-    load(LANGS.has(page) ? page : page.split("-")[0]);
-  } catch (_err) {
-    /* no DOM */
-  }
   return { register, load, customElements };
 })();
 `;

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.21.1 - 2026-11-09
+
+### Fixes
+- Translations: the cards are defined once the page's language file has arrived (at most 1.5 s; Home Assistant builds a card when its element gets defined), so the first render is already translated instead of English then redrawn; until a language file is in, a missing text reads the English one wherever the card has no fallback of its own.
+
 ## 1.21.0 - 2026-11-09
 
 ### Performance
