@@ -177,8 +177,8 @@ The Marketplace registers the dashboard resource for you; the single file provid
 
 ### Manual
 
-1. Download `ha-room-card.js` from the [latest release](https://github.com/juju35/ha-room-card/releases/latest)
-2. Copy it to `/config/www/`
+1. Download `ha-room-card.js` and the `ha-room-card.i18n.*.js` translation files from the [latest release](https://github.com/juju35/ha-room-card/releases/latest)
+2. Copy them all to `/config/www/` (without the translation files, the cards show in English)
 3. Go to **Settings → Dashboards → Resources** → Add resource:
    - URL: `/local/ha-room-card.js`
    - Type: **JavaScript Module**
