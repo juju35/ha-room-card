@@ -34,6 +34,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Only the readings outside the comfort range stay visible",
     ed_show_gauge: "Show gauges",
     ed_show_gauge_helper: "A thin bar under each reading, coloured by its level",
+    ed_show_history: "Show 24 h curves",
+    ed_show_history_helper: "The last 24 hours of each reading, drawn behind it",
     ed_include: "Sensors to add",
     ed_include_helper: "From another room or without one",
     ed_exclude: "Sensors to exclude",
@@ -67,6 +69,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Seules les mesures hors de la plage de confort restent affichées",
     ed_show_gauge: "Afficher les jauges",
     ed_show_gauge_helper: "Une fine barre sous chaque mesure, colorée selon son niveau",
+    ed_show_history: "Afficher les courbes 24 h",
+    ed_show_history_helper: "Les dernières 24 heures de chaque mesure, dessinées derrière elle",
     ed_include: "Capteurs à ajouter",
     ed_include_helper: "D'une autre pièce ou sans pièce",
     ed_exclude: "Capteurs à exclure",
@@ -100,6 +104,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Nur Messwerte außerhalb des Komfortbereichs bleiben sichtbar",
     ed_show_gauge: "Balken anzeigen",
     ed_show_gauge_helper: "Ein dünner Balken unter jedem Messwert, nach seinem Niveau eingefärbt",
+    ed_show_history: "24-h-Kurven anzeigen",
+    ed_show_history_helper: "Die letzten 24 Stunden jedes Messwerts, dahinter gezeichnet",
     ed_include: "Hinzuzufügende Sensoren",
     ed_include_helper: "Aus einem anderen Raum oder ohne Raum",
     ed_exclude: "Auszuschließende Sensoren",
@@ -133,6 +139,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Solo quedan visibles las lecturas fuera del rango de confort",
     ed_show_gauge: "Mostrar indicadores",
     ed_show_gauge_helper: "Una barra fina bajo cada lectura, coloreada según su nivel",
+    ed_show_history: "Mostrar curvas de 24 h",
+    ed_show_history_helper: "Las últimas 24 horas de cada lectura, dibujadas detrás",
     ed_include: "Sensores a añadir",
     ed_include_helper: "De otra habitación o sin habitación",
     ed_exclude: "Sensores a excluir",
@@ -166,6 +174,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Остаће видљива само очитавања ван опсега комфора",
     ed_show_gauge: "Прикажи индикаторе",
     ed_show_gauge_helper: "Танка линија испод сваког очитавања, обојена у зависности од нивоа",
+    ed_show_history: "Прикажи криве за 24 ч",
+    ed_show_history_helper: "Последња 24 сата сваког очитавања, исцртана иза њега",
     ed_include: "Сензори за додавање",
     ed_include_helper: "Из друге просторије или без ње",
     ed_exclude: "Изостави сензоре",
@@ -199,6 +209,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Ostaće vidljiva samo očitavanja van opsega komfora",
     ed_show_gauge: "Prikaži indikatore",
     ed_show_gauge_helper: "Tanka linija ispod svakog očitavanja, obojena u zavisnosti od nivoa",
+    ed_show_history: "Prikaži krive za 24 č",
+    ed_show_history_helper: "Poslednja 24 sata svakog očitavanja, iscrtana iza njega",
     ed_include: "Senzori za dodavanje",
     ed_include_helper: "Iz druge prostorije ili bez nje",
     ed_exclude: "Izostavi senzore",
@@ -232,6 +244,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Restano visibili solo le misure fuori dall'intervallo di comfort",
     ed_show_gauge: "Mostra gli indicatori",
     ed_show_gauge_helper: "Una barra sottile sotto ogni misura, colorata in base al livello",
+    ed_show_history: "Mostra le curve di 24 h",
+    ed_show_history_helper: "Le ultime 24 ore di ogni lettura, disegnate dietro",
     ed_include: "Sensori da aggiungere",
     ed_include_helper: "Da un'altra stanza o senza stanza",
     ed_exclude: "Sensori da escludere",
@@ -265,6 +279,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Alleen metingen buiten het comfortbereik blijven zichtbaar",
     ed_show_gauge: "Meters tonen",
     ed_show_gauge_helper: "Een dunne balk onder elke meting, gekleurd naar het niveau",
+    ed_show_history: "24-uurscurves tonen",
+    ed_show_history_helper: "De laatste 24 uur van elke meting, erachter getekend",
     ed_include: "Toe te voegen sensoren",
     ed_include_helper: "Uit een andere ruimte of zonder ruimte",
     ed_exclude: "Uit te sluiten sensoren",
@@ -298,6 +314,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Só ficam visíveis as medições fora do intervalo de conforto",
     ed_show_gauge: "Mostrar os medidores",
     ed_show_gauge_helper: "Uma barra fina sob cada medição, colorida conforme o nível",
+    ed_show_history: "Mostrar curvas de 24 h",
+    ed_show_history_helper: "As últimas 24 horas de cada leitura, desenhadas por trás",
     ed_include: "Sensores a adicionar",
     ed_include_helper: "De outra divisão ou sem divisão",
     ed_exclude: "Sensores a excluir",
@@ -331,6 +349,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Widoczne pozostają tylko odczyty poza zakresem komfortu",
     ed_show_gauge: "Pokaż wskaźniki",
     ed_show_gauge_helper: "Cienki pasek pod każdym odczytem, zabarwiony według poziomu",
+    ed_show_history: "Pokaż krzywe 24 h",
+    ed_show_history_helper: "Ostatnie 24 godziny każdego odczytu, narysowane za nim",
     ed_include: "Czujniki do dodania",
     ed_include_helper: "Z innego pomieszczenia lub bez pomieszczenia",
     ed_exclude: "Czujniki do wykluczenia",
@@ -364,6 +384,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Rămân vizibile doar valorile din afara intervalului de confort",
     ed_show_gauge: "Afișează indicatoarele",
     ed_show_gauge_helper: "O bară subțire sub fiecare valoare, colorată după nivelul ei",
+    ed_show_history: "Afișează curbele de 24 h",
+    ed_show_history_helper: "Ultimele 24 de ore ale fiecărei citiri, desenate în spate",
     ed_include: "Senzori de adăugat",
     ed_include_helper: "Din altă cameră sau fără cameră",
     ed_exclude: "Senzori excluși",
@@ -397,6 +419,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Kun målinger uden for komfortområdet forbliver synlige",
     ed_show_gauge: "Vis målere",
     ed_show_gauge_helper: "En tynd bjælke under hver måling, farvet efter niveau",
+    ed_show_history: "Vis 24-timers kurver",
+    ed_show_history_helper: "De seneste 24 timer af hver måling, tegnet bagved",
     ed_include: "Sensorer, der tilføjes",
     ed_include_helper: "Fra et andet rum eller uden rum",
     ed_exclude: "Sensorer, der udelades",
@@ -430,6 +454,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Bara mätvärden utanför komfortintervallet förblir synliga",
     ed_show_gauge: "Visa mätare",
     ed_show_gauge_helper: "En tunn stapel under varje mätvärde, färgad efter nivå",
+    ed_show_history: "Visa 24-timmarskurvor",
+    ed_show_history_helper: "De senaste 24 timmarna av varje mätning, ritade bakom",
     ed_include: "Sensorer att lägga till",
     ed_include_helper: "Från ett annat rum eller utan rum",
     ed_exclude: "Sensorer att utesluta",
@@ -463,6 +489,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Остават видими само стойностите извън диапазона на комфорт",
     ed_show_gauge: "Показвай индикатори",
     ed_show_gauge_helper: "Тънка лента под всяка стойност, оцветена според нивото ѝ",
+    ed_show_history: "Показване на криви за 24 ч",
+    ed_show_history_helper: "Последните 24 часа на всяко отчитане, изобразени зад него",
     ed_include: "Сензори за добавяне",
     ed_include_helper: "От друга стая или без стая",
     ed_exclude: "Сензори за пропускане",
@@ -496,6 +524,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Видны только показания вне диапазона комфорта",
     ed_show_gauge: "Показывать шкалы",
     ed_show_gauge_helper: "Тонкая полоска под каждым показанием, окрашенная по его уровню",
+    ed_show_history: "Показывать графики за 24 ч",
+    ed_show_history_helper: "Последние 24 часа каждого показания, нарисованные за ним",
     ed_include: "Добавить датчики",
     ed_include_helper: "Из другой комнаты или без комнаты",
     ed_exclude: "Исключить датчики",
@@ -529,6 +559,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Видимими залишаються лише показники поза діапазоном комфорту",
     ed_show_gauge: "Показувати шкали",
     ed_show_gauge_helper: "Тонка смужка під кожним показником, забарвлена відповідно до рівня",
+    ed_show_history: "Показувати графіки за 24 год",
+    ed_show_history_helper: "Останні 24 години кожного показника, намальовані за ним",
     ed_include: "Додати датчики",
     ed_include_helper: "З іншої кімнати або без кімнати",
     ed_exclude: "Виключити датчики",
@@ -562,6 +594,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Csak a komforttartományon kívüli értékek maradnak láthatók",
     ed_show_gauge: "Mérősávok megjelenítése",
     ed_show_gauge_helper: "Vékony sáv minden érték alatt, a szintjének megfelelő színnel",
+    ed_show_history: "24 órás görbék megjelenítése",
+    ed_show_history_helper: "Minden mérés utolsó 24 órája, mögé rajzolva",
     ed_include: "Hozzáadandó érzékelők",
     ed_include_helper: "Másik helyiségből vagy helyiség nélkül",
     ed_exclude: "Kihagyott érzékelők",
@@ -595,6 +629,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Viditeľné zostanú len hodnoty mimo rozsahu komfortu",
     ed_show_gauge: "Zobraziť ukazovatele",
     ed_show_gauge_helper: "Tenký pruh pod každou hodnotou, zafarbený podľa jej úrovne",
+    ed_show_history: "Zobraziť 24 h krivky",
+    ed_show_history_helper: "Posledných 24 hodín každého merania, nakreslených za ním",
     ed_include: "Senzory na pridanie",
     ed_include_helper: "Z inej miestnosti alebo bez miestnosti",
     ed_exclude: "Vynechané senzory",
@@ -628,6 +664,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Viditelné zůstanou jen hodnoty mimo rozsah komfortu",
     ed_show_gauge: "Zobrazit ukazatele",
     ed_show_gauge_helper: "Tenký pruh pod každou hodnotou, zbarvený podle její úrovně",
+    ed_show_history: "Zobrazit 24h křivky",
+    ed_show_history_helper: "Posledních 24 hodin každého měření, nakreslených za ním",
     ed_include: "Senzory k přidání",
     ed_include_helper: "Z jiné místnosti nebo bez místnosti",
     ed_exclude: "Vynechané senzory",
@@ -661,6 +699,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Vidne ostanejo samo vrednosti zunaj območja udobja",
     ed_show_gauge: "Prikaži merilnike",
     ed_show_gauge_helper: "Tanka vrstica pod vsako vrednostjo, obarvana glede na njeno raven",
+    ed_show_history: "Prikaži 24-urne krivulje",
+    ed_show_history_helper: "Zadnjih 24 ur vsake meritve, narisanih za njo",
     ed_include: "Senzorji za dodajanje",
     ed_include_helper: "Iz drugega prostora ali brez prostora",
     ed_exclude: "Izpuščeni senzorji",
@@ -694,6 +734,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Redzami paliek tikai rādījumi ārpus komforta diapazona",
     ed_show_gauge: "Rādīt mērjoslas",
     ed_show_gauge_helper: "Plāna josla zem katra rādījuma, iekrāsota atbilstoši tā līmenim",
+    ed_show_history: "Rādīt 24 h līknes",
+    ed_show_history_helper: "Katra mērījuma pēdējās 24 stundas, uzzīmētas aiz tā",
     ed_include: "Pievienojamie sensori",
     ed_include_helper: "No citas telpas vai bez telpas",
     ed_exclude: "Izslēdzamie sensori",
@@ -727,6 +769,8 @@ const RE_I18N = {
     ed_only_alerts_helper: "Μένουν ορατές μόνο οι μετρήσεις εκτός του εύρους άνεσης",
     ed_show_gauge: "Εμφάνιση δεικτών",
     ed_show_gauge_helper: "Μια λεπτή μπάρα κάτω από κάθε μέτρηση, χρωματισμένη ανάλογα με το επίπεδό της",
+    ed_show_history: "Εμφάνιση καμπυλών 24 ωρών",
+    ed_show_history_helper: "Οι τελευταίες 24 ώρες κάθε μέτρησης, σχεδιασμένες πίσω της",
     ed_include: "Αισθητήρες προς προσθήκη",
     ed_include_helper: "Από άλλο δωμάτιο ή χωρίς δωμάτιο",
     ed_exclude: "Αισθητήρες προς εξαίρεση",
@@ -879,13 +923,28 @@ const reBand = (v, [al, wl, wh, ah]) => {
 };
 
 // ── Card ─────────────────────────────────────────────────────────────────────
+// The last 24 hours behind a tile: area and line of the 5-minute means, scaled to their own range.
+const RE_HIST_WINDOW = 24 * 3600000;
+function reSpark(points, end) {
+  if (!points || points.length < 2) return "";
+  const vs = points.map((p) => p.v);
+  const lo = Math.min(...vs);
+  const hi = Math.max(...vs);
+  const span = hi - lo || 1;
+  const x = (t) => Math.max(0, Math.min(100, (100 * (t - (end - RE_HIST_WINDOW))) / RE_HIST_WINDOW)).toFixed(2);
+  const y = (v) => (28 - ((v - lo) / span) * 24).toFixed(2);
+  const line = `M${points.map((p) => `${x(p.t)},${y(p.v)}`).join("L")}`;
+  const area = `M${x(points[0].t)},30L${points.map((p) => `${x(p.t)},${y(p.v)}`).join("L")}L${x(points.at(-1).t)},30Z`;
+  return `<svg class="spark" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path class="spark-a" d="${area}"/><path class="spark-l" d="${line}"/></svg>`;
+}
+
 class RoomEnvironmentCard extends RcCard {
   static tag = "room-environment-card";
   static i18n = RE_I18N;
   static needsArea = true;
   static includeDomains = ["sensor"];
   static includeMatch = (hass, id) => !!reKindOf(hass.states[id]);
-  static defaults = { columns: 2, only_alerts: false, show_gauge: true, exclude: [] };
+  static defaults = { columns: 2, only_alerts: false, show_gauge: true, show_history: true, exclude: [] };
 
   _candidate(id) {
     return reMatch(this._hass, id);
@@ -1027,13 +1086,39 @@ class RoomEnvironmentCard extends RcCard {
     return worst.icon;
   }
 
+  // 24 h of 5-minute means of the readings (their first sensor), from the recorder's statistics: one query, again
+  // every 5 minutes; drawn behind the tiles once it has come.
+  _history(ids) {
+    const key = ids.join(",");
+    if (!key || !this._hass.callWS || this._config.show_history === false) return null;
+    if (this._histKey !== key || Date.now() - (this._histAt || 0) > 300000) {
+      const end = Date.now();
+      this._histKey = key;
+      this._histAt = end;
+      this._hass
+        .callWS({ type: "recorder/statistics_during_period", start_time: new Date(end - RE_HIST_WINDOW).toISOString(), statistic_ids: ids, period: "5minute", types: ["mean"] })
+        .then((r) => {
+          if (this._histKey !== key) return;
+          this._hist = { end, points: Object.fromEntries(ids.map((id) => [id, (r?.[id] || []).map((p) => ({ t: typeof p.start === "number" ? p.start : Date.parse(p.start), v: p.mean })).filter((p) => Number.isFinite(p.t) && Number.isFinite(p.v))])) };
+          this._histVer = (this._histVer || 0) + 1;
+          if (this._lastItems) this._draw(this._lastItems);
+        })
+        .catch(() => {
+          this._histAt = Date.now() - 240000;
+        });
+    }
+    return this._histKey === key ? this._hist : null;
+  }
+
   _draw(items) {
     const c = this._config;
     const worst = this._worst(items);
     const level = worst ? (worst.cold ? "cold" : worst.sev) : "ok";
+    this._lastItems = items;
+    const hist = this._history(items.filter((i) => !i.unavailable && i.id).map((i) => i.id));
 
     const na = this._naItem();
-    if (!this._changed([items.map((i) => [i.id, i.name, i.icon, i.state, i.sev, i.cold, i.pct]), na?.name, na?.state]))
+    if (!this._changed([items.map((i) => [i.id, i.name, i.icon, i.state, i.sev, i.cold, i.pct]), na?.name, na?.state, this._histVer]))
       return;
 
     const shown = c.only_alerts ? items.filter((i) => i.sev !== "ok") : items;
@@ -1042,7 +1127,9 @@ class RoomEnvironmentCard extends RcCard {
       .map((i) =>
         this._tile(i, {
           cls: ` k-${i.kind} s-${i.sev}${i.cold ? " cold" : ""}${i.light ? " lit" : ""}`,
-          extra: c.show_gauge && i.pct != null ? `<span class="gauge"><span style="width:${i.pct}%"></span></span>` : "",
+          extra:
+            (hist ? reSpark(hist.points[i.id], hist.end) : "") +
+            (c.show_gauge && i.pct != null ? `<span class="gauge"><span style="width:${i.pct}%"></span></span>` : ""),
           // The comfort word only when the reading needs a look (and for the light level): shorter tiles.
           state: i.word && (i.sev !== "ok" || i.kind === "illuminance")
             ? `<span class="val">${rcEsc(i.value)}</span> · ${rcEsc(i.word)}`
@@ -1095,6 +1182,11 @@ class RoomEnvironmentCard extends RcCard {
     .val { color: var(--primary-text-color); font-weight: 600; }
     .tile.s-warn .state, .tile.s-alert .state, .tile.cold .state { color: var(--t); }
     .tile.s-warn .val, .tile.s-alert .val, .tile.cold .val { color: inherit; }
+    /* The last 24 hours behind the reading, in its level's colour, discreet. */
+    .spark { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; border-radius: inherit; }
+    .spark-a { fill: color-mix(in srgb, var(--t) 8%, transparent); }
+    .spark-l { fill: none; stroke: color-mix(in srgb, var(--t) 35%, transparent); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+    .tile > :not(.spark):not(.gauge) { position: relative; }
     /* Drawn in the bottom padding of the tile: no extra height. */
     .gauge { position: absolute; inset: auto 8px 2px 41px; height: 2px; border-radius: 1px; pointer-events: none;
              background: color-mix(in srgb, var(--t) 16%, transparent); }
@@ -1112,10 +1204,10 @@ class RoomEnvironmentCard extends RcCard {
 // ── Editor ───────────────────────────────────────────────────────────────────
 const RoomEnvironmentCardEditor = rcEditor({
   card: RoomEnvironmentCard,
-  helpers: ["title", "navigation_path", "only_alerts", "show_gauge", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "only_alerts", "show_gauge", "show_history", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
-    ...rcBooleans("only_alerts", "show_gauge"),
+    ...rcBooleans("only_alerts", "show_gauge", "show_history"),
     ...rcIncludeField(RoomEnvironmentCard, hass, config),
     ...rcExcludeField(RoomEnvironmentCard, hass, config),
     ...rcAdvanced(RE_I18N, lang, "thresholds", "entities", "language"),
@@ -1180,7 +1272,7 @@ const RoomEnvironmentMiniCardEditor = rcEditor({
   helpers: ["title", "navigation_path", "columns", "only_alerts", "show_gauge", "zoom", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
-    ...rcBooleans("only_alerts", "zoom", "show_gauge"),
+    ...rcBooleans("only_alerts", "zoom", "show_gauge", "show_history"),
     ...rcIncludeField(RoomEnvironmentMiniCard, hass, config),
     ...rcExcludeField(RoomEnvironmentMiniCard, hass, config),
     ...rcAdvanced(RE_I18N, lang, "thresholds", "entities", "language"),

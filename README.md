@@ -480,6 +480,7 @@ navigation_path: /dashboard-home/living-room
 columns: 2
 only_alerts: false
 show_gauge: true
+show_history: true
 thresholds:
   temperature: [17, 19, 24, 27]
   co2: [800, 1200]
@@ -517,11 +518,12 @@ The Environment card takes these options on top of the [common options](#common-
 |---|---|---|---|
 | `only_alerts` | ❌ | `false` | Keep only the readings outside the comfort range |
 | `show_gauge` | ❌ | `true` | Thin gauge under each reading |
+| `show_history` | ❌ | `true` | The last 24 hours of each reading as a curve behind its tile (5-minute statistics from the recorder, one query refreshed every 5 minutes) |
 | `thresholds` | ❌ | See above | Comfort limits per kind, in the sensor's unit |
 
 ### Environment mini
 
-Same options as the [Environment card](#environment), plus `zoom`; `columns` and `show_gauge` only shape the zoomed-in view:
+Same options as the [Environment card](#environment), plus `zoom`; `columns`, `show_gauge` and `show_history` only shape the zoomed-in view:
 
 ```yaml
 type: custom:room-environment-mini-card

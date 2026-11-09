@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.22.0 - 2026-11-09
+
+### Features
+- Environment card: each tile draws the last 24 hours of its reading as a faint curve behind it (`show_history`, on by default; also in the zoomed-in mini card). One recorder statistics query (5-minute means) covers every tile and is refreshed at most every 5 minutes; sensors without statistics simply get no curve.
+
 ## 1.21.1 - 2026-11-09
 
 ### Fixes
