@@ -518,7 +518,7 @@ The Environment card takes these options on top of the [common options](#common-
 |---|---|---|---|
 | `only_alerts` | ❌ | `false` | Keep only the readings outside the comfort range |
 | `show_gauge` | ❌ | `true` | Thin gauge under each reading |
-| `show_history` | ❌ | `true` | The last 24 hours of each reading as a curve behind its tile (5-minute statistics from the recorder, one query refreshed every 5 minutes) |
+| `show_history` | ❌ | `true` | The last 24 hours of each reading as a curve behind its tile, its lowest and highest values in the tile's tooltip (5-minute statistics from the recorder, one query refreshed every 5 minutes) |
 | `thresholds` | ❌ | See above | Comfort limits per kind, in the sensor's unit |
 
 ### Environment mini

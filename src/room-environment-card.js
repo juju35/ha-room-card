@@ -938,6 +938,13 @@ function reSpark(points, end) {
   return `<svg class="spark" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path class="spark-a" d="${area}"/><path class="spark-l" d="${line}"/></svg>`;
 }
 
+// Lowest and highest of the curve's points, or null without a curve.
+function reRange(points) {
+  if (!points || points.length < 2) return null;
+  const vs = points.map((p) => p.v);
+  return { lo: Math.min(...vs), hi: Math.max(...vs) };
+}
+
 class RoomEnvironmentCard extends RcCard {
   static tag = "room-environment-card";
   static i18n = RE_I18N;
@@ -1110,6 +1117,13 @@ class RoomEnvironmentCard extends RcCard {
     return this._histKey === key ? this._hist : null;
   }
 
+  _rangeTitle(i, hist) {
+    const r = hist && reRange(hist.points[i.id]);
+    if (!r) return `${i.name} — ${i.state}`;
+    const digits = RE_KINDS[i.kind]?.digits ?? 1;
+    return `${i.name} — ${i.state} · 24 h ${this._formatNumber(r.lo, digits, i.unit)} – ${this._formatNumber(r.hi, digits, i.unit)}`;
+  }
+
   _draw(items) {
     const c = this._config;
     const worst = this._worst(items);
@@ -1131,6 +1145,8 @@ class RoomEnvironmentCard extends RcCard {
             (hist ? reSpark(hist.points[i.id], hist.end) : "") +
             (c.show_gauge && i.pct != null ? `<span class="gauge"><span style="width:${i.pct}%"></span></span>` : ""),
           // The comfort word only when the reading needs a look (and for the light level): shorter tiles.
+          // The curve has no scale: its lowest and highest values of the 24 hours in the tooltip.
+          title: this._rangeTitle(i, hist),
           state: i.word && (i.sev !== "ok" || i.kind === "illuminance")
             ? `<span class="val">${rcEsc(i.value)}</span> · ${rcEsc(i.word)}`
             : `<span class="val">${rcEsc(i.value ?? i.state)}</span>`,
