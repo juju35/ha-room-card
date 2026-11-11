@@ -18,6 +18,25 @@ test("rcIsPlug / rcIsLightSwitch tell plugs from light switches", () => {
   assert.equal(rc.rcIsPlug(sw("Relay", "outlet")), true);
 });
 
+test("rcMatchSensor keeps the motion and person detections of cameras", () => {
+  const ids = ["binary_sensor.cam_motion", "binary_sensor.cam_person"];
+  const h = {
+    states: {
+      "binary_sensor.cam_motion": { entity_id: ids[0], state: "on", attributes: { device_class: "motion" } },
+      "binary_sensor.cam_person": { entity_id: ids[1], state: "off", attributes: { device_class: "occupancy" } },
+    },
+    entities: {
+      "camera.cam": { entity_id: "camera.cam", device_id: "cam" },
+      [ids[0]]: { entity_id: ids[0], device_id: "cam" },
+      [ids[1]]: { entity_id: ids[1], device_id: "cam" },
+    },
+  };
+  for (const id of ids) {
+    assert.equal(rc.rcMatchSensor(h, id), true);
+    assert.equal(rc.rcMatchSensor(h, id, { presence: false }), false);
+  }
+});
+
 test("shared matchers: sensors keep diagnostic entities, lights and plugs skip them", () => {
   const h = makeHass();
   assert.equal(rc.rcMatchSensor(h, "binary_sensor.diag_door"), true);

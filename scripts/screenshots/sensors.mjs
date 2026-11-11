@@ -2,26 +2,24 @@
 // Usage: npm install && npm run build && node scripts/screenshots/sensors.mjs
 import { pair, shoot } from "./harness.mjs";
 
-// Leak sensor, two sliding doors, a window, a presence sensor and a camera motion detection (left out by the card).
+// Leak sensor, two sliding doors, a window, a presence sensor.
 const SENSORS = [
   ["binary_sensor.sink_leak", { en: "Sink Leak", fr: "Capteur Évier Fuite d'eau" }, "moisture"],
   ["binary_sensor.kitchen_porte_fenetre_door", { en: "Kitchen Patio Door Contact", fr: "Capteur Porte Fenêtre Cuisine Porte" }, "door"],
   ["binary_sensor.living_room_porte_fenetre_door", { en: "Living Room Patio Door Contact", fr: "Capteur Porte Fenêtre Salon Porte" }, "door"],
   ["binary_sensor.living_room_window", { en: "Living Room Window Contact", fr: "Capteur Fenêtre Salon Porte" }, "window"],
   ["binary_sensor.living_room_occupancy", { en: "Living Room Presence Occupancy", fr: "Capteur Présence Séjour Occupation" }, "occupancy"],
-  ["binary_sensor.living_room_camera_motion", { en: "Living Room Camera Motion", fr: "Caméra Séjour Mouvement" }, "motion", "camera"],
 ];
 const ago = (min) => new Date(Date.now() - min * 60000).toISOString();
 const OPEN = {
   "binary_sensor.kitchen_porte_fenetre_door": [true, 12],
   "binary_sensor.living_room_occupancy": [true, 5],
-  "binary_sensor.living_room_camera_motion": [true, 1],
 };
 const LEAK = { ...OPEN, "binary_sensor.sink_leak": [true, 3] };
 
 const setup = (s, lang) => {
   const states = {};
-  const entities = { "camera.living_room": { entity_id: "camera.living_room", device_id: "camera" } };
+  const entities = {};
   for (const [entity_id, names, device_class, device] of SENSORS) {
     const [on, min] = s.open[entity_id] ?? [false, 180];
     states[entity_id] = { entity_id, state: on ? "on" : "off", last_changed: ago(min), attributes: { device_class, friendly_name: names[lang] } };

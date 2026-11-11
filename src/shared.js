@@ -21,14 +21,13 @@ const rcIsPlug = (st) =>
   !rcIsLightSwitch(st) && (st.attributes.device_class === "outlet" || RC_PLUG_NAME.test(st.attributes.friendly_name || ""));
 
 // What each room card shows, shared with the Overview so that both count the same entities.
-// Sensors card: leak, door, window and opening sensors, plus presence and motion unless `presence` is false
-// (the devices in `cameras` excepted).
-const rcMatchSensor = (hass, id, { presence = true, cameras = new Set() } = {}) => {
+// Sensors card: leak, door, window and opening sensors, plus presence and motion (camera detections included) unless
+// `presence` is false.
+const rcMatchSensor = (hass, id, { presence = true } = {}) => {
   if (!id.startsWith("binary_sensor.")) return false;
   const dc = hass.states[id]?.attributes.device_class;
   if (RC_OPENING_CLASSES.includes(dc)) return true;
-  if (presence === false || !RC_PRESENCE_CLASSES.includes(dc)) return false;
-  return !cameras.has(hass.entities?.[id]?.device_id);
+  return presence !== false && RC_PRESENCE_CLASSES.includes(dc);
 };
 // Lights card: lights (groups excepted) and switches driving a light, configuration and diagnostic entities excepted.
 const rcMatchLight = (hass, id) => {
@@ -77,16 +76,6 @@ const rcPerRegistry = (fn) => {
     return cache.get(reg);
   };
 };
-
-// Devices with a camera entity: their motion and person detections are left out.
-const rcCameraDevices = rcPerRegistry(
-  (hass) =>
-    new Set(
-      Object.entries(hass.entities || {})
-        .filter(([id, r]) => id.startsWith("camera.") && r.device_id)
-        .map(([, r]) => r.device_id),
-    ),
-);
 
 // The sensor entities of each device, in registry order.
 const rcDeviceSensors = rcPerRegistry((hass) => {
@@ -1256,7 +1245,7 @@ class RcCard extends HTMLElement {
     });
   }
 
-  // Hook run before the discovery, for what `_candidate` needs (the camera devices, say).
+  // Hook run before the discovery, for what `_candidate` needs.
   _prepare() {}
 
   // Re-render only when something visible changed.

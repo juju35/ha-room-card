@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.22.4 - 2026-11-11
+
+### Fixes
+- Sensors and Overview cards: the motion and presence detections of cameras are no longer left out — a room whose only presence sensor is a camera (motion, person) now shows it. A camera's other detections reported as `motion` (vehicle, pet, line crossing) show too: leave them out with `exclude`.
+
 ## 1.22.3 - 2026-11-09
 
 ### Improvements

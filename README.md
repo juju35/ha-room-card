@@ -43,7 +43,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - **Tap** the lights chip of the header to turn every light the card counts off (`all_off_button`), and the plugs chip to turn every plug off once confirmed in a popup listing them (`plugs_off_button`, off by default: a plug may feed a camera or a network switch)
 - **Tap** a room to unfold its details at the top of the card: the Sensors, Lights and Plugs cards of that room; tap it again or anywhere else to fold it back
 - Automatic discovery: every area with door, window, leak or presence sensors, lights or plugs becomes a room, with an icon picked from its name
-- Same rules as the room cards: hidden entities and camera detections are skipped, and so are light groups and the configuration and diagnostic entities of lights and plugs (door, window, leak and presence sensors count whatever their category); light switches count as lights
+- Same rules as the room cards: hidden entities are skipped, and so are light groups and the configuration and diagnostic entities of lights and plugs (door, window, leak and presence sensors count whatever their category); light switches count as lights
 - Only the rooms with something open, on, detected or unavailable show; the **detail** button (top right) shows every room, and back, as does a click anywhere else (`zoom: false`: every room, always, no button); `sort: state` lists the rooms needing attention first
 
 ### Sensors
@@ -250,7 +250,7 @@ rooms:
 | `title` | ❌ | `Home` | Card title |
 | `columns` | ❌ | `3` | Number of room columns (1–6); on a card of 340 px or less at most 2, and 1 at 260 px or less (6 columns of a Sections view on a phone) |
 | `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing attention first (leak, open, unavailable sensor, presence, something on) |
-| `presence` | ❌ | `true` | Include the presence and motion sensors (camera detections are always left out) |
+| `presence` | ❌ | `true` | Include the presence and motion sensors, camera detections included |
 | `zoom` | ❌ | `true` | Show only the rooms with something open, on or detected, with a detail button showing every room; `false` shows every room, always |
 | `all_off_button` | ❌ | `true` | Tapping the lights chip of the header turns every light the card counts off |
 | `plugs_off_button` | ❌ | `false` | Tapping the plugs chip of the header opens a confirmation listing every plug the card counts that is on, and turns them off on OK (Cancel, Escape or a tap outside do nothing); the Plugs card of the room details gets its turn-everything-off pill too, behind the same confirmation. Off by default: a plug may feed a camera or a network switch, leave those out with `exclude` |
@@ -682,7 +682,7 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 The card goes through every entity with an area (set on the entity or on its device), with the same rules as the room cards:
 
 - **Sensors**: `binary_sensor` with device class `moisture`, `door`, `window`, `opening` or `garage_door`
-- **Presence**: `binary_sensor` with device class `occupancy`, `presence` or `motion`, except the ones of a device that has a `camera` entity
+- **Presence**: `binary_sensor` with device class `occupancy`, `presence` or `motion`, camera detections included
 - **Lights**: every `light` except light groups, and every `switch` whose name contains *lumière*, *lampe*, *lamp*, *light*, *veilleuse* or *guirlande*
 - **Plugs**: every other `switch` with device class `outlet`, or whose name contains *prise*, *multiprise*, *plug*, *outlet* or *socket*, with the power sensor of the same device
 
@@ -692,7 +692,7 @@ A tile shows the most important state of the room: a wet leak sensor, then open 
 
 ### Sensors
 
-The card keeps every `binary_sensor` of the area whose device class is `moisture`, `door`, `window`, `opening` or `garage_door`, and with `presence` (the default) `occupancy`, `presence` or `motion` (the area set on the entity, or on its device). Hidden entities are skipped, and so are the motion and person detections of cameras (a sensor whose device also has a `camera` entity): list them in `entities` to show them.
+The card keeps every `binary_sensor` of the area whose device class is `moisture`, `door`, `window`, `opening` or `garage_door`, and with `presence` (the default) `occupancy`, `presence` or `motion` (the area set on the entity, or on its device). Hidden entities are skipped. Camera detections count too (motion, person, and also vehicle, pet or line crossing, which some cameras report as `motion`): leave the ones you do not want out with `exclude`.
 
 The room is **in alert** when a sensor is open (orange) and **critical** when a leak sensor is wet (red). Presence and motion are information, not alerts: shown in blue, they never change the header colour. Wet leak sensors come first, then open doors and windows, then detected presence, then the others by name. The icon follows the sensor: a sensor whose entity ID contains `porte_fenetre`, `baie`, `sliding` or `patio` gets a sliding door, whatever its device class (garage doors, leak, presence and motion sensors excepted), a `window` sensor (or a `door` sensor with `fenetre` / `window` in its ID) gets a window.
 
