@@ -82,7 +82,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add screenshots
-          git commit -m "chore: refresh screenshots"
+          # [skip ci]: a push made with GITHUB_TOKEN starts pull_request runs that then wait for an approval.
+          # The PR checks are re-run on this commit below as workflow_dispatch runs, which it does not stop.
+          git commit -m "chore: refresh screenshots [skip ci]"
           git push
           echo "pushed=true" >> "$GITHUB_OUTPUT"
       # A push made with GITHUB_TOKEN triggers no pull_request run, but workflow_dispatch does: re-run the PR checks
