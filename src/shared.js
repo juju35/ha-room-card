@@ -21,14 +21,25 @@ const rcIsPlug = (st) =>
   !rcIsLightSwitch(st) && (st.attributes.device_class === "outlet" || RC_PLUG_NAME.test(st.attributes.friendly_name || ""));
 
 // What each room card shows, shared with the Overview so that both count the same entities.
-// Sensors card: leak, door, window and opening sensors, plus presence and motion unless `presence` is false
-// (the devices in `cameras` excepted).
-const rcMatchSensor = (hass, id, { presence = true, cameras = new Set() } = {}) => {
+// Detections that are not about people, which cameras report as motion: pets never count, vehicles only outdoors.
+const RC_PET = /(^|[\s_.-])(pets?|animals?|animaux|chiens?|chats?|dogs?|cats?)($|[\s_-])/i;
+const RC_VEHICLE = /(^|[\s_.-])(vehicles?|v[ée]hicules?|voitures?|cars?)($|[\s_-])/i;
+// An outdoor room, from its name: garden, terrace, balcony, patio, yard, driveway, porch, gate, parking…
+const RC_OUTDOOR =
+  /jardin|terrasse|balcon|patio|ext[ée]rieur|cour(\s|$)|all[ée]e|porche|portail|parking|garden|terrace|balcony|outdoor|outside|yard|driveway|porch|gate/i;
+const rcIsOutdoor = (area) => !!area && RC_OUTDOOR.test(`${area.name || ""} ${area.area_id || ""}`);
+
+// Sensors card: leak, door, window and opening sensors, plus presence and motion unless `presence` is false. Camera
+// detections count, except pets, and vehicles outside an `outdoor` room.
+const rcMatchSensor = (hass, id, { presence = true, outdoor = false } = {}) => {
   if (!id.startsWith("binary_sensor.")) return false;
-  const dc = hass.states[id]?.attributes.device_class;
+  const st = hass.states[id];
+  const dc = st?.attributes.device_class;
   if (RC_OPENING_CLASSES.includes(dc)) return true;
   if (presence === false || !RC_PRESENCE_CLASSES.includes(dc)) return false;
-  return !cameras.has(hass.entities?.[id]?.device_id);
+  const name = `${id} ${st.attributes.friendly_name || ""}`;
+  if (RC_PET.test(name)) return false;
+  return outdoor || !RC_VEHICLE.test(name);
 };
 // Lights card: lights (groups excepted) and switches driving a light, configuration and diagnostic entities excepted.
 const rcMatchLight = (hass, id) => {
@@ -77,16 +88,6 @@ const rcPerRegistry = (fn) => {
     return cache.get(reg);
   };
 };
-
-// Devices with a camera entity: their motion and person detections are left out.
-const rcCameraDevices = rcPerRegistry(
-  (hass) =>
-    new Set(
-      Object.entries(hass.entities || {})
-        .filter(([id, r]) => id.startsWith("camera.") && r.device_id)
-        .map(([, r]) => r.device_id),
-    ),
-);
 
 // The sensor entities of each device, in registry order.
 const rcDeviceSensors = rcPerRegistry((hass) => {
@@ -1256,7 +1257,7 @@ class RcCard extends HTMLElement {
     });
   }
 
-  // Hook run before the discovery, for what `_candidate` needs (the camera devices, say).
+  // Hook run before the discovery, for what `_candidate` needs.
   _prepare() {}
 
   // Re-render only when something visible changed.

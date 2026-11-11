@@ -26,7 +26,7 @@ const RO_I18N = {
     ed_title_helper: "Leave empty for “Home”",
     ed_columns_helper: "Empty: 3, or 2 on narrow screens",
     ed_presence: "Include presence sensors",
-    ed_presence_helper: "Presence and motion sensors, cameras excluded",
+    ed_presence_helper: "Presence and motion sensors",
     ed_zoom: "Detail button",
     ed_zoom_helper: "Only the rooms with something open, on or detected show; the button shows every room. Off: every room, always",
     ed_all_off_button: "“Turn all lights off” button",
@@ -57,7 +57,7 @@ const RO_I18N = {
     ed_title_helper: "Laisser vide pour « Maison »",
     ed_columns_helper: "Vide : 3, ou 2 sur les écrans étroits",
     ed_presence: "Inclure les capteurs de présence",
-    ed_presence_helper: "Capteurs de présence et de mouvement, hors caméras",
+    ed_presence_helper: "Capteurs de présence et de mouvement",
     ed_zoom: "Bouton détail",
     ed_zoom_helper: "Seules les pièces avec quelque chose d'ouvert, d'allumé ou de détecté s'affichent ; le bouton affiche toutes les pièces. Désactivé : toujours toutes les pièces",
     ed_all_off_button: "Bouton « Éteindre toutes les lumières »",
@@ -88,7 +88,7 @@ const RO_I18N = {
     ed_title_helper: "Leer lassen für „Zuhause“",
     ed_columns_helper: "Leer: 3, oder 2 auf schmalen Bildschirmen",
     ed_presence: "Anwesenheitssensoren einbeziehen",
-    ed_presence_helper: "Anwesenheits- und Bewegungsmelder, ohne Kameras",
+    ed_presence_helper: "Anwesenheits- und Bewegungsmelder",
     ed_zoom: "Detail-Schaltfläche",
     ed_zoom_helper: "Nur Räume, in denen etwas offen, an oder erkannt ist, werden angezeigt; die Schaltfläche zeigt alle Räume. Aus: immer alle Räume",
     ed_all_off_button: "Schaltfläche „Alle Lichter ausschalten“",
@@ -118,7 +118,7 @@ const RO_I18N = {
     ed_title_helper: "Déjalo vacío para «Casa»",
     ed_columns_helper: "Vacío: 3, o 2 en pantallas estrechas",
     ed_presence: "Incluir los sensores de presencia",
-    ed_presence_helper: "Sensores de presencia y movimiento, sin cámaras",
+    ed_presence_helper: "Sensores de presencia y movimiento",
     ed_zoom: "Botón de detalle",
     ed_zoom_helper: "Solo se muestran las habitaciones con algo abierto, encendido o detectado; el botón muestra todas las habitaciones. Desactivado: siempre todas las habitaciones",
     ed_all_off_button: "Botón «Apagar todas las luces»",
@@ -149,7 +149,7 @@ const RO_I18N = {
     ed_title_helper: "Остави празно за „Кућа“",
     ed_columns_helper: "Празно: 3, или 2 на уским екранима",
     ed_presence: "Укључи сензоре присутности",
-    ed_presence_helper: "Сензори присутности и покрета, камере су искључене",
+    ed_presence_helper: "Сензори присутности и покрета",
     ed_zoom: "Дугме за детаље",
     ed_zoom_helper: "Приказују се само просторије у којима је нешто отворено, укључено или детектовано; дугме приказује све просторије. Искључено: све просторије, увек",
     ed_all_off_button: "Дугме „Искључи сва светла“",
@@ -180,7 +180,7 @@ const RO_I18N = {
     ed_title_helper: "Ostavi prazno za „Kuća“",
     ed_columns_helper: "Prazno: 3, ili 2 na uskim ekranima",
     ed_presence: "Uključi senzore prisutnosti",
-    ed_presence_helper: "Senzori prisutnosti i pokreta, kamere su isključene",
+    ed_presence_helper: "Senzori prisutnosti i pokreta",
     ed_zoom: "Dugme za detalje",
     ed_zoom_helper: "Prikazuju se samo prostorije u kojima je nešto otvoreno, uključeno ili detektovano; dugme prikazuje sve prostorije. Isključeno: sve prostorije, uvek",
     ed_all_off_button: "Dugme „Isključi sva svetla“",
@@ -210,7 +210,7 @@ const RO_I18N = {
     ed_title_helper: "Lascia vuoto per «Casa»",
     ed_columns_helper: "Vuoto: 3, o 2 sugli schermi stretti",
     ed_presence: "Includi i sensori di presenza",
-    ed_presence_helper: "Sensori di presenza e di movimento, telecamere escluse",
+    ed_presence_helper: "Sensori di presenza e di movimento",
     ed_zoom: "Pulsante dettagli",
     ed_zoom_helper: "Vengono mostrate solo le stanze con qualcosa di aperto, acceso o rilevato; il pulsante mostra tutte le stanze. Disattivato: sempre tutte le stanze",
     ed_all_off_button: "Pulsante «Spegni tutte le luci»",
@@ -240,7 +240,7 @@ const RO_I18N = {
     ed_title_helper: "Leeg laten voor “Thuis”",
     ed_columns_helper: "Leeg: 3, of 2 op smalle schermen",
     ed_presence: "Aanwezigheidssensoren meenemen",
-    ed_presence_helper: "Aanwezigheids- en bewegingssensoren, zonder camera's",
+    ed_presence_helper: "Aanwezigheids- en bewegingssensoren",
     ed_zoom: "Detailknop",
     ed_zoom_helper: "Alleen ruimtes waar iets open, aan of gedetecteerd is worden getoond; de knop toont alle ruimtes. Uit: altijd alle ruimtes",
     ed_all_off_button: "Knop “Alle lampen uitschakelen”",
@@ -270,7 +270,7 @@ const RO_I18N = {
     ed_title_helper: "Deixe vazio para «Casa»",
     ed_columns_helper: "Vazio: 3, ou 2 em ecrãs estreitos",
     ed_presence: "Incluir os sensores de presença",
-    ed_presence_helper: "Sensores de presença e de movimento, sem câmaras",
+    ed_presence_helper: "Sensores de presença e de movimento",
     ed_zoom: "Botão de detalhe",
     ed_zoom_helper: "Só são mostradas as divisões com algo aberto, ligado ou detetado; o botão mostra todas as divisões. Desativado: sempre todas as divisões",
     ed_all_off_button: "Botão «Apagar todas as luzes»",
@@ -300,7 +300,7 @@ const RO_I18N = {
     ed_title_helper: "Pozostaw puste, aby użyć nazwy „Dom”",
     ed_columns_helper: "Puste: 3 lub 2 na wąskich ekranach",
     ed_presence: "Uwzględnij czujniki obecności",
-    ed_presence_helper: "Czujniki obecności i ruchu, bez kamer",
+    ed_presence_helper: "Czujniki obecności i ruchu",
     ed_zoom: "Przycisk szczegółów",
     ed_zoom_helper: "Wyświetlane są tylko pomieszczenia, w których coś jest otwarte, włączone lub wykryte; przycisk pokazuje wszystkie pomieszczenia. Wyłączone: zawsze wszystkie pomieszczenia",
     ed_all_off_button: "Przycisk „Wyłącz wszystkie światła”",
@@ -330,7 +330,7 @@ const RO_I18N = {
     ed_title_helper: "Lasă gol pentru „Acasă”",
     ed_columns_helper: "Gol: 3 sau 2 pe ecranele înguste",
     ed_presence: "Include senzorii de prezență",
-    ed_presence_helper: "Senzori de prezență și de mișcare, fără camere video",
+    ed_presence_helper: "Senzori de prezență și de mișcare",
     ed_zoom: "Buton de detalii",
     ed_zoom_helper: "Se afișează doar camerele cu ceva deschis, aprins sau detectat; butonul afișează toate camerele. Dezactivat: mereu toate camerele",
     ed_all_off_button: "Butonul „Stinge toate luminile”",
@@ -360,7 +360,7 @@ const RO_I18N = {
     ed_title_helper: "Lad stå tomt for »Hjem«",
     ed_columns_helper: "Tomt: 3, eller 2 på smalle skærme",
     ed_presence: "Medtag tilstedeværelsessensorer",
-    ed_presence_helper: "Tilstedeværelses- og bevægelsessensorer, undtagen kameraer",
+    ed_presence_helper: "Tilstedeværelses- og bevægelsessensorer",
     ed_zoom: "Detaljeknap",
     ed_zoom_helper: "Kun rum, hvor noget er åbent, tændt eller registreret, vises; knappen viser alle rum. Fra: altid alle rum",
     ed_all_off_button: "Knappen »Sluk alle lys«",
@@ -390,7 +390,7 @@ const RO_I18N = {
     ed_title_helper: "Lämna tomt för ”Hem”",
     ed_columns_helper: "Tomt: 3, eller 2 på smala skärmar",
     ed_presence: "Inkludera närvarosensorer",
-    ed_presence_helper: "Närvaro- och rörelsesensorer, utom kameror",
+    ed_presence_helper: "Närvaro- och rörelsesensorer",
     ed_zoom: "Detaljknapp",
     ed_zoom_helper: "Bara rum där något är öppet, på eller upptäckt visas; knappen visar alla rum. Av: alltid alla rum",
     ed_all_off_button: "Knappen ”Släck alla lampor”",
@@ -420,7 +420,7 @@ const RO_I18N = {
     ed_title_helper: "Оставете празно за „Дом“",
     ed_columns_helper: "Празно: 3 или 2 на тесни екрани",
     ed_presence: "Включи сензорите за присъствие",
-    ed_presence_helper: "Сензори за присъствие и движение, без камери",
+    ed_presence_helper: "Сензори за присъствие и движение",
     ed_zoom: "Бутон за подробности",
     ed_zoom_helper: "Показват се само стаите, в които нещо е отворено, включено или засечено; бутонът показва всички стаи. Изключено: винаги всички стаи",
     ed_all_off_button: "Бутон „Изключи всички лампи“",
@@ -450,7 +450,7 @@ const RO_I18N = {
     ed_title_helper: "Оставьте пустым для «Дом»",
     ed_columns_helper: "Пусто: 3 или 2 на узких экранах",
     ed_presence: "Учитывать датчики присутствия",
-    ed_presence_helper: "Датчики присутствия и движения, кроме камер",
+    ed_presence_helper: "Датчики присутствия и движения",
     ed_zoom: "Кнопка подробностей",
     ed_zoom_helper: "Показываются только комнаты, где что-то открыто, включено или обнаружено; кнопка показывает все комнаты. Выключено: всегда все комнаты",
     ed_all_off_button: "Кнопка «Выключить весь свет»",
@@ -480,7 +480,7 @@ const RO_I18N = {
     ed_title_helper: "Залиште порожнім для «Дім»",
     ed_columns_helper: "Порожньо: 3 або 2 на вузьких екранах",
     ed_presence: "Враховувати датчики присутності",
-    ed_presence_helper: "Датчики присутності та руху, крім камер",
+    ed_presence_helper: "Датчики присутності та руху",
     ed_zoom: "Кнопка подробиць",
     ed_zoom_helper: "Показуються лише кімнати, де щось відчинено, увімкнено чи виявлено; кнопка показує всі кімнати. Вимкнено: завжди всі кімнати",
     ed_all_off_button: "Кнопка «Вимкнути все світло»",
@@ -510,7 +510,7 @@ const RO_I18N = {
     ed_title_helper: "Hagyd üresen az „Otthon” címhez",
     ed_columns_helper: "Üres: 3, keskeny képernyőn 2",
     ed_presence: "Jelenlét-érzékelők bevonása",
-    ed_presence_helper: "Jelenlét- és mozgásérzékelők, kamerák nélkül",
+    ed_presence_helper: "Jelenlét- és mozgásérzékelők",
     ed_zoom: "Részletek gomb",
     ed_zoom_helper: "Csak azok a helyiségek jelennek meg, ahol valami nyitva vagy bekapcsolva van, illetve észlelés történt; a gomb minden helyiséget megjelenít. Kikapcsolva: mindig minden helyiség",
     ed_all_off_button: "„Minden lámpa kikapcsolása” gomb",
@@ -540,7 +540,7 @@ const RO_I18N = {
     ed_title_helper: "Nechajte prázdne pre „Domov“",
     ed_columns_helper: "Prázdne: 3, alebo 2 na úzkych obrazovkách",
     ed_presence: "Zahrnúť senzory prítomnosti",
-    ed_presence_helper: "Senzory prítomnosti a pohybu, bez kamier",
+    ed_presence_helper: "Senzory prítomnosti a pohybu",
     ed_zoom: "Tlačidlo podrobností",
     ed_zoom_helper: "Zobrazia sa len miestnosti, kde je niečo otvorené, zapnuté alebo zistené; tlačidlo zobrazí všetky miestnosti. Vypnuté: vždy všetky miestnosti",
     ed_all_off_button: "Tlačidlo „Vypnúť všetky svetlá“",
@@ -570,7 +570,7 @@ const RO_I18N = {
     ed_title_helper: "Ponechte prázdné pro „Domov“",
     ed_columns_helper: "Prázdné: 3, nebo 2 na úzkých obrazovkách",
     ed_presence: "Zahrnout senzory přítomnosti",
-    ed_presence_helper: "Senzory přítomnosti a pohybu, bez kamer",
+    ed_presence_helper: "Senzory přítomnosti a pohybu",
     ed_zoom: "Tlačítko podrobností",
     ed_zoom_helper: "Zobrazí se jen místnosti, kde je něco otevřené, zapnuté nebo zjištěné; tlačítko zobrazí všechny místnosti. Vypnuto: vždy všechny místnosti",
     ed_all_off_button: "Tlačítko „Vypnout všechna světla“",
@@ -600,7 +600,7 @@ const RO_I18N = {
     ed_title_helper: "Pustite prazno za »Dom«",
     ed_columns_helper: "Prazno: 3 ali 2 na ozkih zaslonih",
     ed_presence: "Vključi senzorje prisotnosti",
-    ed_presence_helper: "Senzorji prisotnosti in gibanja, brez kamer",
+    ed_presence_helper: "Senzorji prisotnosti in gibanja",
     ed_zoom: "Gumb za podrobnosti",
     ed_zoom_helper: "Prikazani so samo prostori, kjer je kaj odprto, vklopljeno ali zaznano; gumb prikaže vse prostore. Izklopljeno: vedno vsi prostori",
     ed_all_off_button: "Gumb »Ugasni vse luči«",
@@ -630,7 +630,7 @@ const RO_I18N = {
     ed_title_helper: "Atstājiet tukšu, lai izmantotu “Mājas”",
     ed_columns_helper: "Tukšs: 3 vai 2 šauros ekrānos",
     ed_presence: "Iekļaut klātbūtnes sensorus",
-    ed_presence_helper: "Klātbūtnes un kustības sensori, izņemot kameras",
+    ed_presence_helper: "Klātbūtnes un kustības sensori",
     ed_zoom: "Detaļu poga",
     ed_zoom_helper: "Tiek rādītas tikai telpas, kurās kaut kas ir atvērts, ieslēgts vai konstatēts; poga parāda visas telpas. Izslēgts: vienmēr visas telpas",
     ed_all_off_button: "Poga “Izslēgt visus gaismekļus”",
@@ -660,7 +660,7 @@ const RO_I18N = {
     ed_title_helper: "Αφήστε το κενό για «Σπίτι»",
     ed_columns_helper: "Κενό: 3 ή 2 σε στενές οθόνες",
     ed_presence: "Συμπερίληψη αισθητήρων παρουσίας",
-    ed_presence_helper: "Αισθητήρες παρουσίας και κίνησης, εκτός από κάμερες",
+    ed_presence_helper: "Αισθητήρες παρουσίας και κίνησης",
     ed_zoom: "Κουμπί λεπτομερειών",
     ed_zoom_helper: "Εμφανίζονται μόνο τα δωμάτια όπου κάτι είναι ανοιχτό, αναμμένο ή ανιχνεύθηκε· το κουμπί εμφανίζει όλα τα δωμάτια. Ανενεργό: πάντα όλα τα δωμάτια",
     ed_all_off_button: "Κουμπί «Σβήσιμο όλων των φώτων»",
@@ -728,14 +728,16 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     const c = this._config;
     const reg = h.entities || {};
 
-    const cameras = rcCameraDevices(h);
     const power = rcPowerSensors(h);
     const watts = (id) => rcWattsOf(h, power[reg[id]?.device_id]);
+
+    const overrides = Object.fromEntries((c.rooms || []).map((x) => [x.area, x]));
+    const outdoor = (aid) => overrides[aid]?.outdoor ?? rcIsOutdoor(h.areas?.[aid]);
 
     const rooms = {};
     const room = (aid) => {
       if (!rooms[aid]) {
-        rooms[aid] = { id: aid, sensors: [], presence: [], lights: [], plugs: [] };
+        rooms[aid] = { id: aid, outdoor: outdoor(aid), sensors: [], presence: [], lights: [], plugs: [] };
       }
       return rooms[aid];
     };
@@ -745,7 +747,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       const st = h.states[id];
       if (!st) continue;
       const dc = st.attributes.device_class;
-      if (rcMatchSensor(h, id, { presence: c.presence, cameras })) {
+      if (rcMatchSensor(h, id, { presence: c.presence, outdoor: outdoor(aid) })) {
         if (RC_OPENING_CLASSES.includes(dc)) room(aid).sensors.push({ id, leak: dc === "moisture", st });
         else room(aid).presence.push({ id, st });
       } else if (rcMatchLight(h, id)) {
@@ -756,7 +758,6 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     }
 
     const exclude = new Set(c.exclude_areas || []);
-    const overrides = Object.fromEntries((c.rooms || []).map((x) => [x.area, x]));
 
     let list = Object.values(rooms)
       .filter((x) => !exclude.has(x.id) && h.areas?.[x.id])
@@ -1020,7 +1021,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     this._details = [];
 
     const parts = [
-      ["room-sensors-card", x.sensors.length + x.presence.length, { title: this._t("sensors"), presence: this._config.presence }],
+      ["room-sensors-card", x.sensors.length + x.presence.length, { title: this._t("sensors"), presence: this._config.presence, outdoor: x.outdoor }],
       ["room-lights-card", x.lights.length, { title: this._t("lights") }],
       ["room-switch-card", x.plugs.length, { title: this._t("plugs"), all_off_button: this._config.plugs_off_button === true }],
     ];
