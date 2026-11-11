@@ -676,7 +676,10 @@ class RoomSensorsCard extends RcCard {
   static defaults = { columns: 2, only_alerts: false, hide_when_clear: false, presence: true, blink: true, exclude: [] };
 
   _candidate(id) {
-    return rcMatchSensor(this._hass, id, { presence: this._config.presence });
+    return rcMatchSensor(this._hass, id, {
+      presence: this._config.presence,
+      outdoor: this._config.outdoor ?? rcIsOutdoor(this._hass.areas?.[this._config.area]),
+    });
   }
 
   // The "since" labels move with the clock, not only with the states: redrawn every minute while the card is shown

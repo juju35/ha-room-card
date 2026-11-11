@@ -18,23 +18,29 @@ test("rcIsPlug / rcIsLightSwitch tell plugs from light switches", () => {
   assert.equal(rc.rcIsPlug(sw("Relay", "outlet")), true);
 });
 
-test("rcMatchSensor keeps the motion and person detections of cameras", () => {
-  const ids = ["binary_sensor.cam_motion", "binary_sensor.cam_person"];
-  const h = {
-    states: {
-      "binary_sensor.cam_motion": { entity_id: ids[0], state: "on", attributes: { device_class: "motion" } },
-      "binary_sensor.cam_person": { entity_id: ids[1], state: "off", attributes: { device_class: "occupancy" } },
-    },
-    entities: {
-      "camera.cam": { entity_id: "camera.cam", device_id: "cam" },
-      [ids[0]]: { entity_id: ids[0], device_id: "cam" },
-      [ids[1]]: { entity_id: ids[1], device_id: "cam" },
-    },
+test("rcMatchSensor keeps camera detections, without pets, with vehicles only outdoors", () => {
+  const det = {
+    "binary_sensor.cam_motion": ["motion", "Séjour Motion"],
+    "binary_sensor.cam_personne": ["occupancy", "Séjour Person"],
+    "binary_sensor.cam_franchissement_de_ligne": ["motion", "Séjour Line crossing"],
+    "binary_sensor.cam_animal": ["motion", "Séjour Pet"],
+    "binary_sensor.cam_vehicule": ["motion", "Séjour Vehicle"],
   };
-  for (const id of ids) {
-    assert.equal(rc.rcMatchSensor(h, id), true);
-    assert.equal(rc.rcMatchSensor(h, id, { presence: false }), false);
+  const h = { states: {}, entities: { "camera.cam": { entity_id: "camera.cam", device_id: "cam" } } };
+  for (const [id, [device_class, friendly_name]] of Object.entries(det)) {
+    h.states[id] = { entity_id: id, state: "off", attributes: { device_class, friendly_name } };
+    h.entities[id] = { entity_id: id, device_id: "cam" };
   }
+  const kept = (opts) => Object.keys(det).filter((id) => rc.rcMatchSensor(h, id, opts));
+  assert.deepEqual(kept(), ["binary_sensor.cam_motion", "binary_sensor.cam_personne", "binary_sensor.cam_franchissement_de_ligne"]);
+  assert.deepEqual(kept({ outdoor: true }), [...kept(), "binary_sensor.cam_vehicule"]);
+  assert.deepEqual(kept({ presence: false }), []);
+});
+
+test("rcIsOutdoor tells outdoor rooms by name", () => {
+  for (const name of ["Jardin", "Terrasse", "Extérieur", "Allée", "Garden", "Driveway"]) assert.equal(rc.rcIsOutdoor({ name }), true, name);
+  for (const name of ["Séjour", "Chambre Léa", "Cuisine"]) assert.equal(rc.rcIsOutdoor({ name }), false, name);
+  assert.equal(rc.rcIsOutdoor(undefined), false);
 });
 
 test("shared matchers: sensors keep diagnostic entities, lights and plugs skip them", () => {

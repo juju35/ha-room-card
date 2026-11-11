@@ -3,7 +3,7 @@
 ## 1.22.4 - 2026-11-11
 
 ### Fixes
-- Sensors and Overview cards: the motion and presence detections of cameras are no longer left out — a room whose only presence sensor is a camera (motion, person) now shows it. A camera's other detections reported as `motion` (vehicle, pet, line crossing) show too: leave them out with `exclude`.
+- Sensors and Overview cards: the motion and presence detections of cameras are no longer left out — a room whose only presence sensor is a camera now shows its motion, person and line crossing detections. Pet detections never count; vehicle detections count only in outdoor rooms (*Terrasse*, *Jardin*, *Garden*…, guessed from the area name), and `outdoor: true` / `false` sets it on the Sensors card and in the Overview's `rooms` entries.
 
 ## 1.22.3 - 2026-11-09
 

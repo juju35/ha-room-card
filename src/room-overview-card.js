@@ -731,10 +731,13 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     const power = rcPowerSensors(h);
     const watts = (id) => rcWattsOf(h, power[reg[id]?.device_id]);
 
+    const overrides = Object.fromEntries((c.rooms || []).map((x) => [x.area, x]));
+    const outdoor = (aid) => overrides[aid]?.outdoor ?? rcIsOutdoor(h.areas?.[aid]);
+
     const rooms = {};
     const room = (aid) => {
       if (!rooms[aid]) {
-        rooms[aid] = { id: aid, sensors: [], presence: [], lights: [], plugs: [] };
+        rooms[aid] = { id: aid, outdoor: outdoor(aid), sensors: [], presence: [], lights: [], plugs: [] };
       }
       return rooms[aid];
     };
@@ -744,7 +747,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       const st = h.states[id];
       if (!st) continue;
       const dc = st.attributes.device_class;
-      if (rcMatchSensor(h, id, { presence: c.presence })) {
+      if (rcMatchSensor(h, id, { presence: c.presence, outdoor: outdoor(aid) })) {
         if (RC_OPENING_CLASSES.includes(dc)) room(aid).sensors.push({ id, leak: dc === "moisture", st });
         else room(aid).presence.push({ id, st });
       } else if (rcMatchLight(h, id)) {
@@ -755,7 +758,6 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     }
 
     const exclude = new Set(c.exclude_areas || []);
-    const overrides = Object.fromEntries((c.rooms || []).map((x) => [x.area, x]));
 
     let list = Object.values(rooms)
       .filter((x) => !exclude.has(x.id) && h.areas?.[x.id])
@@ -1019,7 +1021,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     this._details = [];
 
     const parts = [
-      ["room-sensors-card", x.sensors.length + x.presence.length, { title: this._t("sensors"), presence: this._config.presence }],
+      ["room-sensors-card", x.sensors.length + x.presence.length, { title: this._t("sensors"), presence: this._config.presence, outdoor: x.outdoor }],
       ["room-lights-card", x.lights.length, { title: this._t("lights") }],
       ["room-switch-card", x.plugs.length, { title: this._t("plugs"), all_off_button: this._config.plugs_off_button === true }],
     ];
