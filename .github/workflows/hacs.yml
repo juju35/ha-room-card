@@ -15,9 +15,11 @@ permissions:
   contents: read
 
 # github.workflow is "Release" when called from Release: the group then stays distinct from this
-# workflow's own push run on main, so neither cancels the other.
+# workflow's own push run on main, so neither cancels the other. The event too: the checks the screenshot commit
+# dispatches on a pull request's branch have their own group, so a dispatched run stuck on GitHub's side (queued
+# with no job, impossible to cancel) cannot hold the pull request's own runs, nor theirs.
 concurrency:
-  group: hacs-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  group: hacs-${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
