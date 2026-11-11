@@ -28,6 +28,10 @@ jobs:
     # Debian 12 container (Node 22 included): apt goes to the Debian mirrors, not the runner's Ubuntu ones, which
     # kept hanging. The job runs as root, hence no sudo below.
     container: node:22-bookworm
+    # In a container, run steps default to sh (dash, no pipefail): keep bash.
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
