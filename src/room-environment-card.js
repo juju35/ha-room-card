@@ -1224,7 +1224,7 @@ const RoomEnvironmentCardEditor = rcEditor({
   helpers: ["title", "navigation_path", "only_alerts", "show_gauge", "show_history", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
-    ...rcBooleans("only_alerts", "show_gauge", "show_history"),
+    ...rcBooleans("show_title", "only_alerts", "show_gauge", "show_history"),
     ...rcIncludeField(RoomEnvironmentCard, hass, config),
     ...rcExcludeField(RoomEnvironmentCard, hass, config),
     ...rcAdvanced(RE_I18N, lang, "thresholds", "entities", "language"),
@@ -1289,7 +1289,7 @@ const RoomEnvironmentMiniCardEditor = rcEditor({
   helpers: ["title", "navigation_path", "columns", "only_alerts", "show_gauge", "zoom", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
-    ...rcBooleans("only_alerts", "zoom", "show_gauge", "show_history"),
+    ...rcBooleans("show_title", "only_alerts", "zoom", "show_gauge", "show_history"),
     ...rcIncludeField(RoomEnvironmentMiniCard, hass, config),
     ...rcExcludeField(RoomEnvironmentMiniCard, hass, config),
     ...rcAdvanced(RE_I18N, lang, "thresholds", "entities", "language"),
@@ -1877,7 +1877,7 @@ const RoomEnvironmentOverviewCardEditor = rcEditor({
     for (const id of config?.exclude || []) if (!ids.includes(id)) ids.push(id);
     return [
       ...rcOverviewFields(REO_I18N, lang),
-      ...rcBooleans("zoom"),
+      ...rcBooleans("show_title", "zoom"),
       {
         name: "exclude_areas",
         selector: { select: { multiple: true, mode: "dropdown", options: rooms.map((x) => ({ value: x.id, label: x.name })) } },

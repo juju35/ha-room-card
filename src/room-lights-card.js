@@ -622,7 +622,7 @@ const RoomLightsCardEditor = rcEditor({
   helpers: ["title", "navigation_path", "only_on", "hide_when_off", "show_brightness", "all_off_button", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
-    ...rcBooleans("only_on", "hide_when_off", "show_brightness", "all_off_button"),
+    ...rcBooleans("show_title", "only_on", "hide_when_off", "show_brightness", "all_off_button"),
     ...rcIncludeField(RoomLightsCard, hass, config),
     ...rcExcludeField(RoomLightsCard, hass, config),
     ...rcAdvanced(RL_I18N, lang, "entities", "language"),
@@ -648,7 +648,7 @@ const RoomLightsMiniCardEditor = rcEditor({
   helpers: ["title", "navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
-    ...rcBooleans("only_on", "hide_when_off", "all_off_button", "zoom", "show_brightness"),
+    ...rcBooleans("show_title", "only_on", "hide_when_off", "all_off_button", "zoom", "show_brightness"),
     ...rcIncludeField(RoomLightsMiniCard, hass, config),
     ...rcExcludeField(RoomLightsMiniCard, hass, config),
     ...rcAdvanced(RL_I18N, lang, "entities", "language"),

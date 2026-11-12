@@ -224,6 +224,7 @@ const RC_I18N = {
     turn_all_off: "Turn everything off",
     ed_area: "Area",
     ed_title: "Title",
+    ed_show_title: "Show title",
     ed_title_helper: "Leave empty for the area name",
     ed_columns: "Columns",
     ed_advanced: "Advanced",
@@ -263,6 +264,7 @@ const RC_I18N = {
     turn_all_off: "Tout éteindre",
     ed_area: "Pièce",
     ed_title: "Titre",
+    ed_show_title: "Afficher le titre",
     ed_title_helper: "Laisser vide pour le nom de la pièce",
     ed_columns: "Colonnes",
     ed_advanced: "Avancé",
@@ -302,6 +304,7 @@ const RC_I18N = {
     turn_all_off: "Alles ausschalten",
     ed_area: "Bereich",
     ed_title: "Titel",
+    ed_show_title: "Titel anzeigen",
     ed_title_helper: "Leer lassen für den Namen des Bereichs",
     ed_columns: "Spalten",
     ed_advanced: "Erweitert",
@@ -341,6 +344,7 @@ const RC_I18N = {
     turn_all_off: "Apagar todo",
     ed_area: "Área",
     ed_title: "Título",
+    ed_show_title: "Mostrar el título",
     ed_title_helper: "Déjalo vacío para usar el nombre del área",
     ed_columns: "Columnas",
     ed_advanced: "Avanzado",
@@ -381,6 +385,7 @@ const RC_I18N = {
     turn_all_off: "Искључи све",
     ed_area: "Просторија",
     ed_title: "Наслов",
+    ed_show_title: "Прикажи наслов",
     ed_title_helper: "Остави празно за назив просторије",
     ed_columns: "Колоне",
     ed_advanced: "Напредно",
@@ -421,6 +426,7 @@ const RC_I18N = {
     turn_all_off: "Isključi sve",
     ed_area: "Prostorija",
     ed_title: "Naslov",
+    ed_show_title: "Prikaži naslov",
     ed_title_helper: "Ostavi prazno za naziv prostorije",
     ed_columns: "Kolone",
     ed_advanced: "Napredno",
@@ -460,6 +466,7 @@ const RC_I18N = {
     turn_all_off: "Spegni tutto",
     ed_area: "Area",
     ed_title: "Titolo",
+    ed_show_title: "Mostra il titolo",
     ed_title_helper: "Lascia vuoto per usare il nome dell'area",
     ed_columns: "Colonne",
     ed_advanced: "Avanzate",
@@ -499,6 +506,7 @@ const RC_I18N = {
     turn_all_off: "Alles uitschakelen",
     ed_area: "Ruimte",
     ed_title: "Titel",
+    ed_show_title: "Titel tonen",
     ed_title_helper: "Leeg laten voor de naam van de ruimte",
     ed_columns: "Kolommen",
     ed_advanced: "Geavanceerd",
@@ -538,6 +546,7 @@ const RC_I18N = {
     turn_all_off: "Desligar tudo",
     ed_area: "Área",
     ed_title: "Título",
+    ed_show_title: "Mostrar o título",
     ed_title_helper: "Deixe vazio para usar o nome da área",
     ed_columns: "Colunas",
     ed_advanced: "Avançado",
@@ -577,6 +586,7 @@ const RC_I18N = {
     turn_all_off: "Wyłącz wszystko",
     ed_area: "Obszar",
     ed_title: "Tytuł",
+    ed_show_title: "Pokaż tytuł",
     ed_title_helper: "Pozostaw puste, aby użyć nazwy obszaru",
     ed_columns: "Kolumny",
     ed_advanced: "Zaawansowane",
@@ -616,6 +626,7 @@ const RC_I18N = {
     turn_all_off: "Oprește tot",
     ed_area: "Zonă",
     ed_title: "Titlu",
+    ed_show_title: "Afișează titlul",
     ed_title_helper: "Lasă gol pentru numele zonei",
     ed_columns: "Coloane",
     ed_advanced: "Avansat",
@@ -655,6 +666,7 @@ const RC_I18N = {
     turn_all_off: "Sluk alt",
     ed_area: "Område",
     ed_title: "Titel",
+    ed_show_title: "Vis titel",
     ed_title_helper: "Lad stå tomt for at bruge områdets navn",
     ed_columns: "Kolonner",
     ed_advanced: "Avanceret",
@@ -694,6 +706,7 @@ const RC_I18N = {
     turn_all_off: "Stäng av allt",
     ed_area: "Område",
     ed_title: "Titel",
+    ed_show_title: "Visa rubrik",
     ed_title_helper: "Lämna tomt för områdets namn",
     ed_columns: "Kolumner",
     ed_advanced: "Avancerat",
@@ -733,6 +746,7 @@ const RC_I18N = {
     turn_all_off: "Изключи всичко",
     ed_area: "Зона",
     ed_title: "Заглавие",
+    ed_show_title: "Показване на заглавието",
     ed_title_helper: "Оставете празно за името на зоната",
     ed_columns: "Колони",
     ed_advanced: "Разширени",
@@ -772,6 +786,7 @@ const RC_I18N = {
     turn_all_off: "Выключить всё",
     ed_area: "Пространство",
     ed_title: "Заголовок",
+    ed_show_title: "Показывать заголовок",
     ed_title_helper: "Оставьте пустым, чтобы использовать название пространства",
     ed_columns: "Столбцы",
     ed_advanced: "Дополнительно",
@@ -811,6 +826,7 @@ const RC_I18N = {
     turn_all_off: "Вимкнути все",
     ed_area: "Простір",
     ed_title: "Заголовок",
+    ed_show_title: "Показувати заголовок",
     ed_title_helper: "Залиште порожнім, щоб використати назву простору",
     ed_columns: "Стовпці",
     ed_advanced: "Додатково",
@@ -850,6 +866,7 @@ const RC_I18N = {
     turn_all_off: "Minden kikapcsolása",
     ed_area: "Terület",
     ed_title: "Cím",
+    ed_show_title: "Cím megjelenítése",
     ed_title_helper: "Hagyd üresen a terület nevéhez",
     ed_columns: "Oszlopok",
     ed_advanced: "Speciális",
@@ -889,6 +906,7 @@ const RC_I18N = {
     turn_all_off: "Vypnúť všetko",
     ed_area: "Oblasť",
     ed_title: "Názov",
+    ed_show_title: "Zobraziť názov",
     ed_title_helper: "Nechajte prázdne pre názov oblasti",
     ed_columns: "Stĺpce",
     ed_advanced: "Rozšírené",
@@ -928,6 +946,7 @@ const RC_I18N = {
     turn_all_off: "Vypnout vše",
     ed_area: "Oblast",
     ed_title: "Název",
+    ed_show_title: "Zobrazit název",
     ed_title_helper: "Ponechte prázdné pro název oblasti",
     ed_columns: "Sloupce",
     ed_advanced: "Pokročilé",
@@ -967,6 +986,7 @@ const RC_I18N = {
     turn_all_off: "Izklopi vse",
     ed_area: "Območje",
     ed_title: "Naslov",
+    ed_show_title: "Prikaži naslov",
     ed_title_helper: "Pustite prazno za ime območja",
     ed_columns: "Stolpci",
     ed_advanced: "Napredno",
@@ -1006,6 +1026,7 @@ const RC_I18N = {
     turn_all_off: "Izslēgt visu",
     ed_area: "Zona",
     ed_title: "Virsraksts",
+    ed_show_title: "Rādīt virsrakstu",
     ed_title_helper: "Atstājiet tukšu, lai izmantotu zonas nosaukumu",
     ed_columns: "Kolonnas",
     ed_advanced: "Papildu",
@@ -1045,6 +1066,7 @@ const RC_I18N = {
     turn_all_off: "Απενεργοποίηση όλων",
     ed_area: "Περιοχή",
     ed_title: "Τίτλος",
+    ed_show_title: "Εμφάνιση τίτλου",
     ed_title_helper: "Αφήστε το κενό για το όνομα της περιοχής",
     ed_columns: "Στήλες",
     ed_advanced: "Για προχωρημένους",
@@ -1186,6 +1208,8 @@ class RcCard extends HTMLElement {
       throw new Error(rcT(this.constructor.i18n, rcLang(this.constructor.i18n, this._hass, config), "err_config"));
     }
     this._config = { ...this.constructor.defaults, ...config };
+    // show_title: the header's title, hidden by the stylesheet
+    this.toggleAttribute?.("hide-title", config.show_title === false);
     if (!this.shadowRoot) this.attachShadow({ mode: "open" });
     this._sig = null;
     this._render();
@@ -1796,7 +1820,7 @@ const rcExcludeField = (card, hass, config) => {
 // (list defaults such as `exclude: []` are not shown in the form: an empty list is never written anyway).
 const rcEditor = ({ card, helpers, schema }) => {
   const i18n = card.i18n;
-  const defaults = Object.fromEntries(Object.entries(card.defaults).filter(([, v]) => !Array.isArray(v)));
+  const defaults = { show_title: true, ...Object.fromEntries(Object.entries(card.defaults).filter(([, v]) => !Array.isArray(v))) };
   return class extends HTMLElement {
     setConfig(config) {
       this._config = config;
@@ -1894,6 +1918,8 @@ const RC_BASE_STYLES = `
      (zoom, power) never shrink; under 200 px the pill is only its coloured dot, its text kept for screen readers. */
   .title { flex: 1 1 0; min-width: 5ch; font-size: 16px; font-weight: 500; color: var(--primary-text-color);
            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+           /* show_title: false keeps the title's room (the pill and buttons stay in place) */
+  :host([hide-title]) .head > .title { visibility: hidden; }
   .pill { all: unset; flex: 0 1 auto; min-width: 0; box-sizing: border-box; position: relative;
           display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 500;
           padding: 1px 8px; border-radius: 999px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
