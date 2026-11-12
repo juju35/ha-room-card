@@ -536,7 +536,7 @@ const RoomSwitchCardEditor = rcEditor({
   helpers: ["title", "navigation_path", "only_on", "hide_when_off", "show_power", "all_off_button", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
-    ...rcBooleans("only_on", "hide_when_off", "show_power", "all_off_button"),
+    ...rcBooleans("show_title", "only_on", "hide_when_off", "show_power", "all_off_button"),
     ...rcIncludeField(RoomSwitchCard, hass, config),
     ...rcExcludeField(RoomSwitchCard, hass, config),
     ...rcAdvanced(RW_I18N, lang, "entities", "language"),
@@ -565,7 +565,7 @@ const RoomSwitchMiniCardEditor = rcEditor({
   helpers: ["title", "navigation_path", "columns", "only_on", "hide_when_off", "show_power", "all_off_button", "zoom", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
-    ...rcBooleans("only_on", "hide_when_off", "show_power", "all_off_button", "zoom"),
+    ...rcBooleans("show_title", "only_on", "hide_when_off", "show_power", "all_off_button", "zoom"),
     ...rcIncludeField(RoomSwitchMiniCard, hass, config),
     ...rcExcludeField(RoomSwitchMiniCard, hass, config),
     ...rcAdvanced(RW_I18N, lang, "entities", "language"),

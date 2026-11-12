@@ -835,7 +835,7 @@ const RoomSensorsCardEditor = rcEditor({
   helpers: ["title", "only_alerts", "hide_when_clear", "presence", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
-    ...rcBooleans("only_alerts", "hide_when_clear", "presence", "blink"),
+    ...rcBooleans("show_title", "only_alerts", "hide_when_clear", "presence", "blink"),
     ...rcIncludeField(RoomSensorsCard, hass, config),
     ...rcExcludeField(RoomSensorsCard, hass, config),
     ...rcAdvanced(RS_I18N, lang, "entities", "language"),
@@ -890,7 +890,7 @@ const RoomSensorsMiniCardEditor = rcEditor({
   helpers: ["title", "columns", "hide_when_clear", "presence", "zoom", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
-    ...rcBooleans("hide_when_clear", "presence", "blink", "zoom"),
+    ...rcBooleans("show_title", "hide_when_clear", "presence", "blink", "zoom"),
     ...rcIncludeField(RoomSensorsMiniCard, hass, config),
     ...rcExcludeField(RoomSensorsMiniCard, hass, config),
     ...rcAdvanced(RS_I18N, lang, "entities", "language"),

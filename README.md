@@ -200,6 +200,7 @@ The Sensors, Lights, Plugs and Environment cards share these options; each card 
 | `include` | ✅* | — | Entities added to the ones found in the area: from another room, without a room, or not recognised (a switch that is not named as a plug, say); each item is an entity ID or `{entity, name, icon}`. The visual editor offers the entities of the card's domains that it does not show yet |
 | `entities` | ✅* | — | Explicit list, replaces the discovery; each item is an entity ID or `{entity, name, icon}` (plus `power` on the Plugs card) |
 | `title` | ❌ | Area name | Card title |
+| `show_title` | ❌ | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `columns` | ❌ | `2` | Number of tile columns (1–4) |
 | `exclude` | ❌ | — | Entities left out of the automatic discovery; the visual editor only offers the ones the card finds in the chosen room |
 | `navigation_path` | ❌ | — | Dashboard opened when tapping the title, e.g. `/light` |
@@ -248,6 +249,7 @@ rooms:
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `title` | ❌ | `Home` | Card title |
+| `show_title` | ❌ | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `columns` | ❌ | `3` | Number of room columns (1–6); on a card of 340 px or less at most 2, and 1 at 260 px or less (6 columns of a Sections view on a phone) |
 | `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing attention first (leak, open, unavailable sensor, presence, something on) |
 | `presence` | ❌ | `true` | Include the presence and motion sensors, camera detections included (pets never, vehicles only in outdoor rooms) |
@@ -578,6 +580,7 @@ rooms:
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `title` | ❌ | `Indoor climate` | Card title |
+| `show_title` | ❌ | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `columns` | ❌ | `3` | Number of room columns (1–6); on a card of 340 px or less at most 2, and 1 at 260 px or less (6 columns of a Sections view on a phone) |
 | `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing a look first |
 | `zoom` | ❌ | `true` | Show only the rooms with a reading outside the comfort range, with a detail button showing every room; `false` shows every room, always |

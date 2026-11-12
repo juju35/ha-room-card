@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.23.0 - 2026-11-12
+
+### Features
+- `show_title` option (also in the visual editor) hides the header's title on every room card, the status pill and buttons keeping their place, for a card placed under a section heading of its own (asked in juju35/ha-vehicle-card#72).
+
 ## 1.22.4 - 2026-11-11
 
 ### Fixes

@@ -1130,6 +1130,7 @@ const RoomOverviewCardEditor = rcEditor({
   helpers: ["title", "columns", "presence", "zoom", "all_off_button", "plugs_off_button", "exclude", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcOverviewFields(RO_I18N, lang),
+    { name: "show_title", selector: { boolean: {} } },
     { name: "presence", selector: { boolean: {} } },
     { name: "zoom", selector: { boolean: {} } },
     { name: "all_off_button", selector: { boolean: {} } },
