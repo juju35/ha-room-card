@@ -181,6 +181,42 @@ const rcUnzoom = (card) => {
 // True for a click outside `card` that is not in a dialog opened from it (more-info, say): it folds the card back.
 const rcOutside = (card, ev) => !ev.composedPath().includes(card) && !rcInDialog(ev);
 
+// "A click elsewhere" is caught on the pointer, not only on the click event: on iOS (Safari and the companion app)
+// a tap on something that is not clickable (the background, an empty spot, a card with no action) sends no click to
+// the page. The handler runs when the press and the release are both outside the card (a slider dragged out of the
+// card does not count), and a scroll does not count (the browser cancels the pointer); keyboard clicks still go
+// through the click event. The handler keeps its own checks (outside of the card, not in a dialog).
+const watchOutside = (card, handler) => {
+  let downOutside = false;
+  const onDown = (ev) => {
+    downOutside = !ev.composedPath().includes(card);
+  };
+  const onUp = (ev) => {
+    if (downOutside) handler(ev);
+    downOutside = false;
+  };
+  const onClick = (ev) => {
+    if (ev.detail === 0) handler(ev);
+  };
+  return {
+    on() {
+      document.addEventListener("pointerdown", onDown, true);
+      document.addEventListener("pointerup", onUp, true);
+      document.addEventListener("click", onClick, true);
+    },
+    off() {
+      document.removeEventListener("pointerdown", onDown, true);
+      document.removeEventListener("pointerup", onUp, true);
+      document.removeEventListener("click", onClick, true);
+    },
+    // A tap (press and release at the same spot), for the tests.
+    tap(ev) {
+      onDown(ev);
+      onUp(ev);
+    },
+  };
+};
+
 // A click on the detail button: every room, or back to the rooms needing a look. True when handled.
 const rcZoomClick = (card, ev) => {
   if (!ev.target.closest?.(".zoom")) return false;
@@ -1559,12 +1595,15 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
 
     connectedCallback() {
       super.connectedCallback?.();
-      document.addEventListener("click", this._onUnzoom, true);
+      this._unzoom ??= watchOutside(this, this._onUnzoom);
+      this._unzoom.on();
     }
 
     disconnectedCallback() {
       super.disconnectedCallback?.();
-      document.removeEventListener("click", this._onUnzoom, true);
+      this._unzoom?.off();
+      // Left (another dashboard view, a conditional card hidden): back to the compact view.
+      rcUnzoom(this);
     }
 
     getCardSize() {
@@ -1683,12 +1722,18 @@ const rcRoomsPanel = (Base) =>
 
     connectedCallback() {
       super.connectedCallback?.();
-      document.addEventListener("click", this._onOutside, true);
+      this._outside ??= watchOutside(this, this._onOutside);
+      this._outside.on();
     }
 
     disconnectedCallback() {
       super.disconnectedCallback?.();
-      document.removeEventListener("click", this._onOutside, true);
+      this._outside?.off();
+      // Left (another dashboard view, a conditional card hidden): folded back as by a click elsewhere, so that the
+      // card does not come back with a room open, zoomed or its popup open.
+      this._beforeFold?.();
+      if (this._openArea) this._toggle(null);
+      rcUnzoom(this);
     }
 
     _tap(aid) {

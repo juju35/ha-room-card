@@ -600,6 +600,41 @@ test("a click elsewhere brings a zoomed mini card back to its compact view, not 
   assert.match(card.shadowRoot.innerHTML, /class="mini"/);
 });
 
+test("folding: a tap elsewhere (pointer), not a drag that ends outside; leaving the page goes back too", () => {
+  const card = new cards["room-sensors-mini-card"]();
+  card.setConfig({ area: "kitchen" });
+  card.hass = makeHass();
+  card.connectedCallback();
+  card._zoomed = true;
+  // Pressed in the card and released outside of it (a slider dragged out): nothing folds.
+  card._unzoom.tap(clickVia(card));
+  assert.equal(card._zoomed, true);
+  // A tap on a spot that sends no click (iOS): the pointer alone folds it.
+  card._unzoom.tap(clickVia({ localName: "div" }));
+  assert.equal(card._zoomed, false);
+  // Left zoomed and back on the page: compact.
+  card._zoomed = true;
+  card.disconnectedCallback();
+  card.connectedCallback();
+  assert.equal(card._zoomed, false);
+  assert.match(card.shadowRoot.innerHTML, /class="mini"/);
+  card.disconnectedCallback();
+  // The Overview: a room left open comes back folded.
+  const overview = new cards["room-overview-card"]();
+  overview._config = { ...cards["room-overview-card"].defaults };
+  overview._render = () => {};
+  overview.connectedCallback();
+  overview._openArea = "kitchen";
+  overview._toggle = (aid) => {
+    overview._openArea = aid;
+  };
+  overview._outside.tap(clickVia({ localName: "div" }));
+  assert.equal(overview._openArea, null);
+  overview._openArea = "kitchen";
+  overview.disconnectedCallback();
+  assert.equal(overview._openArea, null);
+});
+
 test("a click elsewhere brings the Overview back to the active rooms", () => {
   const overview = new cards["room-overview-card"]();
   overview._config = { ...cards["room-overview-card"].defaults };
