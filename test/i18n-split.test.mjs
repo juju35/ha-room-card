@@ -15,8 +15,13 @@ const tmp = mkdtempSync(`${tmpdir()}/i18n-split-`);
 const skip = new Set(["dist", "node_modules", ".git", "screenshots"]);
 for (const f of readdirSync(repo)) if (!skip.has(f)) cpSync(`${repo}${f}`, `${tmp}/${f}`, { recursive: true });
 symlinkSync(`${repo}node_modules`, `${tmp}/node_modules`);
+// Run through a symlink, as on macOS where os.tmpdir() (/var/folders) is a link to /private/var/folders: the build
+// must still see that it is the main module and split the translations.
+const link = `${tmp}-link`;
+symlinkSync(tmp, link);
 after(() => rmSync(tmp, { recursive: true, force: true }));
-execFileSync(process.execPath, [`${tmp}/scripts/build.mjs`], { stdio: "pipe" });
+after(() => rmSync(link, { force: true }));
+execFileSync(process.execPath, [`${link}/scripts/build.mjs`], { stdio: "pipe" });
 const dist = (f) => pathToFileURL(`${tmp}/dist/${f}`);
 const bundle = readFileSync(dist(MAIN), "utf8");
 const langs = JSON.parse(bundle.match(/const LANGS = new Set\((\[[^\]]*\])\)/)[1]);
