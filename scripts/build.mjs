@@ -2,7 +2,7 @@
 // Usage: node scripts/build.mjs  (dist/ is not committed: CI and the release workflow build it)
 // shared.js comes first; each card is wrapped in its own block, inside one block for the whole bundle,
 // so nothing leaks into the page.
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { splitDist } from "./i18n-split.mjs";
 
@@ -26,4 +26,4 @@ console.log(`Built dist/ha-room-card.js (${(out.length / 1024).toFixed(1)} KB, $
 
 // Translations: English stays in the bundle, each other language goes to dist/ha-room-card.i18n.<lang>.js,
 // fetched when a card needs it (scripts/i18n-split.mjs).
-if (process.argv[1] === fileURLToPath(import.meta.url)) splitDist(`${root}dist`, "ha-room-card.js", { version: pkg.version });
+if (process.argv[1] && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) splitDist(`${root}dist`, "ha-room-card.js", { version: pkg.version });
