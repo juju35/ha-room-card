@@ -1246,9 +1246,44 @@ class RcCard extends HTMLElement {
     this._config = { ...this.constructor.defaults, ...config };
     // show_title: the header's title, hidden by the stylesheet
     this.toggleAttribute?.("hide-title", config.show_title === false);
-    if (!this.shadowRoot) this.attachShadow({ mode: "open" });
+    if (!this.shadowRoot) this._attach();
     this._sig = null;
     this._render();
+  }
+
+  // The shadow root, and no rewrite of the card between a press anywhere in it and the end of the click: Home
+  // Assistant updates the card several times a second, and a rewrite under the pointer replaces the element pressed,
+  // so that the click lands on the card itself and does nothing (the tiles already hold it, see _bindPress; this
+  // covers the rest: header button, detail button, rows, popup). The pending update is rendered once released.
+  _attach() {
+    const root = this.attachShadow({ mode: "open" });
+    this._onPressEnd = () => {
+      window.removeEventListener("pointerup", this._onPressEnd, true);
+      window.removeEventListener("pointercancel", this._onPressEnd, true);
+      // After the click, which comes in the same task as the release.
+      setTimeout(() => {
+        if (this._pressing) this._released();
+      }, 0);
+    };
+    root.addEventListener("pointerdown", (ev) => {
+      this._byPointer = true;
+      if (ev.button !== 0) return;
+      this._pressing = true;
+      window.addEventListener("pointerup", this._onPressEnd, true);
+      window.addEventListener("pointercancel", this._onPressEnd, true);
+    });
+    // The focus is kept across rewrites for the keyboard only (no focus ring after a mouse click or a tap).
+    root.addEventListener("keydown", () => {
+      this._byPointer = false;
+    });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback?.();
+    window.removeEventListener("pointerup", this._onPressEnd, true);
+    window.removeEventListener("pointercancel", this._onPressEnd, true);
+    // A press cut short by the detach never gets its release: rendered now, and the next updates too.
+    if (this._pressing) this._released();
   }
 
   set hass(hass) {
@@ -1398,7 +1433,7 @@ class RcCard extends HTMLElement {
 
   _paint(level, head, tiles, extraClass = "") {
     // The tile with the keyboard focus keeps it through the redraw (a toggle or a brightness step from the keyboard).
-    const focused = this.shadowRoot.activeElement?.dataset?.id;
+    const focused = this._byPointer ? null : this.shadowRoot.activeElement?.dataset?.id;
     this.shadowRoot.innerHTML = `
       <style>${RC_BASE_STYLES}${this.constructor.styles}</style>
       <ha-card class="lvl-${level}${extraClass}">
