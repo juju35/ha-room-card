@@ -373,7 +373,13 @@ exclude:
 
 #### Scenes
 
-The scenes of the area show under the lights, folded until the *Scenes* title is tapped. To pick them by hand (and rename them):
+The scenes of the area show under the lights, folded until the *Scenes* title is tapped; a Philips Hue scene with no area joins the room its Hue room is named after, and a dynamic one keeps its colours moving:
+
+| Light theme | Dark theme |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-scenes.png" alt="Scenes" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-scenes-dark.png" alt="Scenes dark" width="400"> |
+
+To pick them by hand (and rename them):
 
 ```yaml
 type: custom:room-lights-card
