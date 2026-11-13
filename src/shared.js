@@ -1907,7 +1907,9 @@ const rcExcludeField = (card, hass, config) => {
 
 // `schema(lang, hass, config)` lists the fields; options left at the card's default are not written to the YAML
 // (list defaults such as `exclude: []` are not shown in the form: an empty list is never written anyway).
-const rcEditor = ({ card, helpers, schema }) => {
+// `autos` maps an option to its default worked out from the config (`(hass, config) => value`): shown in the form
+// while unset, and kept out of the YAML when left at it.
+const rcEditor = ({ card, helpers, schema, autos = {} }) => {
   const i18n = card.i18n;
   const defaults = { show_title: true, ...Object.fromEntries(Object.entries(card.defaults).filter(([, v]) => !Array.isArray(v))) };
   return class extends HTMLElement {
@@ -1937,6 +1939,10 @@ const rcEditor = ({ card, helpers, schema }) => {
             const v = config[k];
             if (v === "" || v == null || (Array.isArray(v) && !v.length) || defaults[k] === v) delete config[k];
           }
+          for (const [k, auto] of Object.entries(autos)) {
+            const untouched = this._config[k] === undefined && config[k] === auto(this._hass, this._config);
+            if (untouched || config[k] === auto(this._hass, config)) delete config[k];
+          }
           this.dispatchEvent(new CustomEvent("config-changed", { detail: { config }, bubbles: true, composed: true }));
         });
         this.appendChild(this._form);
@@ -1946,7 +1952,11 @@ const rcEditor = ({ card, helpers, schema }) => {
       // both only change with the config, the language or the registries.
       const memo = (this._memo ||= {});
       const h = this._hass;
-      this._form.data = rcMemo(memo, "data", [this._config], () => ({ ...defaults, ...this._config }));
+      this._form.data = rcMemo(memo, "data", [this._config, h.areas], () => {
+        const data = { ...defaults, ...this._config };
+        for (const [k, auto] of Object.entries(autos)) data[k] ??= auto(h, this._config);
+        return data;
+      });
       this._form.schema = rcMemo(memo, "schema", [lang, this._config, h.entities, h.devices, h.areas], () =>
         schema(lang, h, this._config),
       );

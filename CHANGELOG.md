@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.24.1 - 2026-11-14
+
+### Fixes
+- Sensors card and Sensors mini card visual editors: `outdoor` was missing. The editor now offers it, showing the guess from the area name while it is unset and writing it only when changed; its label and help text in the 22 languages.
+
 ## 1.24.0 - 2026-11-13
 
 ### Features
