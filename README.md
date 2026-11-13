@@ -327,7 +327,7 @@ In addition to the [common options](#common-options):
 | `only_alerts` | ❌ | `false` | Show only the open, leaking, active (presence detected) or unavailable sensors |
 | `hide_when_clear` | ❌ | `false` | Hide the whole card when everything is closed, dry and reporting and no presence is detected (never while a leak or opening sensor is unavailable) |
 | `presence` | ❌ | `true` | Include the presence and motion sensors of the area |
-| `outdoor` | ❌ | from the area name | Outdoor room: camera vehicle detections are shown too (see the rules above) |
+| `outdoor` | ❌ | from the area name | Outdoor room: camera vehicle detections are shown too (see the rules above). The visual editor shows the guess from the area name while the option is unset, and only writes it when changed |
 | `blink` | ❌ | `true` | Blink the icon of open sensors (also stops when the system asks for reduced motion) |
 
 ### Sensors mini

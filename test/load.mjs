@@ -20,7 +20,11 @@ export const fakeNode = () => ({
   querySelectorAll() {
     return [];
   },
-  addEventListener() {},
+  // The last listener of each type, for the tests to call (the editors' value-changed).
+  addEventListener(type, fn) {
+    this.listeners ||= {};
+    this.listeners[type] = fn;
+  },
   appendChild(el) {
     this.children.push(el);
   },
@@ -41,6 +45,12 @@ export const load = () => {
   }
   const sandbox = {
     HTMLElement,
+    CustomEvent: class {
+      constructor(type, init = {}) {
+        this.type = type;
+        this.detail = init.detail;
+      }
+    },
     console: { info() {} },
     customElements: { get: (t) => registry.get(t), define: (t, c) => registry.set(t, c) },
     document: {

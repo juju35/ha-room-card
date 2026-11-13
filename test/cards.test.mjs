@@ -707,8 +707,8 @@ test("each visual editor offers every option of its card", () => {
     for (const name of expected) assert.ok(fields.includes(name), `${tag}: ${name} missing from the editor`);
   };
   const room = { area: "kitchen" };
-  has("room-sensors-card", room, ["area", "title", "navigation_path", "columns", "only_alerts", "hide_when_clear", "presence", "blink", "entities", "language"]);
-  has("room-sensors-mini-card", room, ["navigation_path", "columns", "hide_when_clear", "presence", "blink", "zoom", "entities", "language"]);
+  has("room-sensors-card", room, ["area", "title", "navigation_path", "columns", "only_alerts", "hide_when_clear", "presence", "outdoor", "blink", "entities", "language"]);
+  has("room-sensors-mini-card", room, ["navigation_path", "columns", "hide_when_clear", "presence", "outdoor", "blink", "zoom", "entities", "language"]);
   has("room-lights-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "show_scenes", "scenes", "entities", "language"]);
   has("room-switch-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_power", "all_off_button", "entities", "language"]);
   has("room-lights-mini-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "show_scenes", "scenes", "entities", "language"]);
@@ -717,6 +717,29 @@ test("each visual editor offers every option of its card", () => {
   has("room-environment-mini-card", room, ["navigation_path", "columns", "only_alerts", "show_gauge", "zoom", "thresholds", "entities", "language"]);
   has("room-overview-card", {}, ["title", "columns", "sort", "presence", "zoom", "all_off_button", "plugs_off_button", "exclude_areas", "rooms", "language"]);
   has("room-environment-overview-card", {}, ["title", "columns", "sort", "zoom", "exclude_areas", "thresholds", "rooms", "language"]);
+});
+
+test("the sensors editors show `outdoor` guessed from the room, and keep it out of the YAML at that guess", () => {
+  for (const tag of ["room-sensors-card", "room-sensors-mini-card"]) {
+    const editor = new (rc.customElements.get(`${tag}-editor`))();
+    editor.appendChild = () => {};
+    const hass = makeHass();
+    hass.areas = { ...hass.areas, garden: { area_id: "garden", name: "Garden" } };
+    editor.setConfig({ area: "garden" });
+    editor.hass = hass;
+    assert.equal(editor._form.data.outdoor, true, tag);
+    assert.equal(editor._form.computeLabel({ name: "outdoor" }), "Pièce extérieure");
+    assert.ok(editor._form.computeHelper({ name: "outdoor" }));
+    const sent = [];
+    editor.dispatchEvent = (ev) => sent.push(ev.detail.config);
+    const change = (value) => editor._form.listeners["value-changed"]({ detail: { value } });
+    change({ ...editor._form.data, title: "Garden" });
+    assert.equal(sent.at(-1).outdoor, undefined, `${tag}: the guess is not written`);
+    change({ ...editor._form.data, outdoor: false });
+    assert.equal(sent.at(-1).outdoor, false, `${tag}: a change is written`);
+    editor.setConfig({ area: "kitchen" });
+    assert.equal(editor._form.data.outdoor, false);
+  }
 });
 
 test("the editor's labels follow a language change", () => {
