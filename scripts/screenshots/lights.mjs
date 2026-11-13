@@ -11,7 +11,14 @@ const LIGHTS = [
 ];
 const EVENING = { "light.kitchen": [102, [255, 141, 26]], "switch.sofa_lamp": [], "light.night_light": [64, [120, 90, 255]] };
 
-const icons = ["mdi:ceiling-light", "mdi:floor-lamp", "mdi:lightbulb-night"];
+const SCENES = [
+  ["scene.living_room_relax", "Living room Relax", "mdi:sofa", { entity: { area_id: "living_room" } }],
+  ["scene.living_room_movie_night", "Living room Movie night", "mdi:movie-open", { entity: { area_id: "living_room" } }],
+  ["scene.living_room_bright", "Living room Bright", undefined, { entity: { platform: "hue" }, attributes: { group_name: "Living room", brightness: 100, is_dynamic: false } }],
+  ["scene.living_room_savanna_sunset", "Living room Savanna sunset", undefined, { entity: { platform: "hue" }, attributes: { group_name: "Living room", brightness: 70, is_dynamic: true, speed: 60 } }],
+];
+
+const icons = ["mdi:sofa", "mdi:movie-open", "mdi:palette-outline", "mdi:ceiling-light", "mdi:floor-lamp", "mdi:lightbulb-night"];
 const shots = [...pair("on", { on: EVENING }), ...pair("off", { on: {} })];
 const setup = (s, lang) => {
   const states = {};
@@ -25,10 +32,26 @@ const setup = (s, lang) => {
     entities[entity_id] = { entity_id, area_id: "living_room" };
   }
   const areas = { living_room: { area_id: "living_room", name: lang === "fr" ? "Séjour" : "Living room" } };
+  // The scenes shots only: two scenes of the area and two Philips Hue scenes with no area, matched by their Hue room
+  // (one of them dynamic). The other shots have no scene, so their captures stay as they are.
+  if (s.scenes) {
+    for (const [entity_id, name, icon, extra] of SCENES) {
+      states[entity_id] = { entity_id, state: "2026-11-13T19:30:00+00:00", attributes: { friendly_name: name, icon, ...extra.attributes } };
+      entities[entity_id] = { entity_id, ...extra.entity };
+    }
+  }
   return { hass: { states, entities, devices: {}, areas, language: lang, locale: { language: lang } }, config: { area: "living_room" } };
 };
 
 await shoot({ prefix: "lights", tag: "room-lights-card", icons, shots, setup });
+// The Scenes section unfolded (its title clicked).
+await shoot({
+  prefix: "lights",
+  tag: "room-lights-card",
+  icons,
+  shots: pair("scenes", { on: EVENING, scenes: true }),
+  setup: (s, lang) => ({ ...setup(s, lang), open: ".section-title" }),
+});
 // The mini card, and the same card zoomed in (its zoom button clicked).
 await shoot({
   prefix: "lights-mini",

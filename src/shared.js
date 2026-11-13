@@ -1439,6 +1439,7 @@ class RcCard extends HTMLElement {
       <ha-card class="lvl-${level}${extraClass}">
         ${head}
         ${tiles ? `<div class="grid" style="--cols:${this._cols()}">${tiles}</div>` : ""}
+        ${this._afterGrid()}
       </ha-card>`;
     const root = this.shadowRoot;
     root.querySelector(".pill.action")?.addEventListener("click", (ev) => this._allOff(ev));
@@ -1447,7 +1448,15 @@ class RcCard extends HTMLElement {
       this._bindTile(el, (this._items || []).find((i) => i.id === el.dataset.id));
       if (focused && el.dataset.id === focused) el.focus({ preventScroll: true });
     }
+    this._bindAfter(root);
   }
+
+  // What a card adds under its tiles (the Lights card's scenes), and its event wiring.
+  _afterGrid() {
+    return "";
+  }
+
+  _bindAfter() {}
 
   // The "turn everything off" button of the header (full card) or of the status (mini card).
   _allOff(ev) {

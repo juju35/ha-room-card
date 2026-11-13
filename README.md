@@ -83,6 +83,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Show only the lights that are on (`only_on`), or hide the whole card when everything is off (`hide_when_off`)
 - Tap the title to open a dashboard (`navigation_path`)
 - Automatic discovery from the area, or an explicit list with name and icon overrides (custom icon sets supported)
+- **Scenes** of the room under the lights, in a section folded until its title is tapped (folded back by a click anywhere else): one chip per scene, a tap activates it. Philips Hue scenes are found by their Hue room when they have no area of their own, and a dynamic Hue scene starts with its colours moving (`hue.activate_scene`); `show_scenes: false` hides them, `scenes` lists them by hand
 
 ### Lights mini
 
@@ -91,7 +92,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Room badge coloured like the Lights card, the title and the status on the first line: *All off*, or how many lights are on out of the total (*2/4 on*)
 - The status doubles as a power button turning every light of the room off (`all_off_button`, on by default)
 - On the second line, a pill tinted with its colour and showing its name for each light that is on, the icon alone for the others (`only_on` hides them)
-- **Zoom** button (top right) switches the card to the full [Lights card](#lights) — tap to toggle, drag to dim — and back, as does a click anywhere else (`zoom: false` removes it)
+- **Zoom** button (top right) switches the card to the full [Lights card](#lights) — tap to toggle, drag to dim, the scenes — and back, as does a click anywhere else (`zoom: false` removes it)
 - Same discovery and options as the Lights card: `only_on`, `hide_when_off`, `include` / `exclude`, `navigation_path`
 - Tap a light to open its details
 
@@ -154,6 +155,15 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Header with the number of rooms to check and the home's average temperature and humidity
 - **Tap** a room to unfold its Environment card at the top of the card; tap it again or anywhere else to fold it back
 - Only the rooms needing a look show; the **detail** button (top right) shows every room, and back, as does a click anywhere else (`zoom: false`: every room, always, no button); `sort: state` lists them first; room order, names and icons with `rooms`, like the [Overview](#overview)
+
+## Supported integrations
+
+The cards read the entities Home Assistant gives them, whatever the integration: any `binary_sensor`, `light`, `switch`, `sensor` or `scene` set on an area (or on its device) is picked up. A few get more:
+
+| Integration | What the cards add |
+|---|---|
+| [Philips Hue](https://www.home-assistant.io/integrations/hue/) | Lights card: the Hue scenes of the room, found by their Hue room (`group_name`) when they have no area; a dynamic scene starts with its colours moving (`hue.activate_scene`) |
+| [IKEA TRÅDFRI](https://www.home-assistant.io/integrations/tradfri/) | Lights card: its lights, colours and brightness, as any `light` entity |
 
 ## Prerequisites
 
@@ -356,8 +366,29 @@ only_on: false
 hide_when_off: false
 show_brightness: true
 all_off_button: true
+show_scenes: true
 exclude:
   - light.living_room_camera_floodlight
+```
+
+#### Scenes
+
+The scenes of the area show under the lights, folded until the *Scenes* title is tapped; a Philips Hue scene with no area joins the room its Hue room is named after, and a dynamic one keeps its colours moving:
+
+| Light theme | Dark theme |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-scenes.png" alt="Scenes" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-scenes-dark.png" alt="Scenes dark" width="400"> |
+
+To pick them by hand (and rename them):
+
+```yaml
+type: custom:room-lights-card
+area: living_room
+scenes:
+  - scene.living_room_reading
+  - entity: scene.living_room_movie
+    name: Movie
+    icon: mdi:movie-open
 ```
 
 #### Explicit lights
@@ -384,6 +415,8 @@ In addition to the [common options](#common-options):
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `show_brightness` | ❌ | `true` | Brightness bar and drag-to-dim on dimmable lights |
+| `show_scenes` | ❌ | `true` | Scenes of the room under the lights (Philips Hue scenes of the Hue room included) |
+| `scenes` | ❌ | — | Scenes to show instead of the room's: scene IDs, or `{entity, name, icon}` |
 
 ### Lights mini
 
@@ -391,7 +424,7 @@ Same options as the [Lights card](#lights), `all_off_button` included (the power
 
 | Option | Required | Default | Description |
 |---|---|---|---|
-| `zoom` | ❌ | `true` | Zoom button switching to the full Lights card and back (`columns` and `show_brightness` only shape that view) |
+| `zoom` | ❌ | `true` | Zoom button switching to the full Lights card and back (`columns`, `show_brightness` and the scenes only shape that view) |
 
 For example, a living room showing only the lights that are on, the title opening the lights dashboard:
 
