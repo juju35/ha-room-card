@@ -35,6 +35,48 @@ const pressSetup = () => {
   return t;
 };
 
+test("no rewrite under a press anywhere in the card, rendered once released; focus kept for the keyboard only", async () => {
+  const card = new cards["room-switch-card"]();
+  const on = {};
+  let tiles = [];
+  card.attachShadow = () => {
+    card.shadowRoot = { ...fakeNode(), addEventListener: (type, fn) => (on[type] = fn), querySelectorAll: (s) => (s === ".tile" ? tiles : []) };
+    return card.shadowRoot;
+  };
+  card.setConfig({ area: "kitchen" });
+  card.hass = makeHass();
+  let renders = 0;
+  card._render = () => renders++;
+  // A press on the header button (not a tile): an update is held, then rendered once released.
+  on.pointerdown({ button: 0 });
+  card.hass = makeHass();
+  assert.equal(renders, 0, "no rewrite under the pointer");
+  rc.window.fire("pointerup", {});
+  await new Promise((r) => setTimeout(r, 5));
+  assert.equal(renders, 1);
+  assert.equal(card._pressing, false);
+  // Detached mid-press: the next update renders.
+  on.pointerdown({ button: 0 });
+  card.disconnectedCallback();
+  card.hass = makeHass();
+  assert.equal(renders, 2);
+  // The focus goes back to the tile after a rewrite for the keyboard only.
+  delete card._render;
+  const id = card._items[0].id;
+  let focused = 0;
+  tiles = [{ ...fakeTile(), dataset: { id }, focus: () => focused++ }];
+  card.shadowRoot.activeElement = { dataset: { id } };
+  on.pointerdown({ button: 0 });
+  card._pressing = false;
+  card._sig = null;
+  card._render();
+  assert.equal(focused, 0, "pointer: no focus put back");
+  on.keydown({ key: " " });
+  card._sig = null;
+  card._render();
+  assert.equal(focused, 1, "keyboard: focus kept");
+});
+
 test("an update during a press does not re-render, so the tap toggles instead of opening more-info", async () => {
   const t = pressSetup();
   const { card, tile, calls } = t;
@@ -598,6 +640,41 @@ test("a click elsewhere brings a zoomed mini card back to its compact view, not 
   card._onUnzoom(clickVia({ localName: "div" }));
   assert.equal(card._zoomed, false);
   assert.match(card.shadowRoot.innerHTML, /class="mini"/);
+});
+
+test("folding: a tap elsewhere (pointer), not a drag that ends outside; leaving the page goes back too", () => {
+  const card = new cards["room-sensors-mini-card"]();
+  card.setConfig({ area: "kitchen" });
+  card.hass = makeHass();
+  card.connectedCallback();
+  card._zoomed = true;
+  // Pressed in the card and released outside of it (a slider dragged out): nothing folds.
+  card._unzoom.tap(clickVia(card));
+  assert.equal(card._zoomed, true);
+  // A tap on a spot that sends no click (iOS): the pointer alone folds it.
+  card._unzoom.tap(clickVia({ localName: "div" }));
+  assert.equal(card._zoomed, false);
+  // Left zoomed and back on the page: compact.
+  card._zoomed = true;
+  card.disconnectedCallback();
+  card.connectedCallback();
+  assert.equal(card._zoomed, false);
+  assert.match(card.shadowRoot.innerHTML, /class="mini"/);
+  card.disconnectedCallback();
+  // The Overview: a room left open comes back folded.
+  const overview = new cards["room-overview-card"]();
+  overview._config = { ...cards["room-overview-card"].defaults };
+  overview._render = () => {};
+  overview.connectedCallback();
+  overview._openArea = "kitchen";
+  overview._toggle = (aid) => {
+    overview._openArea = aid;
+  };
+  overview._outside.tap(clickVia({ localName: "div" }));
+  assert.equal(overview._openArea, null);
+  overview._openArea = "kitchen";
+  overview.disconnectedCallback();
+  assert.equal(overview._openArea, null);
 });
 
 test("a click elsewhere brings the Overview back to the active rooms", () => {
