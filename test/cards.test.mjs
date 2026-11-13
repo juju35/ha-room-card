@@ -709,9 +709,9 @@ test("each visual editor offers every option of its card", () => {
   const room = { area: "kitchen" };
   has("room-sensors-card", room, ["area", "title", "navigation_path", "columns", "only_alerts", "hide_when_clear", "presence", "blink", "entities", "language"]);
   has("room-sensors-mini-card", room, ["navigation_path", "columns", "hide_when_clear", "presence", "blink", "zoom", "entities", "language"]);
-  has("room-lights-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "entities", "language"]);
+  has("room-lights-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "show_scenes", "scenes", "entities", "language"]);
   has("room-switch-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_power", "all_off_button", "entities", "language"]);
-  has("room-lights-mini-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "entities", "language"]);
+  has("room-lights-mini-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "show_scenes", "scenes", "entities", "language"]);
   has("room-switch-mini-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_power", "all_off_button", "zoom", "entities", "language"]);
   has("room-environment-card", room, ["navigation_path", "columns", "only_alerts", "show_gauge", "thresholds", "entities", "language"]);
   has("room-environment-mini-card", room, ["navigation_path", "columns", "only_alerts", "show_gauge", "zoom", "thresholds", "entities", "language"]);
@@ -1009,4 +1009,91 @@ test("powers follow the card's language", () => {
   assert.equal(rc.rcWatts(1234, "fr"), "1,2 kW");
   assert.equal(rc.rcWatts(12345, "de"), "12 kW");
   assert.equal(rc.rcWatts(80.4, "fr"), "80 W");
+});
+
+// The Lights card's scenes: one scene of the area, a Hue scene of the Hue room named like the area (no area of its
+// own, dynamic), a Hue scene of another room and a scene of another area.
+const scenesHass = (calls = []) => {
+  const h = makeHass({ callService: (...a) => calls.push(a) });
+  const st = (entity_id, attributes) => ({ entity_id, state: "2026-01-01T00:00:00Z", attributes, last_changed: "2026-01-01T00:00:00Z" });
+  Object.assign(h.entities, {
+    "scene.kitchen_dinner": { area_id: "kitchen" },
+    "scene.kitchen_relax": { platform: "hue" },
+    "scene.office_focus": { platform: "hue" },
+    "scene.garden_party": { area_id: "garden" },
+  });
+  Object.assign(h.states, {
+    "scene.kitchen_dinner": st("scene.kitchen_dinner", { friendly_name: "Scene Dinner" }),
+    "scene.kitchen_relax": st("scene.kitchen_relax", { friendly_name: "Kitchen Relax", group_name: "Kitchen", is_dynamic: true, brightness: 60 }),
+    "scene.office_focus": st("scene.office_focus", { friendly_name: "Office Focus", group_name: "Office" }),
+    "scene.garden_party": st("scene.garden_party", { friendly_name: "Party" }),
+  });
+  return h;
+};
+
+test("the lights card: the room's scenes, Hue ones by their Hue room, in a section folded until its title is tapped", () => {
+  const card = new cards["room-lights-card"]();
+  card.setConfig({ area: "kitchen", language: "en" });
+  card.hass = scenesHass();
+  assert.deepEqual(
+    [...card._scenes()].map((x) => [x.id, x.name, x.dynamic]),
+    [
+      ["scene.kitchen_dinner", "Dinner", false],
+      ["scene.kitchen_relax", "Relax", true],
+    ],
+  );
+  const html = card.shadowRoot.innerHTML;
+  assert.match(html, /<button class="section-title" aria-expanded="false">.*Scenes<\/span><span class="count">2<\/span><ha-icon class="chev" icon="mdi:chevron-right">/s);
+  assert.doesNotMatch(html, /class="scene"/, "folded: no chip");
+  card._scenesOpen = true;
+  card._sig = null;
+  card._render();
+  const open = card.shadowRoot.innerHTML;
+  assert.match(open, /aria-expanded="true">.*icon="mdi:chevron-down"/s);
+  assert.match(open, /<button class="scene" data-scene="scene\.kitchen_dinner" title="Activate Dinner">/);
+  assert.match(open, /data-scene="scene\.kitchen_relax"/);
+  assert.doesNotMatch(open, /office_focus|garden_party/);
+});
+
+test("the lights card: a tap on a scene activates it, a dynamic Hue scene through hue.activate_scene", () => {
+  const calls = [];
+  const card = new cards["room-lights-card"]();
+  card.setConfig({ area: "kitchen", language: "en" });
+  card.hass = scenesHass(calls);
+  card._activateScene(null, "scene.kitchen_dinner");
+  card._activateScene(null, "scene.kitchen_relax");
+  assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
+    ["scene", "turn_on", { entity_id: "scene.kitchen_dinner" }],
+    ["hue", "activate_scene", { entity_id: "scene.kitchen_relax", dynamic: true }],
+  ]);
+});
+
+test("the lights card: show_scenes: false hides the scenes, `scenes` lists them, a click elsewhere folds them", () => {
+  const card = new cards["room-lights-card"]();
+  card.setConfig({ area: "kitchen", language: "en", show_scenes: false });
+  card.hass = scenesHass();
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /<button class="section-title"/);
+  card.setConfig({ area: "kitchen", language: "en", scenes: ["scene.garden_party", { entity: "scene.office_focus", name: "Work", icon: "mdi:briefcase" }, "scene.missing"] });
+  assert.deepEqual(
+    [...card._scenes()].map((x) => [x.id, x.name, x.icon]),
+    [
+      ["scene.garden_party", "Party", "mdi:palette-outline"],
+      ["scene.office_focus", "Work", "mdi:briefcase"],
+    ],
+  );
+  card._scenesOpen = true;
+  card._onScenesOutside({ composedPath: () => [] });
+  assert.equal(card._scenesOpen, false);
+  assert.match(card.shadowRoot.innerHTML, /aria-expanded="false"/);
+});
+
+test("the lights mini card: no scenes in the compact view, the section once zoomed in", () => {
+  const card = new cards["room-lights-mini-card"]();
+  card.setConfig({ area: "kitchen", language: "en" });
+  card.hass = scenesHass();
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /<button class="section-title"/);
+  card._zoomed = true;
+  card._sig = null;
+  card._render();
+  assert.match(card.shadowRoot.innerHTML, /<button class="section-title"/);
 });

@@ -26,6 +26,12 @@ const RL_I18N = {
     ed_include: "Lights to add",
     ed_include_helper: "From another room or without one",
     ed_exclude: "Lights to exclude",
+    scenes: "Scenes",
+    activate_scene: "Activate {name}",
+    ed_show_scenes: "Show the room's scenes",
+    ed_show_scenes_helper: "Scenes of the room (Philips Hue included), activated in one tap",
+    ed_scenes: "Scenes to show (YAML)",
+    ed_scenes_helper: "Replaces the room's scenes: scene IDs, or {entity, name, icon}",
   },
   fr: {
     title: "Lumières",
@@ -47,6 +53,12 @@ const RL_I18N = {
     ed_include: "Lumières à ajouter",
     ed_include_helper: "D'une autre pièce ou sans pièce",
     ed_exclude: "Lumières à exclure",
+    scenes: "Scènes",
+    activate_scene: "Activer {name}",
+    ed_show_scenes: "Afficher les scènes de la pièce",
+    ed_show_scenes_helper: "Les scènes de la pièce (Philips Hue comprises), activées d'un tap",
+    ed_scenes: "Scènes à afficher (YAML)",
+    ed_scenes_helper: "Remplace les scènes de la pièce : identifiants de scènes, ou {entity, name, icon}",
   },
   de: {
     title: "Lichter",
@@ -68,6 +80,12 @@ const RL_I18N = {
     ed_include: "Hinzuzufügende Lichter",
     ed_include_helper: "Aus einem anderen Raum oder ohne Raum",
     ed_exclude: "Auszuschließende Lichter",
+    scenes: "Szenen",
+    activate_scene: "{name} aktivieren",
+    ed_show_scenes: "Szenen des Raums anzeigen",
+    ed_show_scenes_helper: "Die Szenen des Raums (auch Philips Hue), mit einem Tippen aktiviert",
+    ed_scenes: "Anzuzeigende Szenen (YAML)",
+    ed_scenes_helper: "Ersetzt die Szenen des Raums: Szenen-IDs oder {entity, name, icon}",
   },
   es: {
     title: "Luces",
@@ -89,6 +107,12 @@ const RL_I18N = {
     ed_include: "Luces a añadir",
     ed_include_helper: "De otra habitación o sin habitación",
     ed_exclude: "Luces a excluir",
+    scenes: "Escenas",
+    activate_scene: "Activar {name}",
+    ed_show_scenes: "Mostrar las escenas de la habitación",
+    ed_show_scenes_helper: "Las escenas de la habitación (Philips Hue incluidas), activadas con un toque",
+    ed_scenes: "Escenas a mostrar (YAML)",
+    ed_scenes_helper: "Sustituye las escenas de la habitación: IDs de escena o {entity, name, icon}",
   },
   sr: {
     title: "Светла",
@@ -111,6 +135,12 @@ const RL_I18N = {
     ed_include: "Светла за додавање",
     ed_include_helper: "Из друге просторије или без ње",
     ed_exclude: "Изостави светла",
+    scenes: "Сцене",
+    activate_scene: "Активирај {name}",
+    ed_show_scenes: "Прикажи сцене просторије",
+    ed_show_scenes_helper: "Сцене просторије (укључујући Philips Hue), активиране једним додиром",
+    ed_scenes: "Сцене за приказ (YAML)",
+    ed_scenes_helper: "Замењује сцене просторије: ID-јеви сцена или {entity, name, icon}",
   },
   "sr-Latn": {
     title: "Svetla",
@@ -133,6 +163,12 @@ const RL_I18N = {
     ed_include: "Svetla za dodavanje",
     ed_include_helper: "Iz druge prostorije ili bez nje",
     ed_exclude: "Izostavi svetla",
+    scenes: "Scene",
+    activate_scene: "Aktiviraj {name}",
+    ed_show_scenes: "Prikaži scene prostorije",
+    ed_show_scenes_helper: "Scene prostorije (uključujući Philips Hue), aktivirane jednim dodirom",
+    ed_scenes: "Scene za prikaz (YAML)",
+    ed_scenes_helper: "Zamenjuje scene prostorije: ID-jevi scena ili {entity, name, icon}",
   },
   it: {
     title: "Luci",
@@ -154,6 +190,12 @@ const RL_I18N = {
     ed_include: "Luci da aggiungere",
     ed_include_helper: "Da un'altra stanza o senza stanza",
     ed_exclude: "Luci da escludere",
+    scenes: "Scene",
+    activate_scene: "Attiva {name}",
+    ed_show_scenes: "Mostra le scene della stanza",
+    ed_show_scenes_helper: "Le scene della stanza (comprese Philips Hue), attivate con un tocco",
+    ed_scenes: "Scene da mostrare (YAML)",
+    ed_scenes_helper: "Sostituisce le scene della stanza: ID delle scene o {entity, name, icon}",
   },
   nl: {
     title: "Lampen",
@@ -175,6 +217,12 @@ const RL_I18N = {
     ed_include: "Toe te voegen lampen",
     ed_include_helper: "Uit een andere ruimte of zonder ruimte",
     ed_exclude: "Uit te sluiten lampen",
+    scenes: "Scènes",
+    activate_scene: "{name} activeren",
+    ed_show_scenes: "Scènes van de ruimte tonen",
+    ed_show_scenes_helper: "De scènes van de ruimte (ook Philips Hue), met één tik geactiveerd",
+    ed_scenes: "Te tonen scènes (YAML)",
+    ed_scenes_helper: "Vervangt de scènes van de ruimte: scène-ID's of {entity, name, icon}",
   },
   pt: {
     title: "Luzes",
@@ -196,6 +244,12 @@ const RL_I18N = {
     ed_include: "Luzes a adicionar",
     ed_include_helper: "De outra divisão ou sem divisão",
     ed_exclude: "Luzes a excluir",
+    scenes: "Cenas",
+    activate_scene: "Ativar {name}",
+    ed_show_scenes: "Mostrar as cenas da divisão",
+    ed_show_scenes_helper: "As cenas da divisão (incluindo Philips Hue), ativadas com um toque",
+    ed_scenes: "Cenas a mostrar (YAML)",
+    ed_scenes_helper: "Substitui as cenas da divisão: IDs de cenas ou {entity, name, icon}",
   },
   pl: {
     title: "Światła",
@@ -217,6 +271,12 @@ const RL_I18N = {
     ed_include: "Światła do dodania",
     ed_include_helper: "Z innego pomieszczenia lub bez pomieszczenia",
     ed_exclude: "Światła do wykluczenia",
+    scenes: "Sceny",
+    activate_scene: "Aktywuj {name}",
+    ed_show_scenes: "Pokaż sceny pomieszczenia",
+    ed_show_scenes_helper: "Sceny pomieszczenia (także Philips Hue), aktywowane jednym dotknięciem",
+    ed_scenes: "Sceny do pokazania (YAML)",
+    ed_scenes_helper: "Zastępuje sceny pomieszczenia: identyfikatory scen lub {entity, name, icon}",
   },
   ro: {
     title: "Lumini",
@@ -238,6 +298,12 @@ const RL_I18N = {
     ed_include: "Lumini de adăugat",
     ed_include_helper: "Din altă cameră sau fără cameră",
     ed_exclude: "Lumini excluse",
+    scenes: "Scene",
+    activate_scene: "Activează {name}",
+    ed_show_scenes: "Afișează scenele camerei",
+    ed_show_scenes_helper: "Scenele camerei (inclusiv Philips Hue), activate cu o atingere",
+    ed_scenes: "Scene de afișat (YAML)",
+    ed_scenes_helper: "Înlocuiește scenele camerei: ID-uri de scene sau {entity, name, icon}",
   },
   da: {
     title: "Lys",
@@ -259,6 +325,12 @@ const RL_I18N = {
     ed_include: "Lys, der tilføjes",
     ed_include_helper: "Fra et andet rum eller uden rum",
     ed_exclude: "Lys, der udelades",
+    scenes: "Scener",
+    activate_scene: "Aktivér {name}",
+    ed_show_scenes: "Vis rummets scener",
+    ed_show_scenes_helper: "Rummets scener (også Philips Hue), aktiveret med ét tryk",
+    ed_scenes: "Scener, der vises (YAML)",
+    ed_scenes_helper: "Erstatter rummets scener: scene-id'er eller {entity, name, icon}",
   },
   sv: {
     title: "Lampor",
@@ -280,6 +352,12 @@ const RL_I18N = {
     ed_include: "Lampor att lägga till",
     ed_include_helper: "Från ett annat rum eller utan rum",
     ed_exclude: "Lampor att utesluta",
+    scenes: "Scener",
+    activate_scene: "Aktivera {name}",
+    ed_show_scenes: "Visa rummets scener",
+    ed_show_scenes_helper: "Rummets scener (även Philips Hue), aktiveras med ett tryck",
+    ed_scenes: "Scener att visa (YAML)",
+    ed_scenes_helper: "Ersätter rummets scener: scen-ID:n eller {entity, name, icon}",
   },
   bg: {
     title: "Светлини",
@@ -301,6 +379,12 @@ const RL_I18N = {
     ed_include: "Лампи за добавяне",
     ed_include_helper: "От друга стая или без стая",
     ed_exclude: "Лампи за пропускане",
+    scenes: "Сцени",
+    activate_scene: "Активиране на {name}",
+    ed_show_scenes: "Показвай сцените на стаята",
+    ed_show_scenes_helper: "Сцените на стаята (включително Philips Hue), активирани с едно докосване",
+    ed_scenes: "Сцени за показване (YAML)",
+    ed_scenes_helper: "Заменя сцените на стаята: ID на сцени или {entity, name, icon}",
   },
   ru: {
     title: "Освещение",
@@ -322,6 +406,12 @@ const RL_I18N = {
     ed_include: "Добавить светильники",
     ed_include_helper: "Из другой комнаты или без комнаты",
     ed_exclude: "Исключить светильники",
+    scenes: "Сцены",
+    activate_scene: "Активировать {name}",
+    ed_show_scenes: "Показывать сцены комнаты",
+    ed_show_scenes_helper: "Сцены комнаты (включая Philips Hue), запускаются одним нажатием",
+    ed_scenes: "Показываемые сцены (YAML)",
+    ed_scenes_helper: "Заменяет сцены комнаты: ID сцен или {entity, name, icon}",
   },
   uk: {
     title: "Освітлення",
@@ -343,6 +433,12 @@ const RL_I18N = {
     ed_include: "Додати світильники",
     ed_include_helper: "З іншої кімнати або без кімнати",
     ed_exclude: "Виключити світильники",
+    scenes: "Сцени",
+    activate_scene: "Активувати {name}",
+    ed_show_scenes: "Показувати сцени кімнати",
+    ed_show_scenes_helper: "Сцени кімнати (зокрема Philips Hue), запускаються одним натисканням",
+    ed_scenes: "Сцени для показу (YAML)",
+    ed_scenes_helper: "Замінює сцени кімнати: ID сцен або {entity, name, icon}",
   },
   hu: {
     title: "Világítás",
@@ -364,6 +460,12 @@ const RL_I18N = {
     ed_include: "Hozzáadandó lámpák",
     ed_include_helper: "Másik helyiségből vagy helyiség nélkül",
     ed_exclude: "Kihagyott lámpák",
+    scenes: "Jelenetek",
+    activate_scene: "{name} aktiválása",
+    ed_show_scenes: "A helyiség jeleneteinek megjelenítése",
+    ed_show_scenes_helper: "A helyiség jelenetei (a Philips Hue is), egy koppintással aktiválva",
+    ed_scenes: "Megjelenítendő jelenetek (YAML)",
+    ed_scenes_helper: "A helyiség jeleneteit helyettesíti: jelenetazonosítók vagy {entity, name, icon}",
   },
   sk: {
     title: "Svetlá",
@@ -385,6 +487,12 @@ const RL_I18N = {
     ed_include: "Svetlá na pridanie",
     ed_include_helper: "Z inej miestnosti alebo bez miestnosti",
     ed_exclude: "Vynechané svetlá",
+    scenes: "Scény",
+    activate_scene: "Aktivovať {name}",
+    ed_show_scenes: "Zobraziť scény miestnosti",
+    ed_show_scenes_helper: "Scény miestnosti (aj Philips Hue), aktivované jedným ťuknutím",
+    ed_scenes: "Zobrazené scény (YAML)",
+    ed_scenes_helper: "Nahrádza scény miestnosti: ID scén alebo {entity, name, icon}",
   },
   cs: {
     title: "Světla",
@@ -406,6 +514,12 @@ const RL_I18N = {
     ed_include: "Světla k přidání",
     ed_include_helper: "Z jiné místnosti nebo bez místnosti",
     ed_exclude: "Vynechaná světla",
+    scenes: "Scény",
+    activate_scene: "Aktivovat {name}",
+    ed_show_scenes: "Zobrazit scény místnosti",
+    ed_show_scenes_helper: "Scény místnosti (i Philips Hue), aktivované jedním klepnutím",
+    ed_scenes: "Zobrazené scény (YAML)",
+    ed_scenes_helper: "Nahrazuje scény místnosti: ID scén nebo {entity, name, icon}",
   },
   sl: {
     title: "Luči",
@@ -427,6 +541,12 @@ const RL_I18N = {
     ed_include: "Luči za dodajanje",
     ed_include_helper: "Iz drugega prostora ali brez prostora",
     ed_exclude: "Izpuščene luči",
+    scenes: "Scene",
+    activate_scene: "Aktiviraj {name}",
+    ed_show_scenes: "Prikaži scene prostora",
+    ed_show_scenes_helper: "Scene prostora (tudi Philips Hue), aktivirane z enim dotikom",
+    ed_scenes: "Prikazane scene (YAML)",
+    ed_scenes_helper: "Nadomesti scene prostora: ID-ji scen ali {entity, name, icon}",
   },
   lv: {
     title: "Gaismas",
@@ -448,6 +568,12 @@ const RL_I18N = {
     ed_include: "Pievienojamie gaismekļi",
     ed_include_helper: "No citas telpas vai bez telpas",
     ed_exclude: "Izslēdzamie gaismekļi",
+    scenes: "Ainas",
+    activate_scene: "Aktivizēt {name}",
+    ed_show_scenes: "Rādīt telpas ainas",
+    ed_show_scenes_helper: "Telpas ainas (arī Philips Hue), aktivizējamas ar vienu pieskārienu",
+    ed_scenes: "Rādāmās ainas (YAML)",
+    ed_scenes_helper: "Aizstāj telpas ainas: ainu ID vai {entity, name, icon}",
   },
   el: {
     title: "Φώτα",
@@ -469,6 +595,12 @@ const RL_I18N = {
     ed_include: "Φώτα προς προσθήκη",
     ed_include_helper: "Από άλλο δωμάτιο ή χωρίς δωμάτιο",
     ed_exclude: "Φώτα προς εξαίρεση",
+    scenes: "Σκηνές",
+    activate_scene: "Ενεργοποίηση {name}",
+    ed_show_scenes: "Εμφάνιση των σκηνών του δωματίου",
+    ed_show_scenes_helper: "Οι σκηνές του δωματίου (και Philips Hue), ενεργοποιούνται με ένα πάτημα",
+    ed_scenes: "Σκηνές προς εμφάνιση (YAML)",
+    ed_scenes_helper: "Αντικαθιστά τις σκηνές του δωματίου: ID σκηνών ή {entity, name, icon}",
   },
 };
 
@@ -477,6 +609,9 @@ const RL_PREFIX = /^(lumi[eè]re|lampe|light|lamp)\s+/i;
 const RL_SUFFIX = /$^/;
 // Keyboard dimming: the light is called this long after the last ←/→ step.
 const RL_KEY_MS = 300;
+
+// Scenes: "Scène Lecture" → "Lecture"; a Hue scene also loses its Hue room's name ("Séjour Lecture" → "Lecture").
+const RL_SCENE_PREFIX = /^(sc[eè]ne|scene)\s+/i;
 
 // Brightness can be set unless the light only supports on/off.
 const rlDimmable = (st) =>
@@ -496,11 +631,128 @@ class RoomLightsCard extends RcToggleCard {
     hide_when_off: false,
     show_brightness: true,
     all_off_button: true,
+    show_scenes: true,
     exclude: [],
   };
 
+  constructor() {
+    super();
+    // A click anywhere else folds the scenes back.
+    this._onScenesOutside = (ev) => {
+      if (this._scenesOpen && rcOutside(this, ev)) this._foldScenes();
+    };
+  }
+
+  connectedCallback() {
+    super.connectedCallback?.();
+    this._scenesWatch ??= watchOutside(this, this._onScenesOutside);
+    this._scenesWatch.on();
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback?.();
+    this._scenesWatch?.off();
+    // Left (another dashboard view, a conditional card hidden): folded again.
+    this._scenesOpen = false;
+    this._sig = null;
+  }
+
+  _foldScenes() {
+    this._scenesOpen = false;
+    this._sig = null;
+    this._render();
+  }
+
   _candidate(id) {
     return rcMatchLight(this._hass, id);
+  }
+
+  // The room's scenes: `scenes` when given (IDs or {entity, name, icon}), else the scene entities of the area, and
+  // the Philips Hue scenes of the Hue room named like it (they often have no area of their own). None with
+  // `show_scenes: false`. Sorted by name.
+  _scenes() {
+    const h = this._hass;
+    const c = this._config;
+    if (c.show_scenes === false) return [];
+    const areaName = this._areaName();
+    const list = c.scenes?.length
+      ? c.scenes.map((e) => (typeof e === "string" ? { entity: e } : e)).filter((e) => e?.entity && h.states[e.entity])
+      : c.area
+        ? Object.keys(h.entities || {})
+            .filter((id) => id.startsWith("scene.") && h.states[id] && !h.entities[id].hidden && !(c.exclude || []).includes(id))
+            .filter((id) => {
+              if (this._areaOf(id) === c.area) return true;
+              const group = h.states[id].attributes.group_name;
+              return !this._areaOf(id) && h.entities[id].platform === "hue" && !!areaName && String(group || "").toLowerCase() === areaName.toLowerCase();
+            })
+            .map((entity) => ({ entity }))
+        : [];
+    return list
+      .map((e) => {
+        const st = h.states[e.entity];
+        const group = st.attributes.group_name;
+        let name = e.name ?? rcCleanName(st.attributes.friendly_name || e.entity, areaName, RL_SCENE_PREFIX, /$^/);
+        if (!e.name && group && group !== areaName) name = rcCleanName(name, group, /$^/, /$^/);
+        return {
+          id: e.entity,
+          name,
+          icon: e.icon ?? h.entities?.[e.entity]?.icon ?? st.attributes.icon ?? "mdi:palette-outline",
+          dynamic: h.entities?.[e.entity]?.platform === "hue" && st.attributes.is_dynamic === true,
+          unavailable: rcUnavailable(st),
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  // The scenes and whether their section is open count as something shown: a change redraws the card.
+  _changed(parts) {
+    this._sceneItems = this._scenes();
+    return super._changed([...parts, this._scenesOpen === true, this._sceneItems.map((x) => [x.id, x.name, x.icon, x.dynamic, x.unavailable])]);
+  }
+
+  // Under the lights: a "Scenes" section, folded (chevron right) until its title is tapped (chevron down), then one
+  // chip per scene. A tap activates it: scene.turn_on, or hue.activate_scene for a dynamic Hue scene (its colours
+  // keep moving).
+  _afterGrid() {
+    const scenes = this._sceneItems || [];
+    if (!scenes.length) return "";
+    const open = this._scenesOpen === true;
+    const chips = open
+      ? `<div class="scenes">${scenes
+          .map(
+            (x) =>
+              `<button class="scene${x.unavailable ? " na" : ""}" data-scene="${rcEsc(x.id)}" title="${rcEsc(this._t("activate_scene", { name: x.name }))}"${
+                x.unavailable ? " disabled" : ""
+              }><ha-icon icon="${rcEsc(x.icon)}"></ha-icon><span>${rcEsc(x.name)}</span></button>`,
+          )
+          .join("")}</div>`
+      : "";
+    return `<div class="section">
+        <button class="section-title" aria-expanded="${open}"><ha-icon icon="mdi:palette-outline"></ha-icon><span>${rcEsc(
+          this._t("scenes"),
+        )}</span><span class="count">${scenes.length}</span><ha-icon class="chev" icon="${open ? "mdi:chevron-down" : "mdi:chevron-right"}"></ha-icon></button>
+        ${chips}
+      </div>`;
+  }
+
+  _bindAfter(root) {
+    root.querySelector(".section-title")?.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      this._scenesOpen = !this._scenesOpen;
+      this._sig = null;
+      this._render();
+      // From the keyboard (Enter / Space: no click count), the new title keeps the focus.
+      if (ev.detail === 0) this.shadowRoot.querySelector(".section-title")?.focus({ preventScroll: true });
+    });
+    for (const el of root.querySelectorAll(".scene")) el.addEventListener("click", (ev) => this._activateScene(ev, el.dataset.scene));
+  }
+
+  _activateScene(ev, id) {
+    ev?.stopPropagation?.();
+    const x = (this._sceneItems || []).find((i) => i.id === id);
+    if (!x || x.unavailable) return;
+    if (x.dynamic) rcCall(this._hass, "hue", "activate_scene", { entity_id: id, dynamic: true });
+    else rcCall(this._hass, "scene", "turn_on", { entity_id: id });
   }
 
   _collect() {
@@ -613,19 +865,38 @@ class RoomLightsCard extends RcToggleCard {
            background: color-mix(in srgb, var(--t) 14%, transparent); transition: width .2s; }
     .tile.dragging .bar { transition: none; }
     @media (prefers-reduced-motion: reduce) { .bar { transition: none; } }
+    .section { margin-top: 8px; }
+    .section-title { all: unset; box-sizing: border-box; width: 100%; display: flex; align-items: center; gap: 6px; cursor: pointer;
+                     font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; color: var(--secondary-text-color);
+                     padding: 4px 2px; border-radius: 6px; }
+    .section-title:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+    .section-title ha-icon { --mdc-icon-size: 16px; flex: none; }
+    .section-title span:first-of-type { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .section-title .count { font-size: 11px; font-weight: 500; padding: 0 6px; border-radius: 999px;
+                            background: color-mix(in srgb, var(--rc-light) 14%, transparent); color: var(--rc-light); }
+    .scenes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .scene { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
+             padding: 4px 10px 4px 6px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--primary-text-color);
+             background: color-mix(in srgb, var(--rc-light) 9%, var(--secondary-background-color, transparent));
+             border: 1px solid color-mix(in srgb, var(--rc-light) 22%, transparent); }
+    .scene span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .scene ha-icon { --mdc-icon-size: 16px; color: var(--rc-light); flex: none; }
+    .scene:hover { background: color-mix(in srgb, var(--rc-light) 16%, var(--secondary-background-color, transparent)); }
+    .scene:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+    .scene.na { opacity: .6; cursor: default; }
   `;
 }
 
 // ── Editor ───────────────────────────────────────────────────────────────────
 const RoomLightsCardEditor = rcEditor({
   card: RoomLightsCard,
-  helpers: ["title", "navigation_path", "only_on", "hide_when_off", "show_brightness", "all_off_button", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "only_on", "hide_when_off", "show_brightness", "all_off_button", "show_scenes", "scenes", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
-    ...rcBooleans("show_title", "only_on", "hide_when_off", "show_brightness", "all_off_button"),
+    ...rcBooleans("show_title", "only_on", "hide_when_off", "show_brightness", "all_off_button", "show_scenes"),
     ...rcIncludeField(RoomLightsCard, hass, config),
     ...rcExcludeField(RoomLightsCard, hass, config),
-    ...rcAdvanced(RL_I18N, lang, "entities", "language"),
+    ...rcAdvanced(RL_I18N, lang, "entities", "scenes", "language"),
   ],
 });
 
@@ -639,19 +910,19 @@ rcRegister(
 // ── Mini card ────────────────────────────────────────────────────────────────
 // The room on two lines: the badge, title and status (*2/4 on*, with the button turning every light off), then a
 // pill tinted with its colour for each light that is on, the icon alone for the others. The zoom button switches to
-// the full Lights card (tap to toggle, drag to dim) and back. `columns` and `show_brightness` only shape the
-// zoomed-in view.
+// the full Lights card (tap to toggle, drag to dim, the scenes) and back. `columns`, `show_brightness` and the scenes
+// only shape the zoomed-in view.
 class RoomLightsMiniCard extends rcToggleMini(RoomLightsCard, "room-lights-mini-card", ".r.on { --t: var(--rc-light); }") {}
 
 const RoomLightsMiniCardEditor = rcEditor({
   card: RoomLightsMiniCard,
-  helpers: ["title", "navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "show_scenes", "scenes", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
-    ...rcBooleans("show_title", "only_on", "hide_when_off", "all_off_button", "zoom", "show_brightness"),
+    ...rcBooleans("show_title", "only_on", "hide_when_off", "all_off_button", "zoom", "show_brightness", "show_scenes"),
     ...rcIncludeField(RoomLightsMiniCard, hass, config),
     ...rcExcludeField(RoomLightsMiniCard, hass, config),
-    ...rcAdvanced(RL_I18N, lang, "entities", "language"),
+    ...rcAdvanced(RL_I18N, lang, "entities", "scenes", "language"),
   ],
 });
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.24.0 - 2026-11-13
+
+### Features
+- **Lights card scenes**: the scenes of the room show under the lights, in a *Scenes* section folded until its title is tapped and folded back by a click anywhere else (or when the card leaves the page). One chip per scene, a tap activates it (`scene.turn_on`).
+- **Philips Hue**: Hue scenes with no area of their own are found by their Hue room (`group_name`) when it has the area's name, their names lose the room's name, and a dynamic scene starts with its colours moving (`hue.activate_scene` with `dynamic: true`).
+- `show_scenes: false` hides the scenes, `scenes` lists them by hand (scene IDs, or `{entity, name, icon}`), both in the visual editor; the mini card shows them once zoomed in.
+- The new texts in the 22 languages.
+- README: a *Supported integrations* section (Philips Hue, IKEA TRÅDFRI).
+
 ## 1.23.1 - 2026-11-13
 
 ### Fixes
