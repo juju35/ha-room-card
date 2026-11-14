@@ -1135,3 +1135,19 @@ test("layout: tiles enlarges the tiles of the lights and plugs cards and counts 
     assert.ok(card.getCardSize() >= compact.getCardSize(), tag);
   }
 });
+
+test("the editor shows included entities written with a name as their entity, and keeps their name (#77)", () => {
+  const editor = new (rc.customElements.get("room-lights-card-editor"))();
+  editor.appendChild = () => {};
+  const config = { area: "kitchen", include: [{ entity: "switch.coffee_plug", name: "Cuisine", icon: "mdi:ceiling-light" }] };
+  editor.setConfig(config);
+  editor.hass = makeHass();
+  assert.deepEqual([...editor._form.data.include], ["switch.coffee_plug"]);
+  const field = [...editor._form.schema].flatMap((f) => (f.schema ? [...f.schema] : [f])).find((s) => s.name === "include");
+  assert.ok(field && [...field.selector.entity.include_entities].includes("switch.coffee_plug"));
+  const sent = [];
+  editor.dispatchEvent = (ev) => sent.push(ev.detail.config);
+  const fire = (value) => editor._form.listeners["value-changed"]({ detail: { value } });
+  fire({ ...editor._form.data, include: ["switch.coffee_plug", "switch.relay"] });
+  assert.deepEqual(JSON.parse(JSON.stringify(sent.at(-1).include)), [{ entity: "switch.coffee_plug", name: "Cuisine", icon: "mdi:ceiling-light" }, "switch.relay"]);
+});

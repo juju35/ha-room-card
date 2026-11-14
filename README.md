@@ -212,7 +212,7 @@ The Sensors, Lights, Plugs and Environment cards share these options; each card 
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `area` | ✅* | — | Area ID; its entities are found automatically |
-| `include` | ✅* | — | Entities added to the ones found in the area: from another room, without a room, or not recognised (a switch that is not named as a plug, say); each item is an entity ID or `{entity, name, icon}`. The visual editor offers the entities of the card's domains that it does not show yet |
+| `include` | ✅* | — | Entities added to the ones found in the area: from another room, without a room, or not recognised (a switch that is not named as a plug, say); each item is an entity ID or `{entity, name, icon}`. The visual editor offers the entities of the card's domains that it does not show yet; an item with a `name` or an `icon` keeps them when the list is changed there |
 | `entities` | ✅* | — | Explicit list, replaces the discovery; each item is an entity ID or `{entity, name, icon}` (plus `power` on the Plugs card) |
 | `title` | ❌ | Area name | Card title |
 | `show_title` | ❌ | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |

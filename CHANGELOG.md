@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.25.1 - 2026-11-14
+
+### Fixes
+- Visual editor: an `include` item written with a name or an icon (`- entity: switch.kitchen` / `name: Kitchen`) no longer breaks the editor ([#77](https://github.com/juju35/ha-room-card/issues/77), reported by @mielikki33). It shows as its entity in the picker, and keeps its name and icon when entities are added or removed there.
+
 ## 1.25.0 - 2026-11-14
 
 ### Features

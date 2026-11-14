@@ -2137,6 +2137,13 @@ const rcExcludeField = (card, hass, config) => {
 // (list defaults such as `exclude: []` are not shown in the form: an empty list is never written anyway).
 // `autos` maps an option to its default worked out from the config (`(hass, config) => value`): shown in the form
 // while unset, and kept out of the YAML when left at it.
+// Entity lists the form edits with an entity picker (ids only): an item written `{ entity, name, icon }` in YAML shows as its entity,
+// and gets its name and icon back when the form changes the list (ha-room-card#77).
+const RC_ENTITY_LISTS = ["include"];
+const rcListIds = (list) => (Array.isArray(list) ? list.map((e) => (typeof e === "string" ? e : e?.entity)).filter(Boolean) : list);
+const rcListKeep = (ids, before) =>
+  Array.isArray(ids) ? ids.map((id) => (Array.isArray(before) ? before.find((e) => typeof e === "object" && e?.entity === id) : undefined) ?? id) : ids;
+
 const rcEditor = ({ card, helpers, schema, autos = {} }) => {
   const i18n = card.i18n;
   const defaults = { show_title: true, ...Object.fromEntries(Object.entries(card.defaults).filter(([, v]) => !Array.isArray(v))) };
@@ -2163,6 +2170,7 @@ const rcEditor = ({ card, helpers, schema, autos = {} }) => {
           helpers.includes(s.name) ? rcT(i18n, this._lang, `ed_${s.name}_helper`) : undefined;
         this._form.addEventListener("value-changed", (ev) => {
           const config = { ...ev.detail.value };
+          for (const k of RC_ENTITY_LISTS) if (k in config) config[k] = rcListKeep(config[k], this._config[k]);
           for (const k of Object.keys(config)) {
             const v = config[k];
             if (v === "" || v == null || (Array.isArray(v) && !v.length) || defaults[k] === v) delete config[k];
@@ -2182,6 +2190,7 @@ const rcEditor = ({ card, helpers, schema, autos = {} }) => {
       const h = this._hass;
       this._form.data = rcMemo(memo, "data", [this._config, h.areas], () => {
         const data = { ...defaults, ...this._config };
+        for (const k of RC_ENTITY_LISTS) if (k in data) data[k] = rcListIds(data[k]);
         for (const [k, auto] of Object.entries(autos)) data[k] ??= auto(h, this._config);
         return data;
       });
