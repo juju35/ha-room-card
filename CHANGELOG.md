@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.25.0 - 2026-11-14
+
+### Features
+- **Tiles layout** (`layout: tiles`) on the Lights, Plugs and Environment cards, and the zoomed-in view of their mini cards: one large tile per entity, the size of Home Assistant's Tile card (56 px high, 40 px icon, the name over the state), easier to tap on a phone; `columns` still sets how many per row. Tap, drag and hold work as in the compact layout. In the visual editor.
+- **Environment card in tiles**: one tile per sensor rather than one mean per kind, named after the sensor, its background coloured by the reading — temperatures from dark blue (under 16 °C) through light blue, green (19–23 °C) and yellow to red (above 26 °C) by default, °F sensors converted.
+- `color_thresholds` (YAML only) sets those colours: steps `{below, color}` per kind (temperature, humidity, CO₂…) or a bare list for the temperature, in the sensor's unit; also in the compact layout; `false` turns them off.
+- The new texts in the 22 languages; README examples and tiles screenshots (asked in juju35/ha-public-transport#4).
+
 ## 1.24.2 - 2026-11-14
 
 ### Fixes

@@ -68,8 +68,9 @@ const pageHtml = (theme, width) => `<!doctype html><html><head><meta charset="ut
          font-family: Roboto, "Segoe UI", Helvetica, Arial, sans-serif; width: ${width}px; }
 </style></head><body><div id="root"></div></body></html>`;
 
-// Card widths: 460px for the full cards, the overviews and a zoomed-in mini card, 380px for the mini cards.
-const widthFor = (tag, s) => (tag.endsWith("-mini-card") && !s.zoom ? 380 : 460);
+// Card widths: 460px for the full cards, the overviews and a zoomed-in mini card, 380px for the mini cards; a shot's
+// own `width` wins (the tiles layout, shown at a phone's width).
+const widthFor = (tag, s) => s.width ?? (tag.endsWith("-mini-card") && !s.zoom ? 380 : 460);
 
 // A light shot and its dark twin, both in English: pair("on", { on: X }).
 export const pair = (file, extra = {}) => [
@@ -163,3 +164,15 @@ export const shoot = async ({ prefix, tag, shots, setup, icons = [], ws = "" }) 
   }
   await browser.close();
 };
+
+// The tiles layout (`layout: tiles`) of a card at a phone's width, light and dark: the card's own `setup` with the
+// layout added; `extra` goes into the shot.
+export const shootTiles = ({ setup, ...opts }, extra = {}) =>
+  shoot({
+    ...opts,
+    shots: pair("tiles", { width: 380, ...extra }),
+    setup: (s, lang) => {
+      const out = setup(s, lang);
+      return { ...out, config: { ...out.config, layout: "tiles" } };
+    },
+  });

@@ -627,6 +627,7 @@ class RoomLightsCard extends RcToggleCard {
   static emptyKey = "no_lights";
   static defaults = {
     columns: 2,
+    layout: "compact",
     only_on: false,
     hide_when_off: false,
     show_brightness: true,
@@ -890,9 +891,10 @@ class RoomLightsCard extends RcToggleCard {
 // ── Editor ───────────────────────────────────────────────────────────────────
 const RoomLightsCardEditor = rcEditor({
   card: RoomLightsCard,
-  helpers: ["title", "navigation_path", "only_on", "hide_when_off", "show_brightness", "all_off_button", "show_scenes", "scenes", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "layout", "only_on", "hide_when_off", "show_brightness", "all_off_button", "show_scenes", "scenes", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
+    rcLayoutField(RL_I18N, lang),
     ...rcBooleans("show_title", "only_on", "hide_when_off", "show_brightness", "all_off_button", "show_scenes"),
     ...rcIncludeField(RoomLightsCard, hass, config),
     ...rcExcludeField(RoomLightsCard, hass, config),
@@ -916,9 +918,10 @@ class RoomLightsMiniCard extends rcToggleMini(RoomLightsCard, "room-lights-mini-
 
 const RoomLightsMiniCardEditor = rcEditor({
   card: RoomLightsMiniCard,
-  helpers: ["title", "navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "show_scenes", "scenes", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "layout", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "show_scenes", "scenes", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
+    rcLayoutField(RL_I18N, lang),
     ...rcBooleans("show_title", "only_on", "hide_when_off", "all_off_button", "zoom", "show_brightness", "show_scenes"),
     ...rcIncludeField(RoomLightsMiniCard, hass, config),
     ...rcExcludeField(RoomLightsMiniCard, hass, config),

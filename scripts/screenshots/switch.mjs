@@ -1,6 +1,6 @@
 // Renders the plugs card with a mock living room and saves the README screenshots.
 // Usage: npm install && npm run build && node scripts/screenshots/switch.mjs
-import { pair, shoot } from "./harness.mjs";
+import { pair, shoot, shootTiles } from "./harness.mjs";
 
 // Four smart plugs, each with a power sensor on the same device.
 const PLUGS = [
@@ -32,6 +32,8 @@ const setup = (s, lang) => {
 };
 
 await shoot({ prefix: "switch", tag: "room-switch-card", icons, shots, setup });
+// The tiles layout at a phone's width: one large tile per plug, two columns.
+await shootTiles({ prefix: "switch", tag: "room-switch-card", icons, setup }, { on: DAY });
 // The mini card, and the same card zoomed in (its zoom button clicked).
 await shoot({
   prefix: "switch-mini",

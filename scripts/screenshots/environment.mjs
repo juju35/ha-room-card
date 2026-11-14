@@ -66,3 +66,37 @@ await shoot({
     return { hass, config: { ...config, exclude: ["sensor.living_room_pm25"] }, open: s.zoom && ".zoom" };
   },
 });
+
+// The tiles layout at a phone's width: one tile per temperature probe of the house, listed with `entities`, each
+// tinted by the default colour thresholds (cold blue to hot red).
+const PROBES = [
+  ["sensor.garage_temperature", "Garage", 13.2],
+  ["sensor.bedroom_temperature", "Bedroom", 17.6],
+  ["sensor.living_room_temperature", "Living room", 21.4],
+  ["sensor.office_temperature", "Office", 20.2],
+  ["sensor.kitchen_temperature", "Kitchen", 24.3],
+  ["sensor.attic_temperature", "Attic", 27.8],
+];
+await shoot({
+  prefix: "environment",
+  tag: "room-environment-card",
+  shots: pair("tiles", { width: 380 }),
+  ws,
+  setup: (_s, lang) => {
+    const states = {};
+    const entities = {};
+    for (const [entity_id, name, value] of PROBES) {
+      states[entity_id] = {
+        entity_id,
+        state: String(value),
+        last_changed: new Date().toISOString(),
+        attributes: { device_class: "temperature", unit_of_measurement: "°C", friendly_name: name },
+      };
+      entities[entity_id] = { entity_id };
+    }
+    return {
+      hass: { states, entities, devices: {}, areas: {}, language: lang, locale: { language: lang } },
+      config: { title: "Temperatures", layout: "tiles", show_gauge: false, entities: PROBES.map(([id]) => id) },
+    };
+  },
+});

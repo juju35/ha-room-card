@@ -280,6 +280,10 @@ const RC_I18N = {
     ed_show_title: "Show title",
     ed_title_helper: "Leave empty for the area name",
     ed_columns: "Columns",
+    ed_layout: "Layout",
+    ed_layout_helper: "Tiles: one large tile per entity, like the Tile card, easier to tap on a phone",
+    ed_layout_compact: "Compact",
+    ed_layout_tiles: "Tiles",
     ed_advanced: "Advanced",
     ed_language: "Language",
     ed_language_helper: "Empty: the Home Assistant language",
@@ -325,6 +329,10 @@ const RC_I18N = {
     ed_show_title: "Afficher le titre",
     ed_title_helper: "Laisser vide pour le nom de la pièce",
     ed_columns: "Colonnes",
+    ed_layout: "Disposition",
+    ed_layout_helper: "Tuiles : une grande tuile par entité, comme la carte Tuile, plus facile à toucher sur téléphone",
+    ed_layout_compact: "Compacte",
+    ed_layout_tiles: "Tuiles",
     ed_advanced: "Avancé",
     ed_language: "Langue",
     ed_language_helper: "Vide : la langue de Home Assistant",
@@ -370,6 +378,10 @@ const RC_I18N = {
     ed_show_title: "Titel anzeigen",
     ed_title_helper: "Leer lassen für den Namen des Bereichs",
     ed_columns: "Spalten",
+    ed_layout: "Layout",
+    ed_layout_helper: "Kacheln: eine große Kachel pro Entität wie die Kachel-Karte, auf dem Handy leichter anzutippen",
+    ed_layout_compact: "Kompakt",
+    ed_layout_tiles: "Kacheln",
     ed_advanced: "Erweitert",
     ed_language: "Sprache",
     ed_language_helper: "Leer: die Sprache von Home Assistant",
@@ -415,6 +427,10 @@ const RC_I18N = {
     ed_show_title: "Mostrar el título",
     ed_title_helper: "Déjalo vacío para usar el nombre del área",
     ed_columns: "Columnas",
+    ed_layout: "Diseño",
+    ed_layout_helper: "Mosaicos: un mosaico grande por entidad, como la tarjeta Mosaico, más fácil de tocar en el móvil",
+    ed_layout_compact: "Compacto",
+    ed_layout_tiles: "Mosaicos",
     ed_advanced: "Avanzado",
     ed_language: "Idioma",
     ed_language_helper: "Vacío: el idioma de Home Assistant",
@@ -461,6 +477,10 @@ const RC_I18N = {
     ed_show_title: "Прикажи наслов",
     ed_title_helper: "Остави празно за назив просторије",
     ed_columns: "Колоне",
+    ed_layout: "Распоред",
+    ed_layout_helper: "Плочице: једна велика плочица по ентитету, као картица Плочица, лакше за додир на телефону",
+    ed_layout_compact: "Збијено",
+    ed_layout_tiles: "Плочице",
     ed_advanced: "Напредно",
     ed_language: "Језик",
     ed_language_helper: "Празно: језик Home Assistant-а",
@@ -507,6 +527,10 @@ const RC_I18N = {
     ed_show_title: "Prikaži naslov",
     ed_title_helper: "Ostavi prazno za naziv prostorije",
     ed_columns: "Kolone",
+    ed_layout: "Raspored",
+    ed_layout_helper: "Pločice: jedna velika pločica po entitetu, kao kartica Pločica, lakše za dodir na telefonu",
+    ed_layout_compact: "Zbijeno",
+    ed_layout_tiles: "Pločice",
     ed_advanced: "Napredno",
     ed_language: "Jezik",
     ed_language_helper: "Prazno: jezik Home Assistant-a",
@@ -552,6 +576,10 @@ const RC_I18N = {
     ed_show_title: "Mostra il titolo",
     ed_title_helper: "Lascia vuoto per usare il nome dell'area",
     ed_columns: "Colonne",
+    ed_layout: "Layout",
+    ed_layout_helper: "Riquadri: un riquadro grande per entità, come la scheda Riquadro, più facile da toccare sul telefono",
+    ed_layout_compact: "Compatto",
+    ed_layout_tiles: "Riquadri",
     ed_advanced: "Avanzate",
     ed_language: "Lingua",
     ed_language_helper: "Vuoto: la lingua di Home Assistant",
@@ -597,6 +625,10 @@ const RC_I18N = {
     ed_show_title: "Titel tonen",
     ed_title_helper: "Leeg laten voor de naam van de ruimte",
     ed_columns: "Kolommen",
+    ed_layout: "Indeling",
+    ed_layout_helper: "Tegels: één grote tegel per entiteit, zoals de Tegel-kaart, makkelijker aan te tikken op een telefoon",
+    ed_layout_compact: "Compact",
+    ed_layout_tiles: "Tegels",
     ed_advanced: "Geavanceerd",
     ed_language: "Taal",
     ed_language_helper: "Leeg: de taal van Home Assistant",
@@ -642,6 +674,10 @@ const RC_I18N = {
     ed_show_title: "Mostrar o título",
     ed_title_helper: "Deixe vazio para usar o nome da área",
     ed_columns: "Colunas",
+    ed_layout: "Disposição",
+    ed_layout_helper: "Mosaicos: um mosaico grande por entidade, como o cartão Mosaico, mais fácil de tocar no telemóvel",
+    ed_layout_compact: "Compacta",
+    ed_layout_tiles: "Mosaicos",
     ed_advanced: "Avançado",
     ed_language: "Idioma",
     ed_language_helper: "Vazio: o idioma do Home Assistant",
@@ -687,6 +723,10 @@ const RC_I18N = {
     ed_show_title: "Pokaż tytuł",
     ed_title_helper: "Pozostaw puste, aby użyć nazwy obszaru",
     ed_columns: "Kolumny",
+    ed_layout: "Układ",
+    ed_layout_helper: "Kafelki: jeden duży kafelek na encję, jak karta Kafelek, łatwiejszy do dotknięcia na telefonie",
+    ed_layout_compact: "Kompaktowy",
+    ed_layout_tiles: "Kafelki",
     ed_advanced: "Zaawansowane",
     ed_language: "Język",
     ed_language_helper: "Puste: język Home Assistanta",
@@ -732,6 +772,10 @@ const RC_I18N = {
     ed_show_title: "Afișează titlul",
     ed_title_helper: "Lasă gol pentru numele zonei",
     ed_columns: "Coloane",
+    ed_layout: "Aspect",
+    ed_layout_helper: "Plăci: o placă mare pentru fiecare entitate, ca fișa Placă, mai ușor de atins pe telefon",
+    ed_layout_compact: "Compact",
+    ed_layout_tiles: "Plăci",
     ed_advanced: "Avansat",
     ed_language: "Limbă",
     ed_language_helper: "Gol: limba Home Assistant",
@@ -777,6 +821,10 @@ const RC_I18N = {
     ed_show_title: "Vis titel",
     ed_title_helper: "Lad stå tomt for at bruge områdets navn",
     ed_columns: "Kolonner",
+    ed_layout: "Layout",
+    ed_layout_helper: "Fliser: én stor flise pr. entitet som Flise-kortet, nemmere at trykke på en telefon",
+    ed_layout_compact: "Kompakt",
+    ed_layout_tiles: "Fliser",
     ed_advanced: "Avanceret",
     ed_language: "Sprog",
     ed_language_helper: "Tomt: Home Assistants sprog",
@@ -822,6 +870,10 @@ const RC_I18N = {
     ed_show_title: "Visa rubrik",
     ed_title_helper: "Lämna tomt för områdets namn",
     ed_columns: "Kolumner",
+    ed_layout: "Layout",
+    ed_layout_helper: "Rutor: en stor ruta per entitet, som Ruta-kortet, lättare att trycka på i mobilen",
+    ed_layout_compact: "Kompakt",
+    ed_layout_tiles: "Rutor",
     ed_advanced: "Avancerat",
     ed_language: "Språk",
     ed_language_helper: "Tomt: Home Assistants språk",
@@ -867,6 +919,10 @@ const RC_I18N = {
     ed_show_title: "Показване на заглавието",
     ed_title_helper: "Оставете празно за името на зоната",
     ed_columns: "Колони",
+    ed_layout: "Оформление",
+    ed_layout_helper: "Плочки: по една голяма плочка за обект, като картата Плочка, по-лесна за докосване на телефон",
+    ed_layout_compact: "Компактно",
+    ed_layout_tiles: "Плочки",
     ed_advanced: "Разширени",
     ed_language: "Език",
     ed_language_helper: "Празно: езикът на Home Assistant",
@@ -912,6 +968,10 @@ const RC_I18N = {
     ed_show_title: "Показывать заголовок",
     ed_title_helper: "Оставьте пустым, чтобы использовать название пространства",
     ed_columns: "Столбцы",
+    ed_layout: "Макет",
+    ed_layout_helper: "Плитки: одна большая плитка на объект, как карточка «Плитка», удобнее нажимать на телефоне",
+    ed_layout_compact: "Компактный",
+    ed_layout_tiles: "Плитки",
     ed_advanced: "Дополнительно",
     ed_language: "Язык",
     ed_language_helper: "Пусто: язык Home Assistant",
@@ -957,6 +1017,10 @@ const RC_I18N = {
     ed_show_title: "Показувати заголовок",
     ed_title_helper: "Залиште порожнім, щоб використати назву простору",
     ed_columns: "Стовпці",
+    ed_layout: "Макет",
+    ed_layout_helper: "Плитки: одна велика плитка на сутність, як картка «Плитка», зручніше торкатися на телефоні",
+    ed_layout_compact: "Компактний",
+    ed_layout_tiles: "Плитки",
     ed_advanced: "Додатково",
     ed_language: "Мова",
     ed_language_helper: "Порожньо: мова Home Assistant",
@@ -1002,6 +1066,10 @@ const RC_I18N = {
     ed_show_title: "Cím megjelenítése",
     ed_title_helper: "Hagyd üresen a terület nevéhez",
     ed_columns: "Oszlopok",
+    ed_layout: "Elrendezés",
+    ed_layout_helper: "Csempék: entitásonként egy nagy csempe, mint a Csempe kártya, telefonon könnyebb megérinteni",
+    ed_layout_compact: "Tömör",
+    ed_layout_tiles: "Csempék",
     ed_advanced: "Speciális",
     ed_language: "Nyelv",
     ed_language_helper: "Üres: a Home Assistant nyelve",
@@ -1047,6 +1115,10 @@ const RC_I18N = {
     ed_show_title: "Zobraziť názov",
     ed_title_helper: "Nechajte prázdne pre názov oblasti",
     ed_columns: "Stĺpce",
+    ed_layout: "Rozloženie",
+    ed_layout_helper: "Dlaždice: jedna veľká dlaždica na entitu ako karta Dlaždica, na telefóne sa ľahšie ťuká",
+    ed_layout_compact: "Kompaktné",
+    ed_layout_tiles: "Dlaždice",
     ed_advanced: "Rozšírené",
     ed_language: "Jazyk",
     ed_language_helper: "Prázdne: jazyk Home Assistanta",
@@ -1092,6 +1164,10 @@ const RC_I18N = {
     ed_show_title: "Zobrazit název",
     ed_title_helper: "Ponechte prázdné pro název oblasti",
     ed_columns: "Sloupce",
+    ed_layout: "Rozložení",
+    ed_layout_helper: "Dlaždice: jedna velká dlaždice na entitu jako karta Dlaždice, na telefonu se snáz ťuká",
+    ed_layout_compact: "Kompaktní",
+    ed_layout_tiles: "Dlaždice",
     ed_advanced: "Pokročilé",
     ed_language: "Jazyk",
     ed_language_helper: "Prázdné: jazyk Home Assistanta",
@@ -1137,6 +1213,10 @@ const RC_I18N = {
     ed_show_title: "Prikaži naslov",
     ed_title_helper: "Pustite prazno za ime območja",
     ed_columns: "Stolpci",
+    ed_layout: "Postavitev",
+    ed_layout_helper: "Ploščice: ena velika ploščica na entiteto, kot kartica Ploščica, lažje za dotik na telefonu",
+    ed_layout_compact: "Strnjena",
+    ed_layout_tiles: "Ploščice",
     ed_advanced: "Napredno",
     ed_language: "Jezik",
     ed_language_helper: "Prazno: jezik Home Assistanta",
@@ -1182,6 +1262,10 @@ const RC_I18N = {
     ed_show_title: "Rādīt virsrakstu",
     ed_title_helper: "Atstājiet tukšu, lai izmantotu zonas nosaukumu",
     ed_columns: "Kolonnas",
+    ed_layout: "Izkārtojums",
+    ed_layout_helper: "Flīzes: viena liela flīze katrai entītijai kā kartītē Flīze, tālrunī vieglāk pieskarties",
+    ed_layout_compact: "Kompakts",
+    ed_layout_tiles: "Flīzes",
     ed_advanced: "Papildu",
     ed_language: "Valoda",
     ed_language_helper: "Tukšs: Home Assistant valoda",
@@ -1227,6 +1311,10 @@ const RC_I18N = {
     ed_show_title: "Εμφάνιση τίτλου",
     ed_title_helper: "Αφήστε το κενό για το όνομα της περιοχής",
     ed_columns: "Στήλες",
+    ed_layout: "Διάταξη",
+    ed_layout_helper: "Πλακίδια: ένα μεγάλο πλακίδιο ανά οντότητα, όπως η κάρτα Πλακίδιο, πιο εύκολο στο πάτημα στο κινητό",
+    ed_layout_compact: "Συμπαγής",
+    ed_layout_tiles: "Πλακίδια",
     ed_advanced: "Για προχωρημένους",
     ed_language: "Γλώσσα",
     ed_language_helper: "Κενό: η γλώσσα του Home Assistant",
@@ -1419,7 +1507,10 @@ class RcCard extends HTMLElement {
   getCardSize() {
     if (this.style.display === "none") return 0;
     const n = this._shown ?? this._items?.length ?? 0;
-    return n && this._config ? 1 + Math.ceil(n / this._cols()) : 1;
+    if (!n || !this._config) return 1;
+    // A row of large tiles (`layout: tiles`) is about one and a half rows of compact ones.
+    const rows = Math.ceil(n / this._cols());
+    return 1 + (this._tiles() ? Math.ceil(rows * 1.5) : rows);
   }
 
   getGridOptions() {
@@ -1511,6 +1602,11 @@ class RcCard extends HTMLElement {
     return Math.min(4, Math.max(1, Number(this._config.columns) || 2));
   }
 
+  // `layout: tiles`: one large tile per entity, the size of Home Assistant's Tile card (easier to tap on a phone).
+  _tiles() {
+    return this._config?.layout === "tiles";
+  }
+
   // Overviews: the grid of room tiles (`tile(room)`), its columns, the empty and idle states, then the open room's
   // details kept in step with the rooms shown.
   _roomGrid(grid, rooms, tile) {
@@ -1558,7 +1654,7 @@ class RcCard extends HTMLElement {
     const focused = this._byPointer ? null : this.shadowRoot.activeElement?.dataset?.id;
     this.shadowRoot.innerHTML = `
       <style>${RC_BASE_STYLES}${this.constructor.styles}</style>
-      <ha-card class="lvl-${level}${extraClass}">
+      <ha-card class="lvl-${level}${extraClass}${this._tiles() ? " layout-tiles" : ""}">
         ${head}
         ${tiles ? `<div class="grid" style="--cols:${this._cols()}">${tiles}</div>` : ""}
         ${this._afterGrid()}
@@ -1930,6 +2026,16 @@ const rcAreaFields = (navigation) => [
   ...(navigation ? [{ name: "navigation_path", selector: { navigation: {} } }] : []),
   { name: "columns", selector: { number: { min: 1, max: 4, mode: "box" } } },
 ];
+// Compact tiles (default) or large ones, the size of Home Assistant's Tile card.
+const rcLayoutField = (i18n, lang) => ({
+  name: "layout",
+  selector: {
+    select: {
+      mode: "dropdown",
+      options: ["compact", "tiles"].map((value) => ({ value, label: rcT(i18n, lang, `ed_layout_${value}`) })),
+    },
+  },
+});
 const rcBooleans = (...names) => names.map((name) => ({ name, selector: { boolean: {} } }));
 
 // "Advanced" section, folded, with the options that are lists or maps (edited as YAML) and the language. Its fields
@@ -2194,6 +2300,14 @@ const RC_BASE_STYLES = `
   .state { font-size: 11px; line-height: 1.2; color: var(--secondary-text-color); overflow-wrap: break-word; }
   /* A card this narrow (a phone, 6 columns of the Sections view): one tile per row, whatever the columns option. */
   @container (max-width: 260px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  /* layout: tiles — the size of Home Assistant's Tile card — 56 px high, a 40 px icon, the name over the state. */
+  .layout-tiles .grid { gap: 8px; }
+  .layout-tiles .tile { min-height: 56px; gap: 10px; padding: 8px 10px 8px 8px; border-radius: 12px; }
+  .layout-tiles .ic { width: 40px; height: 40px; }
+  .layout-tiles .ic ha-icon { --mdc-icon-size: 24px; }
+  .layout-tiles .txt { gap: 2px; }
+  .layout-tiles .name { font-size: 14px; line-height: 1.25; }
+  .layout-tiles .state { font-size: 12px; line-height: 1.25; }
 
   @keyframes rc-blink { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
   @keyframes rc-pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 45%, transparent) }
