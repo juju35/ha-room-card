@@ -82,7 +82,7 @@ await shoot({
   tag: "room-environment-card",
   shots: pair("tiles", { width: 380 }),
   ws,
-  setup: (s, lang) => {
+  setup: (_s, lang) => {
     const states = {};
     const entities = {};
     for (const [entity_id, name, value] of PROBES) {
