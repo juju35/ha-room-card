@@ -17,7 +17,7 @@ Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, pl
 | Card | Type | What it shows |
 |---|---|---|
 | [Overview](#overview) | `custom:room-overview-card` | Every room at a glance: one tile per room, tap a room to unfold its sensors, lights and plugs. |
-| [Sensors](#sensors) | `custom:room-sensors-card` | Leak, door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open. |
+| [Sensors](#sensors) | `custom:room-sensors-card` | Leak, smoke, gas, door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open. |
 | [Sensors mini](#sensors-mini) | `custom:room-sensors-mini-card` | The same sensors on two lines, with a zoom to the full card. |
 | [Lights](#lights) | `custom:room-lights-card` | Lights of a room: tap to toggle, drag to dim, turn everything off from the header. |
 | [Lights mini](#lights-mini) | `custom:room-lights-mini-card` | The same lights on two lines: how many are on, a button to turn them all off, a zoom to the full card. |
@@ -50,10 +50,11 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 
 ### Sensors
 
-`custom:room-sensors-card` — Leak, door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open.
+`custom:room-sensors-card` — Leak, smoke, gas, door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open.
 
 - Header with an icon and a status pill coloured by the room state: *All closed* (green), *1 open* (orange), *Water leak* (red, pulsing); a leak or opening sensor that is unavailable is no all-clear: *1 unavailable* (orange)
-- Open sensors listed first, leaks before doors and windows, with a blinking icon and how long they have been open
+- Smoke, carbon monoxide and gas detectors read *Clear* / *Detected* (Home Assistant's own wording), never *Closed*; an active one is an alarm like a leak (red, *Smoke detected*)
+- Open sensors listed first, alarms (leak, smoke, CO, gas) before doors and windows, with a blinking icon and how long they have been open
 - Presence and motion sensors in blue (*Detected* / *Clear*), with a person icon next to the pill while someone is in the room; they are not alerts and never blink
 - Icon picked from the sensor: sliding door, window, door, garage door, water drop, person, motion sensor
 - Clean names: the `Sensor` / `Capteur` prefix, the area name and the trailing device-class word are removed (*Capteur Porte Fenêtre Cuisine Porte* → *Porte Fenêtre Cuisine*)
@@ -721,7 +722,7 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 
 The card goes through every entity with an area (set on the entity or on its device), with the same rules as the room cards:
 
-- **Sensors**: `binary_sensor` with device class `moisture`, `door`, `window`, `opening` or `garage_door`
+- **Sensors**: `binary_sensor` with device class `moisture`, `smoke`, `carbon_monoxide`, `gas`, `door`, `window`, `opening` or `garage_door`
 - **Presence**: `binary_sensor` with device class `occupancy`, `presence` or `motion`, camera detections included except pets, and vehicles outside the outdoor rooms
 - **Lights**: every `light` except light groups, and every `switch` whose name contains *lumière*, *lampe*, *lamp*, *light*, *veilleuse* or *guirlande*
 - **Plugs**: every other `switch` with device class `outlet`, or whose name contains *prise*, *multiprise*, *plug*, *outlet* or *socket*, with the power sensor of the same device
@@ -732,9 +733,9 @@ A tile shows the most important state of the room: a wet leak sensor, then open 
 
 ### Sensors
 
-The card keeps every `binary_sensor` of the area whose device class is `moisture`, `door`, `window`, `opening` or `garage_door`, and with `presence` (the default) `occupancy`, `presence` or `motion` (the area set on the entity, or on its device). Hidden entities are skipped. Camera detections count too (motion, person, line crossing), except the pet detections, and the vehicle detections outside an outdoor room: a sensor whose entity ID or name says *pet*, *animal*, *dog*, *cat* (*chien*, *chat*), or *vehicle*, *véhicule*, *car* (*voiture*). A room is outdoor when its name says *jardin*, *terrasse*, *balcon*, *patio*, *extérieur*, *cour*, *allée*, *porche*, *portail*, *parking*, *garden*, *terrace*, *balcony*, *outdoor*, *outside*, *yard*, *driveway*, *porch* or *gate*; `outdoor: true` / `false` overrides it. Leave out any other sensor with `exclude`.
+The card keeps every `binary_sensor` of the area whose device class is `moisture`, `smoke`, `carbon_monoxide`, `gas`, `door`, `window`, `opening` or `garage_door`, and with `presence` (the default) `occupancy`, `presence` or `motion` (the area set on the entity, or on its device). Hidden entities are skipped. Camera detections count too (motion, person, line crossing), except the pet detections, and the vehicle detections outside an outdoor room: a sensor whose entity ID or name says *pet*, *animal*, *dog*, *cat* (*chien*, *chat*), or *vehicle*, *véhicule*, *car* (*voiture*). A room is outdoor when its name says *jardin*, *terrasse*, *balcon*, *patio*, *extérieur*, *cour*, *allée*, *porche*, *portail*, *parking*, *garden*, *terrace*, *balcony*, *outdoor*, *outside*, *yard*, *driveway*, *porch* or *gate*; `outdoor: true` / `false` overrides it. Leave out any other sensor with `exclude`.
 
-The room is **in alert** when a sensor is open (orange) and **critical** when a leak sensor is wet (red). Presence and motion are information, not alerts: shown in blue, they never change the header colour. Wet leak sensors come first, then open doors and windows, then detected presence, then the others by name. The icon follows the sensor: a sensor whose entity ID contains `porte_fenetre`, `baie`, `sliding` or `patio` gets a sliding door, whatever its device class (garage doors, leak, presence and motion sensors excepted), a `window` sensor (or a `door` sensor with `fenetre` / `window` in its ID) gets a window.
+The room is **in alert** when a sensor is open (orange) and **critical** when a leak sensor is wet or a smoke, carbon monoxide or gas detector goes off (red; the status names the most serious alarm: smoke, then CO, then gas, then the leak). Those detectors show Home Assistant's own state (*Clear* / *Detected*, *Non détecté* / *Détecté* in French), not *Open* / *Closed*. Presence and motion are information, not alerts: shown in blue, they never change the header colour. Wet leak sensors come first, then open doors and windows, then detected presence, then the others by name. The icon follows the sensor: a sensor whose entity ID contains `porte_fenetre`, `baie`, `sliding` or `patio` gets a sliding door, whatever its device class (garage doors, leak, presence and motion sensors excepted), a `window` sensor (or a `door` sensor with `fenetre` / `window` in its ID) gets a window.
 
 ### Lights
 

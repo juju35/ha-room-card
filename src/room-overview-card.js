@@ -748,7 +748,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       if (!st) continue;
       const dc = st.attributes.device_class;
       if (rcMatchSensor(h, id, { presence: c.presence, outdoor: outdoor(aid) })) {
-        if (RC_OPENING_CLASSES.includes(dc)) room(aid).sensors.push({ id, leak: dc === "moisture", st });
+        if (RC_OPENING_CLASSES.includes(dc)) room(aid).sensors.push({ id, leak: !!rcAlertKind(dc), alert: rcAlertKind(dc), st });
         else room(aid).presence.push({ id, st });
       } else if (rcMatchLight(h, id)) {
         room(aid).lights.push({ id, st });
@@ -773,6 +773,8 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
           icon: o.icon ?? rcRoomIcon(area),
           navigation_path: o.navigation_path,
           leaks: x.sensors.filter((s) => s.leak && on(s)).length,
+          // The most serious active alarm (smoke, co, gas, leak): it names the room's status.
+          alert: rcTopAlert(x.sensors.filter((s) => s.leak && on(s)).map((s) => s.alert)),
           open: x.sensors.filter((s) => !s.leak && on(s)).length,
           // A leak or opening sensor that cannot report is no all-clear: the room needs a look.
           unavail: x.sensors.filter((s) => rcUnavailable(s.st)).length,
@@ -793,7 +795,10 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
 
   _roomState(x) {
     if (x.leaks || x.open || x.unavail) {
-      return { lvl: x.leaks ? "alert" : "warn", text: this._openingStatus(x.leaks, x.open, false, "all_quiet", x.unavail) };
+      return {
+        lvl: x.leaks ? "alert" : "warn",
+        text: this._openingStatus(x.leaks, x.open, false, "all_quiet", x.unavail, x.alert),
+      };
     }
     if (x.occupied) return { lvl: "info", text: this._t("presence") };
     return { lvl: "ok", text: this._openingStatus(0, 0, x.sensors.some((e) => !e.leak)) };
@@ -807,7 +812,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     this._rooms = rooms;
 
     // The sensor count too: a door added to an idle room turns "All quiet" into "All closed" without any state change.
-    const parts = rooms.map((x) => [x.id, x.name, x.icon, x.leaks, x.open, x.occupied, x.lightsOn, x.plugsOn, x.watts && Math.round(x.watts), x.sensors.length, x.unavail]);
+    const parts = rooms.map((x) => [x.id, x.name, x.icon, x.leaks, x.alert, x.open, x.occupied, x.lightsOn, x.plugsOn, x.watts && Math.round(x.watts), x.sensors.length, x.unavail]);
     if (!this._changed([this._openArea, this._zoomed, this._anySensors, parts])) return;
 
     if (!this.shadowRoot.querySelector("ha-card")) {
@@ -871,8 +876,9 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     const watts = rooms.some((x) => x.watts != null) ? rooms.reduce((t, x) => t + (x.watts ?? 0), 0) : null;
     const occupied = rooms.filter((x) => x.occupied).length;
     const level = leaks ? "alert" : open || unavail ? "warn" : "ok";
-    const status = this._openingStatus(leaks, open, this._anySensors, "all_quiet", unavail);
-    const headIcon = leaks ? "mdi:water-alert" : open || unavail ? "mdi:home-alert-outline" : "mdi:home-outline";
+    const alert = rcTopAlert(rooms.filter((x) => x.leaks).map((x) => x.alert));
+    const status = this._openingStatus(leaks, open, this._anySensors, "all_quiet", unavail, alert);
+    const headIcon = leaks ? RC_ALERT_KINDS[alert].on : open || unavail ? "mdi:home-alert-outline" : "mdi:home-outline";
 
     const chip = (cls, icon, label, text) =>
       `<span class="chip ${cls}" title="${rcEsc(label)}"><ha-icon icon="${icon}"></ha-icon>${text ? `<span>${rcEsc(text)}</span>` : ""}</span>`;

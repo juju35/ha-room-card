@@ -680,9 +680,10 @@ const RS_I18N = {
 // ── Sensor kinds ─────────────────────────────────────────────────────────────
 // `fem`: the state is feminine in the languages that have `open_f` / `closed_f` (fr: porte, fenêtre; es: puerta, ventana;
 // it: porta, finestra; pt: porta, janela; ro: ușă, fereastră).
-// `info`: an active state that is not an alert (presence, motion).
+// `info`: an active state that is not an alert (presence, motion); `alert`: an active state that is an alarm (leak,
+// smoke, carbon monoxide, gas).
 const RS_KINDS = {
-  leak: { on: "mdi:water-alert", off: "mdi:water-check" },
+  ...Object.fromEntries(Object.entries(RC_ALERT_KINDS).map(([k, v]) => [k, { on: v.on, off: v.off, alert: true }])),
   slide: { on: "mdi:door-sliding-open", off: "mdi:door-sliding", fem: true },
   window: { on: "mdi:window-open-variant", off: "mdi:window-closed-variant", fem: true },
   garage: { on: "mdi:garage-open", off: "mdi:garage" },
@@ -695,7 +696,8 @@ const RS_KINDS = {
 const rsKindOf = (st) => {
   const dc = st.attributes.device_class;
   const id = st.entity_id;
-  if (dc === "moisture") return "leak";
+  const alert = rcAlertKind(dc);
+  if (alert) return alert;
   if (dc === "occupancy" || dc === "presence") return "presence";
   if (dc === "motion") return "motion";
   if (dc === "garage_door") return "garage";
@@ -742,17 +744,19 @@ class RoomSensorsCard extends RcCard {
     this._clock = null;
   }
 
-  _stateText(kind, on) {
+  _stateText(kind, on, st) {
     if (kind === "leak") return this._t(on ? "leak_on" : "leak_off");
+    // Smoke, CO, gas: Home Assistant's own words ("Clear" / "Detected"), never "Closed".
+    if (RS_KINDS[kind].alert) return this._hass.formatEntityState?.(st) || this._t(on ? "detected" : "clear");
     if (RS_KINDS[kind].info) return this._t(`${kind}_${on ? "on" : "off"}`);
     if (RS_KINDS[kind].fem && RS_I18N[this._lang()]?.open_f) return this._t(on ? "open_f" : "closed_f");
     return this._t(on ? "open" : "closed");
   }
 
-  // Leaks first, then open doors and windows, then detected presence, then the rest.
+  // Alarms first (leaks, smoke, CO, gas), then open doors and windows, then detected presence, then the rest.
   _rank(i) {
     if (!i.on) return 0;
-    if (i.kind === "leak") return 3;
+    if (i.alert) return 3;
     return i.info ? 1 : 2;
   }
 
@@ -776,22 +780,25 @@ class RoomSensorsCard extends RcCard {
           id: e.entity,
           kind,
           info: !!RS_KINDS[kind].info,
+          alert: !!RS_KINDS[kind].alert,
           on,
           unavailable,
           name: e.name ?? rcCleanName(st.attributes.friendly_name, areaName, RS_PREFIX, RS_SUFFIX),
           icon: e.icon ?? (on ? RS_KINDS[kind].on : RS_KINDS[kind].off),
-          state: unavailable ? this._t("unavailable") : this._stateText(kind, on),
+          state: unavailable ? this._t("unavailable") : this._stateText(kind, on, st),
           since: st.last_changed,
         };
       })
       .sort((a, b) => this._rank(b) - this._rank(a) || a.name.localeCompare(b.name));
   }
 
-  // State of the room, shared by the full and the mini card. An unavailable leak or opening sensor is no all-clear:
-  // it warns (*2 unavailable*) like an open one.
+  // State of the room, shared by the full and the mini card. An unavailable alarm or opening sensor is no all-clear:
+  // it warns (*2 unavailable*) like an open one. The most serious active alarm names the status and the icon.
   _summary(items) {
-    const leaks = items.filter((i) => i.kind === "leak" && i.on).length;
-    const open = items.filter((i) => i.kind !== "leak" && !i.info && i.on).length;
+    const alarms = items.filter((i) => i.alert && i.on);
+    const leaks = alarms.length;
+    const top = rcTopAlert(alarms.map((i) => i.kind));
+    const open = items.filter((i) => !i.alert && !i.info && i.on).length;
     const unavail = items.filter((i) => !i.info && i.unavailable).length;
     const warn = open || unavail;
     return {
@@ -799,13 +806,14 @@ class RoomSensorsCard extends RcCard {
       open,
       occupied: items.some((i) => i.info && i.on),
       level: leaks ? "alert" : warn ? "warn" : "ok",
-      icon: leaks ? "mdi:water-alert" : warn ? "mdi:shield-alert-outline" : "mdi:shield-home-outline",
+      icon: leaks ? RC_ALERT_KINDS[top].on : warn ? "mdi:shield-alert-outline" : "mdi:shield-home-outline",
       status: this._openingStatus(
         leaks,
         open,
-        items.some((i) => i.kind !== "leak" && !i.info),
+        items.some((i) => !i.alert && !i.info),
         items.length ? "all_quiet" : "no_sensors",
         unavail,
+        top,
       ),
     };
   }
@@ -832,7 +840,7 @@ class RoomSensorsCard extends RcCard {
     const tiles = shown
       .map((i) =>
         this._tile(i, {
-          cls: `${i.kind === "leak" ? " leak" : ""}${i.info ? " info" : ""}`,
+          cls: `${i.alert ? " leak" : ""}${i.info ? " info" : ""}`,
           state: `${rcEsc(i.state)}${i.on ? ` · <span class="since">${rcEsc(ago.get(i.id))}</span>` : ""}`,
         }),
       )
@@ -922,7 +930,7 @@ class RoomSensorsMiniCard extends rcMini(
     const { level, icon, status, shown } = v;
     const chips = shown
       .map((i) => {
-        const cls = `${i.on ? " on pill" : " icon"}${i.kind === "leak" ? " leak" : ""}${i.info ? " info" : ""}${i.unavailable ? " na" : ""}`;
+        const cls = `${i.on ? " on pill" : " icon"}${i.alert ? " leak" : ""}${i.info ? " info" : ""}${i.unavailable ? " na" : ""}`;
         return `
         <button class="r${cls}" data-id="${rcEsc(i.id)}" title="${rcEsc(i.name)} — ${rcEsc(i.state)}">
           <ha-icon icon="${rcEsc(i.icon)}"></ha-icon>${i.on ? `<span>${rcEsc(i.name)}</span>` : ""}
