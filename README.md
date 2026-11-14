@@ -84,6 +84,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Show only the lights that are on (`only_on`), or hide the whole card when everything is off (`hide_when_off`)
 - Tap the title to open a dashboard (`navigation_path`)
 - Automatic discovery from the area, or an explicit list with name and icon overrides (custom icon sets supported)
+- **Tiles layout** (`layout: tiles`): one large tile per light, the size of Home Assistant's Tile card, easier to tap on a phone
 - **Scenes** of the room under the lights, in a section folded until its title is tapped (folded back by a click anywhere else): one chip per scene, a tap activates it. Philips Hue scenes are found by their Hue room when they have no area of their own, and a dynamic Hue scene starts with its colours moving (`hue.activate_scene`); `show_scenes: false` hides them, `scenes` lists them by hand
 
 ### Lights mini
@@ -134,6 +135,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Built-in comfort thresholds (WHO and common indoor guidelines), adjustable per kind with `thresholds`; °F and ppb sensors are handled
 - Several sensors of the same kind in a room make **one reading: their mean** (three thermometers, one *Temperature* tile); unavailable and unknown sensors are left out of it and gathered in one muted *2 unavailable* tile (a chip on the mini card) listing them
 - Show only the readings outside the comfort range (`only_alerts`)
+- **Tiles layout** (`layout: tiles`): one large tile per sensor (no mean), the size of Home Assistant's Tile card, its background coloured by the reading — temperatures from dark blue (cold) to red (hot) by default, your own steps per kind with `color_thresholds`
 - Tap a reading to open its details and history; tap the title to open a dashboard (`navigation_path`)
 - Automatic discovery from the area, or an explicit list with name and icon overrides
 
@@ -215,6 +217,7 @@ The Sensors, Lights, Plugs and Environment cards share these options; each card 
 | `title` | ❌ | Area name | Card title |
 | `show_title` | ❌ | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `columns` | ❌ | `2` | Number of tile columns (1–4) |
+| `layout` | ❌ | `compact` | Lights, Plugs and Environment cards: `tiles` for one large tile per entity, the size of Home Assistant's Tile card (56 px high, 40 px icon), easier to tap on a phone; on a mini card it shapes the zoomed-in view |
 | `exclude` | ❌ | — | Entities left out of the automatic discovery; the visual editor only offers the ones the card finds in the chosen room |
 | `navigation_path` | ❌ | — | Dashboard opened when tapping the title, e.g. `/light` |
 | `only_on` | ❌ | `false` | Lights and Plugs cards: show only what is on (and unavailable entities) |
@@ -363,6 +366,7 @@ area: living_room
 title: Living room
 navigation_path: /light
 columns: 2
+layout: compact
 only_on: false
 hide_when_off: false
 show_brightness: true
@@ -370,6 +374,17 @@ all_off_button: true
 show_scenes: true
 exclude:
   - light.living_room_camera_floodlight
+```
+
+#### Tiles layout
+
+On a phone, `layout: tiles` gives each light a large tile, the size of Home Assistant's Tile card, two per row — tap to toggle, drag to dim, hold for the details, as in the compact layout. The same option exists on the Plugs card.
+
+```yaml
+type: custom:room-lights-card
+area: living_room
+layout: tiles
+columns: 2
 ```
 
 #### Scenes
@@ -453,6 +468,7 @@ area: living_room
 title: Living room
 navigation_path: /energy
 columns: 2
+layout: compact
 only_on: false
 hide_when_off: false
 show_power: true
@@ -518,6 +534,7 @@ area: living_room
 title: Living room
 navigation_path: /dashboard-home/living-room
 columns: 2
+layout: compact
 only_alerts: false
 show_gauge: true
 show_history: true
@@ -550,6 +567,45 @@ A temperature sensor in °F gets the default limits converted; a cool room (warn
 
 **Wet rooms.** In a room whose name says it is a bathroom, a shower room or a laundry (*Salle de bain*, *Salle d'eau*, *Douche*, *Buanderie*, *Bathroom*, *Shower*, *Laundry*), humidity defaults to `[25, 35, 70, 80]`: 61 % after a shower is fine there. Your own `humidity` thresholds always win.
 
+#### Tiles and colours
+
+`layout: tiles` shows one large tile per sensor — the sensor's own reading, not a mean — named after the sensor (the room's name left out), its background coloured by the reading. Listed with `entities`, it gathers the temperature probes of the whole house in one card:
+
+```yaml
+type: custom:room-environment-card
+title: Temperatures
+layout: tiles
+columns: 2
+show_gauge: false
+entities:
+  - sensor.living_room_temperature
+  - sensor.bedroom_temperature
+  - sensor.kitchen_temperature
+  - sensor.attic_temperature
+```
+
+By default, temperatures are coloured in °C (a °F sensor is converted): dark blue under 16, light blue under 19, green under 23, yellow under 26, red above. `color_thresholds` sets your own steps, read in order, in the sensor's unit: the first step whose `below` is above the value gives the colour, a last step without `below` takes the rest. A bare list applies to the temperature; a map sets any kind (`temperature`, `humidity`, `co2`, `pm25`, `pm10`, `voc`, `aqi`, `noise`). It works in the compact layout too; `color_thresholds: false` turns the colours off.
+
+```yaml
+color_thresholds:
+  temperature:
+    - below: 17
+      color: "#1565c0"
+    - below: 20
+      color: "#4fc3f7"
+    - below: 24
+      color: "#43a047"
+    - below: 27
+      color: "#fbc02d"
+    - color: "#e53935"
+  humidity:
+    - below: 35
+      color: "#ffb74d"
+    - below: 60
+      color: "#43a047"
+    - color: "#1e88e5"
+```
+
 #### Options reference
 
 The Environment card takes these options on top of the [common options](#common-options):
@@ -560,6 +616,7 @@ The Environment card takes these options on top of the [common options](#common-
 | `show_gauge` | ❌ | `true` | Thin gauge under each reading |
 | `show_history` | ❌ | `true` | The last 24 hours of each reading as a curve behind its tile, its lowest and highest values in the tile's tooltip (5-minute statistics from the recorder, one query refreshed every 5 minutes) |
 | `thresholds` | ❌ | See above | Comfort limits per kind, in the sensor's unit |
+| `color_thresholds` | ❌ | Temperature with `layout: tiles` | Background colour of a tile by its reading (YAML only): steps `{below, color}` per kind, see [Tiles and colours](#tiles-and-colours); `false` turns them off |
 
 ### Environment mini
 
@@ -683,6 +740,10 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-mini-zoom.png" alt="Mini zoomed in" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-mini-zoom-dark.png" alt="Mini zoomed in dark" width="400"> |
 
+| Tiles layout (`layout: tiles`) | |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-tiles.png" alt="Lights tiles" width="380"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-tiles-dark.png" alt="Lights tiles dark" width="380"> |
+
 ### Plugs
 
 | Plugs on | All off |
@@ -696,6 +757,10 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-mini-zoom.png" alt="Mini zoomed in" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-mini-zoom-dark.png" alt="Mini zoomed in dark" width="400"> |
 
+| Tiles layout (`layout: tiles`) | |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-tiles.png" alt="Plugs tiles" width="380"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-tiles-dark.png" alt="Plugs tiles dark" width="380"> |
+
 ### Environment
 
 | Comfortable | Stuffy room |
@@ -708,6 +773,10 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 | Mini card zoomed in | |
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-zoom.png" alt="Mini zoomed in" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-mini-zoom-dark.png" alt="Mini zoomed in dark" width="400"> |
+
+| Tiles layout (`layout: tiles`) | |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-tiles.png" alt="Temperatures tiles" width="380"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-tiles-dark.png" alt="Temperatures tiles dark" width="380"> |
 
 ### Environment overview
 

@@ -1120,3 +1120,18 @@ test("the lights mini card: no scenes in the compact view, the section once zoom
   card._render();
   assert.match(card.shadowRoot.innerHTML, /<button class="section-title"/);
 });
+
+test("layout: tiles enlarges the tiles of the lights and plugs cards and counts taller rows", () => {
+  for (const tag of ["room-lights-card", "room-switch-card"]) {
+    const Card = rc.cards[tag];
+    const card = new Card();
+    card.setConfig({ area: "kitchen", layout: "tiles" });
+    card.hass = makeHass();
+    assert.match(card.shadowRoot.innerHTML, /<ha-card class="[^"]*layout-tiles/, tag);
+    const compact = new Card();
+    compact.setConfig({ area: "kitchen" });
+    compact.hass = makeHass();
+    assert.doesNotMatch(compact.shadowRoot.innerHTML, /<ha-card class="[^"]*layout-tiles/, tag);
+    assert.ok(card.getCardSize() >= compact.getCardSize(), tag);
+  }
+});

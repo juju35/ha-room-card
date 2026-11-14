@@ -466,6 +466,7 @@ class RoomSwitchCard extends RcToggleCard {
   static emptyKey = "no_plugs";
   static defaults = {
     columns: 2,
+    layout: "compact",
     only_on: false,
     hide_when_off: false,
     show_power: true,
@@ -533,9 +534,10 @@ class RoomSwitchCard extends RcToggleCard {
 // ── Editor ───────────────────────────────────────────────────────────────────
 const RoomSwitchCardEditor = rcEditor({
   card: RoomSwitchCard,
-  helpers: ["title", "navigation_path", "only_on", "hide_when_off", "show_power", "all_off_button", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "layout", "only_on", "hide_when_off", "show_power", "all_off_button", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
+    rcLayoutField(RW_I18N, lang),
     ...rcBooleans("show_title", "only_on", "hide_when_off", "show_power", "all_off_button"),
     ...rcIncludeField(RoomSwitchCard, hass, config),
     ...rcExcludeField(RoomSwitchCard, hass, config),
@@ -562,9 +564,10 @@ class RoomSwitchMiniCard extends rcToggleMini(RoomSwitchCard, "room-switch-mini-
 
 const RoomSwitchMiniCardEditor = rcEditor({
   card: RoomSwitchMiniCard,
-  helpers: ["title", "navigation_path", "columns", "only_on", "hide_when_off", "show_power", "all_off_button", "zoom", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "layout", "columns", "only_on", "hide_when_off", "show_power", "all_off_button", "zoom", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
+    rcLayoutField(RW_I18N, lang),
     ...rcBooleans("show_title", "only_on", "hide_when_off", "show_power", "all_off_button", "zoom"),
     ...rcIncludeField(RoomSwitchMiniCard, hass, config),
     ...rcExcludeField(RoomSwitchMiniCard, hass, config),

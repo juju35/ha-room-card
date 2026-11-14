@@ -44,6 +44,17 @@ const setup = (s, lang) => {
 };
 
 await shoot({ prefix: "lights", tag: "room-lights-card", icons, shots, setup });
+// The tiles layout at a phone's width: one large tile per light, two columns.
+await shoot({
+  prefix: "lights",
+  tag: "room-lights-card",
+  icons,
+  shots: pair("tiles", { on: EVENING, width: 380 }),
+  setup: (s, lang) => {
+    const { hass, config } = setup(s, lang);
+    return { hass, config: { ...config, layout: "tiles" } };
+  },
+});
 // The Scenes section unfolded (its title clicked).
 await shoot({
   prefix: "lights",

@@ -923,6 +923,33 @@ const reBand = (v, [al, wl, wh, ah]) => {
 };
 
 // ── Card ─────────────────────────────────────────────────────────────────────
+// Background colour of a tile by its reading (`color_thresholds`): a list of steps `{ below, color }` read in order,
+// the first whose `below` is above the value wins, a last step without `below` takes the rest. Per kind
+// (`{ temperature: [...], humidity: [...] }`) or a bare list for the temperature; values in the sensor's unit.
+// With `layout: tiles` and no `color_thresholds`, the temperature is coloured by default (in °C, a °F sensor
+// converted): dark blue under 16, light blue under 19, green under 23, yellow under 26, red above.
+// `color_thresholds: false` turns the colours off.
+const RE_TINT_DEFAULT = [
+  { below: 16, color: "#1565c0" },
+  { below: 19, color: "#4fc3f7" },
+  { below: 23, color: "#43a047" },
+  { below: 26, color: "#fbc02d" },
+  { color: "#e53935" },
+];
+const reTint = (kind, value, unit, cfg, tiles) => {
+  if (cfg === false || !Number.isFinite(value)) return null;
+  const custom = Array.isArray(cfg) ? (kind === "temperature" ? cfg : null) : cfg?.[kind];
+  let steps = Array.isArray(custom) ? custom : null;
+  let v = value;
+  if (!steps && kind === "temperature" && tiles && !Array.isArray(cfg)) {
+    steps = RE_TINT_DEFAULT;
+    v = reConvert(kind, value, unit, "°C");
+  }
+  if (!steps) return null;
+  const step = steps.find((s) => s && (s.below == null || v < Number(s.below)));
+  return typeof step?.color === "string" && step.color ? step.color : null;
+};
+
 // The last 24 hours behind a tile: area and line of the 5-minute means, scaled to their own range.
 const RE_HIST_WINDOW = 24 * 3600000;
 function reSpark(points, end) {
@@ -951,7 +978,7 @@ class RoomEnvironmentCard extends RcCard {
   static needsArea = true;
   static includeDomains = ["sensor"];
   static includeMatch = (hass, id) => !!reKindOf(hass.states[id]);
-  static defaults = { columns: 2, only_alerts: false, show_gauge: true, show_history: true, exclude: [] };
+  static defaults = { columns: 2, layout: "compact", only_alerts: false, show_gauge: true, show_history: true, exclude: [] };
 
   _candidate(id) {
     return reMatch(this._hass, id);
@@ -1038,12 +1065,13 @@ class RoomEnvironmentCard extends RcCard {
         const st = this._hass.states[id];
         return reKindOf(st) && !reValid(st);
       });
-    return this._itemsOf(entries, { name: this._areaName(), thresholds: this._config.thresholds });
+    // `layout: tiles`: one tile per sensor, as with the Tile card, rather than one mean per kind.
+    return this._itemsOf(entries, { name: this._areaName(), thresholds: this._config.thresholds }, this._tiles());
   }
 
   // The readings of `entries`, one per kind, in kind order; also used by the overview, room by room.
   // `room`: { name, thresholds } of the room, for its comfort limits.
-  _itemsOf(entries, room) {
+  _itemsOf(entries, room, split = false) {
     const byKind = {};
     for (const e of entries) {
       const st = this._hass.states[e.entity];
@@ -1059,8 +1087,18 @@ class RoomEnvironmentCard extends RcCard {
         if (!byUnit.has(unit)) byUnit.set(unit, []);
         byUnit.get(unit).push(m);
       }
-      return [...byUnit.values()].map((members) => this._reading(kind, members, room));
+      return [...byUnit.values()].flatMap((members) =>
+        split ? members.map((m) => this._sensorReading(kind, m, room)) : [this._reading(kind, members, room)],
+      );
     });
+  }
+
+  // One sensor's own reading (`layout: tiles`): named after the sensor, the room's name left out.
+  _sensorReading(kind, m, room) {
+    const item = this._reading(kind, [m], room);
+    if (m.e.name) return item;
+    const name = rcCleanName(m.st.attributes.friendly_name, room.name, /^$/, /^$/);
+    return { ...item, name: name || item.name };
   }
 
   // Number in full, unit small and muted ("°" for a temperature) to keep the chips short.
@@ -1134,13 +1172,15 @@ class RoomEnvironmentCard extends RcCard {
     const na = this._naItem();
     if (!this._changed([items.map((i) => [i.id, i.name, i.icon, i.state, i.sev, i.cold, i.pct]), na?.name, na?.state, this._histVer]))
       return;
+    const tint = (i) => reTint(i.kind, i.num, i.unit, c.color_thresholds, this._tiles());
 
     const shown = c.only_alerts ? items.filter((i) => i.sev !== "ok") : items;
     this._shown = shown.length + (na ? 1 : 0);
     const tiles = shown
       .map((i) =>
         this._tile(i, {
-          cls: ` k-${i.kind} s-${i.sev}${i.cold ? " cold" : ""}${i.light ? " lit" : ""}`,
+          cls: ` k-${i.kind} s-${i.sev}${i.cold ? " cold" : ""}${i.light ? " lit" : ""}${tint(i) ? " tint" : ""}`,
+          style: tint(i) ? `--t: ${tint(i)}` : "",
           extra:
             (hist ? reSpark(hist.points[i.id], hist.end) : "") +
             (c.show_gauge && i.pct != null ? `<span class="gauge"><span style="width:${i.pct}%"></span></span>` : ""),
@@ -1207,13 +1247,19 @@ class RoomEnvironmentCard extends RcCard {
     /* Drawn in the bottom padding of the tile: no extra height. */
     .gauge { position: absolute; inset: auto 8px 2px 41px; height: 2px; border-radius: 1px; pointer-events: none;
              background: color-mix(in srgb, var(--t) 16%, transparent); }
+    /* color_thresholds: the whole tile in the reading's colour, its value in full contrast. */
+    .tile.tint, .tile.tint.s-ok { background: color-mix(in srgb, var(--t) 22%, var(--card-background-color, transparent));
+                                  border-color: color-mix(in srgb, var(--t) 45%, transparent); }
+    .tile.tint .ic { color: var(--t); background: color-mix(in srgb, var(--t) 28%, transparent); }
+    .tile.tint .state, .tile.tint .val { color: var(--primary-text-color); }
+    .layout-tiles .gauge { left: 58px; bottom: 3px; }
     .gauge > span { display: block; height: 100%; border-radius: inherit; background: var(--t); transition: width .4s; }
     @media (prefers-reduced-motion: reduce) { .gauge > span { transition: none; } }
     /* Very narrow card (a phone, 6 columns: one tile per row of ~130 px): the reading wins the room of the tile's icon. */
     @container (max-width: 200px) {
       .tile { padding-left: 8px; }
       .tile .ic { display: none; }
-      .gauge { left: 8px; }
+      .gauge, .layout-tiles .gauge { left: 8px; }
     }
   `;
 }
@@ -1221,9 +1267,10 @@ class RoomEnvironmentCard extends RcCard {
 // ── Editor ───────────────────────────────────────────────────────────────────
 const RoomEnvironmentCardEditor = rcEditor({
   card: RoomEnvironmentCard,
-  helpers: ["title", "navigation_path", "only_alerts", "show_gauge", "show_history", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "layout", "only_alerts", "show_gauge", "show_history", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
+    rcLayoutField(RE_I18N, lang),
     ...rcBooleans("show_title", "only_alerts", "show_gauge", "show_history"),
     ...rcIncludeField(RoomEnvironmentCard, hass, config),
     ...rcExcludeField(RoomEnvironmentCard, hass, config),
@@ -1286,9 +1333,10 @@ class RoomEnvironmentMiniCard extends rcMini(
 
 const RoomEnvironmentMiniCardEditor = rcEditor({
   card: RoomEnvironmentMiniCard,
-  helpers: ["title", "navigation_path", "columns", "only_alerts", "show_gauge", "zoom", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "layout", "columns", "only_alerts", "show_gauge", "zoom", "include", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
+    rcLayoutField(RE_I18N, lang),
     ...rcBooleans("show_title", "only_alerts", "zoom", "show_gauge", "show_history"),
     ...rcIncludeField(RoomEnvironmentMiniCard, hass, config),
     ...rcExcludeField(RoomEnvironmentMiniCard, hass, config),

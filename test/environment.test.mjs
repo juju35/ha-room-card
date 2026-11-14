@@ -471,3 +471,55 @@ test("24 h curves off: no query, no sparkline", async () => {
   assert.equal(n, 0);
   assert.doesNotMatch(head(card), /class="spark"/);
 });
+
+test("layout: tiles shows one tile per sensor, named after it, instead of one mean per kind", () => {
+  const extra = {
+    "sensor.lr_temperature_2": st("sensor.lr_temperature_2", 24, "temperature", "°C", "Salon Sonde fenêtre"),
+  };
+  const hass = makeHass({}, extra);
+  hass.entities["sensor.lr_temperature_2"] = { area_id: "living_room" };
+  const compact = render({}, hass);
+  assert.equal(compact._items.filter((i) => i.kind === "temperature").length, 1);
+  const tiles = render({ layout: "tiles" }, hass);
+  const temps = tiles._items.filter((i) => i.kind === "temperature");
+  assert.deepEqual(Array.from(temps, (i) => [i.id, i.name]), [
+    ["sensor.lr_temperature", "Température"],
+    ["sensor.lr_temperature_2", "Sonde fenêtre"],
+  ]);
+  assert.match(head(tiles), /class="lvl-\w+ layout-tiles"/);
+});
+
+test("layout: tiles colours the temperature tiles by default: blue, light blue, green, yellow, red", () => {
+  const color = (temp, config = { layout: "tiles" }, unit) => {
+    const html = head(render(config, makeHass({ temp, tempUnit: unit })));
+    const tile = html.split('<button class="tile').find((t) => t.includes('data-id="sensor.lr_temperature"'));
+    return tile.match(/style="--t: ([^"]+)"/)?.[1] ?? null;
+  };
+  assert.equal(color(14), "#1565c0");
+  assert.equal(color(17.5), "#4fc3f7");
+  assert.equal(color(21), "#43a047");
+  assert.equal(color(24), "#fbc02d");
+  assert.equal(color(28), "#e53935");
+  // A °F sensor is compared in °C: 70 °F ≈ 21 °C.
+  assert.equal(color(70, { layout: "tiles" }, "°F"), "#43a047");
+  // Compact layout: no colour unless asked; `false` turns them off.
+  assert.equal(color(28, {}), null);
+  assert.equal(color(28, { layout: "tiles", color_thresholds: false }), null);
+});
+
+test("color_thresholds: a bare list for the temperature, or per kind, in the sensor's unit", () => {
+  const tileStyle = (config, id, values) => {
+    const html = head(render(config, makeHass(values)));
+    const tile = html.split('<button class="tile').find((t) => t.includes(`data-id="${id}"`));
+    return tile.match(/style="--t: ([^"]+)"/)?.[1] ?? null;
+  };
+  const list = [{ below: 20, color: "blue" }, { color: "orange" }];
+  assert.equal(tileStyle({ color_thresholds: list }, "sensor.lr_temperature", { temp: 19 }), "blue");
+  assert.equal(tileStyle({ color_thresholds: list }, "sensor.lr_temperature", { temp: 22 }), "orange");
+  const perKind = { humidity: [{ below: 40, color: "tan" }, { below: 60, color: "green" }] };
+  assert.equal(tileStyle({ layout: "tiles", color_thresholds: perKind }, "sensor.lr_humidity", { hum: 50 }), "green");
+  // No step matches (no catch-all): no colour.
+  assert.equal(tileStyle({ layout: "tiles", color_thresholds: perKind }, "sensor.lr_humidity", { hum: 70 }), null);
+  // Kinds left out of a per-kind map keep the default temperature colours in tiles.
+  assert.equal(tileStyle({ layout: "tiles", color_thresholds: perKind }, "sensor.lr_temperature", { temp: 21 }), "#43a047");
+});
