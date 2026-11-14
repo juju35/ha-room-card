@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.24.2 - 2026-11-14
+
+### Fixes
+- Sensors card, Sensors mini card and Overview: smoke, carbon monoxide and gas detectors (`smoke`, `carbon_monoxide`, `gas`) read *Closed* / *Open*. They now show Home Assistant's own state (*Clear* / *Detected*), with the right icon, and are found in the room without `include`. An active detector is an alarm like a water leak: listed first, red and blinking, and the status names it (*Smoke detected*, *Carbon monoxide*, *Gas detected*), the most serious first. Reported in juju35/ha-public-transport#4.
+- The new texts in the 22 languages.
+
 ## 1.24.1 - 2026-11-14
 
 ### Fixes
