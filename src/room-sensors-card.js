@@ -719,7 +719,7 @@ class RoomSensorsCard extends RcCard {
   static i18n = RS_I18N;
   static needsArea = true;
   static includeDomains = ["binary_sensor"];
-  static defaults = { columns: 2, only_alerts: false, hide_when_clear: false, presence: true, blink: true, exclude: [] };
+  static defaults = { columns: 2, layout: "compact", only_alerts: false, hide_when_clear: false, presence: true, blink: true, exclude: [] };
 
   _candidate(id) {
     return rcMatchSensor(this._hass, id, {
@@ -887,10 +887,11 @@ const RS_AUTOS = { outdoor: (hass, config) => rcIsOutdoor(hass?.areas?.[config?.
 
 const RoomSensorsCardEditor = rcEditor({
   card: RoomSensorsCard,
-  helpers: ["title", "only_alerts", "hide_when_clear", "presence", "outdoor", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "layout", "only_alerts", "hide_when_clear", "presence", "outdoor", "include", ...RC_ADVANCED_HELPERS],
   autos: RS_AUTOS,
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
+    rcLayoutField(RS_I18N, lang),
     ...rcBooleans("show_title", "only_alerts", "hide_when_clear", "presence", "outdoor", "blink"),
     ...rcIncludeField(RoomSensorsCard, hass, config),
     ...rcExcludeField(RoomSensorsCard, hass, config),
@@ -943,10 +944,11 @@ class RoomSensorsMiniCard extends rcMini(
 
 const RoomSensorsMiniCardEditor = rcEditor({
   card: RoomSensorsMiniCard,
-  helpers: ["title", "columns", "hide_when_clear", "presence", "outdoor", "zoom", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "layout", "columns", "hide_when_clear", "presence", "outdoor", "zoom", "include", ...RC_ADVANCED_HELPERS],
   autos: RS_AUTOS,
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
+    rcLayoutField(RS_I18N, lang),
     ...rcBooleans("show_title", "hide_when_clear", "presence", "outdoor", "blink", "zoom"),
     ...rcIncludeField(RoomSensorsMiniCard, hass, config),
     ...rcExcludeField(RoomSensorsMiniCard, hass, config),

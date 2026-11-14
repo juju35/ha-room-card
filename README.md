@@ -58,6 +58,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Presence and motion sensors in blue (*Detected* / *Clear*), with a person icon next to the pill while someone is in the room; they are not alerts and never blink
 - Icon picked from the sensor: sliding door, window, door, garage door, water drop, person, motion sensor
 - Clean names: the `Sensor` / `Capteur` prefix, the area name and the trailing device-class word are removed (*Capteur Porte Fenêtre Cuisine Porte* → *Porte Fenêtre Cuisine*)
+- **Tiles layout** (`layout: tiles`): one large tile per sensor, the size of Home Assistant's Tile card, easier to tap on a phone
 - Show only the open or active sensors (`only_alerts`), or hide the whole card when everything is closed, dry, reporting and nobody is there (`hide_when_clear`)
 - Tap a sensor to open its details
 - Automatic discovery from the area, or an explicit list with name and icon overrides
@@ -217,7 +218,7 @@ The Sensors, Lights, Plugs and Environment cards share these options; each card 
 | `title` | ❌ | Area name | Card title |
 | `show_title` | ❌ | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `columns` | ❌ | `2` | Number of tile columns (1–4) |
-| `layout` | ❌ | `compact` | Lights, Plugs and Environment cards: `tiles` for one large tile per entity, the size of Home Assistant's Tile card (56 px high, 40 px icon), easier to tap on a phone; on a mini card it shapes the zoomed-in view |
+| `layout` | ❌ | `compact` | Sensors, Lights, Plugs and Environment cards: `tiles` for one large tile per entity, the size of Home Assistant's Tile card (56 px high, 40 px icon), easier to tap on a phone; on a mini card it shapes the zoomed-in view |
 | `exclude` | ❌ | — | Entities left out of the automatic discovery; the visual editor only offers the ones the card finds in the chosen room |
 | `navigation_path` | ❌ | — | Dashboard opened when tapping the title, e.g. `/light` |
 | `only_on` | ❌ | `false` | Lights and Plugs cards: show only what is on (and unavailable entities) |
@@ -303,12 +304,24 @@ type: custom:room-sensors-card
 area: living_room
 title: Living room
 columns: 2
+layout: compact
 only_alerts: false
 hide_when_clear: false
 presence: true
 blink: true
 exclude:
   - binary_sensor.living_room_tv_cabinet
+```
+
+#### Tiles layout
+
+On a phone, `layout: tiles` gives each sensor a large tile, the size of Home Assistant's Tile card, two per row — open sensors first, with how long they have been open, as in the compact layout. On the Sensors mini card it shapes the zoomed-in view.
+
+```yaml
+type: custom:room-sensors-card
+area: living_room
+layout: tiles
+columns: 2
 ```
 
 #### Alerts only
@@ -378,7 +391,7 @@ exclude:
 
 #### Tiles layout
 
-On a phone, `layout: tiles` gives each light a large tile, the size of Home Assistant's Tile card, two per row — tap to toggle, drag to dim, hold for the details, as in the compact layout. The same option exists on the Plugs card.
+On a phone, `layout: tiles` gives each light a large tile, the size of Home Assistant's Tile card, two per row — tap to toggle, drag to dim, hold for the details, as in the compact layout. The same option exists on the Plugs and Sensors cards.
 
 ```yaml
 type: custom:room-lights-card
@@ -726,6 +739,10 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 | Mini card zoomed in | |
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-zoom.png" alt="Mini zoomed in" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-zoom-dark.png" alt="Mini zoomed in dark" width="400"> |
+
+| Tiles layout (`layout: tiles`) | |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-tiles.png" alt="Sensors tiles" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-tiles-dark.png" alt="Sensors tiles dark" width="400"> |
 
 ### Lights
 
