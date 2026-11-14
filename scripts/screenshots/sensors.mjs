@@ -1,6 +1,6 @@
 // Renders the sensors card with a mock living room and saves the README screenshots.
 // Usage: npm install && npm run build && node scripts/screenshots/sensors.mjs
-import { pair, shoot } from "./harness.mjs";
+import { pair, shoot, shootTiles } from "./harness.mjs";
 
 // Leak sensor, two sliding doors, a window, a presence sensor.
 const SENSORS = [
@@ -31,6 +31,8 @@ const setup = (s, lang) => {
 
 const shots = [...pair("open", { open: OPEN }), ...pair("leak", { open: LEAK })];
 await shoot({ prefix: "sensors", tag: "room-sensors-card", shots, setup });
+// The tiles layout at a phone's width: one large tile per sensor, two columns.
+await shootTiles({ prefix: "sensors", tag: "room-sensors-card", setup }, { open: OPEN });
 // The mini card, and the same card zoomed in (its zoom button clicked).
 await shoot({
   prefix: "sensors-mini",

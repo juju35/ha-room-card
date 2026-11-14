@@ -707,8 +707,8 @@ test("each visual editor offers every option of its card", () => {
     for (const name of expected) assert.ok(fields.includes(name), `${tag}: ${name} missing from the editor`);
   };
   const room = { area: "kitchen" };
-  has("room-sensors-card", room, ["area", "title", "navigation_path", "columns", "only_alerts", "hide_when_clear", "presence", "outdoor", "blink", "entities", "language"]);
-  has("room-sensors-mini-card", room, ["navigation_path", "columns", "hide_when_clear", "presence", "outdoor", "blink", "zoom", "entities", "language"]);
+  has("room-sensors-card", room, ["area", "title", "navigation_path", "columns", "layout", "only_alerts", "hide_when_clear", "presence", "outdoor", "blink", "entities", "language"]);
+  has("room-sensors-mini-card", room, ["navigation_path", "columns", "layout", "hide_when_clear", "presence", "outdoor", "blink", "zoom", "entities", "language"]);
   has("room-lights-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "show_scenes", "scenes", "entities", "language"]);
   has("room-switch-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_power", "all_off_button", "entities", "language"]);
   has("room-lights-mini-card", room, ["navigation_path", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "show_scenes", "scenes", "entities", "language"]);
@@ -1121,8 +1121,8 @@ test("the lights mini card: no scenes in the compact view, the section once zoom
   assert.match(card.shadowRoot.innerHTML, /<button class="section-title"/);
 });
 
-test("layout: tiles enlarges the tiles of the lights and plugs cards and counts taller rows", () => {
-  for (const tag of ["room-lights-card", "room-switch-card"]) {
+test("layout: tiles enlarges the tiles of the lights, plugs and sensors cards and counts taller rows", () => {
+  for (const tag of ["room-lights-card", "room-switch-card", "room-sensors-card"]) {
     const Card = rc.cards[tag];
     const card = new Card();
     card.setConfig({ area: "kitchen", layout: "tiles" });
@@ -1133,6 +1133,30 @@ test("layout: tiles enlarges the tiles of the lights and plugs cards and counts 
     compact.hass = makeHass();
     assert.doesNotMatch(compact.shadowRoot.innerHTML, /<ha-card class="[^"]*layout-tiles/, tag);
     assert.ok(card.getCardSize() >= compact.getCardSize(), tag);
+  }
+});
+
+test("layout: tiles on the sensors mini card shapes its zoomed-in view only (#79)", () => {
+  const card = new rc.cards["room-sensors-mini-card"]();
+  card.setConfig({ area: "kitchen", layout: "tiles" });
+  card.hass = makeHass();
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /<ha-card class="[^"]*layout-tiles/, "the compact two-line view is unchanged");
+  card._zoomed = true;
+  card._sig = null;
+  card._render();
+  assert.match(card.shadowRoot.innerHTML, /<ha-card class="[^"]*layout-tiles/);
+});
+
+test("the sensors card editors offer the layout: compact or tiles (#79)", () => {
+  for (const tag of ["room-sensors-card", "room-sensors-mini-card"]) {
+    const editor = new (rc.customElements.get(`${tag}-editor`))();
+    editor.appendChild = () => {};
+    editor.setConfig({ area: "kitchen" });
+    editor.hass = makeHass();
+    const field = [...editor._form.schema].find((f) => f.name === "layout");
+    assert.ok(field, tag);
+    assert.deepEqual([...field.selector.select.options].map((o) => o.value), ["compact", "tiles"], tag);
+    assert.ok(editor._form.computeHelper({ name: "layout" }), `${tag}: help text`);
   }
 });
 

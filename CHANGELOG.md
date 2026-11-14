@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.26.0 - 2026-11-14
+
+### Features
+- **Tiles layout** (`layout: tiles`) on the Sensors card, and the zoomed-in view of the Sensors mini card, as on the Lights, Plugs and Environment cards: one large tile per sensor, the size of Home Assistant's Tile card, easier to tap on a phone; `columns` still sets how many per row. In the visual editor ([#79](https://github.com/juju35/ha-room-card/issues/79), asked by @mielikki33).
+
 ## 1.25.1 - 2026-11-14
 
 ### Fixes
