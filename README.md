@@ -742,7 +742,7 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 
 | Tiles layout (`layout: tiles`) | |
 |---|---|
-| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-tiles.png" alt="Lights tiles" width="380"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-tiles-dark.png" alt="Lights tiles dark" width="380"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-tiles.png" alt="Lights tiles" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-tiles-dark.png" alt="Lights tiles dark" width="400"> |
 
 ### Plugs
 
@@ -759,7 +759,7 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 
 | Tiles layout (`layout: tiles`) | |
 |---|---|
-| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-tiles.png" alt="Plugs tiles" width="380"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-tiles-dark.png" alt="Plugs tiles dark" width="380"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-tiles.png" alt="Plugs tiles" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/switch-tiles-dark.png" alt="Plugs tiles dark" width="400"> |
 
 ### Environment
 
@@ -776,7 +776,7 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 
 | Tiles layout (`layout: tiles`) | |
 |---|---|
-| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-tiles.png" alt="Temperatures tiles" width="380"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-tiles-dark.png" alt="Temperatures tiles dark" width="380"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-tiles.png" alt="Temperatures tiles" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/environment-tiles-dark.png" alt="Temperatures tiles dark" width="400"> |
 
 ### Environment overview
 

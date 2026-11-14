@@ -1,6 +1,6 @@
 // Renders the lights card with a mock living room and saves the README screenshots.
 // Usage: npm install && npm run build && node scripts/screenshots/lights.mjs
-import { pair, shoot } from "./harness.mjs";
+import { pair, shoot, shootTiles } from "./harness.mjs";
 
 // Two ceiling lights, a lamp on a smart plug and a night light.
 const LIGHTS = [
@@ -45,16 +45,7 @@ const setup = (s, lang) => {
 
 await shoot({ prefix: "lights", tag: "room-lights-card", icons, shots, setup });
 // The tiles layout at a phone's width: one large tile per light, two columns.
-await shoot({
-  prefix: "lights",
-  tag: "room-lights-card",
-  icons,
-  shots: pair("tiles", { on: EVENING, width: 380 }),
-  setup: (s, lang) => {
-    const { hass, config } = setup(s, lang);
-    return { hass, config: { ...config, layout: "tiles" } };
-  },
-});
+await shootTiles({ prefix: "lights", tag: "room-lights-card", icons, setup }, { on: EVENING });
 // The Scenes section unfolded (its title clicked).
 await shoot({
   prefix: "lights",

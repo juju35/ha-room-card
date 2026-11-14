@@ -164,3 +164,15 @@ export const shoot = async ({ prefix, tag, shots, setup, icons = [], ws = "" }) 
   }
   await browser.close();
 };
+
+// The tiles layout (`layout: tiles`) of a card at a phone's width, light and dark: the card's own `setup` with the
+// layout added; `extra` goes into the shot.
+export const shootTiles = ({ setup, ...opts }, extra = {}) =>
+  shoot({
+    ...opts,
+    shots: pair("tiles", { width: 380, ...extra }),
+    setup: (s, lang) => {
+      const out = setup(s, lang);
+      return { ...out, config: { ...out.config, layout: "tiles" } };
+    },
+  });
