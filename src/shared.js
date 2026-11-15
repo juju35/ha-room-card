@@ -2442,9 +2442,8 @@ const RC_ROOM_GRID_STYLES = `
           column-gap: 7px; align-items: center; align-content: start; padding: 6px 7px; border-radius: 10px;
           background: var(--secondary-background-color, transparent); border: 1px solid transparent;
           transition: background .2s, border-color .2s; }
-  .room.lvl-warn, .room.lvl-alert {
-    background: color-mix(in srgb, var(--t) 9%, var(--secondary-background-color, transparent));
-    border-color: color-mix(in srgb, var(--t) 22%, transparent); }
+  /* Tile B look: the background stays neutral at every level — the state reads from the tinted icon badge, the
+     coloured state line and the chips (an alert shows red without tinting the whole tile). */
   .room:hover { background: color-mix(in srgb, var(--t) 13%, var(--secondary-background-color, transparent)); }
   .room:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
   .room.sel { border-color: color-mix(in srgb, var(--primary-color) 55%, transparent); }

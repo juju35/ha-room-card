@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.27.1 - 2026-11-16
+
+### Fixes
+- Overview and environment-overview tiles keep a neutral background at every level (tile look B); the state reads from the tinted icon badge, the coloured state line and the chips. A leak or an alarm still stands out in red without tinting the whole tile.
+
 ## 1.27.0 - 2026-11-15
 
 ### Features
