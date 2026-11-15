@@ -1175,3 +1175,15 @@ test("the editor shows included entities written with a name as their entity, an
   fire({ ...editor._form.data, include: ["switch.coffee_plug", "switch.relay"] });
   assert.deepEqual(JSON.parse(JSON.stringify(sent.at(-1).include)), [{ entity: "switch.coffee_plug", name: "Cuisine", icon: "mdi:ceiling-light" }, "switch.relay"]);
 });
+
+test("names renames an entity on the card, default kept otherwise (#81)", () => {
+  const named = new cards["room-sensors-card"]();
+  named.setConfig({ area: "kitchen", names: { "binary_sensor.door": "Front door" } });
+  named.hass = makeHass();
+  assert.equal(named._collect().find((i) => i.id === "binary_sensor.door")?.name, "Front door");
+
+  const plain = new cards["room-sensors-card"]();
+  plain.setConfig({ area: "kitchen" });
+  plain.hass = makeHass();
+  assert.equal(plain._collect().find((i) => i.id === "binary_sensor.door")?.name, "Door");
+});

@@ -286,6 +286,8 @@ const RC_I18N = {
     ed_layout_tiles: "Tiles",
     ed_advanced: "Advanced",
     ed_language: "Language",
+    ed_names: "Entity names",
+    ed_names_helper: "Rename what shows on the card; empty keeps the default",
     ed_language_helper: "Empty: the Home Assistant language",
     ed_language_auto: "Automatic",
     ed_entities: "Explicit entities (YAML)",
@@ -335,6 +337,8 @@ const RC_I18N = {
     ed_layout_tiles: "Tuiles",
     ed_advanced: "Avancé",
     ed_language: "Langue",
+    ed_names: "Noms des entités",
+    ed_names_helper: "Renommer l'affichage sur la carte ; vide garde le nom par défaut",
     ed_language_helper: "Vide : la langue de Home Assistant",
     ed_language_auto: "Automatique",
     ed_entities: "Entités explicites (YAML)",
@@ -384,6 +388,8 @@ const RC_I18N = {
     ed_layout_tiles: "Kacheln",
     ed_advanced: "Erweitert",
     ed_language: "Sprache",
+    ed_names: "Entitätsnamen",
+    ed_names_helper: "Anzeigenamen auf der Karte ändern; leer behält den Standard",
     ed_language_helper: "Leer: die Sprache von Home Assistant",
     ed_language_auto: "Automatisch",
     ed_entities: "Explizite Entitäten (YAML)",
@@ -433,6 +439,8 @@ const RC_I18N = {
     ed_layout_tiles: "Mosaicos",
     ed_advanced: "Avanzado",
     ed_language: "Idioma",
+    ed_names: "Nombres de las entidades",
+    ed_names_helper: "Cambiar el nombre mostrado en la tarjeta; vacío mantiene el predeterminado",
     ed_language_helper: "Vacío: el idioma de Home Assistant",
     ed_language_auto: "Automático",
     ed_entities: "Entidades explícitas (YAML)",
@@ -483,6 +491,8 @@ const RC_I18N = {
     ed_layout_tiles: "Плочице",
     ed_advanced: "Напредно",
     ed_language: "Језик",
+    ed_names: "Називи ентитета",
+    ed_names_helper: "Промените приказано име на картици; празно задржава подразумевано",
     ed_language_helper: "Празно: језик Home Assistant-а",
     ed_language_auto: "Аутоматски",
     ed_entities: "Експлицитни ентитети (YAML)",
@@ -533,6 +543,8 @@ const RC_I18N = {
     ed_layout_tiles: "Pločice",
     ed_advanced: "Napredno",
     ed_language: "Jezik",
+    ed_names: "Nazivi entiteta",
+    ed_names_helper: "Promenite prikazano ime na kartici; prazno zadržava podrazumevano",
     ed_language_helper: "Prazno: jezik Home Assistant-a",
     ed_language_auto: "Automatski",
     ed_entities: "Eksplicitni entiteti (YAML)",
@@ -582,6 +594,8 @@ const RC_I18N = {
     ed_layout_tiles: "Riquadri",
     ed_advanced: "Avanzate",
     ed_language: "Lingua",
+    ed_names: "Nomi delle entità",
+    ed_names_helper: "Rinomina ciò che appare sulla scheda; vuoto mantiene il valore predefinito",
     ed_language_helper: "Vuoto: la lingua di Home Assistant",
     ed_language_auto: "Automatica",
     ed_entities: "Entità esplicite (YAML)",
@@ -631,6 +645,8 @@ const RC_I18N = {
     ed_layout_tiles: "Tegels",
     ed_advanced: "Geavanceerd",
     ed_language: "Taal",
+    ed_names: "Namen van entiteiten",
+    ed_names_helper: "Wijzig de naam op de kaart; leeg houdt de standaard",
     ed_language_helper: "Leeg: de taal van Home Assistant",
     ed_language_auto: "Automatisch",
     ed_entities: "Expliciete entiteiten (YAML)",
@@ -680,6 +696,8 @@ const RC_I18N = {
     ed_layout_tiles: "Mosaicos",
     ed_advanced: "Avançado",
     ed_language: "Idioma",
+    ed_names: "Nomes das entidades",
+    ed_names_helper: "Mudar o nome mostrado no cartão; vazio mantém o padrão",
     ed_language_helper: "Vazio: o idioma do Home Assistant",
     ed_language_auto: "Automático",
     ed_entities: "Entidades explícitas (YAML)",
@@ -729,6 +747,8 @@ const RC_I18N = {
     ed_layout_tiles: "Kafelki",
     ed_advanced: "Zaawansowane",
     ed_language: "Język",
+    ed_names: "Nazwy encji",
+    ed_names_helper: "Zmień nazwę wyświetlaną na karcie; puste zachowuje domyślną",
     ed_language_helper: "Puste: język Home Assistanta",
     ed_language_auto: "Automatyczny",
     ed_entities: "Jawnie podane encje (YAML)",
@@ -778,6 +798,8 @@ const RC_I18N = {
     ed_layout_tiles: "Plăci",
     ed_advanced: "Avansat",
     ed_language: "Limbă",
+    ed_names: "Numele entităților",
+    ed_names_helper: "Redenumește ce apare pe card; gol păstrează numele implicit",
     ed_language_helper: "Gol: limba Home Assistant",
     ed_language_auto: "Automată",
     ed_entities: "Entități explicite (YAML)",
@@ -827,6 +849,8 @@ const RC_I18N = {
     ed_layout_tiles: "Fliser",
     ed_advanced: "Avanceret",
     ed_language: "Sprog",
+    ed_names: "Entitetsnavne",
+    ed_names_helper: "Omdøb det, der vises på kortet; tomt beholder standarden",
     ed_language_helper: "Tomt: Home Assistants sprog",
     ed_language_auto: "Automatisk",
     ed_entities: "Eksplicitte enheder (YAML)",
@@ -876,6 +900,8 @@ const RC_I18N = {
     ed_layout_tiles: "Rutor",
     ed_advanced: "Avancerat",
     ed_language: "Språk",
+    ed_names: "Entitetsnamn",
+    ed_names_helper: "Byt namn som visas på kortet; tomt behåller standardnamnet",
     ed_language_helper: "Tomt: Home Assistants språk",
     ed_language_auto: "Automatiskt",
     ed_entities: "Explicita entiteter (YAML)",
@@ -925,6 +951,8 @@ const RC_I18N = {
     ed_layout_tiles: "Плочки",
     ed_advanced: "Разширени",
     ed_language: "Език",
+    ed_names: "Имена на обектите",
+    ed_names_helper: "Преименувайте показаното на картата; празно запазва името по подразбиране",
     ed_language_helper: "Празно: езикът на Home Assistant",
     ed_language_auto: "Автоматично",
     ed_entities: "Изрично зададени обекти (YAML)",
@@ -974,6 +1002,8 @@ const RC_I18N = {
     ed_layout_tiles: "Плитки",
     ed_advanced: "Дополнительно",
     ed_language: "Язык",
+    ed_names: "Имена объектов",
+    ed_names_helper: "Переименовать отображаемое на карточке; пусто — имя по умолчанию",
     ed_language_helper: "Пусто: язык Home Assistant",
     ed_language_auto: "Автоматически",
     ed_entities: "Явно заданные объекты (YAML)",
@@ -1023,6 +1053,8 @@ const RC_I18N = {
     ed_layout_tiles: "Плитки",
     ed_advanced: "Додатково",
     ed_language: "Мова",
+    ed_names: "Імена сутностей",
+    ed_names_helper: "Перейменувати показане на картці; порожнє залишає типове",
     ed_language_helper: "Порожньо: мова Home Assistant",
     ed_language_auto: "Автоматично",
     ed_entities: "Явно задані сутності (YAML)",
@@ -1072,6 +1104,8 @@ const RC_I18N = {
     ed_layout_tiles: "Csempék",
     ed_advanced: "Speciális",
     ed_language: "Nyelv",
+    ed_names: "Entitások nevei",
+    ed_names_helper: "A kártyán megjelenő név átírása; üresen az alapértelmezett marad",
     ed_language_helper: "Üres: a Home Assistant nyelve",
     ed_language_auto: "Automatikus",
     ed_entities: "Kifejezetten megadott entitások (YAML)",
@@ -1121,6 +1155,8 @@ const RC_I18N = {
     ed_layout_tiles: "Dlaždice",
     ed_advanced: "Rozšírené",
     ed_language: "Jazyk",
+    ed_names: "Názvy entít",
+    ed_names_helper: "Premenujte zobrazené na karte; prázdne ponechá predvolené",
     ed_language_helper: "Prázdne: jazyk Home Assistanta",
     ed_language_auto: "Automaticky",
     ed_entities: "Explicitné entity (YAML)",
@@ -1170,6 +1206,8 @@ const RC_I18N = {
     ed_layout_tiles: "Dlaždice",
     ed_advanced: "Pokročilé",
     ed_language: "Jazyk",
+    ed_names: "Názvy entit",
+    ed_names_helper: "Přejmenujte zobrazené na kartě; prázdné ponechá výchozí",
     ed_language_helper: "Prázdné: jazyk Home Assistanta",
     ed_language_auto: "Automaticky",
     ed_entities: "Explicitní entity (YAML)",
@@ -1219,6 +1257,8 @@ const RC_I18N = {
     ed_layout_tiles: "Ploščice",
     ed_advanced: "Napredno",
     ed_language: "Jezik",
+    ed_names: "Imena entitet",
+    ed_names_helper: "Preimenujte prikazano na kartici; prazno ohrani privzeto",
     ed_language_helper: "Prazno: jezik Home Assistanta",
     ed_language_auto: "Samodejno",
     ed_entities: "Izrecno navedene entitete (YAML)",
@@ -1268,6 +1308,8 @@ const RC_I18N = {
     ed_layout_tiles: "Flīzes",
     ed_advanced: "Papildu",
     ed_language: "Valoda",
+    ed_names: "Entītiju nosaukumi",
+    ed_names_helper: "Pārdēvējiet kartē redzamo; tukšs saglabā noklusējumu",
     ed_language_helper: "Tukšs: Home Assistant valoda",
     ed_language_auto: "Automātiski",
     ed_entities: "Tieši norādītas vienības (YAML)",
@@ -1317,6 +1359,8 @@ const RC_I18N = {
     ed_layout_tiles: "Πλακίδια",
     ed_advanced: "Για προχωρημένους",
     ed_language: "Γλώσσα",
+    ed_names: "Ονόματα οντοτήτων",
+    ed_names_helper: "Μετονομάστε αυτό που εμφανίζεται στην κάρτα· κενό κρατά το προεπιλεγμένο",
     ed_language_helper: "Κενό: η γλώσσα του Home Assistant",
     ed_language_auto: "Αυτόματα",
     ed_entities: "Ρητές οντότητες (YAML)",
@@ -1546,10 +1590,13 @@ class RcCard extends HTMLElement {
   _entries() {
     const h = this._hass;
     const c = this._config;
-    const list = (l) => (l || []).map((e) => (typeof e === "string" ? { entity: e } : e)).filter((e) => h.states[e.entity]);
+    // `names` (a map entity_id → label, set graphically or in YAML) renames an entity on the card; an inline
+    // `name` on an entities/include entry is more specific and wins over it.
+    const named = (e) => (c.names?.[e.entity] && !e.name ? { ...e, name: c.names[e.entity] } : e);
+    const list = (l) => (l || []).map((e) => (typeof e === "string" ? { entity: e } : e)).filter((e) => h.states[e.entity]).map(named);
     if (c.entities?.length) return list(c.entities);
     this._prepare();
-    const found = c.area ? this._areaIds().filter((id) => h.states[id] && this._candidate(id)).map((entity) => ({ entity })) : [];
+    const found = c.area ? this._areaIds().filter((id) => h.states[id] && this._candidate(id)).map((entity) => named({ entity })) : [];
     const ids = new Set(found.map((e) => e.entity));
     return [...found, ...list(c.include).filter((e) => !ids.has(e.entity))];
   }
@@ -2133,6 +2180,28 @@ const rcExcludeField = (card, hass, config) => {
   return rcEntitiesField("exclude", ids);
 };
 
+// Per-entity rename: a text field for each entity the card shows, grouped under a `names` map (entity_id → label).
+// The field label is the entity's default name, its value the current override; empty keeps the default. Lets the
+// `name` that YAML already supports be set graphically, on any of the cards (ha-room-card#81).
+const rcRenameField = (card, hass, config) => {
+  if (!hass) return [];
+  let entries;
+  try {
+    entries = rcProbe(card, hass, { ...config, names: undefined })._entries();
+  } catch {
+    return [];
+  }
+  const seen = new Set();
+  const fields = [];
+  for (const e of entries || []) {
+    const id = e.entity;
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    fields.push({ name: id, label: hass.states[id]?.attributes?.friendly_name || id, selector: { text: {} } });
+  }
+  return fields.length ? [{ name: "names", type: "expandable", flatten: false, schema: fields }] : [];
+};
+
 // `schema(lang, hass, config)` lists the fields; options left at the card's default are not written to the YAML
 // (list defaults such as `exclude: []` are not shown in the form: an empty list is never written anyway).
 // `autos` maps an option to its default worked out from the config (`(hass, config) => value`): shown in the form
@@ -2165,12 +2234,17 @@ const rcEditor = ({ card, helpers, schema, autos = {} }) => {
       this._lang = lang;
       if (!this._form) {
         this._form = document.createElement("ha-form");
-        this._form.computeLabel = (s) => rcT(i18n, this._lang, `ed_${s.name}`);
+        this._form.computeLabel = (s) => s.label ?? rcT(i18n, this._lang, `ed_${s.name}`);
         this._form.computeHelper = (s) =>
           helpers.includes(s.name) ? rcT(i18n, this._lang, `ed_${s.name}_helper`) : undefined;
         this._form.addEventListener("value-changed", (ev) => {
           const config = { ...ev.detail.value };
           for (const k of RC_ENTITY_LISTS) if (k in config) config[k] = rcListKeep(config[k], this._config[k]);
+          if (config.names && typeof config.names === "object") {
+            const kept = Object.fromEntries(Object.entries(config.names).filter(([, v]) => v != null && v !== ""));
+            if (Object.keys(kept).length) config.names = kept;
+            else delete config.names;
+          }
           for (const k of Object.keys(config)) {
             const v = config[k];
             if (v === "" || v == null || (Array.isArray(v) && !v.length) || defaults[k] === v) delete config[k];

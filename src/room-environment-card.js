@@ -1267,13 +1267,14 @@ class RoomEnvironmentCard extends RcCard {
 // ── Editor ───────────────────────────────────────────────────────────────────
 const RoomEnvironmentCardEditor = rcEditor({
   card: RoomEnvironmentCard,
-  helpers: ["title", "navigation_path", "layout", "only_alerts", "show_gauge", "show_history", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "layout", "only_alerts", "show_gauge", "show_history", "include", "names", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
     rcLayoutField(RE_I18N, lang),
     ...rcBooleans("show_title", "only_alerts", "show_gauge", "show_history"),
     ...rcIncludeField(RoomEnvironmentCard, hass, config),
     ...rcExcludeField(RoomEnvironmentCard, hass, config),
+    ...rcRenameField(RoomEnvironmentCard, hass, config),
     ...rcAdvanced(RE_I18N, lang, "thresholds", "entities", "language"),
   ],
 });
@@ -1333,13 +1334,14 @@ class RoomEnvironmentMiniCard extends rcMini(
 
 const RoomEnvironmentMiniCardEditor = rcEditor({
   card: RoomEnvironmentMiniCard,
-  helpers: ["title", "navigation_path", "layout", "columns", "only_alerts", "show_gauge", "zoom", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "layout", "columns", "only_alerts", "show_gauge", "zoom", "include", "names", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
     rcLayoutField(RE_I18N, lang),
     ...rcBooleans("show_title", "only_alerts", "zoom", "show_gauge", "show_history"),
     ...rcIncludeField(RoomEnvironmentMiniCard, hass, config),
     ...rcExcludeField(RoomEnvironmentMiniCard, hass, config),
+    ...rcRenameField(RoomEnvironmentMiniCard, hass, config),
     ...rcAdvanced(RE_I18N, lang, "thresholds", "entities", "language"),
   ],
 });
