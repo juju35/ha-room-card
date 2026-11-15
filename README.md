@@ -220,6 +220,7 @@ The Sensors, Lights, Plugs and Environment cards share these options; each card 
 | `columns` | ❌ | `2` | Number of tile columns (1–4) |
 | `layout` | ❌ | `compact` | Sensors, Lights, Plugs and Environment cards: `tiles` for one large tile per entity, the size of Home Assistant's Tile card (56 px high, 40 px icon), easier to tap on a phone; on a mini card it shapes the zoomed-in view |
 | `exclude` | ❌ | — | Entities left out of the automatic discovery; the visual editor only offers the ones the card finds in the chosen room |
+| `names` | ❌ | — | Rename entities on the card: a map of entity ID to the label to show (`names: {binary_sensor.front_door: "Front door"}`). The visual editor lists each entity the card shows with a text field (**Entity names** section); an empty field keeps the entity's own name. An inline `name` on an `include` / `entities` item takes precedence |
 | `navigation_path` | ❌ | — | Dashboard opened when tapping the title, e.g. `/light` |
 | `only_on` | ❌ | `false` | Lights and Plugs cards: show only what is on (and unavailable entities) |
 | `hide_when_off` | ❌ | `false` | Lights and Plugs cards: hide the whole card when everything is off |

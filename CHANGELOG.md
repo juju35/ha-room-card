@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.27.0 - 2026-11-15
+
+### Features
+- **Rename entities from the visual editor** with the new `names` option (a map of entity ID to label): the Sensors, Lights, Plugs and Environment cards now show an **Entity names** section listing each entity they display, with a text field to override its name — no YAML needed. An empty field keeps the entity's own name, and an inline `name` on an `include` / `entities` item still takes precedence ([#81](https://github.com/juju35/ha-room-card/issues/81), suggested by @mielikki33).
+
 ## 1.26.0 - 2026-11-14
 
 ### Features

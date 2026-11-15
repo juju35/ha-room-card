@@ -887,7 +887,7 @@ const RS_AUTOS = { outdoor: (hass, config) => rcIsOutdoor(hass?.areas?.[config?.
 
 const RoomSensorsCardEditor = rcEditor({
   card: RoomSensorsCard,
-  helpers: ["title", "layout", "only_alerts", "hide_when_clear", "presence", "outdoor", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "layout", "only_alerts", "hide_when_clear", "presence", "outdoor", "include", "names", ...RC_ADVANCED_HELPERS],
   autos: RS_AUTOS,
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
@@ -895,6 +895,7 @@ const RoomSensorsCardEditor = rcEditor({
     ...rcBooleans("show_title", "only_alerts", "hide_when_clear", "presence", "outdoor", "blink"),
     ...rcIncludeField(RoomSensorsCard, hass, config),
     ...rcExcludeField(RoomSensorsCard, hass, config),
+    ...rcRenameField(RoomSensorsCard, hass, config),
     ...rcAdvanced(RS_I18N, lang, "entities", "language"),
   ],
 });
@@ -944,7 +945,7 @@ class RoomSensorsMiniCard extends rcMini(
 
 const RoomSensorsMiniCardEditor = rcEditor({
   card: RoomSensorsMiniCard,
-  helpers: ["title", "layout", "columns", "hide_when_clear", "presence", "outdoor", "zoom", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "layout", "columns", "hide_when_clear", "presence", "outdoor", "zoom", "include", "names", ...RC_ADVANCED_HELPERS],
   autos: RS_AUTOS,
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
@@ -952,6 +953,7 @@ const RoomSensorsMiniCardEditor = rcEditor({
     ...rcBooleans("show_title", "hide_when_clear", "presence", "outdoor", "blink", "zoom"),
     ...rcIncludeField(RoomSensorsMiniCard, hass, config),
     ...rcExcludeField(RoomSensorsMiniCard, hass, config),
+    ...rcRenameField(RoomSensorsMiniCard, hass, config),
     ...rcAdvanced(RS_I18N, lang, "entities", "language"),
   ],
 });

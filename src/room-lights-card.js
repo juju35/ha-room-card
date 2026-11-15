@@ -891,13 +891,14 @@ class RoomLightsCard extends RcToggleCard {
 // ── Editor ───────────────────────────────────────────────────────────────────
 const RoomLightsCardEditor = rcEditor({
   card: RoomLightsCard,
-  helpers: ["title", "navigation_path", "layout", "only_on", "hide_when_off", "show_brightness", "all_off_button", "show_scenes", "scenes", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "layout", "only_on", "hide_when_off", "show_brightness", "all_off_button", "show_scenes", "scenes", "include", "names", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
     rcLayoutField(RL_I18N, lang),
     ...rcBooleans("show_title", "only_on", "hide_when_off", "show_brightness", "all_off_button", "show_scenes"),
     ...rcIncludeField(RoomLightsCard, hass, config),
     ...rcExcludeField(RoomLightsCard, hass, config),
+    ...rcRenameField(RoomLightsCard, hass, config),
     ...rcAdvanced(RL_I18N, lang, "entities", "scenes", "language"),
   ],
 });
@@ -918,13 +919,14 @@ class RoomLightsMiniCard extends rcToggleMini(RoomLightsCard, "room-lights-mini-
 
 const RoomLightsMiniCardEditor = rcEditor({
   card: RoomLightsMiniCard,
-  helpers: ["title", "navigation_path", "layout", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "show_scenes", "scenes", "include", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "layout", "columns", "only_on", "hide_when_off", "show_brightness", "all_off_button", "zoom", "show_scenes", "scenes", "include", "names", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
     rcLayoutField(RL_I18N, lang),
     ...rcBooleans("show_title", "only_on", "hide_when_off", "all_off_button", "zoom", "show_brightness", "show_scenes"),
     ...rcIncludeField(RoomLightsMiniCard, hass, config),
     ...rcExcludeField(RoomLightsMiniCard, hass, config),
+    ...rcRenameField(RoomLightsMiniCard, hass, config),
     ...rcAdvanced(RL_I18N, lang, "entities", "scenes", "language"),
   ],
 });
