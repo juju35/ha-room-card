@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.27.2 - 2026-11-16
+
+### Fixes
+- Environment and environment-overview cards no longer take an appliance's own sensor (oven cavity, fridge, freezer, dishwasher, water heater, heat-pump flow/return, aquarium, pool…) as the room reading: an oven cooling at 60 °C made the kitchen "Too hot" and dragged the house average up. Appliance sensors are now left out of the automatic discovery by companion-entity detection (a device that also has a `climate`, `water_heater`, `humidifier`, `number` setpoint, or an operation-state/program entity) and an appliance word list; a room left without an ambient sensor reads "No sensor" and drops out of the overview average. A sensor wrongly skipped can be forced back in through `entities`, and `appliance_filter: false` restores the old behaviour ([#89](https://github.com/juju35/ha-room-card/issues/89), reported by @FredM67).
+
 ## 1.27.1 - 2026-11-16
 
 ### Fixes
