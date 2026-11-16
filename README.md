@@ -79,7 +79,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 
 - Header with an icon and a status pill: *All off*, or *2 on* with a power button that turns every light of the room off
 - Lights that are on listed first, tinted with their actual colour, brightness shown as a bar behind the tile
-- **Tap** a light to toggle it, **drag** it sideways to set its brightness, **hold** it to open its details; from the keyboard: Enter or Space toggles, Shift+Enter or the context-menu key opens the details, ← / → dim by 10 % (the light is set once, when the key is released or after a short pause)
+- **Tap** a light to toggle it, **drag** it sideways to set its brightness, **hold** it to open its details and history (the Home Assistant more-info dialog, its *History* tab included — no need to go through settings or the entity list); from the keyboard: Enter or Space toggles, Shift+Enter or the context-menu key opens the details, ← / → dim by 10 % (the light is set once, when the key is released or after a short pause)
 - Lights and light switches: a `switch` whose name says it drives a light (*Lumière Canapé*, *Desk Lamp*) is picked up too
 - Clean names: the `Lumière` / `Light` prefix and the area name are removed (*Lumière Canapé* → *Canapé*)
 - Show only the lights that are on (`only_on`), or hide the whole card when everything is off (`hide_when_off`)
@@ -97,7 +97,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - On the second line, a pill tinted with its colour and showing its name for each light that is on, the icon alone for the others (`only_on` hides them)
 - **Zoom** button (top right) switches the card to the full [Lights card](#lights) — tap to toggle, drag to dim, the scenes — and back, as does a click anywhere else (`zoom: false` removes it)
 - Same discovery and options as the Lights card: `only_on`, `hide_when_off`, `include` / `exclude`, `navigation_path`
-- Tap a light to open its details
+- Tap a light to open its details and history
 
 ### Plugs
 
@@ -106,7 +106,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Header with an icon and a status pill: *All off*, or *3 on · 1.2 kW*
 - Power draw of each plug, read from the power sensor of the same device, and the total in the header
 - Plugs that are on listed first, the most power-hungry first
-- **Tap** a plug to toggle it, **hold** it to open its details (keyboard: Enter or Space, Shift+Enter or the context-menu key)
+- **Tap** a plug to toggle it, **hold** it to open its details and history (the Home Assistant more-info dialog, its *History* tab included — no need to go through settings or the entity list; keyboard: Enter or Space, Shift+Enter or the context-menu key)
 - Optional power button on the status pill to turn every plug of the room off (`all_off_button`, off by default: a plug may feed a camera or a network switch)
 - Plugs found by device class `outlet`, or by a name that says so (*Prise Terrasse*, *Desk Plug*); switches driving a light are left to [room-lights-card](#lights)
 - Clean names: the `Prise` / `Plug` prefix or suffix and the area name are removed (*Prise Machine à café* → *Machine à café*)
@@ -123,7 +123,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - On the second line, a pill with its name and power draw for each plug that is on (*Coffee Machine 1.2 kW*), the icon alone for the others (`only_on` hides them)
 - **Zoom** button (top right) switches the card to the full [Plugs card](#plugs) and back, as does a click anywhere else (`zoom: false` removes it)
 - Same discovery and options as the Plugs card: `only_on`, `hide_when_off`, `show_power`, `include` / `exclude`, `navigation_path`
-- Tap a plug to open its details
+- Tap a plug to open its details and history
 
 ### Environment
 
