@@ -631,6 +631,16 @@ The Environment card takes these options on top of the [common options](#common-
 | `show_history` | ❌ | `true` | The last 24 hours of each reading as a curve behind its tile, its lowest and highest values in the tile's tooltip (5-minute statistics from the recorder, one query refreshed every 5 minutes) |
 | `thresholds` | ❌ | See above | Comfort limits per kind, in the sensor's unit |
 | `color_thresholds` | ❌ | Temperature with `layout: tiles` | Background colour of a tile by its reading (YAML only): steps `{below, color}` per kind, see [Tiles and colours](#tiles-and-colours); `false` turns them off |
+| `appliance_filter` | ❌ | `true` | Leave appliance sensors out of the automatic discovery, see [Appliance sensors](#appliance-sensors); `false` keeps every sensor of the area |
+
+#### Appliance sensors
+
+Only a room's ambient readings should count. An appliance — oven, fridge, freezer, wine cooler, dishwasher, washing machine, water heater, heat pump (flow / return), aquarium, pool — sits in the area through its device, and its own temperature or humidity sensors would otherwise be taken for the air of the room: an oven cooling at 60 °C turning the kitchen "Too hot" and dragging the house average up. By default the card leaves them out, so a room with no other sensor reads "No sensor" (and drops out of the overview average) instead of showing an appliance:
+
+- a sensor whose **device** also exposes a `climate`, `water_heater`, `humidifier` or `number` setpoint entity, or a `select` / `sensor` for an operation state or program (Home Connect, Miele, LG ThinQ, SmartThings…), is skipped — those devices are appliances, not the room;
+- a sensor whose entity ID or name holds an appliance word (oven, four, cavity, fridge, réfrigérateur, freezer, congélateur, dishwasher, lave-vaisselle, washer, lave-linge, dryer, boiler, water heater, chauffe-eau, ballon, cumulus, tank, aquarium, pool, piscine, spa, wine, cave à vin, kettle, flow, return, départ, retour…) is skipped too — this also catches template / Modbus appliance sensors that have no device.
+
+A sensor wrongly skipped can always be forced back in by listing it in `entities` (an explicit list wins over the discovery), and `appliance_filter: false` restores the old behaviour of taking every sensor of the area.
 
 ### Environment mini
 

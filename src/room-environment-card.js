@@ -870,6 +870,50 @@ const reValid = (st) => !rcUnavailable(st) && Number.isFinite(Number.parseFloat(
 const reMatch = (hass, id) =>
   id.startsWith("sensor.") && !hass.entities?.[id]?.entity_category && !!reKindOf(hass.states[id]);
 
+// ── Appliance sensors ──────────────────────────────────────────────────────────
+// Only a room's ambient readings should count: an appliance (oven, fridge, dishwasher, water heater, heat pump,
+// aquarium, pool…) lives in the area through its device, and its own temperature/humidity sensors would otherwise
+// be taken for the air of the room (issue #89). Two heuristics tell them apart, with the explicit `entities` config
+// and `appliance_filter: false` as escape hatches.
+
+// Entity id / friendly name folded for matching: lower case, separators (._-) turned into spaces so the word list
+// below can use word boundaries on both `sensor.four_oven_cavity_temperature` and "Four cavity temperature".
+const reNorm = (s) => (s || "").toString().toLowerCase().replace(/[._-]+/g, " ");
+
+// Inner-part / appliance words, matched on the entity id and on the friendly name. Multilingual and deliberately
+// conservative: bare "water" / "eau" are left out (an ambient "rainwater temperature" must survive), and wine
+// coolers match the "cave à vin" phrase rather than a bare "cave" (a cellar room keeps its ambient sensor).
+// "sonde" / "probe" alone are left out on purpose (a window or outdoor probe is ambient); the oven meat probe is
+// caught by its "sonde à viande" phrase and, failing that, by the companion oven device.
+const RE_APPLIANCE_WORDS =
+  /\b(oven|four|cavity|cavite|meat probe|food probe|sonde a viande|sonde à viande|fridge|refrigerator|refrigerateur|réfrigérateur|frigo|freezer|congelateur|congélateur|dishwasher|lave vaisselle|washer|washing|lave linge|dryer|seche linge|sèche linge|boiler|water heater|chauffe eau|ballon|cumulus|tank|aquarium|pool|piscine|spa|wine|cave a vin|cave à vin|cellar|kettle|bouilloire|flow|return|depart|départ|retour)\b/;
+
+// A sibling entity of one of these domains marks the device as an appliance, not a room: a thermostat/heat-pump
+// `climate`, a `water_heater`, a `humidifier`, or a `number` setpoint.
+const RE_APPLIANCE_DOMAINS = new Set(["climate", "water_heater", "humidifier", "number"]);
+// A `select` / `sensor` for an operation state or a program (Home Connect, Miele, LG ThinQ, SmartThings…).
+const RE_APPLIANCE_STATE = /\b(program|programme|operation|op state)\b/;
+
+const reDomain = (id) => id.slice(0, id.indexOf("."));
+
+// Is `id` an appliance's own sensor (so, not a room reading)? `devEnts`: device_id → sibling entity ids.
+const reIsAppliance = (hass, id, devEnts) => {
+  const name = hass.states?.[id]?.attributes?.friendly_name;
+  if (RE_APPLIANCE_WORDS.test(reNorm(id)) || RE_APPLIANCE_WORDS.test(reNorm(name))) return true;
+  const dev = hass.entities?.[id]?.device_id;
+  if (!dev || !devEnts) return false;
+  for (const sib of devEnts[dev] || []) {
+    if (sib === id) continue;
+    const dom = reDomain(sib);
+    const cat = hass.entities?.[sib]?.entity_category;
+    // A climate / water_heater / humidifier is a decisive appliance signal; a setpoint `number` only when it is not a
+    // config/diagnostic entity (a multisensor's LED-brightness number must not disqualify its temperature).
+    if (RE_APPLIANCE_DOMAINS.has(dom) && (dom !== "number" || !cat)) return true;
+    if ((dom === "select" || dom === "sensor") && !cat && RE_APPLIANCE_STATE.test(reNorm(sib))) return true;
+  }
+  return false;
+};
+
 // Wet rooms (bathroom, shower room, laundry) live with more humidity: 70 % is a warning there, 80 % an alert.
 const RE_WET_ROOM = /salle (de )?bains?|salle d.eau|douche|bath|shower|buanderie|laundry/i;
 const RE_WET_HUMIDITY = [25, 35, 70, 80];
@@ -981,7 +1025,25 @@ class RoomEnvironmentCard extends RcCard {
   static defaults = { columns: 2, layout: "compact", only_alerts: false, show_gauge: true, show_history: true, exclude: [] };
 
   _candidate(id) {
-    return reMatch(this._hass, id);
+    return reMatch(this._hass, id) && this._ambientSensor(id);
+  }
+
+  // Device id → its entity ids, rebuilt only when the entity registry changes. Used to spot an appliance by its
+  // companion entities (a sensor of a device that is also a climate/water_heater/number… is not a room reading).
+  _deviceEntities() {
+    const h = this._hass;
+    return rcMemo((this._memo ||= {}), "devEnts", [h.entities], () => {
+      const map = {};
+      for (const [eid, ent] of Object.entries(h.entities || {})) if (ent?.device_id) (map[ent.device_id] ||= []).push(eid);
+      return map;
+    });
+  }
+
+  // Keep a sensor only if it reads the room's air, not an appliance's inside (issue #89). `appliance_filter: false`
+  // turns the heuristic off; an explicit `entities` list already bypasses discovery and so always wins.
+  _ambientSensor(id) {
+    if (this._config.appliance_filter === false) return true;
+    return !reIsAppliance(this._hass, id, this._deviceEntities());
   }
 
   _words(family) {
@@ -1745,7 +1807,7 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
     const rooms = [];
     for (const [aid, ids] of Object.entries(byArea)) {
       const area = h.areas?.[aid];
-      const entries = ids.filter((id) => h.states[id] && reMatch(h, id)).map((entity) => ({ entity }));
+      const entries = ids.filter((id) => h.states[id] && reMatch(h, id) && this._ambientSensor(id)).map((entity) => ({ entity }));
       const o = overrides[aid] || {};
       const thresholds = this._roomThresholds(o);
       const items = area && !excluded.has(aid) ? this._itemsOf(entries, { name: area.name, thresholds }) : [];
@@ -1878,6 +1940,7 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
       area: this._openArea,
       title: this._t("readings"),
       exclude: c.exclude || [],
+      ...(c.appliance_filter === false ? { appliance_filter: false } : {}),
       ...(thresholds ? { thresholds } : {}),
       ...(c.language ? { language: c.language } : {}),
     });

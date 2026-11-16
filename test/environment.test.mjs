@@ -523,3 +523,78 @@ test("color_thresholds: a bare list for the temperature, or per kind, in the sen
   // Kinds left out of a per-kind map keep the default temperature colours in tiles.
   assert.equal(tileStyle({ layout: "tiles", color_thresholds: perKind }, "sensor.lr_temperature", { temp: 21 }), "#43a047");
 });
+
+// ── Appliance sensors (issue #89) ───────────────────────────────────────────────
+// Only a room's ambient readings count: an appliance's own sensors (oven cavity, fridge, heat-pump water…) are left
+// out, by a word list and by companion-entity detection, unless forced back in through `entities`.
+test("excludes an appliance sensor caught by the word list (oven)", () => {
+  const oven = st("sensor.four_current_oven_cavity_temperature", 60, "temperature", "°C", "Four cavity temperature");
+  const card = render({}, makeHass({}, { "sensor.four_current_oven_cavity_temperature": oven }));
+  assert.ok(!ids(card).includes("sensor.four_current_oven_cavity_temperature"));
+  assert.ok(ids(card).includes("sensor.lr_temperature"));
+});
+
+test("excludes a sensor whose device also exposes an appliance entity (companion detection)", () => {
+  // A generically named reading the word list cannot catch, on a device that also has a climate entity.
+  const hass = makeHass({}, { "sensor.lr_hp_water_temp": st("sensor.lr_hp_water_temp", 45, "temperature", "°C", "Water temperature") });
+  hass.entities["sensor.lr_hp_water_temp"].device_id = "dev_hp";
+  hass.entities["climate.lr_hp"] = { area_id: "living_room", device_id: "dev_hp" };
+  hass.states["climate.lr_hp"] = { entity_id: "climate.lr_hp", state: "heat", attributes: {} };
+  const card = render({}, hass);
+  assert.ok(!ids(card).includes("sensor.lr_hp_water_temp"));
+  assert.ok(ids(card).includes("sensor.lr_temperature"));
+});
+
+test("a sensor for an operation state / program marks its device's readings as an appliance", () => {
+  const hass = makeHass({}, { "sensor.lr_dw_cavity": st("sensor.lr_dw_cavity", 50, "temperature", "°C", "Inside temperature") });
+  hass.entities["sensor.lr_dw_cavity"].device_id = "dev_dw";
+  hass.entities["sensor.lr_dw_operation_state"] = { area_id: "living_room", device_id: "dev_dw" };
+  hass.states["sensor.lr_dw_operation_state"] = { entity_id: "sensor.lr_dw_operation_state", state: "run", attributes: {} };
+  const card = render({}, hass);
+  assert.ok(!ids(card).includes("sensor.lr_dw_cavity"));
+});
+
+test("a diagnostic number on the device does not disqualify an ambient sensor", () => {
+  const hass = makeHass();
+  hass.entities["sensor.lr_temperature"].device_id = "dev_multi";
+  hass.entities["number.lr_led"] = { area_id: "living_room", device_id: "dev_multi", entity_category: "config" };
+  hass.states["number.lr_led"] = { entity_id: "number.lr_led", state: "5", attributes: {} };
+  const card = render({}, hass);
+  assert.ok(ids(card).includes("sensor.lr_temperature"));
+});
+
+test("an explicit entities list re-includes a sensor the heuristic would drop", () => {
+  const oven = st("sensor.four_oven_temperature", 60, "temperature", "°C", "Oven");
+  const hass = makeHass({}, { "sensor.four_oven_temperature": oven });
+  const card = new Card();
+  card.setConfig({ area: "living_room", entities: ["sensor.four_oven_temperature"] });
+  card.hass = hass;
+  assert.deepEqual(ids(card), ["sensor.four_oven_temperature"]);
+});
+
+test("appliance_filter: false keeps the old behaviour", () => {
+  // In the compact layout the two temperatures merge into one mean reading; the oven is back in its members.
+  const oven = st("sensor.four_oven_temperature", 60, "temperature", "°C", "Oven");
+  const card = render({ appliance_filter: false }, makeHass({}, { "sensor.four_oven_temperature": oven }));
+  const temp = [...card._items].find((i) => i.kind === "temperature");
+  assert.ok(temp.ids.includes("sensor.four_oven_temperature"));
+});
+
+test("a room left with only an appliance sensor shows the no-sensor state and drops out of the average", () => {
+  const hass = makeHass();
+  // The kitchen keeps only an oven: no ambient reading.
+  delete hass.states["sensor.kitchen_temperature"];
+  delete hass.entities["sensor.kitchen_temperature"];
+  hass.states["sensor.kitchen_oven_temperature"] = st("sensor.kitchen_oven_temperature", 60, "temperature", "°C", "Oven");
+  hass.entities["sensor.kitchen_oven_temperature"] = { area_id: "kitchen" };
+  const card = new Card();
+  card.setConfig({ area: "kitchen" });
+  card.hass = hass;
+  assert.deepEqual(ids(card), []);
+  assert.match(head(card), /Aucun capteur/);
+  // Overview: the kitchen drops out, so the home average is the living room alone (21.4 °C, not a 40 °C mix).
+  const ov = overview({}, hass);
+  const rooms = [...ov._collect()];
+  assert.deepEqual(rooms.map((x) => x.id), ["living_room"]);
+  assert.equal(ov._average(rooms, "temperature", 1), "21,4");
+});
