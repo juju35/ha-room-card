@@ -2078,7 +2078,7 @@ class RcCard extends HTMLElement {
       pill.style.maxWidth = "";
       pill.style.flex = "";
       const shown = getComputedStyle(title).display !== "none" && getComputedStyle(title).visibility !== "hidden";
-      if ((shown ? textWidth(title) + gap : 0) + natural <= have + 0.5) continue;
+      if ((shown ? textWidth(title) + gap : 0) + natural <= have) continue;
       host.setAttribute("data-wrap", "");
       if (!banner) continue;
       const t = pill.closest(".titles");
