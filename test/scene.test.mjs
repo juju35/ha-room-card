@@ -19,11 +19,15 @@ test("Room type: guessed from the area's name, then its icon; room_type wins, no
   assert.equal(rc.rcRoomType({ room_type: "auto" }, { name: "Kitchen" }), "kitchen");
 });
 
-test("Night: illustration_theme, else the sun, else the dark mode", () => {
-  const sun = (state) => ({ states: { "sun.sun": { state } }, themes: { darkMode: true } });
+test("Night: illustration_theme, else the sun below the horizon or the dark mode", () => {
+  const sun = (state, darkMode = false) => ({ states: { "sun.sun": { state } }, themes: { darkMode } });
+  // A dark theme takes the night picture even while the sun is up; a light theme keeps the day.
+  assert.equal(rc.rcIsNight(sun("above_horizon", true), {}), true);
   assert.equal(rc.rcIsNight(sun("above_horizon"), {}), false);
   assert.equal(rc.rcIsNight(sun("below_horizon"), {}), true);
-  assert.equal(rc.rcIsNight(sun("below_horizon"), { illustration_theme: "day" }), false);
+  assert.equal(rc.rcIsNight(sun("below_horizon", true), { illustration_theme: "day" }), false);
+  assert.equal(rc.rcIsNight(sun("above_horizon"), { illustration_theme: "night" }), true);
+  assert.equal(rc.rcIsNight(sun("unavailable"), {}), false);
   assert.equal(rc.rcIsNight({ states: {}, themes: { darkMode: true } }, {}), true);
   assert.equal(rc.rcIsNight({ states: {} }, { illustration_theme: "night" }), true);
 });
