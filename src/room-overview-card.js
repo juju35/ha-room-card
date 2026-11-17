@@ -930,7 +930,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     card.querySelector(".head").innerHTML = illus
       ? `
       <div class="badge"><ha-icon icon="${headIcon}"></ha-icon></div>
-      <div class="titles"><div class="title">${rcEsc(c.title || this._t("title"))}</div><div class="sub">${pill}</div>${hchips}</div>
+      <div class="titles"><div class="trow"><div class="title">${rcEsc(c.title || this._t("title"))}</div>${pill}</div>${hchips}</div>
       ${rcZoomButton(this)}`
       : `
       <div class="badge"><ha-icon icon="${headIcon}"></ha-icon></div>

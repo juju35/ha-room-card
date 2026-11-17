@@ -1933,7 +1933,7 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
     const title = `<div class="title">${rcEsc(c.title || this._t("title"))}</div>`;
     if (illus) this._updateBanner(card.querySelector(".banner"));
     card.querySelector(".head").innerHTML = illus
-      ? `${badge}<div class="titles">${title}<div class="sub">${pill}${avg}</div></div>${rcZoomButton(this)}`
+      ? `${badge}<div class="titles"><div class="trow">${title}${pill}</div>${avg ? `<div class="sub">${avg}</div>` : ""}</div>${rcZoomButton(this)}`
       : `${badge}${title}${avg}${pill}${rcZoomButton(this)}`;
 
     this._roomGrid(card.querySelector(".grid"), rooms, (x) => {

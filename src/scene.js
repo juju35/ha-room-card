@@ -391,19 +391,53 @@ const RC_BANNER_STYLES = `
   .banner .title { flex: none; min-width: 0; color: inherit; font-size: 16px; font-weight: 500; line-height: 1.25; }
   :host([hide-title]) .banner .title { display: none; }
   .sub { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 6px; min-width: 0; font-size: 13px; line-height: 18px; color: var(--rc-sub); }
-  .banner .pill, .banner .sub .st { flex: 0 1 auto; min-width: 0; max-width: 100%; margin: 0; padding: 0; width: auto; height: auto;
-                               font-size: 13px; font-weight: 400; color: var(--rc-sub); background: none; }
-  .banner .pill .pt, .banner .st .pt { position: static; width: auto; height: auto; clip-path: none; }
-  .banner .pill:not(.action)::before, .banner .st::before { content: none; }
-  .banner .pill.action, .banner .sub .st.action { padding: 1px 8px 1px 6px; border-radius: 999px; font-weight: 500; color: inherit;
-                                             background: rgba(255,255,255,.55); }
-  .banner.night .pill.action, .banner.night .st.action { background: rgba(10,20,40,.45); }
-  .banner .pill.action:hover, .banner .st.action:hover { background: rgba(255,255,255,.8); }
-  .banner.night .pill.action:hover, .banner.night .st.action:hover { background: rgba(10,20,40,.65); }
-  .banner .zoom { position: absolute; top: 6px; right: 6px; margin: 0; color: #1d2733; background: rgba(255,255,255,.55); }
-  .banner.night .zoom { color: #fff; background: rgba(10,20,40,.45); }
-  .banner .zoom:hover { color: inherit; background: rgba(255,255,255,.8); }
-  .banner.night .zoom:hover { background: rgba(10,20,40,.65); }
+  /* The status pill right after the title (8 px), centred on it, in the badge's colour on a frosted tint: the title is
+     cut first (about four letters kept); when the pill would be cut (measured by the card) or on a narrow card, it
+     goes on a line of its own under the title; under 200 px only its dot shows (its text stays in its title). */
+  .banner .trow { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .banner .trow > .title { flex: 0 100 auto; min-width: 4.5ch; }
+  .banner .trow > .pill, .banner .trow > .st { all: unset; flex: 0 1 auto; min-width: 0; max-width: 51%; box-sizing: border-box; position: relative;
+                               display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 12px;
+                               font-size: 11px; font-weight: 500; line-height: 16px; white-space: nowrap; overflow: hidden;
+                               background: color-mix(in srgb, var(--c) 18%, rgba(255,255,255,.78)); color: color-mix(in srgb, var(--c) 45%, #0d2a45); }
+  .banner.night .trow > .pill, .banner.night .trow > .st { background: color-mix(in srgb, var(--c) 30%, rgba(8,18,38,.55)); color: color-mix(in srgb, var(--c) 35%, #ffffff); }
+  .banner .trow > .pill .pt, .banner .trow > .st .pt { position: static; width: auto; height: auto; clip-path: none; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .banner .trow > .pill:not(.action)::before, .banner .trow > .st:not(.action)::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+  .banner .trow > .pill.action ha-icon, .banner .trow > .st.action ha-icon { --mdc-icon-size: 12px; flex: none; margin-left: -2px; color: var(--c); }
+  .banner .trow > .pill.action, .banner .trow > .st.action { cursor: pointer; }
+  .banner .trow > .pill.action:hover, .banner .trow > .st.action:hover { background: color-mix(in srgb, var(--c) 28%, rgba(255,255,255,.85)); }
+  .banner.night .trow > .pill.action:hover, .banner.night .trow > .st.action:hover { background: color-mix(in srgb, var(--c) 40%, rgba(8,18,38,.6)); }
+  .banner .trow > .pill.action:focus-visible, .banner .trow > .st.action:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+  .banner[data-wrap] .trow { display: contents; }
+  .banner[data-wrap] .trow > .pill, .banner[data-wrap] .trow > .st { order: 9; align-self: flex-start; max-width: calc(100cqw - 80px); margin-top: 1px; }
+  /* The overviews' header also holds a row or two of counters: a narrower scene leaves them room, and their pill stays
+     beside the title on a narrow card as long as it fits (measured). */
+  .banner:has(.hchips) { --rc-scene-w: min(200px, 40%); }
+  /* Their wrapped pill leads the counters' row rather than taking a line of its own. */
+  .banner[data-wrap]:has(.hchips) .titles { flex-flow: row wrap; align-items: center; align-content: center; gap: 4px; }
+  .banner[data-wrap]:has(.hchips) .trow > .title { flex: 1 0 100%; }
+  .banner[data-wrap]:has(.hchips) .trow > .pill { order: 1; align-self: center; margin: 0; }
+  .banner[data-wrap] .hchips { display: contents; }
+  .banner[data-wrap] .hchips > * { order: 2; }
+  @container (max-width: 260px) {
+    .banner:not(:has(.hchips)) .trow { display: contents; }
+    .banner:not(:has(.hchips)) .trow > .pill, .banner:not(:has(.hchips)) .trow > .st { order: 9; align-self: flex-start; max-width: calc(100cqw - 80px); margin-top: 1px; }
+  }
+  @container (max-width: 200px) {
+    .banner .trow { display: flex; }
+    .banner .trow > .pill, .banner .trow > .st { order: 0; flex: none; align-self: auto; margin: 0; padding: 0 4px; background: none; }
+    .banner .trow > .pill .pt, .banner .trow > .st .pt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  }
+  /* The detail / expand / collapse button: 24 px, round, frosted, 5 px from the banner's top right corner; the scene
+     steps aside to leave it room. */
+  .banner .zoom { position: absolute; z-index: 2; top: 5px; right: 5px; width: 24px; height: 24px; margin: 0; color: #33506b;
+                  background: rgba(255,255,255,.55); box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); backdrop-filter: blur(4px); }
+  .banner .zoom ha-icon { --mdc-icon-size: 16px; }
+  .banner.night .zoom { color: #fff; background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+  .banner .zoom:hover { color: #33506b; background: rgba(255,255,255,.75); }
+  .banner.night .zoom:hover { color: #fff; background: rgba(255,255,255,.22); }
+  .banner:has(.zoom) .rc-scene { right: 30px; }
+  .banner:has(.zoom) .head { padding-right: calc(var(--rc-scene-w) + 34px); }
   .banner .head.head { flex-wrap: nowrap; gap: 10px; }
   .banner .head::after { content: none; }
   .banner .hchips { order: 0; flex: none; display: flex; flex-wrap: wrap; gap: 4px; padding-left: 0; margin-top: 2px; }
@@ -411,7 +445,7 @@ const RC_BANNER_STYLES = `
   .banner .chip { background: rgba(255,255,255,.6); }
   .banner.night .chip { background: rgba(10,20,40,.45); }
   /* A narrow card: no room for the scene beside the text, the wall and the floor stay. */
-  @container (max-width: 300px) { .rc-scene { display: none; } .banner { --rc-scene-w: 30px; } }
+  @container (max-width: 300px) { .rc-scene { display: none; } .banner, .banner:has(.hchips) { --rc-scene-w: 30px; } .banner:has(.zoom) .head { padding-right: 34px; } }
   ha-card > .banner + .grid, ha-card > .banner + .rs { margin-top: 10px; }
   .rc-scene .sc-blink { animation: sc-blink 1.2s steps(2) infinite; }
   .rc-scene .sc-flow { stroke-dasharray: 3 4; animation: sc-flow 1s linear infinite; }

@@ -2036,6 +2036,32 @@ class RcCard extends HTMLElement {
     root.addEventListener("keydown", () => {
       this._byPointer = false;
     });
+    // The banner's status pill is fitted after every redraw of the card and for every new width.
+    if (typeof MutationObserver === "function") new MutationObserver(() => this._fitPill()).observe(root, { childList: true, subtree: true });
+    if (typeof ResizeObserver === "function") {
+      new ResizeObserver((entries) => {
+        const w = Math.round(entries.at(-1).contentRect.width);
+        if (w === this._fitWidth) return;
+        this._fitWidth = w;
+        this._fitPill();
+      }).observe(this);
+    }
+  }
+
+  // The banner's status pill goes on its own line under the title (and subtitle) when it would be cut next to the
+  // title. Fractional widths: scrollWidth / clientWidth are rounded and miss a label cut by less than a pixel.
+  _fitPill() {
+    const pill = this.shadowRoot?.querySelector?.(".banner .trow > .pill, .banner .trow > .st");
+    const banner = pill?.closest?.(".banner");
+    if (!banner || !pill.getBoundingClientRect) return;
+    banner.removeAttribute("data-wrap");
+    const have = pill.getBoundingClientRect().width;
+    pill.style.maxWidth = "none";
+    pill.style.flex = "none";
+    const need = pill.getBoundingClientRect().width;
+    pill.style.maxWidth = "";
+    pill.style.flex = "";
+    if (need > have + 0.01) banner.setAttribute("data-wrap", "");
   }
 
   disconnectedCallback() {
@@ -2238,9 +2264,8 @@ class RcCard extends HTMLElement {
       <div class="head${c.navigation_path ? " nav" : ""}"${c.navigation_path ? ' role="link" tabindex="0"' : ""}>
         <div class="badge"><ha-icon icon="${rcEsc(icon)}"></ha-icon></div>
         <div class="titles">
-          <div class="title">${rcEsc(title)}</div>
-          <div class="sub">${chips}<button class="pill${allOff ? " action" : ""}" title="${rcEsc(allOff ? this._t("turn_all_off") : status)}"${allOff ? "" : " disabled"}>
-            ${allOff ? '<ha-icon icon="mdi:power"></ha-icon>' : ""}<span class="pt">${rcEsc(status)}</span></button></div>
+          <div class="trow"><div class="title">${rcEsc(title)}</div><button class="pill${allOff ? " action" : ""}" title="${rcEsc(allOff ? this._t("turn_all_off") : status)}"${allOff ? "" : " disabled"}>${allOff ? '<ha-icon icon="mdi:power"></ha-icon>' : ""}<span class="pt">${rcEsc(status)}</span></button></div>
+          ${chips.trim() ? `<div class="sub">${chips}</div>` : ""}
         </div>
       </div>`);
     }
@@ -2526,7 +2551,7 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
         <ha-card class="lvl-${level}${cls}">
           ${this._banner(`<div class="head${navAttrs}>
             <div class="badge" title="${rcEsc(status)}"><ha-icon icon="${rcEsc(icon)}"></ha-icon></div>
-            <div class="titles"><div class="title">${title}</div><div class="sub">${st}</div></div>
+            <div class="titles"><div class="trow"><div class="title">${title}</div>${st}</div></div>
           </div>`)}
           ${chips.trim() ? `<div class="rs">${chips}</div>` : ""}
         </ha-card>`
