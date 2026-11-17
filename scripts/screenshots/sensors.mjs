@@ -2,9 +2,8 @@
 // Usage: npm install && npm run build && node scripts/screenshots/sensors.mjs
 import { pair, shoot, shootTiles } from "./harness.mjs";
 
-// Leak sensor, two sliding doors, a window, a presence sensor.
+// Two sliding doors, a window, a presence sensor.
 const SENSORS = [
-  ["binary_sensor.sink_leak", { en: "Sink Leak", fr: "Capteur Évier Fuite d'eau" }, "moisture"],
   ["binary_sensor.kitchen_porte_fenetre_door", { en: "Kitchen Patio Door Contact", fr: "Capteur Porte Fenêtre Cuisine Porte" }, "door"],
   ["binary_sensor.living_room_porte_fenetre_door", { en: "Living Room Patio Door Contact", fr: "Capteur Porte Fenêtre Salon Porte" }, "door"],
   ["binary_sensor.living_room_window", { en: "Living Room Window Contact", fr: "Capteur Fenêtre Salon Porte" }, "window"],
@@ -15,7 +14,6 @@ const OPEN = {
   "binary_sensor.kitchen_porte_fenetre_door": [true, 12],
   "binary_sensor.living_room_occupancy": [true, 5],
 };
-const LEAK = { ...OPEN, "binary_sensor.sink_leak": [true, 3] };
 
 const setup = (s, lang) => {
   const states = {};
@@ -29,7 +27,7 @@ const setup = (s, lang) => {
   return { hass: { states, entities, devices: {}, areas, language: lang, locale: { language: lang } }, config: { area: "living_room", blink: false } };
 };
 
-const shots = [...pair("open", { open: OPEN }), ...pair("leak", { open: LEAK })];
+const shots = pair("open", { open: OPEN });
 await shoot({ prefix: "sensors", tag: "room-sensors-card", shots, setup });
 // The tiles layout at a phone's width: one large tile per sensor, two columns.
 await shootTiles({ prefix: "sensors", tag: "room-sensors-card", setup }, { open: OPEN });

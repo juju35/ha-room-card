@@ -12,7 +12,7 @@ const ROOMS = [
     ["switch.tv_plug", { en: "TV Plug", fr: "Prise Télé" }, "outlet", "on", { watts: 86 }],
   ]],
   ["kitchen", { en: "Kitchen", fr: "Cuisine" }, [
-    ["binary_sensor.sink_leak", { en: "Sink Leak", fr: "Capteur Évier Fuite d'eau" }, "moisture", "on"],
+    ["binary_sensor.kitchen_window", { en: "Window Contact", fr: "Capteur Fenêtre Porte" }, "window", "on"],
     ["light.kitchen", { en: "Kitchen", fr: "Cuisine" }, "light", "on", { brightness: 255 }],
     ["switch.coffee_plug", { en: "Coffee Machine Plug", fr: "Prise Machine à café" }, "outlet", "on", { watts: 1240 }],
   ]],
@@ -26,7 +26,6 @@ const ROOMS = [
     ["light.bedroom_2", { en: "Bedroom 2", fr: "Chambre 2" }, "light", "on", { brightness: 60, rgb_color: [140, 110, 255] }],
   ]],
   ["bathroom", { en: "Bathroom", fr: "Salle de bain" }, [
-    ["binary_sensor.bathroom_leak", { en: "Bathroom Leak", fr: "Capteur Fuite Salle de bain Fuite d'eau" }, "moisture", "off"],
     ["binary_sensor.bathroom_presence", { en: "Presence Occupancy", fr: "Capteur Présence Occupation" }, "occupancy", "off"],
     ["light.bathroom", { en: "Bathroom", fr: "Salle de bain" }, "light", "off"],
   ]],
@@ -36,12 +35,11 @@ const ROOMS = [
   ]],
 ];
 
-const mockHass = (lang, dry) => {
+const mockHass = (lang) => {
   const states = {}, entities = {}, devices = {}, areas = {};
   for (const [area_id, names, items] of ROOMS) {
     areas[area_id] = { area_id, name: names[lang], icon: null };
-    for (const [entity_id, n, kind, state0, extra = {}] of items) {
-      const state = dry && kind === "moisture" ? "off" : state0;
+    for (const [entity_id, n, kind, state, extra = {}] of items) {
       const dev = `dev_${entity_id.split(".")[1]}`;
       devices[dev] = { id: dev, area_id };
       entities[entity_id] = { entity_id, device_id: dev, area_id: null, platform: "mock" };
@@ -63,9 +61,9 @@ await shoot({
   prefix: "overview",
   tag: "room-overview-card",
   // "all": every room (detail button pressed); "active": the default view; "details": a room unfolded.
-  shots: [...pair("all", { zoom: true }), ...pair("active"), ...pair("details", { open: "living_room", dry: true })],
+  shots: [...pair("all", { zoom: true }), ...pair("active"), ...pair("details", { open: "living_room" })],
   setup: (s, lang) => ({
-    hass: mockHass(lang, s.dry),
+    hass: mockHass(lang),
     config: { plugs_off_button: true },
     open: s.zoom ? ".zoom" : s.open && `.room[data-area="${s.open}"]`,
   }),

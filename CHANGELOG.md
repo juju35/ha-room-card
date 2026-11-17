@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.0 - 2026-11-18
+
+### Breaking changes
+- Smoke, carbon monoxide, gas and water leak detectors (`smoke`, `carbon_monoxide`, `gas`, `moisture`) are no longer picked up by the Sensors, Sensors mini and Overview cards: they belong to [ha-safety-card](https://github.com/juju35/ha-safety-card) (`safety-card`, `safety-mini-card`, `safety-overview-card`), which also shows their battery, end of life and test button. The room cards now cover doors, windows, openings and presence only, so the same alarm no longer shows on two cards. The leak and smoke pictures of the illustrated headers, the red alarm level and the *Water leak* / *Smoke detected* statuses go with them.
+
 ## 1.28.0 - 2026-11-17
 
 ### Features
