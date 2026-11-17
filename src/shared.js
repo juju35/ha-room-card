@@ -259,6 +259,29 @@ const rcOverviewFields = (i18n, lang) => [
 // Strings shared by the cards; a card's own dictionary wins over these.
 const RC_I18N = {
   en: {
+    ed_illustration: "Illustrated header",
+    ed_illustration_helper: "An animated picture of the room in the header, following its state",
+    ed_illustration_theme: "Illustration theme",
+    ed_illustration_theme_helper: "Automatic: night after sunset, or with a dark theme",
+    theme_auto: "Automatic (sun or dark theme)",
+    theme_day: "Day",
+    theme_night: "Night",
+    ed_room_type: "Room type",
+    ed_room_type_helper: "Wall colour, furniture and floor of the picture; automatic: from the area's name or icon",
+    room_auto: "Automatic",
+    room_none: "None (card theme only)",
+    room_living: "Living room",
+    room_bedroom: "Bedroom",
+    room_kids: "Kids' room",
+    room_kitchen: "Kitchen",
+    room_dining: "Dining room",
+    room_bathroom: "Bathroom",
+    room_toilets: "Toilets",
+    room_hallway: "Hallway",
+    room_entry: "Entrance",
+    room_office: "Office",
+    room_laundry: "Laundry room",
+    room_garage: "Garage",
     all_closed: "All closed",
     all_quiet: "All quiet",
     open_one: "{n} open",
@@ -310,6 +333,29 @@ const RC_I18N = {
     ed_exclude_areas: "Rooms to exclude",
   },
   fr: {
+    ed_illustration: "En-tête illustré",
+    ed_illustration_helper: "Une image animée de la pièce dans l'en-tête, qui suit son état",
+    ed_illustration_theme: "Thème de l'illustration",
+    ed_illustration_theme_helper: "Automatique : nuit après le coucher du soleil, ou avec un thème sombre",
+    theme_auto: "Automatique (soleil ou thème sombre)",
+    theme_day: "Jour",
+    theme_night: "Nuit",
+    ed_room_type: "Type de pièce",
+    ed_room_type_helper: "Couleur des murs, meubles et sol de l'image ; automatique : d'après le nom ou l'icône de la pièce",
+    room_auto: "Automatique",
+    room_none: "Aucun (thème de la carte seul)",
+    room_living: "Salon",
+    room_bedroom: "Chambre",
+    room_kids: "Chambre d'enfant",
+    room_kitchen: "Cuisine",
+    room_dining: "Salle à manger",
+    room_bathroom: "Salle de bain",
+    room_toilets: "Toilettes",
+    room_hallway: "Couloir",
+    room_entry: "Entrée",
+    room_office: "Bureau",
+    room_laundry: "Buanderie",
+    room_garage: "Garage",
     all_closed: "Tout est fermé",
     all_quiet: "Tout est calme",
     open_one: "{n} ouverture",
@@ -361,6 +407,29 @@ const RC_I18N = {
     ed_exclude_areas: "Pièces à exclure",
   },
   de: {
+    ed_illustration: "Illustrierte Kopfzeile",
+    ed_illustration_helper: "Ein animiertes Bild des Raums in der Kopfzeile, das seinem Zustand folgt",
+    ed_illustration_theme: "Thema der Illustration",
+    ed_illustration_theme_helper: "Automatisch: Nacht nach Sonnenuntergang oder bei dunklem Thema",
+    theme_auto: "Automatisch (Sonne oder dunkles Design)",
+    theme_day: "Tag",
+    theme_night: "Nacht",
+    ed_room_type: "Raumtyp",
+    ed_room_type_helper: "Wandfarbe, Möbel und Boden des Bildes; automatisch: aus Name oder Symbol des Bereichs",
+    room_auto: "Automatisch",
+    room_none: "Keiner (nur Kartenthema)",
+    room_living: "Wohnzimmer",
+    room_bedroom: "Schlafzimmer",
+    room_kids: "Kinderzimmer",
+    room_kitchen: "Küche",
+    room_dining: "Esszimmer",
+    room_bathroom: "Badezimmer",
+    room_toilets: "Toilette",
+    room_hallway: "Flur",
+    room_entry: "Eingang",
+    room_office: "Büro",
+    room_laundry: "Waschküche",
+    room_garage: "Garage",
     all_closed: "Alles geschlossen",
     all_quiet: "Alles ruhig",
     open_one: "{n} offen",
@@ -412,6 +481,29 @@ const RC_I18N = {
     ed_exclude_areas: "Auszuschließende Räume",
   },
   es: {
+    ed_illustration: "Cabecera ilustrada",
+    ed_illustration_helper: "Una imagen animada de la habitación en la cabecera, que sigue su estado",
+    ed_illustration_theme: "Tema de la ilustración",
+    ed_illustration_theme_helper: "Automático: noche tras la puesta de sol o con un tema oscuro",
+    theme_auto: "Automático (sol o tema oscuro)",
+    theme_day: "Día",
+    theme_night: "Noche",
+    ed_room_type: "Tipo de habitación",
+    ed_room_type_helper: "Color de pared, muebles y suelo de la imagen; automático: según el nombre o el icono del área",
+    room_auto: "Automático",
+    room_none: "Ninguno (solo el tema de la tarjeta)",
+    room_living: "Salón",
+    room_bedroom: "Dormitorio",
+    room_kids: "Habitación infantil",
+    room_kitchen: "Cocina",
+    room_dining: "Comedor",
+    room_bathroom: "Baño",
+    room_toilets: "Aseo",
+    room_hallway: "Pasillo",
+    room_entry: "Entrada",
+    room_office: "Despacho",
+    room_laundry: "Lavadero",
+    room_garage: "Garaje",
     all_closed: "Todo cerrado",
     all_quiet: "Todo tranquilo",
     open_one: "{n} abierto",
@@ -463,6 +555,29 @@ const RC_I18N = {
     ed_exclude_areas: "Habitaciones a excluir",
   },
   sr: {
+    ed_illustration: "Илустровано заглавље",
+    ed_illustration_helper: "Анимирана слика просторије у заглављу, која прати њено стање",
+    ed_illustration_theme: "Тема илустрације",
+    ed_illustration_theme_helper: "Аутоматски: ноћ после заласка сунца или уз тамну тему",
+    theme_auto: "Аутоматски (сунце или тамна тема)",
+    theme_day: "Дан",
+    theme_night: "Ноћ",
+    ed_room_type: "Врста просторије",
+    ed_room_type_helper: "Боја зида, намештај и под слике; аутоматски: према имену или икони области",
+    room_auto: "Аутоматски",
+    room_none: "Ништа (само тема картице)",
+    room_living: "Дневна соба",
+    room_bedroom: "Спаваћа соба",
+    room_kids: "Дечја соба",
+    room_kitchen: "Кухиња",
+    room_dining: "Трпезарија",
+    room_bathroom: "Купатило",
+    room_toilets: "Тоалет",
+    room_hallway: "Ходник",
+    room_entry: "Улаз",
+    room_office: "Канцеларија",
+    room_laundry: "Вешерница",
+    room_garage: "Гаража",
     all_closed: "Све је затворено",
     all_quiet: "Све је мирно",
     open_one: "{n} отворено",
@@ -515,6 +630,29 @@ const RC_I18N = {
     ed_exclude_areas: "Изостави собе",
   },
   "sr-Latn": {
+    ed_illustration: "Ilustrovano zaglavlje",
+    ed_illustration_helper: "Animirana slika prostorije u zaglavlju, koja prati njeno stanje",
+    ed_illustration_theme: "Tema ilustracije",
+    ed_illustration_theme_helper: "Automatski: noć posle zalaska sunca ili uz tamnu temu",
+    theme_auto: "Automatski (sunce ili tamna tema)",
+    theme_day: "Dan",
+    theme_night: "Noć",
+    ed_room_type: "Vrsta prostorije",
+    ed_room_type_helper: "Boja zida, nameštaj i pod slike; automatski: prema imenu ili ikoni oblasti",
+    room_auto: "Automatski",
+    room_none: "Ništa (samo tema kartice)",
+    room_living: "Dnevna soba",
+    room_bedroom: "Spavaća soba",
+    room_kids: "Dečja soba",
+    room_kitchen: "Kuhinja",
+    room_dining: "Trpezarija",
+    room_bathroom: "Kupatilo",
+    room_toilets: "Toalet",
+    room_hallway: "Hodnik",
+    room_entry: "Ulaz",
+    room_office: "Kancelarija",
+    room_laundry: "Vešernica",
+    room_garage: "Garaža",
     all_closed: "Sve je zatvoreno",
     all_quiet: "Sve je mirno",
     open_one: "{n} otvoreno",
@@ -567,6 +705,29 @@ const RC_I18N = {
     ed_exclude_areas: "Izostavi sobe",
   },
   it: {
+    ed_illustration: "Intestazione illustrata",
+    ed_illustration_helper: "Un'immagine animata della stanza nell'intestazione, che ne segue lo stato",
+    ed_illustration_theme: "Tema dell'illustrazione",
+    ed_illustration_theme_helper: "Automatico: notte dopo il tramonto o con un tema scuro",
+    theme_auto: "Automatico (sole o tema scuro)",
+    theme_day: "Giorno",
+    theme_night: "Notte",
+    ed_room_type: "Tipo di stanza",
+    ed_room_type_helper: "Colore delle pareti, mobili e pavimento dell'immagine; automatico: dal nome o dall'icona dell'area",
+    room_auto: "Automatico",
+    room_none: "Nessuno (solo il tema della scheda)",
+    room_living: "Soggiorno",
+    room_bedroom: "Camera da letto",
+    room_kids: "Cameretta",
+    room_kitchen: "Cucina",
+    room_dining: "Sala da pranzo",
+    room_bathroom: "Bagno",
+    room_toilets: "WC",
+    room_hallway: "Corridoio",
+    room_entry: "Ingresso",
+    room_office: "Ufficio",
+    room_laundry: "Lavanderia",
+    room_garage: "Garage",
     all_closed: "Tutto chiuso",
     all_quiet: "Tutto calmo",
     open_one: "{n} apertura",
@@ -618,6 +779,29 @@ const RC_I18N = {
     ed_exclude_areas: "Stanze da escludere",
   },
   nl: {
+    ed_illustration: "Geïllustreerde koptekst",
+    ed_illustration_helper: "Een geanimeerde afbeelding van de kamer in de koptekst, die de toestand volgt",
+    ed_illustration_theme: "Thema van de illustratie",
+    ed_illustration_theme_helper: "Automatisch: nacht na zonsondergang of met een donker thema",
+    theme_auto: "Automatisch (zon of donker thema)",
+    theme_day: "Dag",
+    theme_night: "Nacht",
+    ed_room_type: "Kamertype",
+    ed_room_type_helper: "Wandkleur, meubels en vloer van de afbeelding; automatisch: uit de naam of het pictogram van de ruimte",
+    room_auto: "Automatisch",
+    room_none: "Geen (alleen kaartthema)",
+    room_living: "Woonkamer",
+    room_bedroom: "Slaapkamer",
+    room_kids: "Kinderkamer",
+    room_kitchen: "Keuken",
+    room_dining: "Eetkamer",
+    room_bathroom: "Badkamer",
+    room_toilets: "Toilet",
+    room_hallway: "Gang",
+    room_entry: "Hal",
+    room_office: "Kantoor",
+    room_laundry: "Washok",
+    room_garage: "Garage",
     all_closed: "Alles dicht",
     all_quiet: "Alles rustig",
     open_one: "{n} open",
@@ -669,6 +853,29 @@ const RC_I18N = {
     ed_exclude_areas: "Uit te sluiten ruimtes",
   },
   pt: {
+    ed_illustration: "Cabeçalho ilustrado",
+    ed_illustration_helper: "Uma imagem animada da divisão no cabeçalho, que acompanha o seu estado",
+    ed_illustration_theme: "Tema da ilustração",
+    ed_illustration_theme_helper: "Automático: noite após o pôr do sol ou com um tema escuro",
+    theme_auto: "Automático (sol ou tema escuro)",
+    theme_day: "Dia",
+    theme_night: "Noite",
+    ed_room_type: "Tipo de divisão",
+    ed_room_type_helper: "Cor da parede, mobília e chão da imagem; automático: pelo nome ou ícone da área",
+    room_auto: "Automático",
+    room_none: "Nenhum (só o tema do cartão)",
+    room_living: "Sala de estar",
+    room_bedroom: "Quarto",
+    room_kids: "Quarto de criança",
+    room_kitchen: "Cozinha",
+    room_dining: "Sala de jantar",
+    room_bathroom: "Casa de banho",
+    room_toilets: "WC",
+    room_hallway: "Corredor",
+    room_entry: "Entrada",
+    room_office: "Escritório",
+    room_laundry: "Lavandaria",
+    room_garage: "Garagem",
     all_closed: "Tudo fechado",
     all_quiet: "Tudo calmo",
     open_one: "{n} abertura",
@@ -720,6 +927,29 @@ const RC_I18N = {
     ed_exclude_areas: "Divisões a excluir",
   },
   pl: {
+    ed_illustration: "Ilustrowany nagłówek",
+    ed_illustration_helper: "Animowany obraz pomieszczenia w nagłówku, zgodny z jego stanem",
+    ed_illustration_theme: "Motyw ilustracji",
+    ed_illustration_theme_helper: "Automatycznie: noc po zachodzie słońca lub przy ciemnym motywie",
+    theme_auto: "Automatycznie (słońce lub ciemny motyw)",
+    theme_day: "Dzień",
+    theme_night: "Noc",
+    ed_room_type: "Typ pomieszczenia",
+    ed_room_type_helper: "Kolor ścian, meble i podłoga obrazu; automatycznie: z nazwy lub ikony obszaru",
+    room_auto: "Automatycznie",
+    room_none: "Brak (tylko motyw karty)",
+    room_living: "Salon",
+    room_bedroom: "Sypialnia",
+    room_kids: "Pokój dziecięcy",
+    room_kitchen: "Kuchnia",
+    room_dining: "Jadalnia",
+    room_bathroom: "Łazienka",
+    room_toilets: "Toaleta",
+    room_hallway: "Korytarz",
+    room_entry: "Wejście",
+    room_office: "Biuro",
+    room_laundry: "Pralnia",
+    room_garage: "Garaż",
     all_closed: "Zamknięte",
     all_quiet: "Spokojnie",
     open_one: "Otwarte: {n}",
@@ -771,6 +1001,29 @@ const RC_I18N = {
     ed_exclude_areas: "Pomieszczenia do wykluczenia",
   },
   ro: {
+    ed_illustration: "Antet ilustrat",
+    ed_illustration_helper: "O imagine animată a camerei în antet, care îi urmează starea",
+    ed_illustration_theme: "Tema ilustrației",
+    ed_illustration_theme_helper: "Automat: noapte după apus sau cu o temă întunecată",
+    theme_auto: "Automat (soare sau temă întunecată)",
+    theme_day: "Zi",
+    theme_night: "Noapte",
+    ed_room_type: "Tipul camerei",
+    ed_room_type_helper: "Culoarea pereților, mobilierul și podeaua imaginii; automat: după numele sau pictograma zonei",
+    room_auto: "Automat",
+    room_none: "Niciunul (doar tema cardului)",
+    room_living: "Sufragerie",
+    room_bedroom: "Dormitor",
+    room_kids: "Camera copiilor",
+    room_kitchen: "Bucătărie",
+    room_dining: "Sufragerie de masă",
+    room_bathroom: "Baie",
+    room_toilets: "Toaletă",
+    room_hallway: "Hol",
+    room_entry: "Intrare",
+    room_office: "Birou",
+    room_laundry: "Spălătorie",
+    room_garage: "Garaj",
     all_closed: "Totul închis",
     all_quiet: "Totul liniștit",
     open_one: "Deschise: {n}",
@@ -822,6 +1075,29 @@ const RC_I18N = {
     ed_exclude_areas: "Camere excluse",
   },
   da: {
+    ed_illustration: "Illustreret overskrift",
+    ed_illustration_helper: "Et animeret billede af rummet i overskriften, der følger dets tilstand",
+    ed_illustration_theme: "Illustrationens tema",
+    ed_illustration_theme_helper: "Automatisk: nat efter solnedgang eller med et mørkt tema",
+    theme_auto: "Automatisk (sol eller mørkt tema)",
+    theme_day: "Dag",
+    theme_night: "Nat",
+    ed_room_type: "Rumtype",
+    ed_room_type_helper: "Vægfarve, møbler og gulv i billedet; automatisk: ud fra områdets navn eller ikon",
+    room_auto: "Automatisk",
+    room_none: "Ingen (kun kortets tema)",
+    room_living: "Stue",
+    room_bedroom: "Soveværelse",
+    room_kids: "Børneværelse",
+    room_kitchen: "Køkken",
+    room_dining: "Spisestue",
+    room_bathroom: "Badeværelse",
+    room_toilets: "Toilet",
+    room_hallway: "Gang",
+    room_entry: "Entré",
+    room_office: "Kontor",
+    room_laundry: "Bryggers",
+    room_garage: "Garage",
     all_closed: "Alt lukket",
     all_quiet: "Alt roligt",
     open_one: "{n} åben",
@@ -873,6 +1149,29 @@ const RC_I18N = {
     ed_exclude_areas: "Rum, der udelades",
   },
   sv: {
+    ed_illustration: "Illustrerad rubrik",
+    ed_illustration_helper: "En animerad bild av rummet i rubriken, som följer dess tillstånd",
+    ed_illustration_theme: "Illustrationens tema",
+    ed_illustration_theme_helper: "Automatiskt: natt efter solnedgången eller med ett mörkt tema",
+    theme_auto: "Automatiskt (sol eller mörkt tema)",
+    theme_day: "Dag",
+    theme_night: "Natt",
+    ed_room_type: "Rumstyp",
+    ed_room_type_helper: "Väggfärg, möbler och golv i bilden; automatiskt: från områdets namn eller ikon",
+    room_auto: "Automatiskt",
+    room_none: "Ingen (endast kortets tema)",
+    room_living: "Vardagsrum",
+    room_bedroom: "Sovrum",
+    room_kids: "Barnrum",
+    room_kitchen: "Kök",
+    room_dining: "Matsal",
+    room_bathroom: "Badrum",
+    room_toilets: "Toalett",
+    room_hallway: "Korridor",
+    room_entry: "Entré",
+    room_office: "Kontor",
+    room_laundry: "Tvättstuga",
+    room_garage: "Garage",
     all_closed: "Allt stängt",
     all_quiet: "Allt lugnt",
     open_one: "{n} öppen",
@@ -924,6 +1223,29 @@ const RC_I18N = {
     ed_exclude_areas: "Rum att utesluta",
   },
   bg: {
+    ed_illustration: "Илюстрирана заглавка",
+    ed_illustration_helper: "Анимирано изображение на стаята в заглавката, което следва състоянието ѝ",
+    ed_illustration_theme: "Тема на илюстрацията",
+    ed_illustration_theme_helper: "Автоматично: нощ след залез или с тъмна тема",
+    theme_auto: "Автоматично (слънце или тъмна тема)",
+    theme_day: "Ден",
+    theme_night: "Нощ",
+    ed_room_type: "Вид стая",
+    ed_room_type_helper: "Цвят на стените, мебели и под на изображението; автоматично: по името или иконата на зоната",
+    room_auto: "Автоматично",
+    room_none: "Няма (само темата на картата)",
+    room_living: "Всекидневна",
+    room_bedroom: "Спалня",
+    room_kids: "Детска стая",
+    room_kitchen: "Кухня",
+    room_dining: "Трапезария",
+    room_bathroom: "Баня",
+    room_toilets: "Тоалетна",
+    room_hallway: "Коридор",
+    room_entry: "Вход",
+    room_office: "Кабинет",
+    room_laundry: "Пералня",
+    room_garage: "Гараж",
     all_closed: "Всичко е затворено",
     all_quiet: "Всичко е спокойно",
     open_one: "Отворени: {n}",
@@ -975,6 +1297,29 @@ const RC_I18N = {
     ed_exclude_areas: "Стаи за пропускане",
   },
   ru: {
+    ed_illustration: "Иллюстрированный заголовок",
+    ed_illustration_helper: "Анимированное изображение комнаты в заголовке, отражающее её состояние",
+    ed_illustration_theme: "Тема иллюстрации",
+    ed_illustration_theme_helper: "Автоматически: ночь после заката или при тёмной теме",
+    theme_auto: "Автоматически (солнце или тёмная тема)",
+    theme_day: "День",
+    theme_night: "Ночь",
+    ed_room_type: "Тип комнаты",
+    ed_room_type_helper: "Цвет стен, мебель и пол изображения; автоматически: по названию или значку зоны",
+    room_auto: "Автоматически",
+    room_none: "Нет (только тема карточки)",
+    room_living: "Гостиная",
+    room_bedroom: "Спальня",
+    room_kids: "Детская",
+    room_kitchen: "Кухня",
+    room_dining: "Столовая",
+    room_bathroom: "Ванная",
+    room_toilets: "Туалет",
+    room_hallway: "Коридор",
+    room_entry: "Прихожая",
+    room_office: "Кабинет",
+    room_laundry: "Прачечная",
+    room_garage: "Гараж",
     all_closed: "Всё закрыто",
     all_quiet: "Всё спокойно",
     open_one: "Открыто: {n}",
@@ -1026,6 +1371,29 @@ const RC_I18N = {
     ed_exclude_areas: "Исключить комнаты",
   },
   uk: {
+    ed_illustration: "Ілюстрований заголовок",
+    ed_illustration_helper: "Анімоване зображення кімнати в заголовку, що відображає її стан",
+    ed_illustration_theme: "Тема ілюстрації",
+    ed_illustration_theme_helper: "Автоматично: ніч після заходу сонця або з темною темою",
+    theme_auto: "Автоматично (сонце або темна тема)",
+    theme_day: "День",
+    theme_night: "Ніч",
+    ed_room_type: "Тип кімнати",
+    ed_room_type_helper: "Колір стін, меблі та підлога зображення; автоматично: за назвою або значком зони",
+    room_auto: "Автоматично",
+    room_none: "Немає (лише тема картки)",
+    room_living: "Вітальня",
+    room_bedroom: "Спальня",
+    room_kids: "Дитяча",
+    room_kitchen: "Кухня",
+    room_dining: "Їдальня",
+    room_bathroom: "Ванна",
+    room_toilets: "Туалет",
+    room_hallway: "Коридор",
+    room_entry: "Передпокій",
+    room_office: "Кабінет",
+    room_laundry: "Пральня",
+    room_garage: "Гараж",
     all_closed: "Усе зачинено",
     all_quiet: "Усе спокійно",
     open_one: "Відчинено: {n}",
@@ -1077,6 +1445,29 @@ const RC_I18N = {
     ed_exclude_areas: "Виключити кімнати",
   },
   hu: {
+    ed_illustration: "Illusztrált fejléc",
+    ed_illustration_helper: "A szoba animált képe a fejlécben, amely követi az állapotát",
+    ed_illustration_theme: "Az illusztráció témája",
+    ed_illustration_theme_helper: "Automatikus: éjszaka napnyugta után vagy sötét témával",
+    theme_auto: "Automatikus (nap vagy sötét téma)",
+    theme_day: "Nappal",
+    theme_night: "Éjszaka",
+    ed_room_type: "Helyiség típusa",
+    ed_room_type_helper: "A kép falszíne, bútorai és padlója; automatikus: a terület neve vagy ikonja alapján",
+    room_auto: "Automatikus",
+    room_none: "Nincs (csak a kártya témája)",
+    room_living: "Nappali",
+    room_bedroom: "Hálószoba",
+    room_kids: "Gyerekszoba",
+    room_kitchen: "Konyha",
+    room_dining: "Étkező",
+    room_bathroom: "Fürdőszoba",
+    room_toilets: "WC",
+    room_hallway: "Folyosó",
+    room_entry: "Bejárat",
+    room_office: "Iroda",
+    room_laundry: "Mosókonyha",
+    room_garage: "Garázs",
     all_closed: "Minden zárva",
     all_quiet: "Minden nyugodt",
     open_one: "{n} nyitva",
@@ -1128,6 +1519,29 @@ const RC_I18N = {
     ed_exclude_areas: "Kihagyott helyiségek",
   },
   sk: {
+    ed_illustration: "Ilustrovaná hlavička",
+    ed_illustration_helper: "Animovaný obrázok miestnosti v hlavičke, ktorý sleduje jej stav",
+    ed_illustration_theme: "Téma ilustrácie",
+    ed_illustration_theme_helper: "Automaticky: noc po západe slnka alebo s tmavou témou",
+    theme_auto: "Automaticky (slnko alebo tmavá téma)",
+    theme_day: "Deň",
+    theme_night: "Noc",
+    ed_room_type: "Typ miestnosti",
+    ed_room_type_helper: "Farba stien, nábytok a podlaha obrázka; automaticky: podľa názvu alebo ikony oblasti",
+    room_auto: "Automaticky",
+    room_none: "Žiadny (len téma karty)",
+    room_living: "Obývačka",
+    room_bedroom: "Spálňa",
+    room_kids: "Detská izba",
+    room_kitchen: "Kuchyňa",
+    room_dining: "Jedáleň",
+    room_bathroom: "Kúpeľňa",
+    room_toilets: "WC",
+    room_hallway: "Chodba",
+    room_entry: "Vstup",
+    room_office: "Pracovňa",
+    room_laundry: "Práčovňa",
+    room_garage: "Garáž",
     all_closed: "Všetko zatvorené",
     all_quiet: "Všetko pokojné",
     open_one: "Otvorené: {n}",
@@ -1179,6 +1593,29 @@ const RC_I18N = {
     ed_exclude_areas: "Vynechané miestnosti",
   },
   cs: {
+    ed_illustration: "Ilustrované záhlaví",
+    ed_illustration_helper: "Animovaný obrázek místnosti v záhlaví, který sleduje její stav",
+    ed_illustration_theme: "Téma ilustrace",
+    ed_illustration_theme_helper: "Automaticky: noc po západu slunce nebo s tmavým motivem",
+    theme_auto: "Automaticky (slunce nebo tmavý motiv)",
+    theme_day: "Den",
+    theme_night: "Noc",
+    ed_room_type: "Typ místnosti",
+    ed_room_type_helper: "Barva stěn, nábytek a podlaha obrázku; automaticky: podle názvu nebo ikony oblasti",
+    room_auto: "Automaticky",
+    room_none: "Žádný (jen téma karty)",
+    room_living: "Obývací pokoj",
+    room_bedroom: "Ložnice",
+    room_kids: "Dětský pokoj",
+    room_kitchen: "Kuchyně",
+    room_dining: "Jídelna",
+    room_bathroom: "Koupelna",
+    room_toilets: "WC",
+    room_hallway: "Chodba",
+    room_entry: "Vstup",
+    room_office: "Pracovna",
+    room_laundry: "Prádelna",
+    room_garage: "Garáž",
     all_closed: "Vše zavřeno",
     all_quiet: "Vše v klidu",
     open_one: "Otevřeno: {n}",
@@ -1230,6 +1667,29 @@ const RC_I18N = {
     ed_exclude_areas: "Vynechané místnosti",
   },
   sl: {
+    ed_illustration: "Ilustrirana glava",
+    ed_illustration_helper: "Animirana slika prostora v glavi, ki sledi njegovemu stanju",
+    ed_illustration_theme: "Tema ilustracije",
+    ed_illustration_theme_helper: "Samodejno: noč po sončnem zahodu ali s temno temo",
+    theme_auto: "Samodejno (sonce ali temna tema)",
+    theme_day: "Dan",
+    theme_night: "Noč",
+    ed_room_type: "Vrsta prostora",
+    ed_room_type_helper: "Barva sten, pohištvo in tla slike; samodejno: po imenu ali ikoni območja",
+    room_auto: "Samodejno",
+    room_none: "Brez (samo tema kartice)",
+    room_living: "Dnevna soba",
+    room_bedroom: "Spalnica",
+    room_kids: "Otroška soba",
+    room_kitchen: "Kuhinja",
+    room_dining: "Jedilnica",
+    room_bathroom: "Kopalnica",
+    room_toilets: "Stranišče",
+    room_hallway: "Hodnik",
+    room_entry: "Vhod",
+    room_office: "Pisarna",
+    room_laundry: "Pralnica",
+    room_garage: "Garaža",
     all_closed: "Vse zaprto",
     all_quiet: "Vse mirno",
     open_one: "Odprto: {n}",
@@ -1281,6 +1741,29 @@ const RC_I18N = {
     ed_exclude_areas: "Izpuščeni prostori",
   },
   lv: {
+    ed_illustration: "Ilustrēta galvene",
+    ed_illustration_helper: "Animēts telpas attēls galvenē, kas seko tās stāvoklim",
+    ed_illustration_theme: "Ilustrācijas tēma",
+    ed_illustration_theme_helper: "Automātiski: nakts pēc saulrieta vai ar tumšu tēmu",
+    theme_auto: "Automātiski (saule vai tumšā tēma)",
+    theme_day: "Diena",
+    theme_night: "Nakts",
+    ed_room_type: "Telpas veids",
+    ed_room_type_helper: "Attēla sienu krāsa, mēbeles un grīda; automātiski: pēc apgabala nosaukuma vai ikonas",
+    room_auto: "Automātiski",
+    room_none: "Nav (tikai kartītes tēma)",
+    room_living: "Dzīvojamā istaba",
+    room_bedroom: "Guļamistaba",
+    room_kids: "Bērnistaba",
+    room_kitchen: "Virtuve",
+    room_dining: "Ēdamistaba",
+    room_bathroom: "Vannas istaba",
+    room_toilets: "Tualete",
+    room_hallway: "Gaitenis",
+    room_entry: "Ieeja",
+    room_office: "Birojs",
+    room_laundry: "Veļas telpa",
+    room_garage: "Garāža",
     all_closed: "Viss aizvērts",
     all_quiet: "Viss mierīgi",
     open_one: "Atvērti: {n}",
@@ -1332,6 +1815,29 @@ const RC_I18N = {
     ed_exclude_areas: "Izslēdzamās telpas",
   },
   el: {
+    ed_illustration: "Εικονογραφημένη κεφαλίδα",
+    ed_illustration_helper: "Μια κινούμενη εικόνα του δωματίου στην κεφαλίδα, που ακολουθεί την κατάστασή του",
+    ed_illustration_theme: "Θέμα εικονογράφησης",
+    ed_illustration_theme_helper: "Αυτόματο: νύχτα μετά τη δύση ή με σκούρο θέμα",
+    theme_auto: "Αυτόματο (ήλιος ή σκούρο θέμα)",
+    theme_day: "Ημέρα",
+    theme_night: "Νύχτα",
+    ed_room_type: "Τύπος δωματίου",
+    ed_room_type_helper: "Χρώμα τοίχου, έπιπλα και δάπεδο της εικόνας· αυτόματο: από το όνομα ή το εικονίδιο της περιοχής",
+    room_auto: "Αυτόματο",
+    room_none: "Κανένας (μόνο το θέμα της κάρτας)",
+    room_living: "Σαλόνι",
+    room_bedroom: "Υπνοδωμάτιο",
+    room_kids: "Παιδικό δωμάτιο",
+    room_kitchen: "Κουζίνα",
+    room_dining: "Τραπεζαρία",
+    room_bathroom: "Μπάνιο",
+    room_toilets: "Τουαλέτα",
+    room_hallway: "Διάδρομος",
+    room_entry: "Είσοδος",
+    room_office: "Γραφείο",
+    room_laundry: "Πλυσταριό",
+    room_garage: "Γκαράζ",
     all_closed: "Όλα κλειστά",
     all_quiet: "Όλα ήσυχα",
     open_one: "{n} ανοιχτό",
@@ -1418,6 +1924,13 @@ const rcEsc = (s) =>
     /[&<>"']/g,
     (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
   );
+
+// The whole width of an element's text in its own font, an ellipsised one included.
+const textWidth = (el) => {
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  return range.getBoundingClientRect().width;
+};
 
 const rcEscRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -1530,6 +2043,52 @@ class RcCard extends HTMLElement {
     root.addEventListener("keydown", () => {
       this._byPointer = false;
     });
+    // The banner's status pill is fitted after every redraw of the card and for every new width.
+    if (typeof MutationObserver === "function") new MutationObserver(() => this._fitPill()).observe(root, { childList: true, subtree: true });
+    if (typeof ResizeObserver === "function") {
+      new ResizeObserver((entries) => {
+        const w = Math.round(entries.at(-1).contentRect.width);
+        if (w === this._fitWidth) return;
+        this._fitWidth = w;
+        this._fitPill();
+      }).observe(this);
+    }
+  }
+
+  // The status pill stays right after the title only while the whole title and the pill's whole label fit on that
+  // row; otherwise it takes a line of its own under the title and subtitle (data-wrap), and on the banner, when even
+  // then the text would run into the floor strip, it keeps its dot alone (data-dot). Measured in the real fonts (the
+  // pill at its natural width), so that every language and title length gets its own answer.
+  _fitPill() {
+    const root = this.shadowRoot;
+    for (const pill of root?.querySelectorAll?.(".banner .trow > .pill, .banner .trow > .st, .head > .pill, .mini .head > .st") || []) {
+      const banner = pill.closest(".banner");
+      const host = banner || pill.parentElement;
+      const title = pill.parentElement.querySelector(":scope > .title");
+      if (!pill.getBoundingClientRect || !title) continue;
+      host.removeAttribute("data-wrap");
+      host.removeAttribute("data-dot");
+      // The room the title and the pill share now (the banner's row, or the classic header's title + pill), and the
+      // room they need: the whole title and the pill at its natural width.
+      const have = banner ? pill.parentElement.getBoundingClientRect().width : title.getBoundingClientRect().width + pill.getBoundingClientRect().width;
+      const gap = banner ? parseFloat(getComputedStyle(pill.parentElement).columnGap) || 0 : 0;
+      pill.style.maxWidth = "none";
+      pill.style.flex = "none";
+      const natural = pill.getBoundingClientRect().width;
+      pill.style.maxWidth = "";
+      pill.style.flex = "";
+      const shown = getComputedStyle(title).display !== "none" && getComputedStyle(title).visibility !== "hidden";
+      if ((shown ? textWidth(title) + gap : 0) + natural <= have) continue;
+      host.setAttribute("data-wrap", "");
+      if (!banner) continue;
+      const t = pill.closest(".titles");
+      const sub = t.querySelector(":scope > .sub, :scope > .hchips");
+      if (sub && sub.scrollWidth > sub.clientWidth) sub.title = sub.textContent.replace(/\s+/g, " ").trim();
+      const r = t.getBoundingClientRect();
+      const box = banner.getBoundingClientRect();
+      const floor = banner.querySelector(".ground")?.getBoundingClientRect().top ?? box.bottom;
+      if (r.bottom > floor + 0.5 || r.top < box.top - 0.5 || natural > r.width + 0.5) host.setAttribute("data-dot", "");
+    }
   }
 
   disconnectedCallback() {
@@ -1617,7 +2176,7 @@ class RcCard extends HTMLElement {
 
   // Re-render only when something visible changed.
   _changed(parts) {
-    const sig = JSON.stringify([this._config, this._lang(), parts]);
+    const sig = JSON.stringify([this._config, this._lang(), this._illustrated() && this._night(), parts]);
     if (sig === this._sig) return false;
     this._sig = sig;
     return true;
@@ -1670,8 +2229,73 @@ class RcCard extends HTMLElement {
     else if (this._openArea) this._fillPanel();
   }
 
+  // ── Illustrated header (src/scene.js) ──
+  _illustrated() {
+    return this._config?.illustration !== false;
+  }
+
+  _night() {
+    return rcIsNight(this._hass, this._config);
+  }
+
+  // What the scene shows: the card's state, from its entities (each card sets `static sceneTheme` and implements it).
+  _sceneState() {
+    return {};
+  }
+
+  _bannerParts() {
+    const n = this._night();
+    const area = this._hass?.areas?.[this._config.area];
+    const s = rcScene(this.constructor.sceneTheme || "lights", rcRoomType(this._config, area), this._sceneState(), n);
+    return { cls: `banner${n ? " night" : ""}`, style: `background:${s.wall}`, art: `${s.svg}<div class="ground g-${s.floor}"></div>` };
+  }
+
+  // The banner around `inner` (its .head), for the cards that rewrite their whole content.
+  _banner(inner) {
+    const b = this._bannerParts();
+    return `<div class="${b.cls}" style="${b.style}"><div class="bn-art">${b.art}</div>${inner}</div>`;
+  }
+
+  // The banner `el` already in place (the overviews keep their header node): picture and colours brought up to date.
+  _updateBanner(el) {
+    if (!el?.querySelector) return;
+    const b = this._bannerParts();
+    el.className = b.cls;
+    el.setAttribute?.("style", b.style);
+    const art = el.querySelector(".bn-art");
+    if (art && this._artHtml !== b.art) {
+      art.innerHTML = b.art;
+      this._artHtml = b.art;
+    }
+  }
+
+  // The overviews draw their card once and keep its header node from one render to the next: true when it was
+  // (re)built now (first render, or the illustration switched on or off), its listeners then to be bound.
+  _shellOnce(styles, rest) {
+    const illus = this._illustrated();
+    if (this.shadowRoot.querySelector("ha-card") && this._shell !== illus) this.shadowRoot.innerHTML = "";
+    if (this.shadowRoot.querySelector("ha-card")) return false;
+    this._shell = illus;
+    this._artHtml = null;
+    const head = illus ? '<div class="banner"><div class="bn-art"></div><div class="head"></div></div>' : '<div class="head"></div>';
+    this.shadowRoot.innerHTML = `
+        <style>${RC_BASE_STYLES}${illus ? RC_BANNER_STYLES : ""}${styles}</style>
+        <ha-card>${head}${rest}</ha-card>`;
+    return true;
+  }
+
   _head({ icon, title, status, chips = "", allOff = false }) {
     const c = this._config;
+    if (this._illustrated()) {
+      return this._banner(`
+      <div class="head${c.navigation_path ? " nav" : ""}"${c.navigation_path ? ' role="link" tabindex="0"' : ""}>
+        <div class="badge"><ha-icon icon="${rcEsc(icon)}"></ha-icon></div>
+        <div class="titles">
+          <div class="trow"><div class="title">${rcEsc(title)}</div><button class="pill${allOff ? " action" : ""}" title="${rcEsc(allOff ? this._t("turn_all_off") : status)}"${allOff ? "" : " disabled"}>${allOff ? '<ha-icon icon="mdi:power"></ha-icon>' : ""}<span class="pt">${rcEsc(status)}</span></button></div>
+          ${chips.trim() ? `<div class="sub">${chips}</div>` : ""}
+        </div>
+      </div>`);
+    }
     return `
       <div class="head${c.navigation_path ? " nav" : ""}"${c.navigation_path ? ' role="link" tabindex="0"' : ""}>
         <div class="badge"><ha-icon icon="${rcEsc(icon)}"></ha-icon></div>
@@ -1700,7 +2324,7 @@ class RcCard extends HTMLElement {
     // The tile with the keyboard focus keeps it through the redraw (a toggle or a brightness step from the keyboard).
     const focused = this._byPointer ? null : this.shadowRoot.activeElement?.dataset?.id;
     this.shadowRoot.innerHTML = `
-      <style>${RC_BASE_STYLES}${this.constructor.styles}</style>
+      <style>${RC_BASE_STYLES}${this._illustrated() ? RC_BANNER_STYLES : ""}${this.constructor.styles}</style>
       <ha-card class="lvl-${level}${extraClass}${this._tiles() ? " layout-tiles" : ""}">
         ${head}
         ${tiles ? `<div class="grid" style="--cols:${this._cols()}">${tiles}</div>` : ""}
@@ -1945,14 +2569,27 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
       const st = allOff
         ? `<button class="st action" title="${rcEsc(this._t("turn_all_off"))}"><ha-icon icon="mdi:power"></ha-icon><span class="pt">${rcEsc(status)}</span></button>`
         : `<span class="st" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></span>`;
-      this.shadowRoot.innerHTML = `
+      const title = rcEsc(c.title || this._areaName() || this._t("title"));
+      const navAttrs = `${nav ? " nav" : ""}"${nav ? ' role="link" tabindex="0"' : ""}`;
+      // Illustrated: the banner (icon, title and status on the wall, the scene at the right), the chips under it.
+      this.shadowRoot.innerHTML = this._illustrated()
+        ? `
+        <style>${RC_BASE_STYLES}${RC_BANNER_STYLES}${this.constructor.styles}</style>
+        <ha-card class="lvl-${level}${cls}">
+          ${this._banner(`<div class="head${navAttrs}>
+            <div class="badge" title="${rcEsc(status)}"><ha-icon icon="${rcEsc(icon)}"></ha-icon></div>
+            <div class="titles"><div class="trow"><div class="title">${title}</div>${st}</div></div>
+          </div>`)}
+          ${chips.trim() ? `<div class="rs">${chips}</div>` : ""}
+        </ha-card>`
+        : `
         <style>${RC_BASE_STYLES}${this.constructor.styles}</style>
         <ha-card class="lvl-${level}${cls}">
           <div class="mini">
             <div class="badge" title="${rcEsc(status)}"><ha-icon icon="${rcEsc(icon)}"></ha-icon></div>
             <div class="body">
-              <div class="head${nav ? " nav" : ""}"${nav ? ' role="link" tabindex="0"' : ""}>
-                <div class="title">${rcEsc(c.title || this._areaName() || this._t("title"))}</div>
+              <div class="head${navAttrs}>
+                <div class="title">${title}</div>
                 ${st}
               </div>
               <div class="rs">${chips}</div>
@@ -2085,6 +2722,20 @@ const rcLayoutField = (i18n, lang) => ({
 });
 const rcBooleans = (...names) => names.map((name) => ({ name, selector: { boolean: {} } }));
 
+// The illustrated header: on or off, day / night / automatic, and (rooms) the room type of the picture.
+const RC_SCENE_HELPERS = ["illustration", "illustration_theme", "room_type"];
+const rcIllustrationFields = (i18n, lang, roomType = false) => {
+  const select = (name, values, prefix) => ({
+    name,
+    selector: { select: { mode: "dropdown", options: values.map((value) => ({ value, label: rcT(i18n, lang, `${prefix}${value}`) })) } },
+  });
+  return [
+    { name: "illustration", selector: { boolean: {} } },
+    select("illustration_theme", ["auto", "day", "night"], "theme_"),
+    ...(roomType ? [select("room_type", ["auto", "none", ...RC_ROOM_TYPES], "room_")] : []),
+  ];
+};
+
 // "Advanced" section, folded, with the options that are lists or maps (edited as YAML) and the language. Its fields
 // sit at the root of the config (`flatten`).
 const RC_ADVANCED_HELPERS = ["language", "entities", "thresholds", "rooms"];
@@ -2215,7 +2866,7 @@ const rcListKeep = (ids, before) =>
 
 const rcEditor = ({ card, helpers, schema, autos = {} }) => {
   const i18n = card.i18n;
-  const defaults = { show_title: true, ...Object.fromEntries(Object.entries(card.defaults).filter(([, v]) => !Array.isArray(v))) };
+  const defaults = { show_title: true, illustration: true, illustration_theme: "auto", room_type: "auto", ...Object.fromEntries(Object.entries(card.defaults).filter(([, v]) => !Array.isArray(v))) };
   return class extends HTMLElement {
     setConfig(config) {
       this._config = config;
@@ -2236,7 +2887,7 @@ const rcEditor = ({ card, helpers, schema, autos = {} }) => {
         this._form = document.createElement("ha-form");
         this._form.computeLabel = (s) => s.label ?? rcT(i18n, this._lang, `ed_${s.name}`);
         this._form.computeHelper = (s) =>
-          helpers.includes(s.name) ? rcT(i18n, this._lang, `ed_${s.name}_helper`) : undefined;
+          helpers.includes(s.name) || RC_SCENE_HELPERS.includes(s.name) ? rcT(i18n, this._lang, `ed_${s.name}_helper`) : undefined;
         this._form.addEventListener("value-changed", (ev) => {
           const config = { ...ev.detail.value };
           for (const k of RC_ENTITY_LISTS) if (k in config) config[k] = rcListKeep(config[k], this._config[k]);
@@ -2335,18 +2986,21 @@ const RC_BASE_STYLES = `
           padding: 1px 8px; border-radius: 999px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
   .pt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pill ha-icon { flex: none; }
-  /* A card this narrow (6 columns of the Sections view on a phone): the title is at its few letters already, so the
-     status pill goes to a line of its own under it, where its whole label fits, rather than end with "…". */
-  @container (max-width: 260px) {
-    .head { flex-wrap: wrap; row-gap: 4px; }
-    .head::after { content: ""; order: 1; flex: 1 0 100%; }
-    .head > .pill { order: 2; margin-left: 50px; max-width: calc(100% - 50px); }
-  }
+  /* The status pill right after the title (8 px), whole, then the header's chips; the detail button at the far end. */
+  .head > .title { flex: 0 1 auto; min-width: 0; }
+  .head > .pill, .mini .head > .st { flex: none; margin-left: 0; }
+  .head > .chip, .head > .hchips { order: 2; }
+  .head > .zoom { order: 3; margin-left: auto; }
+  /* Not enough room for the whole title and the pill's whole label on one line (measured by the card, see _fitPill):
+     the status pill goes to a line of its own under the title (and the chips), where its whole label fits; a label
+     too long even there (an empty-state sentence) wraps to a second line rather than being cut. */
+  .head[data-wrap] { flex-wrap: wrap; row-gap: 4px; }
+  .head[data-wrap] > .title { flex: 1 1 0; }
+  .head[data-wrap]::after { content: ""; order: 4; flex: 1 0 100%; }
+  .head[data-wrap] > .pill { order: 5; margin-left: 50px; max-width: calc(100% - 50px); border-radius: 10px; }
+  .head[data-wrap] > .pill .pt { white-space: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .mini .head[data-wrap] > .st { order: 5; max-width: 100%; }
   @container (max-width: 200px) {
-    /* Under 200 px the pill is only its dot again: back on the title's line. */
-    .head { flex-wrap: nowrap; }
-    .head::after { content: none; }
-    .head > .pill { order: 0; margin-left: 0; max-width: none; }
     .head > .pill .pt, .st .pt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
     .head > .pill:not(.action), .st { flex: none; padding: 0; width: 18px; height: 18px; justify-content: center; background: none; }
     .head > .pill:not(.action)::before, .st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }

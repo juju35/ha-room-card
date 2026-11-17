@@ -494,7 +494,7 @@ test("pressing a tile and leaving it with the mouse neither toggles nor opens mo
 
 test("the sensors mini card: a named pill for each open sensor, quiet ones hidden, and a zoom to the full card", () => {
   const card = new cards["room-sensors-mini-card"]();
-  card.setConfig({ area: "kitchen" });
+  card.setConfig({ area: "kitchen", illustration: false });
   const h = makeHass();
   h.states["binary_sensor.door"] = { ...h.states["binary_sensor.door"], state: "on" };
   card.hass = h;
@@ -545,7 +545,7 @@ const twoLights = () => {
 
 test("the lights mini card: on out of the total, a named pill for each light on, the icon alone for the others", () => {
   const card = new cards["room-lights-mini-card"]();
-  card.setConfig({ area: "kitchen", language: "en" });
+  card.setConfig({ area: "kitchen", illustration: false, language: "en" });
   card.hass = twoLights();
   let html = card.shadowRoot.innerHTML;
   assert.match(html, /class="mini"/);
@@ -630,7 +630,7 @@ const clickVia = (...path) => ({ composedPath: () => path });
 
 test("a click elsewhere brings a zoomed mini card back to its compact view, not one inside it or in a dialog", () => {
   const card = new cards["room-sensors-mini-card"]();
-  card.setConfig({ area: "kitchen" });
+  card.setConfig({ area: "kitchen", illustration: false });
   card.hass = makeHass();
   card._zoomed = true;
   card._onUnzoom(clickVia(card));
@@ -644,7 +644,7 @@ test("a click elsewhere brings a zoomed mini card back to its compact view, not 
 
 test("folding: a tap elsewhere (pointer), not a drag that ends outside; leaving the page goes back too", () => {
   const card = new cards["room-sensors-mini-card"]();
-  card.setConfig({ area: "kitchen" });
+  card.setConfig({ area: "kitchen", illustration: false });
   card.hass = makeHass();
   card.connectedCallback();
   card._zoomed = true;

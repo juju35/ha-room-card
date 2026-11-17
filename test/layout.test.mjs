@@ -143,7 +143,7 @@ test("Overview: on a narrow card the header chips go to a line of their own", ()
   assert.match(narrow, /\.hchips \{[^}]*flex: 1 0 100%/);
   assert.equal(decls(css, ".hchips").flex, "none");
 
-  const head = overviewWith({ plugs_off_button: true }, makeHass());
+  const head = overviewWith({ plugs_off_button: true, illustration: false }, makeHass());
   assert.match(head, /<div class="hchips"><button class="chip light action"[\s\S]*<button class="chip plug action"[\s\S]*<\/div>\s*<div class="pill"/);
   assert.match(head, /<div class="pill" title="[^"]+"><span class="pt">/);
 });
@@ -206,18 +206,17 @@ test("Cards shrink in a 1fr column, even wrapped in a div: no intrinsic size, no
   }
 });
 
-// At 6 columns on a phone (~234-245 px) the title is at its few letters already: "Włączone: 4 · 1.3 kW",
-// "Do sprawdzenia: 1" or "Otwarte: 2" ended with "…". The pill goes to a line of its own, under the title.
-test("Header under 260 px: the status pill goes to a line of its own instead of being cut", () => {
-  const narrow = container(BASE, 260, ".head::after");
-  assert.match(narrow, /\.head \{[^}]*flex-wrap: wrap/);
-  assert.match(narrow, /\.head::after \{[^}]*flex: 1 0 100%/);
-  assert.match(narrow, /\.head > \.pill \{[^}]*order: 2/);
-  // Under 200 px it is only its dot again, back on the title's line.
-  const dot = container(BASE, 200, ".head::after");
-  assert.match(dot, /\.head::after \{ content: none; \}/);
-  // The overview keeps its pill on the first line: its chips have the second one.
-  assert.match(container(cards["room-overview-card"].styles, 260, ".head::after"), /\.head > \.pill \{ order: 0;/);
+// "Włączone: 4 · 1.3 kW", "Do sprawdzenia: 1" or "Otwarte: 2" beside a title: when the whole title and the pill's
+// whole label do not fit on one line (measured by the card, data-wrap), the pill goes to a line of its own, under
+// the title (and the overviews' counters) — never a fixed width deciding it.
+test("Header: the status pill goes to a line of its own when the card measures it would not fit whole", () => {
+  assert.match(BASE, /\.head\[data-wrap\] \{ flex-wrap: wrap; row-gap: 4px; \}/);
+  assert.match(BASE, /\.head\[data-wrap\]::after \{[^}]*flex: 1 0 100%/);
+  assert.match(BASE, /\.head\[data-wrap\] > \.pill \{[^}]*order: 5/);
+  for (const css of [BASE, ...Object.values(cards).map((c) => c.styles || "")]) {
+    assert.doesNotMatch(css, /@container \(max-width: 260px\) \{[^}]*\.head::after/);
+    assert.doesNotMatch(css, /\.head > \.pill \{ order: 0;/);
+  }
 });
 
 // The overviews' room tiles at 6 columns of a phone (~156-178 px): two tiles per row (three with `columns: 3`) left

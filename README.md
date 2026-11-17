@@ -122,7 +122,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - With `all_off_button: true`, the status doubles as a power button turning every plug of the room off (off by default, like the Plugs card)
 - On the second line, a pill with its name and power draw for each plug that is on (*Coffee Machine 1.2 kW*), the icon alone for the others (`only_on` hides them)
 - **Zoom** button (top right) switches the card to the full [Plugs card](#plugs) and back, as does a click anywhere else (`zoom: false` removes it)
-- Same discovery and options as the Plugs card: `only_on`, `hide_when_off`, `show_power`, `include` / `exclude`, `navigation_path`
+- Same discovery and options as the Plugs card: `only_on`, `hide_when_off`, `show_power`, `overload_power`, `include` / `exclude`, `navigation_path`
 - Tap a plug to open its details and history
 
 ### Environment
@@ -225,6 +225,9 @@ The Sensors, Lights, Plugs and Environment cards share these options; each card 
 | `only_on` | ❌ | `false` | Lights and Plugs cards: show only what is on (and unavailable entities) |
 | `hide_when_off` | ❌ | `false` | Lights and Plugs cards: hide the whole card when everything is off |
 | `all_off_button` | ❌ | Lights `true`, Plugs `false` | Lights and Plugs cards: the status pill turns everything of the card off when tapped (off by default on Plugs: a plug may feed a camera or a network switch) |
+| `illustration` | ❌ | `true` | Animated illustrated header (90 px, also on the mini cards): the title and status on the left, a picture of the card's theme drawn from its entities on the right, over a 10 px floor strip. `false` keeps the classic header |
+| `illustration_theme` | ❌ | `auto` | `auto` (night after sunset from `sun.sun` or with a dark theme, even while the sun is up), `day` or `night` |
+| `room_type` | ❌ | `auto` | Sensors, Plugs and Environment cards: the room of the picture (wall colour, furniture silhouette, floor: tiles, concrete or parquet) — `living`, `bedroom`, `kids`, `kitchen`, `dining`, `bathroom`, `toilets`, `hallway`, `entry`, `office`, `laundry`, `garage`, or `none` for the card's theme alone; `auto` guesses it from the area's name or icon. The Lights card keeps the light theme alone |
 | `language` | ❌ | Auto | Force language: `en`, `fr`, `de`, `es`, `sr`, `sr-Latn`, `it`, `nl`, `pt`, `pl`, `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv` or `el` (auto-detects from HA settings); also on the Overview card |
 
 \* `area`, `include` or `entities` is required.
@@ -272,6 +275,8 @@ rooms:
 | `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing attention first (leak, open, unavailable sensor, presence, something on) |
 | `presence` | ❌ | `true` | Include the presence and motion sensors, camera detections included (pets never, vehicles only in outdoor rooms) |
 | `zoom` | ❌ | `true` | Show only the rooms with something open, on or detected, with a detail button showing every room; `false` shows every room, always |
+| `illustration` | ❌ | `true` | Illustrated header: a cutaway house whose four rooms show the state of the home's rooms needing a look (someone there, light on, open, leak); `false` keeps the classic header |
+| `illustration_theme` | ❌ | `auto` | `auto` (night after sunset or with a dark theme, even while the sun is up), `day` or `night` |
 | `all_off_button` | ❌ | `true` | Tapping the lights chip of the header turns every light the card counts off |
 | `plugs_off_button` | ❌ | `false` | Tapping the plugs chip of the header opens a confirmation listing every plug the card counts that is on, and turns them off on OK (Cancel, Escape or a tap outside do nothing); the Plugs card of the room details gets its turn-everything-off pill too, behind the same confirmation. Off by default: a plug may feed a camera or a network switch, leave those out with `exclude` |
 | `exclude_areas` | ❌ | — | Rooms left out; the visual editor only offers the rooms the card finds |
@@ -512,6 +517,9 @@ In addition to the [common options](#common-options):
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `show_power` | ❌ | `true` | Power draw of each plug and total in the header |
+| `overload_power` | ❌ | `3000` | Total power of the plugs (W) from which the header warns of an overload; `0` never warns |
+
+From `overload_power` (3 kW by default) drawn by the plugs together, the header icon turns amber and the illustration's electrical panel shows an overload.
 
 ### Plugs mini
 
@@ -701,6 +709,8 @@ rooms:
 | `columns` | ❌ | `3` | Number of room columns (1–6); on a card of 340 px or less at most 2, and 1 at 260 px or less (6 columns of a Sections view on a phone) |
 | `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing a look first |
 | `zoom` | ❌ | `true` | Show only the rooms with a reading outside the comfort range, with a detail button showing every room; `false` shows every room, always |
+| `illustration` | ❌ | `true` | Illustrated header: the home's worst reading (else its average temperature and humidity) on a wall sensor; `false` keeps the classic header |
+| `illustration_theme` | ❌ | `auto` | `auto` (night after sunset or with a dark theme, even while the sun is up), `day` or `night` |
 | `thresholds` | ❌ | See [Thresholds](#thresholds) | Comfort limits per kind, also used by the unfolded room |
 | `exclude_areas` | ❌ | — | Rooms left out; the visual editor only offers the rooms the card finds |
 | `exclude` | ❌ | — | Sensors left out of the tiles, the averages and the room details |

@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.28.0 - 2026-11-17
+
+### Features
+- Animated illustrated header on every card (90 px, full and mini cards): title and status on the room's wall at the left, an illustration of the card's theme at the right, drawn from its entities, over a 10 px floor strip edge to edge. The header icon keeps the status colour, day and night.
+  - Lights: pendant lamps lit in the lights' own colours, the room darker when everything is off (light theme only, no room).
+  - Sensors: the door and window open with their contacts, someone walks in under the motion detector's beam, a puddle and a red puck on a leak, smoke on a smoke, CO or gas alarm.
+  - Plugs: electrical panel whose gauge fills with the plugs on, current flowing in their cords; from `overload_power` W together (3000 by default, `0` to never warn, settable in the editor) the panel shows an overload and the header icon turns amber.
+  - Environment: wall sensor showing the reading that matters in its comfort colour, snow at the window when cold, mist when humid, a strong sun and a wilting plant when hot, a haze when the air is stale.
+  - Overview: a cutaway house (two floors, four rooms) whose rooms show the home's state: someone there in blue, a light on as a warm glow, an opening in amber, a leak in red with a drip, a puddle and an alert badge. The environment overview shows the home's worst reading or its averages.
+- `room_type` (Sensors, Plugs, Environment): wall colour, furniture silhouette and floor (tiles, concrete or parquet) of the room — living, bedroom, kids, kitchen, dining, bathroom, toilets, hallway, entry, office, laundry, garage or none — guessed from the area's name or icon by default.
+- Night pictures after sunset (`sun.sun`) or with the dark theme, even while the sun is up; `illustration_theme: day | night` forces one, `illustration: false` keeps the classic header. Animations stop with reduced motion. New options in the visual editors, translated in every language.
+- Status pill on the banner, right after the title: a coloured dot (the power icon when it turns everything off) and the status, in the badge's colour on a frosted tint; it stays beside the title only while the whole title and the pill's whole label fit on that row (measured in the real fonts, so in every language), otherwise it takes its own line under a one-line subtitle (or the overviews' counters), keeping its dot alone when even that would not fit above the floor strip and under 200 px; the classic header (`illustration: false`) follows the same rule, its pill right after the title (no longer at the far right), and a label too long even on its own line (an empty-state sentence) wraps to a second line instead of being cut. The detail / expand / collapse button is a 24 px frosted round button 5 px from the banner's top right corner, the scene stepping aside to leave it room.
+
 ## 1.27.2 - 2026-11-16
 
 ### Fixes

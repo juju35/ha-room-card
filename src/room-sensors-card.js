@@ -719,6 +719,7 @@ class RoomSensorsCard extends RcCard {
   static i18n = RS_I18N;
   static needsArea = true;
   static includeDomains = ["binary_sensor"];
+  static sceneTheme = "sensors";
   static defaults = { columns: 2, layout: "compact", only_alerts: false, hide_when_clear: false, presence: true, blink: true, exclude: [] };
 
   _candidate(id) {
@@ -790,6 +791,19 @@ class RoomSensorsCard extends RcCard {
         };
       })
       .sort((a, b) => this._rank(b) - this._rank(a) || a.name.localeCompare(b.name));
+  }
+
+  // The banner: the window opens with an open window (or patio door), the door with any other opening, someone walks
+  // in on a presence, a puddle on a leak, smoke under the ceiling on a smoke, CO or gas alarm.
+  _sceneState() {
+    const on = (kinds) => (this._items || []).some((i) => i.on && kinds.includes(i.kind));
+    return {
+      window: on(["window", "slide"]),
+      door: on(["door", "garage", "opening"]),
+      motion: on(["presence", "motion"]),
+      leak: on(["leak"]),
+      smoke: on(["smoke", "co", "gas"]),
+    };
   }
 
   // State of the room, shared by the full and the mini card. An unavailable alarm or opening sensor is no all-clear:
@@ -893,6 +907,7 @@ const RoomSensorsCardEditor = rcEditor({
     ...rcAreaFields(true),
     rcLayoutField(RS_I18N, lang),
     ...rcBooleans("show_title", "only_alerts", "hide_when_clear", "presence", "outdoor", "blink"),
+    ...rcIllustrationFields(RS_I18N, lang, true),
     ...rcIncludeField(RoomSensorsCard, hass, config),
     ...rcExcludeField(RoomSensorsCard, hass, config),
     ...rcRenameField(RoomSensorsCard, hass, config),
@@ -951,6 +966,7 @@ const RoomSensorsMiniCardEditor = rcEditor({
     ...rcAreaFields(true),
     rcLayoutField(RS_I18N, lang),
     ...rcBooleans("show_title", "hide_when_clear", "presence", "outdoor", "blink", "zoom"),
+    ...rcIllustrationFields(RS_I18N, lang, true),
     ...rcIncludeField(RoomSensorsMiniCard, hass, config),
     ...rcExcludeField(RoomSensorsMiniCard, hass, config),
     ...rcRenameField(RoomSensorsMiniCard, hass, config),

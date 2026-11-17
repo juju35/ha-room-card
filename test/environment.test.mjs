@@ -301,7 +301,7 @@ test("thresholds can be set per room in the overview, over the card's", () => {
 
 test("the mini card zoomed in draws the full Environment card, and back", () => {
   const card = new rc.cards["room-environment-mini-card"]();
-  card.setConfig({ area: "living_room" });
+  card.setConfig({ area: "living_room", illustration: false });
   card.hass = makeHass();
   assert.match(card.shadowRoot.innerHTML, /class="mini"/);
   card._zoomed = true;
