@@ -212,7 +212,7 @@ test("Cards shrink in a 1fr column, even wrapped in a div: no intrinsic size, no
 test("Header: the status pill goes to a line of its own when the card measures it would not fit whole", () => {
   assert.match(BASE, /\.head\[data-wrap\] \{ flex-wrap: wrap; row-gap: 4px; \}/);
   assert.match(BASE, /\.head\[data-wrap\]::after \{[^}]*flex: 1 0 100%/);
-  assert.match(BASE, /\.head\[data-wrap\] > \.pill \{[^}]*order: 2/);
+  assert.match(BASE, /\.head\[data-wrap\] > \.pill \{[^}]*order: 5/);
   for (const css of [BASE, ...Object.values(cards).map((c) => c.styles || "")]) {
     assert.doesNotMatch(css, /@container \(max-width: 260px\) \{[^}]*\.head::after/);
     assert.doesNotMatch(css, /\.head > \.pill \{ order: 0;/);

@@ -1108,7 +1108,8 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
          detail button) readable; they wrap there if they still do not fit. */
       @container (max-width: 420px) {
         .head { gap: 6px; flex-wrap: wrap; }
-        .hchips { order: 1; flex: 1 0 100%; flex-wrap: wrap; box-sizing: border-box; padding-left: 46px; }
+        .hchips { order: 2; flex: 1 0 100%; flex-wrap: wrap; box-sizing: border-box; padding-left: 46px; }
+        .head > .zoom { order: 1; }
       }
 
       .confirm[hidden] { display: none; }

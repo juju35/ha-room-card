@@ -1,5 +1,5 @@
 // The illustrated header in Chromium (skipped without Chromium), for every card in en, fr, de, hu, el and ru from 190
-// to 500 px, with its own title and a long one: the status pill sits right after the title only beside a whole title (never an ellipsised title next to
+// to 500 px, with its own title and a long one, with the illustrated banner and the classic header: the status pill sits right after the title only beside a whole title (never an ellipsised title next to
 // it), its label is whole or it shows its dot alone (always its dot alone at 200 px or less), and nothing of the
 // title block leaves the banner or reaches its floor strip; the mini cards' expand / collapse button is a 24 px round
 // button 5 px from the banner's top right corner.
@@ -76,20 +76,30 @@ test("status pill beside a whole title or under the subtitle, label whole or dot
           const pillAudit = new Function(`return (${audit})`)();
           const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
           const res = [];
+          for (const classic of [false, true])
           for (const zoom of tag.includes("mini") ? [false, true] : [false])
             for (const language of LANGUAGES)
               for (const width of WIDTHS)
                 for (const title of [undefined, "Kitchen and dining room"]) {
                 document.body.style.width = `${width}px`;
                 const el = document.createElement(tag);
-                el.setConfig({ type: `custom:${tag}`, area: "kitchen", animations: false, language, ...(title ? { title } : {}) });
+                el.setConfig({ type: `custom:${tag}`, area: "kitchen", animations: false, language, ...(title ? { title } : {}), ...(classic ? { illustration: false } : {}) });
                 el.hass = { ...hass, themes: { darkMode: false }, callService: async () => {} };
                 document.getElementById("root").replaceChildren(el);
                 if (zoom) el.shadowRoot.querySelector(".zoom").dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true, detail: 1 }));
                 await frame();
                 await frame();
                 const r = el.shadowRoot;
-                const what = `${tag}${zoom ? " zoomed" : ""} ${language} ${width}px${title ? " long title" : ""}`;
+                const what = `${tag}${classic ? " classic" : ""}${zoom ? " zoomed" : ""} ${language} ${width}px${title ? " long title" : ""}`;
+                if (classic) {
+                  // The classic header: the same rule, the pill right after the title (the header's 6–10 px gap) when it shares its line.
+                  for (const f of pillAudit(r, width, ".head > .pill, .mini .head > .st", ".title", ".ground")) res.push(`${what}: ${f}`);
+                  const p = r.querySelector(".head > .pill, .mini .head > .st")?.getBoundingClientRect();
+                  const n = r.querySelector(".head > .title")?.getBoundingClientRect();
+                  if (p && n && Math.abs(p.top + p.height / 2 - (n.top + n.height / 2)) < n.height / 2 && (p.left - n.right < 4 || p.left - n.right > 12))
+                    res.push(`${what}: pill ${Math.round(p.left - n.right)}px after the title`);
+                  continue;
+                }
                 for (const f of pillAudit(r, width, ".banner .trow > .pill, .banner .trow > .st", ".title", ".ground")) res.push(`${what}: ${f}`);
                 const bb = r.querySelector(".banner").getBoundingClientRect();
                 const z = r.querySelector(".banner .zoom")?.getBoundingClientRect();

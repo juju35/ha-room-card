@@ -2986,12 +2986,20 @@ const RC_BASE_STYLES = `
           padding: 1px 8px; border-radius: 999px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
   .pt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pill ha-icon { flex: none; }
+  /* The status pill right after the title (8 px), whole, then the header's chips; the detail button at the far end. */
+  .head > .title { flex: 0 1 auto; min-width: 0; }
+  .head > .pill, .mini .head > .st { flex: none; margin-left: 0; }
+  .head > .chip, .head > .hchips { order: 2; }
+  .head > .zoom { order: 3; margin-left: auto; }
   /* Not enough room for the whole title and the pill's whole label on one line (measured by the card, see _fitPill):
-     the status pill goes to a line of its own under the title, where its whole label fits, rather than cut either. */
+     the status pill goes to a line of its own under the title (and the chips), where its whole label fits; a label
+     too long even there (an empty-state sentence) wraps to a second line rather than being cut. */
   .head[data-wrap] { flex-wrap: wrap; row-gap: 4px; }
-  .head[data-wrap]::after { content: ""; order: 1; flex: 1 0 100%; }
-  .head[data-wrap] > .pill { order: 2; margin-left: 50px; max-width: calc(100% - 50px); }
-  .mini .head[data-wrap] > .st { order: 2; margin-left: 0; max-width: 100%; }
+  .head[data-wrap] > .title { flex: 1 1 0; }
+  .head[data-wrap]::after { content: ""; order: 4; flex: 1 0 100%; }
+  .head[data-wrap] > .pill { order: 5; margin-left: 50px; max-width: calc(100% - 50px); border-radius: 10px; }
+  .head[data-wrap] > .pill .pt { white-space: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .mini .head[data-wrap] > .st { order: 5; max-width: 100%; }
   @container (max-width: 200px) {
     .head > .pill .pt, .st .pt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
     .head > .pill:not(.action), .st { flex: none; padding: 0; width: 18px; height: 18px; justify-content: center; background: none; }
