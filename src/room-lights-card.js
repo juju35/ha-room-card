@@ -625,6 +625,7 @@ class RoomLightsCard extends RcToggleCard {
   static includeDomains = ["light", "switch"];
   static headIcons = ["mdi:lightbulb-group", "mdi:lightbulb-group-off-outline"];
   static emptyKey = "no_lights";
+  static sceneTheme = "lights";
   static defaults = {
     columns: 2,
     layout: "compact",
@@ -783,6 +784,11 @@ class RoomLightsCard extends RcToggleCard {
       .sort((a, b) => b.on - a.on || a.name.localeCompare(b.name));
   }
 
+  // The banner's pendant lamps: the first three lights (the ones on first), lit in their own colour.
+  _sceneState() {
+    return { lamps: (this._items || []).slice(0, 3).map((i) => ({ on: i.on, color: i.color })) };
+  }
+
   _stateText(i) {
     if (i.unavailable) return this._t("unavailable");
     if (!i.on) return this._t("off");
@@ -896,6 +902,7 @@ const RoomLightsCardEditor = rcEditor({
     ...rcAreaFields(true),
     rcLayoutField(RL_I18N, lang),
     ...rcBooleans("show_title", "only_on", "hide_when_off", "show_brightness", "all_off_button", "show_scenes"),
+    ...rcIllustrationFields(RL_I18N, lang),
     ...rcIncludeField(RoomLightsCard, hass, config),
     ...rcExcludeField(RoomLightsCard, hass, config),
     ...rcRenameField(RoomLightsCard, hass, config),
@@ -924,6 +931,7 @@ const RoomLightsMiniCardEditor = rcEditor({
     ...rcAreaFields(true),
     rcLayoutField(RL_I18N, lang),
     ...rcBooleans("show_title", "only_on", "hide_when_off", "all_off_button", "zoom", "show_brightness", "show_scenes"),
+    ...rcIllustrationFields(RL_I18N, lang),
     ...rcIncludeField(RoomLightsMiniCard, hass, config),
     ...rcExcludeField(RoomLightsMiniCard, hass, config),
     ...rcRenameField(RoomLightsMiniCard, hass, config),

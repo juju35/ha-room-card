@@ -457,6 +457,9 @@ const RW_PREFIX = /^(prise|multiprise|plug|smart plug|outlet)\s+/i;
 const RW_SUFFIX = /\s+(prise|plug|smart plug|outlet|socket)$/i;
 
 // ── Card ─────────────────────────────────────────────────────────────────────
+// Power drawn by the plugs of a room together from which the header warns of an overload.
+const RW_OVERLOAD_W = 3000;
+
 class RoomSwitchCard extends RcToggleCard {
   static tag = "room-switch-card";
   static i18n = RW_I18N;
@@ -464,6 +467,7 @@ class RoomSwitchCard extends RcToggleCard {
   static includeDomains = ["switch"];
   static headIcons = ["mdi:power-socket-fr", "mdi:power-plug-off-outline"];
   static emptyKey = "no_plugs";
+  static sceneTheme = "plugs";
   static defaults = {
     columns: 2,
     layout: "compact",
@@ -516,6 +520,29 @@ class RoomSwitchCard extends RcToggleCard {
     return this._tile(i, { state: rcEsc(i.state) });
   }
 
+  // Total power of the plugs that are on (null when none reports it).
+  _watts(items) {
+    const lit = items.filter((i) => i.on && i.watts != null);
+    return lit.length ? lit.reduce((t, i) => t + i.watts, 0) : null;
+  }
+
+  // From RW_OVERLOAD_W drawn by the plugs together, the header warns (amber icon, the panel in alert on the banner).
+  _summary(items, ofTotal) {
+    const s = super._summary(items, ofTotal);
+    if (s && s.level === "on" && (this._watts(items) ?? 0) >= RW_OVERLOAD_W) s.level = "high";
+    return s;
+  }
+
+  // The banner's electrical panel and three plugs (the ones on first).
+  _sceneState() {
+    const items = this._items || [];
+    return {
+      on: items.slice(0, 3).map((i) => i.on),
+      total: items.filter((i) => i.on).length,
+      high: (this._watts(items) ?? 0) >= RW_OVERLOAD_W,
+    };
+  }
+
   // Total power of the plugs that are on, when at least one of them reports it.
   _statusExtra(lit) {
     if (!lit.some((i) => i.watts != null)) return "";
@@ -525,6 +552,7 @@ class RoomSwitchCard extends RcToggleCard {
   static styles = `
     ha-card.lvl-on  { --c: var(--rc-plug); }
     ha-card.lvl-off { --c: var(--rc-idle); }
+    ha-card.lvl-high { --c: var(--rc-warn); }
     .tile { --t: var(--rc-plug); }
     .tile.off { --t: var(--rc-idle); }
     .tile.off .ic { background: color-mix(in srgb, var(--t) 12%, transparent); }
@@ -539,6 +567,7 @@ const RoomSwitchCardEditor = rcEditor({
     ...rcAreaFields(true),
     rcLayoutField(RW_I18N, lang),
     ...rcBooleans("show_title", "only_on", "hide_when_off", "show_power", "all_off_button"),
+    ...rcIllustrationFields(RW_I18N, lang, true),
     ...rcIncludeField(RoomSwitchCard, hass, config),
     ...rcExcludeField(RoomSwitchCard, hass, config),
     ...rcRenameField(RoomSwitchCard, hass, config),
@@ -570,6 +599,7 @@ const RoomSwitchMiniCardEditor = rcEditor({
     ...rcAreaFields(true),
     rcLayoutField(RW_I18N, lang),
     ...rcBooleans("show_title", "only_on", "hide_when_off", "show_power", "all_off_button", "zoom"),
+    ...rcIllustrationFields(RW_I18N, lang, true),
     ...rcIncludeField(RoomSwitchMiniCard, hass, config),
     ...rcExcludeField(RoomSwitchMiniCard, hass, config),
     ...rcRenameField(RoomSwitchMiniCard, hass, config),

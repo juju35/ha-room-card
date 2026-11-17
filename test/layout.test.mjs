@@ -143,7 +143,7 @@ test("Overview: on a narrow card the header chips go to a line of their own", ()
   assert.match(narrow, /\.hchips \{[^}]*flex: 1 0 100%/);
   assert.equal(decls(css, ".hchips").flex, "none");
 
-  const head = overviewWith({ plugs_off_button: true }, makeHass());
+  const head = overviewWith({ plugs_off_button: true, illustration: false }, makeHass());
   assert.match(head, /<div class="hchips"><button class="chip light action"[\s\S]*<button class="chip plug action"[\s\S]*<\/div>\s*<div class="pill"/);
   assert.match(head, /<div class="pill" title="[^"]+"><span class="pt">/);
 });

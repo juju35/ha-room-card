@@ -11,7 +11,7 @@ import { makeHass } from "./hass.mjs";
 // The bundle, put together like scripts/build.mjs does.
 const CARDS = ["room-sensors-card", "room-lights-card", "room-switch-card", "room-environment-card", "room-overview-card"];
 const read = (name) => readFileSync(new URL(`../src/${name}.js`, import.meta.url), "utf8");
-const source = ["{", read("shared"), ...CARDS.map((c) => `{\n${read(c)}}\n`), "}"].join("\n");
+const source = ["{", read("shared"), read("scene"), ...CARDS.map((c) => `{\n${read(c)}}\n`), "}"].join("\n");
 
 let chromium;
 try {

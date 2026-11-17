@@ -1,6 +1,6 @@
 // Builds src/ into the single HACS file dist/ha-room-card.js, stamping the package version.
 // Usage: node scripts/build.mjs  (dist/ is not committed: CI and the release workflow build it)
-// shared.js comes first; each card is wrapped in its own block, inside one block for the whole bundle,
+// shared.js comes first, then scene.js (the illustrated header); each card is wrapped in its own block, inside one block for the whole bundle,
 // so nothing leaks into the page.
 import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -15,6 +15,7 @@ const out = [
   `/*! ha-room-card v${pkg.version} — https://github.com/juju35/ha-room-card */`,
   "{",
   src("shared"),
+  src("scene"),
   ...CARDS.map((c) => `// ── ${c} ──\n{\n${src(c)}}\n`),
   "}",
   "",

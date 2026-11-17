@@ -1021,6 +1021,7 @@ class RoomEnvironmentCard extends RcCard {
   static i18n = RE_I18N;
   static needsArea = true;
   static includeDomains = ["sensor"];
+  static sceneTheme = "environment";
   static includeMatch = (hass, id) => !!reKindOf(hass.states[id]);
   static defaults = { columns: 2, layout: "compact", only_alerts: false, show_gauge: true, show_history: true, exclude: [] };
 
@@ -1170,6 +1171,34 @@ class RoomEnvironmentCard extends RcCard {
     const num = unit && i.value.endsWith(unit) ? i.value.slice(0, -unit.length).trim() : i.value;
     const short = /^°[CF]$/.test(unit) ? "°" : unit;
     return `<span>${rcEsc(num)}</span>${short && num !== i.value ? `<small>${rcEsc(short)}</small>` : ""}`;
+  }
+
+  // A reading's number without its unit, for the banner's wall sensor ("21.4").
+  _bare(i) {
+    const unit = i.unit || "";
+    return unit && i.value.endsWith(unit) ? i.value.slice(0, -unit.length).trim() : i.value;
+  }
+
+  // The banner: the wall sensor shows the reading that needs a look in its comfort colour (else temperature and
+  // humidity in green), with snow at the window when cold, mist when humid, a strong sun when hot, a haze when the air
+  // is stale.
+  _sceneState() {
+    return this._envScene(this._items || []);
+  }
+
+  _envScene(items) {
+    const worst = this._worst(items);
+    const temp = items.find((i) => i.kind === "temperature" && i.value != null);
+    const hum = items.find((i) => i.kind === "humidity" && i.value != null);
+    const bad = !!worst && RE_RANK[worst.sev] >= RE_RANK.warn;
+    const family = worst && RE_KINDS[worst.kind]?.issue;
+    const high = bad && worst.band > 2;
+    const tone = !worst ? "ok" : worst.cold || worst.sev === "info" ? "cold" : worst.sev;
+    const fx = worst?.cold ? "cold" : high && family === "temperature" ? "hot" : high && family === "humidity" ? "humid" : bad && (family === "co2" || family === "air") ? "air" : "";
+    if (fx === "air" && worst.value != null) return { tone, fx, top: this._bare(worst), bottom: worst.unit || "" };
+    const t = temp && `${this._bare(temp)}°`;
+    const h = hum && `${this._bare(hum)}%`;
+    return { tone, fx, top: t || h || "—", bottom: t && h ? h : "" };
   }
 
   // The reading that needs a look first: the highest severity, then the kind order.
@@ -1334,6 +1363,7 @@ const RoomEnvironmentCardEditor = rcEditor({
     ...rcAreaFields(true),
     rcLayoutField(RE_I18N, lang),
     ...rcBooleans("show_title", "only_alerts", "show_gauge", "show_history"),
+    ...rcIllustrationFields(RE_I18N, lang, true),
     ...rcIncludeField(RoomEnvironmentCard, hass, config),
     ...rcExcludeField(RoomEnvironmentCard, hass, config),
     ...rcRenameField(RoomEnvironmentCard, hass, config),
@@ -1401,6 +1431,7 @@ const RoomEnvironmentMiniCardEditor = rcEditor({
     ...rcAreaFields(true),
     rcLayoutField(RE_I18N, lang),
     ...rcBooleans("show_title", "only_alerts", "zoom", "show_gauge", "show_history"),
+    ...rcIllustrationFields(RE_I18N, lang, true),
     ...rcIncludeField(RoomEnvironmentMiniCard, hass, config),
     ...rcExcludeField(RoomEnvironmentMiniCard, hass, config),
     ...rcRenameField(RoomEnvironmentMiniCard, hass, config),
@@ -1780,6 +1811,7 @@ const REO_MAIN = ["temperature", "humidity", "co2"];
 
 class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
   static tag = "room-environment-overview-card";
+  static sceneTheme = "environment";
   static i18n = REO_I18N;
   static needsArea = false;
   static defaults = { zoom: true, sort: "name", exclude_areas: [], exclude: [], rooms: [] };
@@ -1843,6 +1875,16 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
     return this._formatNumber(mean, digits);
   }
 
+  // The banner: the home's worst reading, else its average temperature and humidity, on the wall sensor.
+  _sceneState() {
+    const all = this._everyRoom || [];
+    const s = this._envScene(all.flatMap((x) => x.items));
+    if (s.fx === "air") return s;
+    const t = this._average(all, "temperature", 1);
+    const h = this._average(all, "humidity", 0);
+    return { ...s, top: t ? `${t}°` : h ? `${h}%` : "—", bottom: t && h ? `${h}%` : "" };
+  }
+
   _chip(i) {
     const cls = `chip s-${i.sev}${i.cold ? " cold" : ""}`;
     return `<span class="${cls}" title="${rcEsc(i.name)} — ${rcEsc(i.state)}"><ha-icon icon="${rcEsc(i.icon)}"></ha-icon>${this._chipValue(i)}</span>`;
@@ -1859,10 +1901,8 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
     const hum = this._average(all, "humidity", 0);
     if (!this._changed([this._openArea, this._zoomed, this._total, temp, hum, parts])) return;
 
-    if (!this.shadowRoot.querySelector("ha-card")) {
-      this.shadowRoot.innerHTML = `
-        <style>${RC_BASE_STYLES}${RoomEnvironmentOverviewCard.styles}</style>
-        <ha-card><div class="head"></div><div class="panel" hidden></div><div class="grid"></div></ha-card>`;
+    const illus = this._illustrated();
+    if (this._shellOnce(RoomEnvironmentOverviewCard.styles, '<div class="panel" hidden></div><div class="grid"></div>')) {
       this.shadowRoot.querySelector(".grid").addEventListener("click", (ev) => {
         const tile = ev.target.closest(".room");
         if (tile) this._tap(tile.dataset.area);
@@ -1888,12 +1928,13 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
 
     const card = this.shadowRoot.querySelector("ha-card");
     card.className = `lvl-${level}`;
-    card.querySelector(".head").innerHTML = `
-      <div class="badge"><ha-icon icon="${this._headIcon(worst)}"></ha-icon></div>
-      <div class="title">${rcEsc(c.title || this._t("title"))}</div>
-      ${avg}
-      <div class="pill" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></div>
-      ${rcZoomButton(this)}`;
+    const pill = `<div class="pill" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></div>`;
+    const badge = `<div class="badge"><ha-icon icon="${this._headIcon(worst)}"></ha-icon></div>`;
+    const title = `<div class="title">${rcEsc(c.title || this._t("title"))}</div>`;
+    if (illus) this._updateBanner(card.querySelector(".banner"));
+    card.querySelector(".head").innerHTML = illus
+      ? `${badge}<div class="titles">${title}<div class="sub">${pill}${avg}</div></div>${rcZoomButton(this)}`
+      : `${badge}${title}${avg}${pill}${rcZoomButton(this)}`;
 
     this._roomGrid(card.querySelector(".grid"), rooms, (x) => {
       const chips = x.items
@@ -1940,6 +1981,7 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
       area: this._openArea,
       title: this._t("readings"),
       exclude: c.exclude || [],
+      illustration: false,
       ...(c.appliance_filter === false ? { appliance_filter: false } : {}),
       ...(thresholds ? { thresholds } : {}),
       ...(c.language ? { language: c.language } : {}),
@@ -1991,6 +2033,7 @@ const RoomEnvironmentOverviewCardEditor = rcEditor({
     return [
       ...rcOverviewFields(REO_I18N, lang),
       ...rcBooleans("show_title", "zoom"),
+      ...rcIllustrationFields(REO_I18N, lang),
       {
         name: "exclude_areas",
         selector: { select: { multiple: true, mode: "dropdown", options: rooms.map((x) => ({ value: x.id, label: x.name })) } },

@@ -680,6 +680,7 @@ const RO_CLOSED_GUARD_MS = 400;
 // ── Card ─────────────────────────────────────────────────────────────────────
 class RoomOverviewCard extends rcRoomsPanel(RcCard) {
   static tag = "room-overview-card";
+  static sceneTheme = "overview";
   static i18n = RO_I18N;
   static defaults = {
     presence: true,
@@ -788,9 +789,30 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     const rank = (x) => (x.leaks ? 5 : x.open ? 4 : x.unavail ? 3 : x.occupied ? 2 : x.lightsOn || x.plugsOn ? 1 : 0);
     rcSortRooms(list, c, rank);
     this._total = list.length;
+    this._allRooms = list; // the banner's house shows the rooms needing a look, shown or not
     this._anySensors = list.some((x) => x.sensors.some((e) => !e.leak));
     if (rcCompact(this)) list = list.filter((x) => rank(x) > 0 || x.id === this._openArea);
     return list;
+  }
+
+  // The banner's cutaway house: its four rooms (bedroom, bathroom, living room, kitchen) stand for the home's rooms
+  // needing a look most, each in the room of its own type when there is one, else in a free one.
+  _sceneState() {
+    const rank = (x) => (x.leaks ? 5 : x.open || x.unavail ? 4 : x.occupied ? 2 : x.lightsOn ? 1 : 0);
+    const rooms = [...(this._allRooms || [])].sort((a, b) => rank(b) - rank(a)).slice(0, 4);
+    const kinds = [["bedroom", "kids"], ["bathroom", "toilets"], ["living", "dining", "office"], ["kitchen", "laundry"]];
+    const slots = [null, null, null, null];
+    const left = [];
+    for (const x of rooms) {
+      const type = rcGuessRoomType(this._hass.areas?.[x.id]);
+      const i = kinds.findIndex((k, j) => !slots[j] && k.includes(type));
+      if (i >= 0) slots[i] = x;
+      else left.push(x);
+    }
+    for (const x of left) slots[slots.indexOf(null)] = x;
+    return {
+      slots: slots.map((x) => x && { alert: x.leaks > 0, warn: !x.leaks && (x.open > 0 || x.unavail > 0), presence: x.occupied, light: x.lightsOn > 0 }),
+    };
   }
 
   _roomState(x) {
@@ -815,10 +837,8 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     const parts = rooms.map((x) => [x.id, x.name, x.icon, x.leaks, x.alert, x.open, x.occupied, x.lightsOn, x.plugsOn, x.watts && Math.round(x.watts), x.sensors.length, x.unavail]);
     if (!this._changed([this._openArea, this._zoomed, this._anySensors, parts])) return;
 
-    if (!this.shadowRoot.querySelector("ha-card")) {
-      this.shadowRoot.innerHTML = `
-        <style>${RC_BASE_STYLES}${RoomOverviewCard.styles}</style>
-        <ha-card><div class="head"></div><div class="panel" hidden></div><div class="grid"></div><div class="confirm" hidden></div></ha-card>`;
+    const illus = this._illustrated();
+    if (this._shellOnce(RoomOverviewCard.styles, '<div class="panel" hidden></div><div class="grid"></div><div class="confirm" hidden></div>')) {
       // Just after the popup closed, the second click of a double click on OK lands on what lies under it: the header,
       // a room tile, or a tile of the unfolded room's details (room-* cards acting on pointerup). Swallowed here, in
       // the capture phase, before it reaches any of them.
@@ -904,11 +924,19 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
 
     const card = this.shadowRoot.querySelector("ha-card");
     card.className = `lvl-${level}`;
-    card.querySelector(".head").innerHTML = `
+    const pill = `<div class="pill" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></div>`;
+    const hchips = headChips ? `<div class="hchips">${headChips}</div>` : "";
+    if (illus) this._updateBanner(card.querySelector(".banner"));
+    card.querySelector(".head").innerHTML = illus
+      ? `
+      <div class="badge"><ha-icon icon="${headIcon}"></ha-icon></div>
+      <div class="titles"><div class="title">${rcEsc(c.title || this._t("title"))}</div><div class="sub">${pill}</div>${hchips}</div>
+      ${rcZoomButton(this)}`
+      : `
       <div class="badge"><ha-icon icon="${headIcon}"></ha-icon></div>
       <div class="title">${rcEsc(c.title || this._t("title"))}</div>
-      ${headChips ? `<div class="hchips">${headChips}</div>` : ""}
-      <div class="pill" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></div>
+      ${hchips}
+      ${pill}
       ${rcZoomButton(this)}`;
 
     this._roomGrid(card.querySelector(".grid"), rooms, (x) => {
@@ -1038,6 +1066,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
         type: `custom:${tag}`,
         area: x.id,
         exclude: this._config.exclude || [],
+        illustration: false,
         ...(this._config.language ? { language: this._config.language } : {}),
         ...extra,
       });
@@ -1141,6 +1170,7 @@ const RoomOverviewCardEditor = rcEditor({
     { name: "zoom", selector: { boolean: {} } },
     { name: "all_off_button", selector: { boolean: {} } },
     { name: "plugs_off_button", selector: { boolean: {} } },
+    ...rcIllustrationFields(RO_I18N, lang),
     {
       name: "exclude_areas",
       // The rooms the card finds, excluded ones included.
