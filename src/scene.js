@@ -8,7 +8,7 @@
 // - the room type (`room_type`, guessed from the area's name or icon, `none` for the theme alone): wall colour, a
 //   faint silhouette of the room's typical furniture and the floor (tiles, concrete or parquet). The Lights card
 //   keeps the light theme alone, with no room.
-// Night (stars, darker walls, lit lamps) follows the sun (sun.sun), else Home Assistant's dark mode, and
+// Night (stars, darker walls, lit lamps) when the sun is below the horizon (sun.sun) or Home Assistant is dark, and
 // `illustration_theme: day | night` forces one. The scenes hold no id (no gradient, no mask): several cards on a
 // page cannot clash. Everything moving stops with prefers-reduced-motion.
 
