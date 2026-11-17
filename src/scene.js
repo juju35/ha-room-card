@@ -390,12 +390,14 @@ const RC_BANNER_STYLES = `
   .banner .title { flex: none; min-width: 0; color: inherit; font-size: 16px; font-weight: 500; line-height: 1.25; }
   :host([hide-title]) .banner .title { display: none; }
   .sub { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 6px; min-width: 0; font-size: 13px; line-height: 18px; color: var(--rc-sub); }
-  /* The status pill right after the title (8 px), centred on it, in the badge's colour on a frosted tint: the title is
-     cut first (about four letters kept); when the pill would be cut (measured by the card) or on a narrow card, it
-     goes on a line of its own under the title; under 200 px only its dot shows (its text stays in its title). */
+  /* The status pill right after the title (8 px), centred on it, in the badge's colour on a frosted tint, while the
+     whole title and the pill's whole label fit on that row; otherwise (measured by the card, see _fitPill) it goes on a
+     line of its own under the subtitle (data-wrap, the subtitle kept to one line), and when even then the header would
+     run into the floor strip, it keeps its dot alone (data-dot); under 200 px only its dot shows (its text stays in its
+     title). */
   .banner .trow { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .banner .trow > .title { flex: 0 100 auto; min-width: 4.5ch; }
-  .banner .trow > .pill, .banner .trow > .st { all: unset; flex: 0 1 auto; min-width: 0; max-width: 51%; box-sizing: border-box; position: relative;
+  .banner .trow > .title { flex: 0 1 auto; min-width: 0; }
+  .banner .trow > .pill, .banner .trow > .st { all: unset; flex: none; min-width: 0; max-width: none; box-sizing: border-box; position: relative;
                                display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 12px;
                                font-size: 11px; font-weight: 500; line-height: 16px; white-space: nowrap; overflow: hidden;
                                background: color-mix(in srgb, var(--c) 18%, rgba(255,255,255,.78)); color: color-mix(in srgb, var(--c) 45%, #0d2a45); }
@@ -408,23 +410,15 @@ const RC_BANNER_STYLES = `
   .banner.night .trow > .pill.action:hover, .banner.night .trow > .st.action:hover { background: color-mix(in srgb, var(--c) 40%, rgba(8,18,38,.6)); }
   .banner .trow > .pill.action:focus-visible, .banner .trow > .st.action:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
   .banner[data-wrap] .trow { display: contents; }
-  .banner[data-wrap] .trow > .pill, .banner[data-wrap] .trow > .st { order: 9; align-self: flex-start; max-width: calc(100cqw - 80px); margin-top: 1px; }
-  /* The overviews' header also holds a row or two of counters: a narrower scene leaves them room, and their pill stays
-     beside the title on a narrow card as long as it fits (measured). */
+  .banner[data-wrap] .trow > .title { max-width: 100%; }
+  .banner[data-wrap] .trow > .pill, .banner[data-wrap] .trow > .st { order: 9; align-self: flex-start; max-width: 100%; margin-top: 1px; }
+  .banner[data-wrap] .titles > .sub, .banner[data-wrap] .hchips { flex-wrap: nowrap; overflow: hidden; }
+  /* The overviews' header also holds a row or two of counters: a narrower scene leaves them room. */
   .banner:has(.hchips) { --rc-scene-w: min(200px, 40%); }
-  /* Their wrapped pill leads the counters' row rather than taking a line of its own. */
-  .banner[data-wrap]:has(.hchips) .titles { flex-flow: row wrap; align-items: center; align-content: center; gap: 4px; }
-  .banner[data-wrap]:has(.hchips) .trow > .title { flex: 1 0 100%; }
-  .banner[data-wrap]:has(.hchips) .trow > .pill { order: 1; align-self: center; margin: 0; }
-  .banner[data-wrap] .hchips { display: contents; }
-  .banner[data-wrap] .hchips > * { order: 2; }
-  @container (max-width: 260px) {
-    .banner:not(:has(.hchips)) .trow { display: contents; }
-    .banner:not(:has(.hchips)) .trow > .pill, .banner:not(:has(.hchips)) .trow > .st { order: 9; align-self: flex-start; max-width: calc(100cqw - 80px); margin-top: 1px; }
-  }
+  .banner[data-dot] .trow > .pill, .banner[data-dot] .trow > .st { padding: 0 4px; background: none; }
+  .banner[data-dot] .trow > .pill .pt, .banner[data-dot] .trow > .st .pt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   @container (max-width: 200px) {
-    .banner .trow { display: flex; }
-    .banner .trow > .pill, .banner .trow > .st { order: 0; flex: none; align-self: auto; margin: 0; padding: 0 4px; background: none; }
+    .banner .trow > .pill, .banner .trow > .st { padding: 0 4px; background: none; }
     .banner .trow > .pill .pt, .banner .trow > .st .pt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   }
   /* The detail / expand / collapse button: 24 px, round, frosted, 5 px from the banner's top right corner; the scene

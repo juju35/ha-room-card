@@ -1,9 +1,10 @@
-// The illustrated header in Chromium (needs `npm run build`; skipped without Chromium): the status pill shows its
-// whole label from 245 to 500 px (right after the title, else on its own line), never more than about half of the
-// title row, next to a readable title; the mini cards' expand / collapse button is a 24 px round button 5 px from the
-// banner's top right corner.
+// The illustrated header in Chromium (skipped without Chromium), for every card in en, fr, de, hu, el and ru from 190
+// to 500 px, with its own title and a long one: the status pill sits right after the title only beside a whole title (never an ellipsised title next to
+// it), its label is whole or it shows its dot alone (always its dot alone at 200 px or less), and nothing of the
+// title block leaves the banner or reaches its floor strip; the mini cards' expand / collapse button is a 24 px round
+// button 5 px from the banner's top right corner.
 import assert from "node:assert/strict";
-import { existsSync, readdirSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { makeHass } from "./hass.mjs";
 
@@ -11,50 +12,94 @@ let harness;
 try {
   harness = await import("../scripts/screenshots/harness.mjs");
 } catch {}
-const dist = new URL("../dist/", import.meta.url);
-const built = existsSync(dist) && readdirSync(dist).some((f) => f.endsWith(".js"));
-const browser = built ? await harness?.launch().catch(() => null) : null;
+const browser = await harness?.launch().catch(() => null);
+
+// The bundle as scripts/build.mjs makes it, with every language inline (the build moves them to files of their own).
+const src = (name) => readFileSync(new URL(`../src/${name}.js`, import.meta.url), "utf8");
+const CARDS = ["room-sensors-card", "room-lights-card", "room-switch-card", "room-environment-card", "room-overview-card"];
+const js = ["{", src("shared"), src("scene"), ...CARDS.map((c) => `{\n${src(c)}}\n`), "}"].join("\n");
 
 const TAGS = ["room-lights-card", "room-lights-mini-card", "room-sensors-card", "room-sensors-mini-card", "room-switch-card", "room-switch-mini-card",
   "room-environment-card", "room-environment-mini-card", "room-overview-card", "room-environment-overview-card"];
+const LANGUAGES = ["en", "fr", "de", "hu", "el", "ru"];
+const WIDTHS = [190, 245, 300, 400, 460, 500];
 
-test("status pill shows its whole label next to a readable title; the zoom button sits at the banner corner", { skip: !browser && "no Chromium or no build" }, async () => {
+// In-page audit of the header (string spliced into page.evaluate): every title block with a status pill —
+// the pill on the title row only beside a whole title, its label whole or its dot alone (≤ 200 px: dot alone),
+// nothing of the title block below the banner's ground strip or outside the banner.
+const pillAudit = (r, width, pillSel, nameSel, groundSel) => {
+  const res = [];
+  const shown = (e) => e && e.getClientRects().length && getComputedStyle(e).visibility !== "hidden";
+  const cut = (e) => [e, ...e.querySelectorAll("*")].some((x) => shown(x) && x.clientWidth > 1 && getComputedStyle(x).overflow !== "visible" && x.scrollWidth > x.clientWidth + 1);
+  const pills = [...r.querySelectorAll(pillSel)].filter(shown);
+  if (!pills.length) return ["no pill"];
+  for (const pill of pills) {
+    const pb = pill.getBoundingClientRect();
+    const dot = pb.width < 22;
+    if (width <= 200 && !dot) res.push(`pill "${pill.textContent.trim()}" not a dot at ${width}px`);
+    if (!dot && cut(pill)) res.push(`pill "${pill.textContent.trim()}" label cut`);
+    const name = pill.parentElement.querySelector(nameSel) || pill.closest(".titles")?.querySelector(nameSel);
+    if (shown(name)) {
+      const nb = name.getBoundingClientRect();
+      const onRow = Math.abs(pb.top + pb.height / 2 - (nb.top + nb.height / 2)) < nb.height / 2;
+      if (onRow && name.scrollWidth > name.clientWidth + 1) res.push(`title "${name.textContent.trim()}" ellipsised beside the pill`);
+    }
+    const banner = pill.closest(".banner");
+    if (!banner) continue;
+    const bb = banner.getBoundingClientRect();
+    const floor = banner.querySelector(groundSel)?.getBoundingClientRect().top ?? bb.bottom;
+    const block = pill.closest(".titles") || pill.parentElement;
+    for (const x of [block, ...block.querySelectorAll("*")]) {
+      if (!shown(x)) continue;
+      const xb = x.getBoundingClientRect();
+      if (!xb.width || !xb.height) continue;
+      if (xb.bottom > floor + 0.5 || xb.top < bb.top - 0.5 || xb.right > bb.right + 0.5 || xb.left < bb.left - 0.5) {
+        res.push(`${x.className || x.tagName} outside the banner above its ground strip`);
+        break;
+      }
+    }
+  }
+  return res;
+};
+
+test("status pill beside a whole title or under the subtitle, label whole or dot alone, inside the banner", { skip: !browser && "no Chromium" }, async () => {
   const failures = [];
+  const hass = { ...makeHass(), language: "en", locale: { language: "en" } };
+  delete hass.callService; // a function cannot reach the page
   try {
     for (const tag of TAGS) {
-      for (const width of [245, 300, 400, 500]) {
-        for (const zoom of tag.includes("mini") ? [false, true] : [false]) {
-          const hass = { ...makeHass(), language: "en", locale: { language: "en" } };
-          delete hass.callService; // a function cannot reach the page
-          const page = await harness.openPage(browser, { theme: "light", width });
-          await harness.mountCard(page, { tag, hass, config: { area: "kitchen", animations: false }, open: zoom ? ".zoom" : null });
-          await page.waitForTimeout(300);
-          const out = await page.evaluate(() => {
-            const r = document.querySelector("#root").firstElementChild.shadowRoot;
-            const res = [];
-            const pill = r.querySelector(".banner .trow > .pill, .banner .trow > .st");
-            if (!pill) return ["no pill"];
-            const txt = pill.querySelector(".pt");
-            const pb = pill.getBoundingClientRect();
-            // A status, not an empty-state sentence ("No room with environment sensors", whole in its tooltip).
-            if (txt.textContent.length <= 20 && (txt.scrollWidth > txt.clientWidth + 0.5 || !txt.clientWidth)) res.push("label cut");
-            const nb = r.querySelector(".banner .title").getBoundingClientRect();
-            if (nb.width < 24) res.push(`title ${Math.round(nb.width)}px`);
-            const onRow = Math.abs(pb.top + pb.height / 2 - (nb.top + nb.height / 2)) < 3;
-            const row = r.querySelector(".banner .trow");
-            const rw = getComputedStyle(row).display === "contents" ? 0 : row.getBoundingClientRect().width;
-            if (onRow && rw && pb.width > rw * 0.51 + 0.5) res.push(`pill ${Math.round(pb.width)} of ${Math.round(rw)}px`);
-            const bb = r.querySelector(".banner").getBoundingClientRect();
-            if (pb.right > bb.right - 4 || pb.bottom > bb.bottom - 10 || pb.top < bb.top) res.push("pill out of the banner");
-            const z = r.querySelector(".banner .zoom")?.getBoundingClientRect();
-            if (z && (Math.round(z.width) !== 24 || Math.round(z.height) !== 24 || Math.round(z.top - bb.top) !== 5 || Math.round(bb.right - z.right) !== 5))
-              res.push(`zoom ${Math.round(z.width)}x${Math.round(z.height)} at ${Math.round(z.top - bb.top)}/${Math.round(bb.right - z.right)}`);
-            return res;
-          });
-          for (const f of out) failures.push(`${tag}${zoom ? " zoomed" : ""} ${width}px: ${f}`);
-          await page.close();
-        }
-      }
+      const page = await harness.openPage(browser, { theme: "light", width: 500, js });
+      const out = await page.evaluate(
+        async ({ tag, hass, LANGUAGES, WIDTHS, audit }) => {
+          const pillAudit = new Function(`return (${audit})`)();
+          const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+          const res = [];
+          for (const zoom of tag.includes("mini") ? [false, true] : [false])
+            for (const language of LANGUAGES)
+              for (const width of WIDTHS)
+                for (const title of [undefined, "Kitchen and dining room"]) {
+                document.body.style.width = `${width}px`;
+                const el = document.createElement(tag);
+                el.setConfig({ type: `custom:${tag}`, area: "kitchen", animations: false, language, ...(title ? { title } : {}) });
+                el.hass = { ...hass, themes: { darkMode: false }, callService: async () => {} };
+                document.getElementById("root").replaceChildren(el);
+                if (zoom) el.shadowRoot.querySelector(".zoom").dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true, detail: 1 }));
+                await frame();
+                await frame();
+                const r = el.shadowRoot;
+                const what = `${tag}${zoom ? " zoomed" : ""} ${language} ${width}px${title ? " long title" : ""}`;
+                for (const f of pillAudit(r, width, ".banner .trow > .pill, .banner .trow > .st", ".title", ".ground")) res.push(`${what}: ${f}`);
+                const bb = r.querySelector(".banner").getBoundingClientRect();
+                const z = r.querySelector(".banner .zoom")?.getBoundingClientRect();
+                if (z && (Math.round(z.width) !== 24 || Math.round(z.height) !== 24 || Math.round(z.top - bb.top) !== 5 || Math.round(bb.right - z.right) !== 5))
+                  res.push(`${what}: zoom ${Math.round(z.width)}x${Math.round(z.height)} at ${Math.round(z.top - bb.top)}/${Math.round(bb.right - z.right)}`);
+              }
+          return res;
+        },
+        { tag, hass, LANGUAGES, WIDTHS, audit: pillAudit.toString() },
+      );
+      failures.push(...out);
+      await page.close();
     }
   } finally {
     await browser?.close();

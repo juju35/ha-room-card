@@ -1925,6 +1925,13 @@ const rcEsc = (s) =>
     (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
   );
 
+// The whole width of an element's text in its own font, an ellipsised one included.
+const textWidth = (el) => {
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  return range.getBoundingClientRect().width;
+};
+
 const rcEscRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // A power in the card's language (*1,2 kW* in French), from `lang` (defaults to the browser's).
@@ -2048,20 +2055,40 @@ class RcCard extends HTMLElement {
     }
   }
 
-  // The banner's status pill goes on its own line under the title (and subtitle) when it would be cut next to the
-  // title. Fractional widths: scrollWidth / clientWidth are rounded and miss a label cut by less than a pixel.
+  // The status pill stays right after the title only while the whole title and the pill's whole label fit on that
+  // row; otherwise it takes a line of its own under the title and subtitle (data-wrap), and on the banner, when even
+  // then the text would run into the floor strip, it keeps its dot alone (data-dot). Measured in the real fonts (the
+  // pill at its natural width), so that every language and title length gets its own answer.
   _fitPill() {
-    const pill = this.shadowRoot?.querySelector?.(".banner .trow > .pill, .banner .trow > .st");
-    const banner = pill?.closest?.(".banner");
-    if (!banner || !pill.getBoundingClientRect) return;
-    banner.removeAttribute("data-wrap");
-    const have = pill.getBoundingClientRect().width;
-    pill.style.maxWidth = "none";
-    pill.style.flex = "none";
-    const need = pill.getBoundingClientRect().width;
-    pill.style.maxWidth = "";
-    pill.style.flex = "";
-    if (need > have + 0.01) banner.setAttribute("data-wrap", "");
+    const root = this.shadowRoot;
+    for (const pill of root?.querySelectorAll?.(".banner .trow > .pill, .banner .trow > .st, .head > .pill, .mini .head > .st") || []) {
+      const banner = pill.closest(".banner");
+      const host = banner || pill.parentElement;
+      const title = pill.parentElement.querySelector(":scope > .title");
+      if (!pill.getBoundingClientRect || !title) continue;
+      host.removeAttribute("data-wrap");
+      host.removeAttribute("data-dot");
+      // The room the title and the pill share now (the banner's row, or the classic header's title + pill), and the
+      // room they need: the whole title and the pill at its natural width.
+      const have = banner ? pill.parentElement.getBoundingClientRect().width : title.getBoundingClientRect().width + pill.getBoundingClientRect().width;
+      const gap = banner ? parseFloat(getComputedStyle(pill.parentElement).columnGap) || 0 : 0;
+      pill.style.maxWidth = "none";
+      pill.style.flex = "none";
+      const natural = pill.getBoundingClientRect().width;
+      pill.style.maxWidth = "";
+      pill.style.flex = "";
+      const shown = getComputedStyle(title).display !== "none" && getComputedStyle(title).visibility !== "hidden";
+      if ((shown ? textWidth(title) + gap : 0) + natural <= have + 0.5) continue;
+      host.setAttribute("data-wrap", "");
+      if (!banner) continue;
+      const t = pill.closest(".titles");
+      const sub = t.querySelector(":scope > .sub, :scope > .hchips");
+      if (sub && sub.scrollWidth > sub.clientWidth) sub.title = sub.textContent.replace(/\s+/g, " ").trim();
+      const r = t.getBoundingClientRect();
+      const box = banner.getBoundingClientRect();
+      const floor = banner.querySelector(".ground")?.getBoundingClientRect().top ?? box.bottom;
+      if (r.bottom > floor + 0.5 || r.top < box.top - 0.5 || natural > r.width + 0.5) host.setAttribute("data-dot", "");
+    }
   }
 
   disconnectedCallback() {
@@ -2959,18 +2986,13 @@ const RC_BASE_STYLES = `
           padding: 1px 8px; border-radius: 999px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
   .pt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pill ha-icon { flex: none; }
-  /* A card this narrow (6 columns of the Sections view on a phone): the title is at its few letters already, so the
-     status pill goes to a line of its own under it, where its whole label fits, rather than end with "…". */
-  @container (max-width: 260px) {
-    .head { flex-wrap: wrap; row-gap: 4px; }
-    .head::after { content: ""; order: 1; flex: 1 0 100%; }
-    .head > .pill { order: 2; margin-left: 50px; max-width: calc(100% - 50px); }
-  }
+  /* Not enough room for the whole title and the pill's whole label on one line (measured by the card, see _fitPill):
+     the status pill goes to a line of its own under the title, where its whole label fits, rather than cut either. */
+  .head[data-wrap] { flex-wrap: wrap; row-gap: 4px; }
+  .head[data-wrap]::after { content: ""; order: 1; flex: 1 0 100%; }
+  .head[data-wrap] > .pill { order: 2; margin-left: 50px; max-width: calc(100% - 50px); }
+  .mini .head[data-wrap] > .st { order: 2; margin-left: 0; max-width: 100%; }
   @container (max-width: 200px) {
-    /* Under 200 px the pill is only its dot again: back on the title's line. */
-    .head { flex-wrap: nowrap; }
-    .head::after { content: none; }
-    .head > .pill { order: 0; margin-left: 0; max-width: none; }
     .head > .pill .pt, .st .pt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
     .head > .pill:not(.action), .st { flex: none; padding: 0; width: 18px; height: 18px; justify-content: center; background: none; }
     .head > .pill:not(.action)::before, .st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }

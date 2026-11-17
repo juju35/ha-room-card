@@ -82,13 +82,14 @@ export const launch = () => chromium.launch(process.env.CHROMIUM_PATH ? { execut
 
 // A page ready to host a card: theme variables, the <ha-*> stand-ins and the card bundle loaded.
 // A new page per shot: the card's script declares top-level names, which cannot be evaluated twice in one page.
-// `ws`: a recorder mock, as script source defining window.__ws (the card's hass.callWS).
-export const openPage = async (browser, { theme, width, icons = {}, label = "", ws = "" }) => {
+// `ws`: a recorder mock, as script source defining window.__ws (the card's hass.callWS). `js`: another bundle (the
+// tests load one with every language inline).
+export const openPage = async (browser, { theme, width, icons = {}, label = "", ws = "", js = null }) => {
   const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1000, height: 2000 } });
   page.on("pageerror", (err) => console.error(`pageerror${label ? ` (${label})` : ""}: ${err.message}`));
   await page.setContent(pageHtml(theme, width));
   await page.addScriptTag({ content: haElements(icons) + ws });
-  await page.addScriptTag({ content: cardJs() });
+  await page.addScriptTag({ content: js ?? cardJs() });
   return page;
 };
 

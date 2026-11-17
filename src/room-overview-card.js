@@ -1110,11 +1110,6 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
         .head { gap: 6px; flex-wrap: wrap; }
         .hchips { order: 1; flex: 1 0 100%; flex-wrap: wrap; box-sizing: border-box; padding-left: 46px; }
       }
-      /* The overview's pill keeps its place on the title's line: its chips have the second line already. */
-      @container (max-width: 260px) {
-        .head::after { content: none; }
-        .head > .pill { order: 0; margin-left: 0; max-width: none; }
-      }
 
       .confirm[hidden] { display: none; }
       ha-card:has(> .confirm:not([hidden])) { min-height: 220px; }
