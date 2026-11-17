@@ -19,6 +19,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "The card only appears when a plug is on",
     ed_show_power: "Show power draw",
     ed_show_power_helper: "Read from the power sensor of each plug",
+    ed_overload_power: "Overload threshold",
+    ed_overload_power_helper: "Total power of the plugs from which the header warns, in W (0: never)",
     ed_all_off_button_helper: "Tapping the status pill turns every plug of the card off",
     ed_include: "Plugs and switches to add",
     ed_include_helper: "From another room or without one, or a switch not recognised as a plug",
@@ -39,6 +41,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "La carte n'apparaît que si une prise est allumée",
     ed_show_power: "Afficher la consommation",
     ed_show_power_helper: "Lue sur le capteur de puissance de chaque prise",
+    ed_overload_power: "Seuil de surcharge",
+    ed_overload_power_helper: "Puissance totale des prises à partir de laquelle l'en-tête alerte, en W (0 : jamais)",
     ed_all_off_button_helper: "Un tap sur la pastille éteint toutes les prises de la carte",
     ed_include: "Prises et interrupteurs à ajouter",
     ed_include_helper: "D'une autre pièce ou sans pièce, ou un interrupteur non reconnu comme prise",
@@ -59,6 +63,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Die Karte erscheint nur, wenn eine Steckdose an ist",
     ed_show_power: "Leistungsaufnahme anzeigen",
     ed_show_power_helper: "Vom Leistungssensor jeder Steckdose gelesen",
+    ed_overload_power: "Überlastschwelle",
+    ed_overload_power_helper: "Gesamtleistung der Steckdosen, ab der der Kopfbereich warnt, in W (0: nie)",
     ed_all_off_button_helper: "Tippen auf die Statusanzeige schaltet alle Steckdosen der Karte aus",
     ed_include: "Hinzuzufügende Steckdosen und Schalter",
     ed_include_helper: "Aus einem anderen Raum oder ohne Raum, oder ein Schalter, der nicht als Steckdose erkannt wird",
@@ -79,6 +85,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "La tarjeta solo aparece cuando hay un enchufe encendido",
     ed_show_power: "Mostrar el consumo",
     ed_show_power_helper: "Leído del sensor de potencia de cada enchufe",
+    ed_overload_power: "Umbral de sobrecarga",
+    ed_overload_power_helper: "Potencia total de los enchufes a partir de la cual avisa el encabezado, en W (0: nunca)",
     ed_all_off_button_helper: "Al tocar el indicador de estado se apagan todos los enchufes de la tarjeta",
     ed_include: "Enchufes e interruptores a añadir",
     ed_include_helper: "De otra habitación o sin habitación, o un interruptor no reconocido como enchufe",
@@ -100,6 +108,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Картица се приказује само када је нека утичница укључена",
     ed_show_power: "Прикажи потрошњу енергије",
     ed_show_power_helper: "Очитава се са сензора снаге сваке утичнице",
+    ed_overload_power: "Праг преоптерећења",
+    ed_overload_power_helper: "Укупна снага утичница од које заглавље упозорава, у W (0: никад)",
     ed_all_off_button_helper: "Додир на статусну пилулу искључује све утичнице на картици",
     ed_include: "Утичнице и прекидачи за додавање",
     ed_include_helper: "Из друге просторије или без ње, или прекидач који није препознат као утичница",
@@ -122,6 +132,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Kartica se prikazuje samo kada je neka utičnica uključena",
     ed_show_power: "Prikaži potrošnju energije",
     ed_show_power_helper: "Očitava se sa senzora snage svake utičnice",
+    ed_overload_power: "Prag preopterećenja",
+    ed_overload_power_helper: "Ukupna snaga utičnica od koje zaglavlje upozorava, u W (0: nikad)",
     ed_all_off_button_helper: "Dodir na statusnu pilulu isključuje sve utičnice na kartici",
     ed_include: "Utičnice i prekidači za dodavanje",
     ed_include_helper: "Iz druge prostorije ili bez nje, ili prekidač koji nije prepoznat kao utičnica",
@@ -143,6 +155,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "La scheda appare solo quando una presa è accesa",
     ed_show_power: "Mostra il consumo",
     ed_show_power_helper: "Letto dal sensore di potenza di ogni presa",
+    ed_overload_power: "Soglia di sovraccarico",
+    ed_overload_power_helper: "Potenza totale delle prese oltre la quale l'intestazione avvisa, in W (0: mai)",
     ed_all_off_button_helper: "Toccando l'indicatore di stato si spengono tutte le prese della scheda",
     ed_include: "Prese e interruttori da aggiungere",
     ed_include_helper: "Da un'altra stanza o senza stanza, oppure un interruttore non riconosciuto come presa",
@@ -163,6 +177,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "De kaart verschijnt alleen als er een stekker aan is",
     ed_show_power: "Stroomverbruik tonen",
     ed_show_power_helper: "Gelezen van de vermogenssensor van elke stekker",
+    ed_overload_power: "Overbelastingsdrempel",
+    ed_overload_power_helper: "Totaal vermogen van de stekkers vanaf waar de koptekst waarschuwt, in W (0: nooit)",
     ed_all_off_button_helper: "Een tik op de statusindicator schakelt alle stekkers van de kaart uit",
     ed_include: "Toe te voegen stekkers en schakelaars",
     ed_include_helper: "Uit een andere ruimte of zonder ruimte, of een schakelaar die niet als stekker wordt herkend",
@@ -183,6 +199,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "O cartão só aparece quando há uma tomada ligada",
     ed_show_power: "Mostrar o consumo",
     ed_show_power_helper: "Lido do sensor de potência de cada tomada",
+    ed_overload_power: "Limite de sobrecarga",
+    ed_overload_power_helper: "Potência total das tomadas a partir da qual o cabeçalho avisa, em W (0: nunca)",
     ed_all_off_button_helper: "Tocar no indicador de estado desliga todas as tomadas do cartão",
     ed_include: "Tomadas e interruptores a adicionar",
     ed_include_helper: "De outra divisão ou sem divisão, ou um interruptor não reconhecido como tomada",
@@ -203,6 +221,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Karta pojawia się tylko, gdy jakieś gniazdko jest włączone",
     ed_show_power: "Pokaż pobór mocy",
     ed_show_power_helper: "Odczytywany z czujnika mocy każdego gniazdka",
+    ed_overload_power: "Próg przeciążenia",
+    ed_overload_power_helper: "Łączna moc gniazdek, od której nagłówek ostrzega, w W (0: nigdy)",
     ed_all_off_button_helper: "Dotknięcie wskaźnika stanu wyłącza wszystkie gniazdka na karcie",
     ed_include: "Gniazdka i przełączniki do dodania",
     ed_include_helper: "Z innego pomieszczenia lub bez pomieszczenia albo przełącznik nierozpoznany jako gniazdko",
@@ -223,6 +243,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Cardul apare doar când o priză e pornită",
     ed_show_power: "Afișează consumul",
     ed_show_power_helper: "Citit de la senzorul de putere al fiecărei prize",
+    ed_overload_power: "Prag de suprasarcină",
+    ed_overload_power_helper: "Puterea totală a prizelor de la care antetul avertizează, în W (0: niciodată)",
     ed_all_off_button_helper: "Atingerea indicatorului de stare oprește toate prizele cardului",
     ed_include: "Prize și întrerupătoare de adăugat",
     ed_include_helper: "Din altă cameră sau fără cameră, ori un întrerupător nerecunoscut ca priză",
@@ -243,6 +265,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Kortet vises kun, når en stikkontakt er tændt",
     ed_show_power: "Vis strømforbrug",
     ed_show_power_helper: "Aflæst fra hver stikkontakts effektsensor",
+    ed_overload_power: "Overbelastningsgrænse",
+    ed_overload_power_helper: "Samlet effekt for stikkene, hvorfra overskriften advarer, i W (0: aldrig)",
     ed_all_off_button_helper: "Et tryk på statusindikatoren slukker alle stikkontakter på kortet",
     ed_include: "Stikkontakter og kontakter, der tilføjes",
     ed_include_helper: "Fra et andet rum eller uden rum, eller en kontakt, der ikke genkendes som stikkontakt",
@@ -263,6 +287,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Kortet visas bara när ett uttag är på",
     ed_show_power: "Visa effektförbrukning",
     ed_show_power_helper: "Läses från varje uttags effektsensor",
+    ed_overload_power: "Överbelastningsgräns",
+    ed_overload_power_helper: "Total effekt för uttagen från vilken rubriken varnar, i W (0: aldrig)",
     ed_all_off_button_helper: "Ett tryck på statusindikatorn stänger av alla uttag på kortet",
     ed_include: "Uttag och brytare att lägga till",
     ed_include_helper: "Från ett annat rum eller utan rum, eller en brytare som inte känns igen som uttag",
@@ -283,6 +309,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Картата се показва само когато има включен контакт",
     ed_show_power: "Показвай консумацията",
     ed_show_power_helper: "Отчита се от сензора за мощност на всеки контакт",
+    ed_overload_power: "Праг на претоварване",
+    ed_overload_power_helper: "Обща мощност на контактите, от която заглавието предупреждава, във W (0: никога)",
     ed_all_off_button_helper: "Докосването на индикатора за състояние изключва всички контакти от картата",
     ed_include: "Контакти и ключове за добавяне",
     ed_include_helper: "От друга стая или без стая, или ключ, който не е разпознат като контакт",
@@ -303,6 +331,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Карточка появляется, только когда включена хотя бы одна розетка",
     ed_show_power: "Показывать потребление",
     ed_show_power_helper: "Считывается с датчика мощности каждой розетки",
+    ed_overload_power: "Порог перегрузки",
+    ed_overload_power_helper: "Суммарная мощность розеток, с которой заголовок предупреждает, в Вт (0: никогда)",
     ed_all_off_button_helper: "Нажатие на индикатор состояния выключает все розетки карточки",
     ed_include: "Добавить розетки и выключатели",
     ed_include_helper: "Из другой комнаты или без комнаты, либо выключатель, не распознанный как розетка",
@@ -323,6 +353,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Картка з'являється, лише коли ввімкнено хоча б одну розетку",
     ed_show_power: "Показувати споживання",
     ed_show_power_helper: "Зчитується з датчика потужності кожної розетки",
+    ed_overload_power: "Поріг перевантаження",
+    ed_overload_power_helper: "Сумарна потужність розеток, з якої заголовок попереджає, у Вт (0: ніколи)",
     ed_all_off_button_helper: "Натискання на індикатор стану вимикає всі розетки картки",
     ed_include: "Додати розетки й вимикачі",
     ed_include_helper: "З іншої кімнати або без кімнати, або вимикач, не розпізнаний як розетка",
@@ -343,6 +375,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "A kártya csak akkor jelenik meg, ha egy konnektor be van kapcsolva",
     ed_show_power: "Teljesítményfelvétel megjelenítése",
     ed_show_power_helper: "Az egyes konnektorok teljesítményérzékelőjéből olvasva",
+    ed_overload_power: "Túlterhelési küszöb",
+    ed_overload_power_helper: "Az aljzatok összteljesítménye, amelytől a fejléc figyelmeztet, W-ban (0: soha)",
     ed_all_off_button_helper: "Az állapotjelzőre koppintva a kártya összes konnektora kikapcsol",
     ed_include: "Hozzáadandó konnektorok és kapcsolók",
     ed_include_helper: "Másik helyiségből vagy helyiség nélkül, illetve konnektorként fel nem ismert kapcsoló",
@@ -363,6 +397,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Karta sa zobrazí len vtedy, keď je nejaká zásuvka zapnutá",
     ed_show_power: "Zobraziť príkon",
     ed_show_power_helper: "Načítaný zo senzora výkonu každej zásuvky",
+    ed_overload_power: "Prah preťaženia",
+    ed_overload_power_helper: "Celkový výkon zásuviek, od ktorého hlavička upozorní, vo W (0: nikdy)",
     ed_all_off_button_helper: "Ťuknutie na indikátor stavu vypne všetky zásuvky na karte",
     ed_include: "Zásuvky a vypínače na pridanie",
     ed_include_helper: "Z inej miestnosti alebo bez miestnosti, alebo vypínač nerozpoznaný ako zásuvka",
@@ -383,6 +419,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Karta se zobrazí jen tehdy, když je nějaká zásuvka zapnutá",
     ed_show_power: "Zobrazit příkon",
     ed_show_power_helper: "Načtený ze senzoru výkonu každé zásuvky",
+    ed_overload_power: "Práh přetížení",
+    ed_overload_power_helper: "Celkový výkon zásuvek, od kterého záhlaví upozorní, ve W (0: nikdy)",
     ed_all_off_button_helper: "Klepnutí na indikátor stavu vypne všechny zásuvky na kartě",
     ed_include: "Zásuvky a vypínače k přidání",
     ed_include_helper: "Z jiné místnosti nebo bez místnosti, nebo vypínač nerozpoznaný jako zásuvka",
@@ -403,6 +441,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Kartica se prikaže samo, ko je kakšna vtičnica vklopljena",
     ed_show_power: "Prikaži porabo",
     ed_show_power_helper: "Prebrano s senzorja moči vsake vtičnice",
+    ed_overload_power: "Prag preobremenitve",
+    ed_overload_power_helper: "Skupna moč vtičnic, od katere glava opozori, v W (0: nikoli)",
     ed_all_off_button_helper: "Dotik indikatorja stanja izklopi vse vtičnice na kartici",
     ed_include: "Vtičnice in stikala za dodajanje",
     ed_include_helper: "Iz drugega prostora ali brez prostora ali stikalo, ki ni prepoznano kot vtičnica",
@@ -423,6 +463,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Karte parādās tikai tad, kad kāda kontaktligzda ir ieslēgta",
     ed_show_power: "Rādīt patēriņu",
     ed_show_power_helper: "Nolasīts no katras kontaktligzdas jaudas sensora",
+    ed_overload_power: "Pārslodzes slieksnis",
+    ed_overload_power_helper: "Kontaktligzdu kopējā jauda, no kuras galvene brīdina, W (0: nekad)",
     ed_all_off_button_helper: "Pieskaroties statusa indikatoram, tiek izslēgtas visas kartes kontaktligzdas",
     ed_include: "Pievienojamās kontaktligzdas un slēdži",
     ed_include_helper: "No citas telpas vai bez telpas, vai slēdzis, kas nav atpazīts kā kontaktligzda",
@@ -443,6 +485,8 @@ const RW_I18N = {
     ed_hide_when_off_helper: "Η κάρτα εμφανίζεται μόνο όταν μια πρίζα είναι ενεργή",
     ed_show_power: "Εμφάνιση κατανάλωσης",
     ed_show_power_helper: "Διαβάζεται από τον αισθητήρα ισχύος κάθε πρίζας",
+    ed_overload_power: "Όριο υπερφόρτωσης",
+    ed_overload_power_helper: "Συνολική ισχύς των πριζών από την οποία η κεφαλίδα προειδοποιεί, σε W (0: ποτέ)",
     ed_all_off_button_helper: "Το πάτημα της ένδειξης κατάστασης απενεργοποιεί όλες τις πρίζες της κάρτας",
     ed_include: "Πρίζες και διακόπτες προς προσθήκη",
     ed_include_helper: "Από άλλο δωμάτιο ή χωρίς δωμάτιο, ή διακόπτης που δεν αναγνωρίζεται ως πρίζα",
@@ -457,7 +501,7 @@ const RW_PREFIX = /^(prise|multiprise|plug|smart plug|outlet)\s+/i;
 const RW_SUFFIX = /\s+(prise|plug|smart plug|outlet|socket)$/i;
 
 // ── Card ─────────────────────────────────────────────────────────────────────
-// Power drawn by the plugs of a room together from which the header warns of an overload.
+// Default power drawn by the plugs of a room together from which the header warns of an overload (`overload_power`).
 const RW_OVERLOAD_W = 3000;
 
 class RoomSwitchCard extends RcToggleCard {
@@ -474,6 +518,7 @@ class RoomSwitchCard extends RcToggleCard {
     only_on: false,
     hide_when_off: false,
     show_power: true,
+    overload_power: RW_OVERLOAD_W,
     all_off_button: false,
     exclude: [],
   };
@@ -526,10 +571,17 @@ class RoomSwitchCard extends RcToggleCard {
     return lit.length ? lit.reduce((t, i) => t + i.watts, 0) : null;
   }
 
-  // From RW_OVERLOAD_W drawn by the plugs together, the header warns (amber icon, the panel in alert on the banner).
+  // From `overload_power` W drawn by the plugs together (3 kW by default, 0 never), the header warns: amber icon,
+  // the panel in alert on the banner.
+  _overloaded(items) {
+    const v = Number(this._config?.overload_power ?? RW_OVERLOAD_W);
+    const limit = Number.isFinite(v) && v >= 0 ? v : RW_OVERLOAD_W;
+    return limit > 0 && (this._watts(items) ?? 0) >= limit;
+  }
+
   _summary(items, ofTotal) {
     const s = super._summary(items, ofTotal);
-    if (s && s.level === "on" && (this._watts(items) ?? 0) >= RW_OVERLOAD_W) s.level = "high";
+    if (s && s.level === "on" && this._overloaded(items)) s.level = "high";
     return s;
   }
 
@@ -539,7 +591,7 @@ class RoomSwitchCard extends RcToggleCard {
     return {
       on: items.slice(0, 3).map((i) => i.on),
       total: items.filter((i) => i.on).length,
-      high: (this._watts(items) ?? 0) >= RW_OVERLOAD_W,
+      high: this._overloaded(items),
     };
   }
 
@@ -562,11 +614,12 @@ class RoomSwitchCard extends RcToggleCard {
 // ── Editor ───────────────────────────────────────────────────────────────────
 const RoomSwitchCardEditor = rcEditor({
   card: RoomSwitchCard,
-  helpers: ["title", "navigation_path", "layout", "only_on", "hide_when_off", "show_power", "all_off_button", "include", "names", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "layout", "only_on", "hide_when_off", "show_power", "overload_power", "all_off_button", "include", "names", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
     rcLayoutField(RW_I18N, lang),
     ...rcBooleans("show_title", "only_on", "hide_when_off", "show_power", "all_off_button"),
+    { name: "overload_power", selector: { number: { min: 0, step: 100, mode: "box", unit_of_measurement: "W" } } },
     ...rcIllustrationFields(RW_I18N, lang, true),
     ...rcIncludeField(RoomSwitchCard, hass, config),
     ...rcExcludeField(RoomSwitchCard, hass, config),
@@ -594,11 +647,12 @@ class RoomSwitchMiniCard extends rcToggleMini(RoomSwitchCard, "room-switch-mini-
 
 const RoomSwitchMiniCardEditor = rcEditor({
   card: RoomSwitchMiniCard,
-  helpers: ["title", "navigation_path", "layout", "columns", "only_on", "hide_when_off", "show_power", "all_off_button", "zoom", "include", "names", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "navigation_path", "layout", "columns", "only_on", "hide_when_off", "show_power", "overload_power", "all_off_button", "zoom", "include", "names", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => [
     ...rcAreaFields(true),
     rcLayoutField(RW_I18N, lang),
     ...rcBooleans("show_title", "only_on", "hide_when_off", "show_power", "all_off_button", "zoom"),
+    { name: "overload_power", selector: { number: { min: 0, step: 100, mode: "box", unit_of_measurement: "W" } } },
     ...rcIllustrationFields(RW_I18N, lang, true),
     ...rcIncludeField(RoomSwitchMiniCard, hass, config),
     ...rcExcludeField(RoomSwitchMiniCard, hass, config),

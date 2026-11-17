@@ -79,6 +79,29 @@ test("Plugs: the plugs on carry current; 3 kW together is an overload (amber lev
   assert.match(card.shadowRoot.innerHTML, /lvl-high/);
 });
 
+test("Plugs: overload_power sets the overload threshold, 0 never warns", () => {
+  const hass = makeHass();
+  hass.states["sensor.coffee_power"].state = "1500";
+  const card = new cards["room-switch-card"]();
+  card.attachShadow();
+  card.setConfig({ area: "kitchen", overload_power: 1200 });
+  card.hass = hass;
+  assert.equal(card._sceneState().high, true);
+  card.setConfig({ area: "kitchen", overload_power: 2000 });
+  card._sig = null;
+  card.hass = { ...hass };
+  assert.equal(card._sceneState().high, false);
+  hass.states["sensor.coffee_power"].state = "9000";
+  card.setConfig({ area: "kitchen", overload_power: 0 });
+  card._sig = null;
+  card.hass = { ...hass };
+  assert.equal(card._sceneState().high, false);
+  card.setConfig({ area: "kitchen", overload_power: "abc" });
+  card._sig = null;
+  card.hass = { ...hass };
+  assert.equal(card._sceneState().high, true);
+});
+
 test("Lights: the lamps are lit in the lights' colours", () => {
   const card = new cards["room-lights-card"]();
   card.attachShadow();

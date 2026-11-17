@@ -122,7 +122,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - With `all_off_button: true`, the status doubles as a power button turning every plug of the room off (off by default, like the Plugs card)
 - On the second line, a pill with its name and power draw for each plug that is on (*Coffee Machine 1.2 kW*), the icon alone for the others (`only_on` hides them)
 - **Zoom** button (top right) switches the card to the full [Plugs card](#plugs) and back, as does a click anywhere else (`zoom: false` removes it)
-- Same discovery and options as the Plugs card: `only_on`, `hide_when_off`, `show_power`, `include` / `exclude`, `navigation_path`
+- Same discovery and options as the Plugs card: `only_on`, `hide_when_off`, `show_power`, `overload_power`, `include` / `exclude`, `navigation_path`
 - Tap a plug to open its details and history
 
 ### Environment
@@ -517,8 +517,9 @@ In addition to the [common options](#common-options):
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `show_power` | ❌ | `true` | Power draw of each plug and total in the header |
+| `overload_power` | ❌ | `3000` | Total power of the plugs (W) from which the header warns of an overload; `0` never warns |
 
-From 3 kW drawn by the plugs together, the header icon turns amber and the illustration's electrical panel shows an overload.
+From `overload_power` (3 kW by default) drawn by the plugs together, the header icon turns amber and the illustration's electrical panel shows an overload.
 
 ### Plugs mini
 
