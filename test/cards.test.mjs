@@ -716,7 +716,7 @@ test("each visual editor offers every option of its card", () => {
   has("room-environment-card", room, ["navigation_path", "columns", "only_alerts", "show_gauge", "thresholds", "entities", "language"]);
   has("room-environment-mini-card", room, ["navigation_path", "columns", "only_alerts", "show_gauge", "zoom", "thresholds", "entities", "language"]);
   has("room-overview-card", {}, ["title", "columns", "sort", "presence", "zoom", "all_off_button", "plugs_off_button", "exclude_areas", "rooms", "language"]);
-  has("room-environment-overview-card", {}, ["title", "columns", "sort", "zoom", "exclude_areas", "thresholds", "rooms", "language"]);
+  has("room-environment-overview-card", {}, ["title", "columns", "sort", "zoom", "hide_when_clear", "exclude_areas", "thresholds", "rooms", "language"]);
 });
 
 test("the sensors editors show `outdoor` guessed from the room, and keep it out of the YAML at that guess", () => {

@@ -158,6 +158,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Header with the number of rooms to check and the home's average temperature and humidity
 - **Tap** a room to unfold its Environment card at the top of the card; tap it again or anywhere else to fold it back
 - Only the rooms needing a look show; the **detail** button (top right) shows every room, and back, as does a click anywhere else (`zoom: false`: every room, always, no button); `sort: state` lists them first; room order, names and icons with `rooms`, like the [Overview](#overview)
+- Hide the whole card while every room is comfortable (`hide_when_clear`)
 
 ## Supported integrations
 
@@ -682,6 +683,7 @@ title: Indoor climate
 columns: 3
 sort: state
 zoom: true
+hide_when_clear: false
 thresholds:
   co2: [800, 1200]
 exclude_areas:
@@ -708,6 +710,7 @@ rooms:
 | `columns` | ❌ | `3` | Number of room columns (1–6); on a card of 340 px or less at most 2, and 1 at 260 px or less (6 columns of a Sections view on a phone) |
 | `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing a look first |
 | `zoom` | ❌ | `true` | Show only the rooms with a reading outside the comfort range, with a detail button showing every room; `false` shows every room, always |
+| `hide_when_clear` | ❌ | `false` | Hide the whole card when no room has a reading to check (every reading in the comfort range or merely cool); it shows again on its own as soon as a room needs a look |
 | `illustration` | ❌ | `true` | Illustrated header: the home's worst reading (else its average temperature and humidity) on a wall sensor; `false` keeps the classic header |
 | `illustration_theme` | ❌ | `auto` | `auto` (follows the Home Assistant theme: night with a dark theme, day with a light theme), `day` or `night` |
 | `thresholds` | ❌ | See [Thresholds](#thresholds) | Comfort limits per kind, also used by the unfolded room |

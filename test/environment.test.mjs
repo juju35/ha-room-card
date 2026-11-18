@@ -400,6 +400,31 @@ test("the overview header follows the averages of hidden rooms in the compact vi
   assert.match(nodes[".head"].innerHTML, /21,7°/);
 });
 
+test("hide_when_clear hides the overview while every room is comfortable, and shows it again when a room needs a look", () => {
+  const card = new (rc.customElements.get("room-environment-overview-card"))();
+  const nodes = {};
+  const node = () => ({ ...fakeNode(), style: { setProperty() {} }, querySelector: (s) => (nodes[s] ||= node()) });
+  card.attachShadow();
+  card.shadowRoot.querySelector = (s) => (s === "ha-card" && !card.shadowRoot.innerHTML ? null : (nodes[s] ||= node()));
+  const seen = [];
+  card.dispatchEvent = (ev) => {
+    if (ev.type === "card-visibility-changed") seen.push(ev.detail.value);
+  };
+  card.setConfig({ hide_when_clear: true });
+  card.hass = makeHass();
+  assert.equal(card.hidden, true);
+  assert.equal(card.style.display, "none");
+  assert.equal(card.getCardSize(), 0);
+  card.hass = makeHass({ co2: 1200 });
+  assert.equal(card.hidden, false);
+  assert.equal(card.style.display, "");
+  assert.deepEqual(seen, [false, true]);
+  // Never hidden in the editor preview.
+  card.preview = true;
+  card.hass = makeHass();
+  assert.equal(card.hidden, false);
+});
+
 test("sensors of one kind in different units are not averaged together", () => {
   const ugm3 = st("sensor.lr_voc", 200, "volatile_organic_compounds", "µg/m³", "Salon COV");
   const ppb = st("sensor.lr_voc_ppb", 700, "volatile_organic_compounds_parts", "ppb", "Salon COV ppb");

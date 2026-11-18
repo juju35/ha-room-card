@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0 - 2026-11-18
+
+### Features
+- Environment overview card: new `hide_when_clear` option (also in the visual editor) hiding the whole card while no room has a reading to check; it shows again on its own as soon as a room needs a look, and stays visible in the card editor preview.
+
 ## 2.0.2 - 2026-11-18
 
 ### Fixes
