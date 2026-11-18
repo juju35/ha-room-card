@@ -1852,6 +1852,37 @@ const rcMemo = (store, key, deps, fn) => {
 
 // ── Base card ────────────────────────────────────────────────────────────────
 class RcCard extends HTMLElement {
+  constructor() {
+    super();
+    // Kept in the DOM by hui-card while hidden (see _hide).
+    this.connectedWhileHidden = true;
+  }
+
+  // Set by hui-card: a card hidden by its `hide_when_*` option still shows in the editor preview and in edit mode.
+  set preview(v) {
+    this._setMode("_isPreview", v);
+  }
+
+  get preview() {
+    return !!this._isPreview;
+  }
+
+  set editMode(v) {
+    this._setMode("_isEditMode", v);
+  }
+
+  get editMode() {
+    return !!this._isEditMode;
+  }
+
+  _setMode(key, v) {
+    if (!!this[key] === !!v) return;
+    this[key] = !!v;
+    this._sig = null;
+    if (this._dragging || this._pressing) this._deferred = true;
+    else this._render();
+  }
+
   static getStubConfig(hass) {
     const areas = Object.keys(hass?.areas ?? {});
     return { area: areas[0] ?? "" };
@@ -1965,7 +1996,7 @@ class RcCard extends HTMLElement {
 
   // The tiles actually shown (`only_on` / `only_alerts` applied), nothing when the card is hidden.
   getCardSize() {
-    if (this.style.display === "none") return 0;
+    if (this.hidden) return 0;
     const n = this._shown ?? this._items?.length ?? 0;
     if (!n || !this._config) return 1;
     // A row of large tiles (`layout: tiles`) is about one and a half rows of compact ones.
@@ -2039,8 +2070,17 @@ class RcCard extends HTMLElement {
     return true;
   }
 
+  // Hides the card and tells Lovelace (card-visibility-changed): hui-card reads the `hidden` property and then
+  // drops the card's slot in a sections view. connectedWhileHidden keeps the card in the DOM so that it keeps
+  // following its entities and shows again on its own. Never hidden in the editor preview / edit mode.
   _hide(hidden) {
-    this.style.display = hidden ? "none" : "";
+    hidden = !!hidden && !this._isEditMode && !this._isPreview;
+    this.connectedWhileHidden = true;
+    if (this.hidden !== hidden) {
+      this.hidden = hidden;
+      this.style.display = hidden ? "none" : "";
+      this.dispatchEvent(new CustomEvent("card-visibility-changed", { detail: { value: !hidden }, bubbles: true, composed: true }));
+    }
     return hidden;
   }
 
@@ -2396,7 +2436,7 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
 
     getCardSize() {
       if (this._zoomed) return super.getCardSize();
-      return this.style.display === "none" ? 0 : 1;
+      return this.hidden ? 0 : 1;
     }
 
     getGridOptions() {
@@ -2813,6 +2853,7 @@ const RC_BASE_STYLES = `
     display: block;
     min-width: 0;
   }
+  :host([hidden]) { display: none !important; }
   /* The card answers its own width (container queries). That containment drops its content from its natural width: in
      a wrapper sized by its content (inline-block, a grid's auto column, a flex row: layout-card, button-card…) it would
      shrink to its padding. The empty grid below (no height) gives the host a natural width of 344 px there, as a

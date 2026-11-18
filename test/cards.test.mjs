@@ -1187,3 +1187,62 @@ test("names renames an entity on the card, default kept otherwise (#81)", () => 
   plain.hass = makeHass();
   assert.equal(plain._collect().find((i) => i.id === "binary_sensor.door")?.name, "Door");
 });
+
+// Hidden cards drop their slot in a sections view: hui-card reads `hidden` on card-visibility-changed, and keeps the
+// card in the DOM (connectedWhileHidden) so that it shows again on its own; never hidden in the editor preview.
+const visibilityEvents = (card) => {
+  const seen = [];
+  card.dispatchEvent = (ev) => {
+    if (ev.type === "card-visibility-changed") seen.push(ev.detail.value);
+  };
+  return seen;
+};
+
+test("a hidden card sets `hidden`, tells Lovelace and stays connected; shown again, it clears it", () => {
+  const card = new cards["room-sensors-card"]();
+  assert.equal(card.connectedWhileHidden, true);
+  const seen = visibilityEvents(card);
+  card.setConfig({ area: "kitchen", hide_when_clear: true, entities: ["binary_sensor.door"] });
+  card.hass = makeHass();
+  assert.equal(card.hidden, true);
+  assert.equal(card.style.display, "none");
+  assert.equal(card.connectedWhileHidden, true);
+  assert.equal(card.getCardSize(), 0);
+  assert.deepEqual([...seen], [false]);
+  card.setConfig({ area: "kitchen", hide_when_clear: false, entities: ["binary_sensor.door"] });
+  assert.equal(card.hidden, false);
+  assert.equal(card.style.display, "");
+  assert.deepEqual([...seen], [false, true]);
+});
+
+for (const [flag, value] of [
+  ["preview", true],
+  ["editMode", true],
+]) {
+  test(`a card hidden by hide_when_off shows in ${flag}, and hides again once left`, () => {
+    const card = new cards["room-lights-card"]();
+    const seen = visibilityEvents(card);
+    card.setConfig({ area: "kitchen", hide_when_off: true });
+    const h = makeHass();
+    for (const id of Object.keys(h.states)) if (id.startsWith("light.")) h.states[id] = { ...h.states[id], state: "off" };
+    card.hass = h;
+    assert.equal(card.hidden, true);
+    card[flag] = value;
+    assert.equal(card[flag], true);
+    assert.equal(card.hidden, false);
+    assert.notEqual(card.style.display, "none");
+    assert.ok(card.getCardSize() > 0);
+    card[flag] = false;
+    assert.equal(card.hidden, true);
+    assert.deepEqual([...seen], [false, true, false]);
+  });
+}
+
+test("the mini card is not hidden in the editor preview either", () => {
+  const card = new cards["room-sensors-mini-card"]();
+  card.preview = true;
+  card.setConfig({ area: "kitchen", hide_when_clear: true, entities: ["binary_sensor.door"] });
+  card.hass = makeHass();
+  assert.equal(card.hidden, false);
+  assert.equal(card.getCardSize(), 1);
+});

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.2 - 2026-11-18
+
+### Fixes
+- Hidden cards (`hide_when_clear`, `hide_when_off`) no longer leave an empty slot in a sections view; they stay visible in the card editor preview.
+
 ## 2.0.1 - 2026-11-18
 
 ### Fixes
