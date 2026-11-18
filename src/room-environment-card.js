@@ -1462,6 +1462,8 @@ const REO_I18N = {
     ed_columns_helper: "Empty: 3, or 2 on narrow screens",
     ed_zoom: "Detail button",
     ed_zoom_helper: "Only the rooms with a reading outside the comfort range show; the button shows every room. Off: every room, always",
+    ed_hide_when_clear: "Hide when all clear",
+    ed_hide_when_clear_helper: "The card only appears when a room has a reading to check",
     ed_sort_state: "Rooms needing a look first",
     ed_exclude_helper: "Left out of the tiles, the averages and the room details",
     ed_rooms_helper: "Order and overrides: a list of {area, name, icon, navigation_path, thresholds}, thresholds applying to that room only",
@@ -1478,6 +1480,8 @@ const REO_I18N = {
     ed_columns_helper: "Vide : 3, ou 2 sur les écrans étroits",
     ed_zoom: "Bouton détail",
     ed_zoom_helper: "Seules les pièces avec une mesure hors de la plage de confort s'affichent ; le bouton affiche toutes les pièces. Désactivé : toujours toutes les pièces",
+    ed_hide_when_clear: "Masquer quand tout va bien",
+    ed_hide_when_clear_helper: "La carte n'apparaît que si une pièce a une mesure à surveiller",
     ed_sort_state: "Pièces à surveiller en premier",
     ed_exclude_helper: "Ignorés dans les tuiles, les moyennes et le détail des pièces",
     ed_rooms_helper: "Ordre et personnalisation : une liste de {area, name, icon, navigation_path, thresholds}, thresholds ne valant que pour cette pièce",
@@ -1494,6 +1498,8 @@ const REO_I18N = {
     ed_columns_helper: "Leer: 3, oder 2 auf schmalen Bildschirmen",
     ed_zoom: "Detail-Schaltfläche",
     ed_zoom_helper: "Nur Räume mit einem Messwert außerhalb des Komfortbereichs werden angezeigt; die Schaltfläche zeigt alle Räume. Aus: immer alle Räume",
+    ed_hide_when_clear: "Ausblenden, wenn alles in Ordnung ist",
+    ed_hide_when_clear_helper: "Die Karte erscheint nur, wenn ein Raum einen zu prüfenden Messwert hat",
     ed_sort_state: "Räume, die Aufmerksamkeit brauchen, zuerst",
     ed_exclude_helper: "Bei den Kacheln, den Durchschnitten und den Raumdetails nicht berücksichtigt",
     ed_rooms_helper: "Reihenfolge und Anpassungen: eine Liste von {area, name, icon, navigation_path, thresholds}, wobei thresholds nur für diesen Raum gilt",
@@ -1510,6 +1516,8 @@ const REO_I18N = {
     ed_columns_helper: "Vacío: 3, o 2 en pantallas estrechas",
     ed_zoom: "Botón de detalle",
     ed_zoom_helper: "Solo se muestran las habitaciones con una lectura fuera del rango de confort; el botón muestra todas las habitaciones. Desactivado: siempre todas las habitaciones",
+    ed_hide_when_clear: "Ocultar cuando todo está en orden",
+    ed_hide_when_clear_helper: "La tarjeta solo aparece cuando una habitación tiene una lectura que revisar",
     ed_sort_state: "Primero las habitaciones que requieren atención",
     ed_exclude_helper: "Se ignoran en los mosaicos, las medias y el detalle de las habitaciones",
     ed_rooms_helper: "Orden y personalización: una lista de {area, name, icon, navigation_path, thresholds}, aplicándose thresholds solo a esa habitación",
@@ -1526,6 +1534,8 @@ const REO_I18N = {
     ed_columns_helper: "Празно: 3, или 2 на уским екранима",
     ed_zoom: "Дугме за детаље",
     ed_zoom_helper: "Приказују се само просторије са очитавањима ван опсега комфора; дугме приказује све просторије. Искључено: све просторије, увек",
+    ed_hide_when_clear: "Сакриј кад је све у реду",
+    ed_hide_when_clear_helper: "Картица се приказује само када просторија има очитавање за проверу",
     ed_sort_state: "Прво просторије које захтевају пажњу",
     ed_exclude_helper: "Изостављено из плочица, просека и детаља просторије",
     ed_rooms_helper:
@@ -1543,6 +1553,8 @@ const REO_I18N = {
     ed_columns_helper: "Prazno: 3, ili 2 na uskim ekranima",
     ed_zoom: "Dugme za detalje",
     ed_zoom_helper: "Prikazuju se samo prostorije sa očitavanjima van opsega komfora; dugme prikazuje sve prostorije. Isključeno: sve prostorije, uvek",
+    ed_hide_when_clear: "Sakrij kad je sve u redu",
+    ed_hide_when_clear_helper: "Kartica se prikazuje samo kada prostorija ima očitavanje za proveru",
     ed_sort_state: "Prvo prostorije koje zahtevaju pažnju",
     ed_exclude_helper: "Izostavljeno iz pločica, proseka i detalja prostorije",
     ed_rooms_helper:
@@ -1560,6 +1572,8 @@ const REO_I18N = {
     ed_columns_helper: "Vuoto: 3, o 2 sugli schermi stretti",
     ed_zoom: "Pulsante dettagli",
     ed_zoom_helper: "Vengono mostrate solo le stanze con una misura fuori dall'intervallo di comfort; il pulsante mostra tutte le stanze. Disattivato: sempre tutte le stanze",
+    ed_hide_when_clear: "Nascondi quando è tutto a posto",
+    ed_hide_when_clear_helper: "La scheda appare solo quando una stanza ha una misura da controllare",
     ed_sort_state: "Prima le stanze da controllare",
     ed_exclude_helper: "Ignorati nei riquadri, nelle medie e nei dettagli delle stanze",
     ed_rooms_helper: "Ordine e personalizzazioni: un elenco di {area, name, icon, navigation_path, thresholds}, dove thresholds vale solo per quella stanza",
@@ -1576,6 +1590,8 @@ const REO_I18N = {
     ed_columns_helper: "Leeg: 3, of 2 op smalle schermen",
     ed_zoom: "Detailknop",
     ed_zoom_helper: "Alleen ruimtes met een meting buiten het comfortbereik worden getoond; de knop toont alle ruimtes. Uit: altijd alle ruimtes",
+    ed_hide_when_clear: "Verbergen als alles in orde is",
+    ed_hide_when_clear_helper: "De kaart verschijnt alleen als een ruimte een meting heeft om te controleren",
     ed_sort_state: "Ruimtes die aandacht nodig hebben eerst",
     ed_exclude_helper: "Niet meegeteld in de tegels, de gemiddelden en de ruimtedetails",
     ed_rooms_helper: "Volgorde en aanpassingen: een lijst van {area, name, icon, navigation_path, thresholds}, waarbij thresholds alleen voor die ruimte geldt",
@@ -1592,6 +1608,8 @@ const REO_I18N = {
     ed_columns_helper: "Vazio: 3, ou 2 em ecrãs estreitos",
     ed_zoom: "Botão de detalhe",
     ed_zoom_helper: "Só são mostradas as divisões com uma medição fora do intervalo de conforto; o botão mostra todas as divisões. Desativado: sempre todas as divisões",
+    ed_hide_when_clear: "Ocultar quando está tudo em ordem",
+    ed_hide_when_clear_helper: "O cartão só aparece quando uma divisão tem uma medição a verificar",
     ed_sort_state: "Primeiro as divisões que precisam de atenção",
     ed_exclude_helper: "Ignorados nos mosaicos, nas médias e no detalhe das divisões",
     ed_rooms_helper: "Ordem e personalização: uma lista de {area, name, icon, navigation_path, thresholds}, aplicando-se thresholds apenas a essa divisão",
@@ -1608,6 +1626,8 @@ const REO_I18N = {
     ed_columns_helper: "Puste: 3 lub 2 na wąskich ekranach",
     ed_zoom: "Przycisk szczegółów",
     ed_zoom_helper: "Wyświetlane są tylko pomieszczenia z odczytem poza zakresem komfortu; przycisk pokazuje wszystkie pomieszczenia. Wyłączone: zawsze wszystkie pomieszczenia",
+    ed_hide_when_clear: "Ukryj, gdy wszystko w porządku",
+    ed_hide_when_clear_helper: "Karta pojawia się tylko, gdy w pomieszczeniu jest odczyt do sprawdzenia",
     ed_sort_state: "Najpierw pomieszczenia wymagające uwagi",
     ed_exclude_helper: "Pomijane w kafelkach, średnich i szczegółach pomieszczeń",
     ed_rooms_helper: "Kolejność i nadpisania: lista {area, name, icon, navigation_path, thresholds}, przy czym thresholds dotyczy tylko tego pomieszczenia",
@@ -1624,6 +1644,8 @@ const REO_I18N = {
     ed_columns_helper: "Gol: 3 sau 2 pe ecranele înguste",
     ed_zoom: "Buton de detalii",
     ed_zoom_helper: "Se afișează doar camerele cu o valoare în afara intervalului de confort; butonul afișează toate camerele. Dezactivat: mereu toate camerele",
+    ed_hide_when_clear: "Ascunde când totul e în regulă",
+    ed_hide_when_clear_helper: "Cardul apare doar când o cameră are o valoare de verificat",
     ed_sort_state: "Întâi camerele care necesită atenție",
     ed_exclude_helper: "Ignorați în dale, în medii și în detaliile camerelor",
     ed_rooms_helper: "Ordine și personalizări: o listă de {area, name, icon, navigation_path, thresholds}, thresholds aplicându-se doar acelei camere",
@@ -1640,6 +1662,8 @@ const REO_I18N = {
     ed_columns_helper: "Tomt: 3, eller 2 på smalle skærme",
     ed_zoom: "Detaljeknap",
     ed_zoom_helper: "Kun rum med en måling uden for komfortområdet vises; knappen viser alle rum. Fra: altid alle rum",
+    ed_hide_when_clear: "Skjul, når alt er i orden",
+    ed_hide_when_clear_helper: "Kortet vises kun, når et rum har en måling, der skal tjekkes",
     ed_sort_state: "Rum, der kræver opmærksomhed, først",
     ed_exclude_helper: "Udelades fra felterne, gennemsnittene og rummenes detaljer",
     ed_rooms_helper: "Rækkefølge og tilpasninger: en liste med {area, name, icon, navigation_path, thresholds}, hvor thresholds kun gælder for det rum",
@@ -1656,6 +1680,8 @@ const REO_I18N = {
     ed_columns_helper: "Tomt: 3, eller 2 på smala skärmar",
     ed_zoom: "Detaljknapp",
     ed_zoom_helper: "Bara rum med ett mätvärde utanför komfortintervallet visas; knappen visar alla rum. Av: alltid alla rum",
+    ed_hide_when_clear: "Dölj när allt är i ordning",
+    ed_hide_when_clear_helper: "Kortet visas bara när ett rum har ett mätvärde att kontrollera",
     ed_sort_state: "Rum som behöver ses över först",
     ed_exclude_helper: "Utelämnas från rutorna, medelvärdena och rummens detaljer",
     ed_rooms_helper: "Ordning och anpassningar: en lista med {area, name, icon, navigation_path, thresholds}, där thresholds bara gäller det rummet",
@@ -1672,6 +1698,8 @@ const REO_I18N = {
     ed_columns_helper: "Празно: 3 или 2 на тесни екрани",
     ed_zoom: "Бутон за подробности",
     ed_zoom_helper: "Показват се само стаите със стойност извън диапазона на комфорт; бутонът показва всички стаи. Изключено: винаги всички стаи",
+    ed_hide_when_clear: "Скрий, когато всичко е наред",
+    ed_hide_when_clear_helper: "Картата се показва само когато в стая има стойност за проверка",
     ed_sort_state: "Първо стаите, които изискват внимание",
     ed_exclude_helper: "Пропускат се в плочките, средните стойности и подробностите за стаите",
     ed_rooms_helper: "Ред и персонализиране: списък от {area, name, icon, navigation_path, thresholds}, като thresholds важи само за тази стая",
@@ -1688,6 +1716,8 @@ const REO_I18N = {
     ed_columns_helper: "Пусто: 3 или 2 на узких экранах",
     ed_zoom: "Кнопка подробностей",
     ed_zoom_helper: "Показываются только комнаты с показанием вне диапазона комфорта; кнопка показывает все комнаты. Выключено: всегда все комнаты",
+    ed_hide_when_clear: "Скрывать, когда всё в порядке",
+    ed_hide_when_clear_helper: "Карточка появляется, только когда в комнате есть показание, требующее внимания",
     ed_sort_state: "Сначала комнаты, требующие внимания",
     ed_exclude_helper: "Не учитываются в плитках, средних значениях и подробностях комнат",
     ed_rooms_helper: "Порядок и настройки: список {area, name, icon, navigation_path, thresholds}, где thresholds действует только для этой комнаты",
@@ -1704,6 +1734,8 @@ const REO_I18N = {
     ed_columns_helper: "Порожньо: 3 або 2 на вузьких екранах",
     ed_zoom: "Кнопка подробиць",
     ed_zoom_helper: "Показуються лише кімнати з показником поза діапазоном комфорту; кнопка показує всі кімнати. Вимкнено: завжди всі кімнати",
+    ed_hide_when_clear: "Приховувати, коли все гаразд",
+    ed_hide_when_clear_helper: "Картка з'являється, лише коли в кімнаті є показник, що потребує уваги",
     ed_sort_state: "Спершу кімнати, що потребують уваги",
     ed_exclude_helper: "Не враховуються в плитках, середніх значеннях і подробицях кімнат",
     ed_rooms_helper: "Порядок і налаштування: список {area, name, icon, navigation_path, thresholds}, де thresholds діє лише для цієї кімнати",
@@ -1720,6 +1752,8 @@ const REO_I18N = {
     ed_columns_helper: "Üres: 3, keskeny képernyőn 2",
     ed_zoom: "Részletek gomb",
     ed_zoom_helper: "Csak a komforttartományon kívüli értékkel rendelkező helyiségek jelennek meg; a gomb minden helyiséget megjelenít. Kikapcsolva: mindig minden helyiség",
+    ed_hide_when_clear: "Elrejtés, ha minden rendben",
+    ed_hide_when_clear_helper: "A kártya csak akkor jelenik meg, ha egy helyiségben ellenőrizendő érték van",
     ed_sort_state: "Elöl a figyelmet igénylő helyiségek",
     ed_exclude_helper: "Kimaradnak a csempékből, az átlagokból és a helyiségek részleteiből",
     ed_rooms_helper: "Sorrend és testreszabás: {area, name, icon, navigation_path, thresholds} elemek listája, ahol a thresholds csak az adott helyiségre vonatkozik",
@@ -1736,6 +1770,8 @@ const REO_I18N = {
     ed_columns_helper: "Prázdne: 3, alebo 2 na úzkych obrazovkách",
     ed_zoom: "Tlačidlo podrobností",
     ed_zoom_helper: "Zobrazia sa len miestnosti s hodnotou mimo rozsahu komfortu; tlačidlo zobrazí všetky miestnosti. Vypnuté: vždy všetky miestnosti",
+    ed_hide_when_clear: "Skryť, keď je všetko v poriadku",
+    ed_hide_when_clear_helper: "Karta sa zobrazí len vtedy, keď má miestnosť hodnotu na kontrolu",
     ed_sort_state: "Najprv miestnosti vyžadujúce pozornosť",
     ed_exclude_helper: "Vynechané z dlaždíc, priemerov a podrobností miestností",
     ed_rooms_helper: "Poradie a úpravy: zoznam {area, name, icon, navigation_path, thresholds}, pričom thresholds platí len pre danú miestnosť",
@@ -1752,6 +1788,8 @@ const REO_I18N = {
     ed_columns_helper: "Prázdné: 3, nebo 2 na úzkých obrazovkách",
     ed_zoom: "Tlačítko podrobností",
     ed_zoom_helper: "Zobrazí se jen místnosti s hodnotou mimo rozsah komfortu; tlačítko zobrazí všechny místnosti. Vypnuto: vždy všechny místnosti",
+    ed_hide_when_clear: "Skrýt, když je vše v pořádku",
+    ed_hide_when_clear_helper: "Karta se zobrazí jen tehdy, když má místnost hodnotu ke kontrole",
     ed_sort_state: "Nejprve místnosti vyžadující pozornost",
     ed_exclude_helper: "Vynechané z dlaždic, průměrů a podrobností místností",
     ed_rooms_helper: "Pořadí a úpravy: seznam {area, name, icon, navigation_path, thresholds}, přičemž thresholds platí jen pro danou místnost",
@@ -1768,6 +1806,8 @@ const REO_I18N = {
     ed_columns_helper: "Prazno: 3 ali 2 na ozkih zaslonih",
     ed_zoom: "Gumb za podrobnosti",
     ed_zoom_helper: "Prikazani so samo prostori z vrednostjo zunaj območja udobja; gumb prikaže vse prostore. Izklopljeno: vedno vsi prostori",
+    ed_hide_when_clear: "Skrij, ko je vse v redu",
+    ed_hide_when_clear_helper: "Kartica se prikaže samo, ko ima prostor vrednost za preverjanje",
     ed_sort_state: "Najprej prostori, ki potrebujejo pozornost",
     ed_exclude_helper: "Izpuščeni iz ploščic, povprečij in podrobnosti prostorov",
     ed_rooms_helper: "Vrstni red in prilagoditve: seznam {area, name, icon, navigation_path, thresholds}, pri čemer thresholds velja samo za ta prostor",
@@ -1784,6 +1824,8 @@ const REO_I18N = {
     ed_columns_helper: "Tukšs: 3 vai 2 šauros ekrānos",
     ed_zoom: "Detaļu poga",
     ed_zoom_helper: "Tiek rādītas tikai telpas ar rādījumu ārpus komforta diapazona; poga parāda visas telpas. Izslēgts: vienmēr visas telpas",
+    ed_hide_when_clear: "Paslēpt, kad viss kārtībā",
+    ed_hide_when_clear_helper: "Karte parādās tikai tad, kad telpā ir pārbaudāms rādījums",
     ed_sort_state: "Vispirms telpas, kurām jāpievērš uzmanība",
     ed_exclude_helper: "Netiek ņemti vērā flīzēs, vidējās vērtībās un telpu detaļās",
     ed_rooms_helper: "Secība un pielāgojumi: saraksts ar {area, name, icon, navigation_path, thresholds}, kur thresholds attiecas tikai uz šo telpu",
@@ -1800,6 +1842,8 @@ const REO_I18N = {
     ed_columns_helper: "Κενό: 3 ή 2 σε στενές οθόνες",
     ed_zoom: "Κουμπί λεπτομερειών",
     ed_zoom_helper: "Εμφανίζονται μόνο τα δωμάτια με μέτρηση εκτός του εύρους άνεσης· το κουμπί εμφανίζει όλα τα δωμάτια. Ανενεργό: πάντα όλα τα δωμάτια",
+    ed_hide_when_clear: "Απόκρυψη όταν όλα είναι εντάξει",
+    ed_hide_when_clear_helper: "Η κάρτα εμφανίζεται μόνο όταν ένα δωμάτιο έχει μέτρηση προς έλεγχο",
     ed_sort_state: "Πρώτα τα δωμάτια που χρειάζονται έλεγχο",
     ed_exclude_helper: "Παραλείπονται από τα πλακίδια, τους μέσους όρους και τις λεπτομέρειες των δωματίων",
     ed_rooms_helper: "Σειρά και προσαρμογές: μια λίστα με {area, name, icon, navigation_path, thresholds}, όπου το thresholds ισχύει μόνο για εκείνο το δωμάτιο",
@@ -1814,7 +1858,7 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
   static sceneTheme = "environment";
   static i18n = REO_I18N;
   static needsArea = false;
-  static defaults = { zoom: true, sort: "name", exclude_areas: [], exclude: [], rooms: [] };
+  static defaults = { zoom: true, hide_when_clear: false, sort: "name", exclude_areas: [], exclude: [], rooms: [] };
 
   static getStubConfig() {
     return {};
@@ -1826,6 +1870,7 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
   }
 
   getCardSize() {
+    if (this.hidden) return 0;
     return 1 + Math.ceil((this._items?.length || 1) / 3);
   }
 
@@ -1900,6 +1945,8 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
     const temp = this._average(all, "temperature", 1);
     const hum = this._average(all, "humidity", 0);
     if (!this._changed([this._openArea, this._zoomed, this._total, temp, hum, parts])) return;
+    // hide_when_clear: no room with a reading to check (the rooms the compact view keeps), and at least one room.
+    if (this._hide(c.hide_when_clear && all.length > 0 && all.every((x) => x.rank < RE_RANK.warn))) return;
 
     const illus = this._illustrated();
     if (this._shellOnce(RoomEnvironmentOverviewCard.styles, '<div class="panel" hidden></div><div class="grid"></div>')) {
@@ -2024,7 +2071,7 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
 
 const RoomEnvironmentOverviewCardEditor = rcEditor({
   card: RoomEnvironmentOverviewCard,
-  helpers: ["title", "columns", "zoom", "exclude", ...RC_ADVANCED_HELPERS],
+  helpers: ["title", "columns", "zoom", "hide_when_clear", "exclude", ...RC_ADVANCED_HELPERS],
   schema: (lang, hass, config) => {
     const probe = hass && rcProbe(RoomEnvironmentOverviewCard, hass, { ...config, exclude_areas: [], exclude: [], zoom: false });
     const rooms = probe ? probe._collect() : [];
@@ -2032,7 +2079,7 @@ const RoomEnvironmentOverviewCardEditor = rcEditor({
     for (const id of config?.exclude || []) if (!ids.includes(id)) ids.push(id);
     return [
       ...rcOverviewFields(REO_I18N, lang),
-      ...rcBooleans("show_title", "zoom"),
+      ...rcBooleans("show_title", "zoom", "hide_when_clear"),
       ...rcIllustrationFields(REO_I18N, lang),
       {
         name: "exclude_areas",
