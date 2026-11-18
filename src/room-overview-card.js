@@ -1,6 +1,6 @@
 /**
  * room-overview-card — compact Lovelace card giving an overview of every room:
- * openings and leaks, presence, lights and plugs, one tile per room.
+ * openings, presence, lights and plugs, one tile per room.
  * Tap a room to unfold its details (room-sensors-card, room-lights-card and
  * room-switch-card). Uses src/shared.js. https://github.com/juju35/ha-room-card
  */
@@ -749,7 +749,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       if (!st) continue;
       const dc = st.attributes.device_class;
       if (rcMatchSensor(h, id, { presence: c.presence, outdoor: outdoor(aid) })) {
-        if (RC_OPENING_CLASSES.includes(dc)) room(aid).sensors.push({ id, leak: !!rcAlertKind(dc), alert: rcAlertKind(dc), st });
+        if (RC_OPENING_CLASSES.includes(dc)) room(aid).sensors.push({ id, st });
         else room(aid).presence.push({ id, st });
       } else if (rcMatchLight(h, id)) {
         room(aid).lights.push({ id, st });
@@ -773,11 +773,8 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
           name: o.name ?? area.name ?? x.id,
           icon: o.icon ?? rcRoomIcon(area),
           navigation_path: o.navigation_path,
-          leaks: x.sensors.filter((s) => s.leak && on(s)).length,
-          // The most serious active alarm (smoke, co, gas, leak): it names the room's status.
-          alert: rcTopAlert(x.sensors.filter((s) => s.leak && on(s)).map((s) => s.alert)),
-          open: x.sensors.filter((s) => !s.leak && on(s)).length,
-          // A leak or opening sensor that cannot report is no all-clear: the room needs a look.
+          open: x.sensors.filter(on).length,
+          // An opening sensor that cannot report is no all-clear: the room needs a look.
           unavail: x.sensors.filter((s) => rcUnavailable(s.st)).length,
           occupied: x.presence.some(on),
           lightsOn: x.lights.filter(on).length,
@@ -786,11 +783,11 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
         };
       });
 
-    const rank = (x) => (x.leaks ? 5 : x.open ? 4 : x.unavail ? 3 : x.occupied ? 2 : x.lightsOn || x.plugsOn ? 1 : 0);
+    const rank = (x) => (x.open ? 4 : x.unavail ? 3 : x.occupied ? 2 : x.lightsOn || x.plugsOn ? 1 : 0);
     rcSortRooms(list, c, rank);
     this._total = list.length;
     this._allRooms = list; // the banner's house shows the rooms needing a look, shown or not
-    this._anySensors = list.some((x) => x.sensors.some((e) => !e.leak));
+    this._anySensors = list.some((x) => x.sensors.length);
     if (rcCompact(this)) list = list.filter((x) => rank(x) > 0 || x.id === this._openArea);
     return list;
   }
@@ -798,7 +795,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
   // The banner's cutaway house: its four rooms (bedroom, bathroom, living room, kitchen) stand for the home's rooms
   // needing a look most, each in the room of its own type when there is one, else in a free one.
   _sceneState() {
-    const rank = (x) => (x.leaks ? 5 : x.open || x.unavail ? 4 : x.occupied ? 2 : x.lightsOn ? 1 : 0);
+    const rank = (x) => (x.open || x.unavail ? 4 : x.occupied ? 2 : x.lightsOn ? 1 : 0);
     const rooms = [...(this._allRooms || [])].sort((a, b) => rank(b) - rank(a)).slice(0, 4);
     const kinds = [["bedroom", "kids"], ["bathroom", "toilets"], ["living", "dining", "office"], ["kitchen", "laundry"]];
     const slots = [null, null, null, null];
@@ -811,19 +808,14 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     }
     for (const x of left) slots[slots.indexOf(null)] = x;
     return {
-      slots: slots.map((x) => x && { alert: x.leaks > 0, warn: !x.leaks && (x.open > 0 || x.unavail > 0), presence: x.occupied, light: x.lightsOn > 0 }),
+      slots: slots.map((x) => x && { warn: x.open > 0 || x.unavail > 0, presence: x.occupied, light: x.lightsOn > 0 }),
     };
   }
 
   _roomState(x) {
-    if (x.leaks || x.open || x.unavail) {
-      return {
-        lvl: x.leaks ? "alert" : "warn",
-        text: this._openingStatus(x.leaks, x.open, false, "all_quiet", x.unavail, x.alert),
-      };
-    }
+    if (x.open || x.unavail) return { lvl: "warn", text: this._openingStatus(x.open, false, "all_quiet", x.unavail) };
     if (x.occupied) return { lvl: "info", text: this._t("presence") };
-    return { lvl: "ok", text: this._openingStatus(0, 0, x.sensors.some((e) => !e.leak)) };
+    return { lvl: "ok", text: this._openingStatus(0, x.sensors.length > 0) };
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -834,7 +826,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     this._rooms = rooms;
 
     // The sensor count too: a door added to an idle room turns "All quiet" into "All closed" without any state change.
-    const parts = rooms.map((x) => [x.id, x.name, x.icon, x.leaks, x.alert, x.open, x.occupied, x.lightsOn, x.plugsOn, x.watts && Math.round(x.watts), x.sensors.length, x.unavail]);
+    const parts = rooms.map((x) => [x.id, x.name, x.icon, x.open, x.occupied, x.lightsOn, x.plugsOn, x.watts && Math.round(x.watts), x.sensors.length, x.unavail]);
     if (!this._changed([this._openArea, this._zoomed, this._anySensors, parts])) return;
 
     const illus = this._illustrated();
@@ -888,17 +880,15 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       });
     }
 
-    const leaks = rooms.reduce((t, x) => t + x.leaks, 0);
     const open = rooms.reduce((t, x) => t + x.open, 0);
     const unavail = rooms.reduce((t, x) => t + x.unavail, 0);
     const lights = rooms.reduce((t, x) => t + x.lightsOn, 0);
     const plugs = rooms.reduce((t, x) => t + x.plugsOn, 0);
     const watts = rooms.some((x) => x.watts != null) ? rooms.reduce((t, x) => t + (x.watts ?? 0), 0) : null;
     const occupied = rooms.filter((x) => x.occupied).length;
-    const level = leaks ? "alert" : open || unavail ? "warn" : "ok";
-    const alert = rcTopAlert(rooms.filter((x) => x.leaks).map((x) => x.alert));
-    const status = this._openingStatus(leaks, open, this._anySensors, "all_quiet", unavail, alert);
-    const headIcon = leaks ? RC_ALERT_KINDS[alert].on : open || unavail ? "mdi:home-alert-outline" : "mdi:home-outline";
+    const level = open || unavail ? "warn" : "ok";
+    const status = this._openingStatus(open, this._anySensors, "all_quiet", unavail);
+    const headIcon = level === "warn" ? "mdi:home-alert-outline" : "mdi:home-outline";
 
     const chip = (cls, icon, label, text) =>
       `<span class="chip ${cls}" title="${rcEsc(label)}"><ha-icon icon="${icon}"></ha-icon>${text ? `<span>${rcEsc(text)}</span>` : ""}</span>`;
@@ -943,7 +933,6 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       const s = this._roomState(x);
       // Chips only add what the state line does not already say.
       const chips = [
-        x.leaks && x.open ? chip("warn", "mdi:door-open", this._tn("open", x.open), String(x.open)) : "",
         x.occupied && s.lvl !== "info" ? chip("info", "mdi:account", this._t("presence")) : "",
         x.lightsOn ? chip("light", "mdi:lightbulb", this._t("lights_on"), String(x.lightsOn)) : "",
         x.plugsOn
@@ -1082,7 +1071,6 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       ha-card { container-type: inline-size; position: relative; }
       ha-card.lvl-ok    { --c: var(--rc-ok); }
       ha-card.lvl-warn  { --c: var(--rc-warn); }
-      ha-card.lvl-alert { --c: var(--rc-alert); }
 
       :where(button.chip) { all: unset; }
       .chip { --k: var(--rc-idle); flex: none; display: inline-flex; align-items: center; gap: 2px; height: 18px; padding: 0 5px;
@@ -1091,7 +1079,6 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       .head .chip { height: 20px; padding: 0 6px; font-size: 11px; }
       .chip ha-icon { --mdc-icon-size: 12px; }
       .chip:not(:has(span)) { width: 18px; padding: 0; justify-content: center; }
-      .chip.alert { --k: var(--rc-alert); }
       .chip.warn  { --k: var(--rc-warn); }
       .chip.info  { --k: var(--rc-info); }
       .chip.light { --k: var(--rc-light); }
@@ -1135,9 +1122,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
 
       .room { --t: var(--rc-idle); }
       .room.lvl-warn  { --t: var(--rc-warn); }
-      .room.lvl-alert { --t: var(--rc-alert); }
       .room.lvl-info  { --t: var(--rc-info); }
-      .room.lvl-alert .ic { animation: rc-blink 1.5s ease-in-out infinite; }
       .chips { gap: 3px; margin-top: 4px; }
 
       .panel > * + * { border-top: 1px solid var(--divider-color, rgba(127,127,127,.15)); }
@@ -1191,5 +1176,5 @@ rcRegister(
   RoomOverviewCard,
   RoomOverviewCardEditor,
   "Room Overview Card",
-  "Every room at a glance: openings, leaks, presence, lights and plugs; tap a room for its details",
+  "Every room at a glance: openings, presence, lights and plugs; tap a room for its details",
 );

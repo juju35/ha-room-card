@@ -137,7 +137,7 @@ test("Mini cards: a chip with a long name ends with an ellipsis inside the card"
 test("Overview: on a narrow card the header chips go to a line of their own", () => {
   const css = styles("room-overview-card");
   // Up to 420 px: just above 340 px (a phone in masonry, 367-410 px) the chips stayed beside the title and the
-  // status pill took all the shrinking ("Water leak" down to "…").
+  // status pill took all the shrinking ("2 unavailable" down to "…").
   const narrow = container(css, 420, ".hchips");
   assert.match(narrow, /\.head \{[^}]*flex-wrap: wrap/);
   assert.match(narrow, /\.hchips \{[^}]*flex: 1 0 100%/);
