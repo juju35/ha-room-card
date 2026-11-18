@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.1 - 2026-11-18
+
+### Fixes
+- Illustrated header: `illustration_theme: auto` now follows the Home Assistant theme alone — a light theme keeps the day picture after sunset, a dark theme still shows the night one.
+
 ## 2.0.0 - 2026-11-18
 
 ### Breaking changes

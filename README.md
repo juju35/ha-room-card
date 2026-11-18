@@ -225,7 +225,7 @@ The Sensors, Lights, Plugs and Environment cards share these options; each card 
 | `hide_when_off` | ❌ | `false` | Lights and Plugs cards: hide the whole card when everything is off |
 | `all_off_button` | ❌ | Lights `true`, Plugs `false` | Lights and Plugs cards: the status pill turns everything of the card off when tapped (off by default on Plugs: a plug may feed a camera or a network switch) |
 | `illustration` | ❌ | `true` | Animated illustrated header (90 px, also on the mini cards): the title and status on the left, a picture of the card's theme drawn from its entities on the right, over a 10 px floor strip. `false` keeps the classic header |
-| `illustration_theme` | ❌ | `auto` | `auto` (night after sunset from `sun.sun` or with a dark theme, even while the sun is up), `day` or `night` |
+| `illustration_theme` | ❌ | `auto` | `auto` (follows the Home Assistant theme: night with a dark theme, day with a light theme), `day` or `night` |
 | `room_type` | ❌ | `auto` | Sensors, Plugs and Environment cards: the room of the picture (wall colour, furniture silhouette, floor: tiles, concrete or parquet) — `living`, `bedroom`, `kids`, `kitchen`, `dining`, `bathroom`, `toilets`, `hallway`, `entry`, `office`, `laundry`, `garage`, or `none` for the card's theme alone; `auto` guesses it from the area's name or icon. The Lights card keeps the light theme alone |
 | `language` | ❌ | Auto | Force language: `en`, `fr`, `de`, `es`, `sr`, `sr-Latn`, `it`, `nl`, `pt`, `pl`, `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv` or `el` (auto-detects from HA settings); also on the Overview card |
 
@@ -275,7 +275,7 @@ rooms:
 | `presence` | ❌ | `true` | Include the presence and motion sensors, camera detections included (pets never, vehicles only in outdoor rooms) |
 | `zoom` | ❌ | `true` | Show only the rooms with something open, on or detected, with a detail button showing every room; `false` shows every room, always |
 | `illustration` | ❌ | `true` | Illustrated header: a cutaway house whose four rooms show the state of the home's rooms needing a look (someone there, light on, open); `false` keeps the classic header |
-| `illustration_theme` | ❌ | `auto` | `auto` (night after sunset or with a dark theme, even while the sun is up), `day` or `night` |
+| `illustration_theme` | ❌ | `auto` | `auto` (follows the Home Assistant theme: night with a dark theme, day with a light theme), `day` or `night` |
 | `all_off_button` | ❌ | `true` | Tapping the lights chip of the header turns every light the card counts off |
 | `plugs_off_button` | ❌ | `false` | Tapping the plugs chip of the header opens a confirmation listing every plug the card counts that is on, and turns them off on OK (Cancel, Escape or a tap outside do nothing); the Plugs card of the room details gets its turn-everything-off pill too, behind the same confirmation. Off by default: a plug may feed a camera or a network switch, leave those out with `exclude` |
 | `exclude_areas` | ❌ | — | Rooms left out; the visual editor only offers the rooms the card finds |
@@ -709,7 +709,7 @@ rooms:
 | `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing a look first |
 | `zoom` | ❌ | `true` | Show only the rooms with a reading outside the comfort range, with a detail button showing every room; `false` shows every room, always |
 | `illustration` | ❌ | `true` | Illustrated header: the home's worst reading (else its average temperature and humidity) on a wall sensor; `false` keeps the classic header |
-| `illustration_theme` | ❌ | `auto` | `auto` (night after sunset or with a dark theme, even while the sun is up), `day` or `night` |
+| `illustration_theme` | ❌ | `auto` | `auto` (follows the Home Assistant theme: night with a dark theme, day with a light theme), `day` or `night` |
 | `thresholds` | ❌ | See [Thresholds](#thresholds) | Comfort limits per kind, also used by the unfolded room |
 | `exclude_areas` | ❌ | — | Rooms left out; the visual editor only offers the rooms the card finds |
 | `exclude` | ❌ | — | Sensors left out of the tiles, the averages and the room details |
