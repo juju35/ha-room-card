@@ -17,7 +17,7 @@ Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, pl
 | Card | Type | What it shows |
 |---|---|---|
 | [Overview](#overview) | `custom:room-overview-card` | Every room at a glance: one tile per room, tap a room to unfold its sensors, lights and plugs. |
-| [Sensors](#sensors) | `custom:room-sensors-card` | Leak, smoke, gas, door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open. |
+| [Sensors](#sensors) | `custom:room-sensors-card` | Door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open. |
 | [Sensors mini](#sensors-mini) | `custom:room-sensors-mini-card` | The same sensors on two lines, with a zoom to the full card. |
 | [Lights](#lights) | `custom:room-lights-card` | Lights of a room: tap to toggle, drag to dim, turn everything off from the header. |
 | [Lights mini](#lights-mini) | `custom:room-lights-mini-card` | The same lights on two lines: how many are on, a button to turn them all off, a zoom to the full card. |
@@ -39,27 +39,26 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 
 `custom:room-overview-card` — Every room at a glance: one tile per room, tap a room to unfold its sensors, lights and plugs.
 
-- One compact tile per room, coloured by what matters most: *Water leak* (red, blinking), *1 open* (orange), *Presence* (blue), otherwise *All closed* / *All quiet*
+- One compact tile per room, coloured by what matters most: *1 open* (orange), *Presence* (blue), otherwise *All closed* / *All quiet*
 - Small chips on each tile for the lights that are on, the plugs that are on with their power draw, and presence when an alert is already shown
 - Header with the home status and totals: occupied rooms, lights on, power drawn by the plugs; on a narrow card (6 columns of a Sections view) the totals move to a line of their own under the title
 - **Tap** the lights chip of the header to turn every light the card counts off (`all_off_button`), and the plugs chip to turn every plug off once confirmed in a popup listing them (`plugs_off_button`, off by default: a plug may feed a camera or a network switch)
 - **Tap** a room to unfold its details at the top of the card: the Sensors, Lights and Plugs cards of that room; tap it again or anywhere else to fold it back
-- Automatic discovery: every area with door, window, leak or presence sensors, lights or plugs becomes a room, with an icon picked from its name
-- Same rules as the room cards: hidden entities are skipped, and so are light groups and the configuration and diagnostic entities of lights and plugs (door, window, leak and presence sensors count whatever their category); light switches count as lights
+- Automatic discovery: every area with door, window or presence sensors, lights or plugs becomes a room, with an icon picked from its name
+- Same rules as the room cards: hidden entities are skipped, and so are light groups and the configuration and diagnostic entities of lights and plugs (door, window and presence sensors count whatever their category); light switches count as lights
 - Only the rooms with something open, on, detected or unavailable show; the **detail** button (top right) shows every room, and back, as does a click anywhere else (`zoom: false`: every room, always, no button); `sort: state` lists the rooms needing attention first
 
 ### Sensors
 
-`custom:room-sensors-card` — Leak, smoke, gas, door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open.
+`custom:room-sensors-card` — Door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open. Smoke, carbon monoxide, gas and water leak detectors are left to [ha-safety-card](https://github.com/juju35/ha-safety-card).
 
-- Header with an icon and a status pill coloured by the room state: *All closed* (green), *1 open* (orange), *Water leak* (red, pulsing); a leak or opening sensor that is unavailable is no all-clear: *1 unavailable* (orange)
-- Smoke, carbon monoxide and gas detectors read *Clear* / *Detected* (Home Assistant's own wording), never *Closed*; an active one is an alarm like a leak (red, *Smoke detected*)
-- Open sensors listed first, alarms (leak, smoke, CO, gas) before doors and windows, with a blinking icon and how long they have been open
+- Header with an icon and a status pill coloured by the room state: *All closed* (green), *1 open* (orange); an opening sensor that is unavailable is no all-clear: *1 unavailable* (orange)
+- Open sensors listed first, doors and windows before presence, with a blinking icon and how long they have been open
 - Presence and motion sensors in blue (*Detected* / *Clear*), with a person icon next to the pill while someone is in the room; they are not alerts and never blink
 - Icon picked from the sensor: sliding door, window, door, garage door, water drop, person, motion sensor
 - Clean names: the `Sensor` / `Capteur` prefix, the area name and the trailing device-class word are removed (*Capteur Porte Fenêtre Cuisine Porte* → *Porte Fenêtre Cuisine*)
 - **Tiles layout** (`layout: tiles`): one large tile per sensor, the size of Home Assistant's Tile card, easier to tap on a phone
-- Show only the open or active sensors (`only_alerts`), or hide the whole card when everything is closed, dry, reporting and nobody is there (`hide_when_clear`)
+- Show only the open or active sensors (`only_alerts`), or hide the whole card when everything is closed, reporting and nobody is there (`hide_when_clear`)
 - Tap a sensor to open its details
 - Automatic discovery from the area, or an explicit list with name and icon overrides
 
@@ -67,8 +66,8 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 
 `custom:room-sensors-mini-card` — Only what is open or detected, for a compact dashboard; zoom in for every sensor.
 
-- Room badge coloured like the Sensors card, the title and the status (*1 open*, *Water leak*) on the first line
-- On the second line, a tinted pill with its name for each open, leaking or detecting sensor (blinking unless `blink: false`); quiet sensors are hidden, so a quiet room is a single line
+- Room badge coloured like the Sensors card, the title and the status (*1 open*, *1 unavailable*) on the first line
+- On the second line, a tinted pill with its name for each open or detecting sensor (blinking unless `blink: false`); quiet sensors are hidden, so a quiet room is a single line
 - **Zoom** button (top right) switches the card to the full [Sensors card](#sensors) — every sensor, with how long it has been open — and back, as does a click anywhere else (`zoom: false` removes it)
 - Same discovery and options as the Sensors card: `hide_when_clear` (compact view only), `presence`, `blink`, `include` / `exclude`
 - Tap a sensor to open its details
@@ -272,10 +271,10 @@ rooms:
 | `title` | ❌ | `Home` | Card title |
 | `show_title` | ❌ | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `columns` | ❌ | `3` | Number of room columns (1–6); on a card of 340 px or less at most 2, and 1 at 260 px or less (6 columns of a Sections view on a phone) |
-| `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing attention first (leak, open, unavailable sensor, presence, something on) |
+| `sort` | ❌ | `name` | `name`, or `state` to list the rooms needing attention first (open, unavailable sensor, presence, something on) |
 | `presence` | ❌ | `true` | Include the presence and motion sensors, camera detections included (pets never, vehicles only in outdoor rooms) |
 | `zoom` | ❌ | `true` | Show only the rooms with something open, on or detected, with a detail button showing every room; `false` shows every room, always |
-| `illustration` | ❌ | `true` | Illustrated header: a cutaway house whose four rooms show the state of the home's rooms needing a look (someone there, light on, open, leak); `false` keeps the classic header |
+| `illustration` | ❌ | `true` | Illustrated header: a cutaway house whose four rooms show the state of the home's rooms needing a look (someone there, light on, open); `false` keeps the classic header |
 | `illustration_theme` | ❌ | `auto` | `auto` (follows the Home Assistant theme: night with a dark theme, day with a light theme), `day` or `night` |
 | `all_off_button` | ❌ | `true` | Tapping the lights chip of the header turns every light the card counts off |
 | `plugs_off_button` | ❌ | `false` | Tapping the plugs chip of the header opens a confirmation listing every plug the card counts that is on, and turns them off on OK (Cancel, Escape or a tap outside do nothing); the Plugs card of the room details gets its turn-everything-off pill too, behind the same confirmation. Off by default: a plug may feed a camera or a network switch, leave those out with `exclude` |
@@ -332,7 +331,7 @@ columns: 2
 
 #### Alerts only
 
-Shows only what is open, leaking or detecting someone, and hides the card when the room is idle:
+Shows only what is open or detecting someone, and hides the card when the room is idle:
 
 ```yaml
 type: custom:room-sensors-card
@@ -347,8 +346,8 @@ In addition to the [common options](#common-options):
 
 | Option | Required | Default | Description |
 |---|---|---|---|
-| `only_alerts` | ❌ | `false` | Show only the open, leaking, active (presence detected) or unavailable sensors |
-| `hide_when_clear` | ❌ | `false` | Hide the whole card when everything is closed, dry and reporting and no presence is detected (never while a leak or opening sensor is unavailable) |
+| `only_alerts` | ❌ | `false` | Show only the open, active (presence detected) or unavailable sensors |
+| `hide_when_clear` | ❌ | `false` | Hide the whole card when everything is closed and reporting and no presence is detected (never while an opening sensor is unavailable) |
 | `presence` | ❌ | `true` | Include the presence and motion sensors of the area |
 | `outdoor` | ❌ | from the area name | Outdoor room: camera vehicle detections are shown too (see the rules above). The visual editor shows the guess from the area name while the option is unset, and only writes it when changed |
 | `blink` | ❌ | `true` | Blink the icon of open sensors (also stops when the system asks for reduced motion) |
@@ -731,12 +730,6 @@ Open doors and windows blink (`rc-blink`) until they are closed; `blink: false` 
 
 | Light | Dark |
 |---|---|
-| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-alert.gif" alt="Water leak alert" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-alert-dark.gif" alt="Water leak alert, dark theme" width="400"> |
-
-A water leak pulses the header badge (`rc-pulse`) while the leaking sensor blinks.
-
-| Light | Dark |
-|---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-dim.gif" alt="Drag to dim" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/lights-dim-dark.gif" alt="Drag to dim, dark theme" width="400"> |
 
 Dragging a dimmable light sideways sets its brightness, the bar and the percentage following the finger.
@@ -750,12 +743,12 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 
 ### Sensors
 
-| A door open | Water leak |
-|---|---|
-| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open.png" alt="A door open" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-leak.png" alt="Water leak" width="400"> |
-| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open-dark.png" alt="A door open dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-leak-dark.png" alt="Water leak dark" width="400"> |
-| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-open.png" alt="Mini a door open" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-leak.png" alt="Mini water leak" width="400"> |
-| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-open-dark.png" alt="Mini a door open dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-leak-dark.png" alt="Mini water leak dark" width="400"> |
+| A door open |
+|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open.png" alt="A door open" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-open-dark.png" alt="A door open dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-open.png" alt="Mini a door open" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/sensors-mini-open-dark.png" alt="Mini a door open dark" width="400"> |
 
 | Mini card zoomed in | |
 |---|---|
@@ -829,20 +822,20 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 
 The card goes through every entity with an area (set on the entity or on its device), with the same rules as the room cards:
 
-- **Sensors**: `binary_sensor` with device class `moisture`, `smoke`, `carbon_monoxide`, `gas`, `door`, `window`, `opening` or `garage_door`
+- **Sensors**: `binary_sensor` with device class `door`, `window`, `opening` or `garage_door`
 - **Presence**: `binary_sensor` with device class `occupancy`, `presence` or `motion`, camera detections included except pets, and vehicles outside the outdoor rooms
 - **Lights**: every `light` except light groups, and every `switch` whose name contains *lumière*, *lampe*, *lamp*, *light*, *veilleuse* or *guirlande*
 - **Plugs**: every other `switch` with device class `outlet`, or whose name contains *prise*, *multiprise*, *plug*, *outlet* or *socket*, with the power sensor of the same device
 
-Hidden entities are skipped, and so are the configuration and diagnostic entities of lights and plugs (an indicator LED, say); door, window, leak and presence sensors count whatever their entity category, like on the Sensors card. A room is shown when it has at least one of them.
+Hidden entities are skipped, and so are the configuration and diagnostic entities of lights and plugs (an indicator LED, say); door, window and presence sensors count whatever their entity category, like on the Sensors card. A room is shown when it has at least one of them.
 
-A tile shows the most important state of the room: a wet leak sensor, then open doors and windows, then presence, otherwise *All closed* (or *All quiet* for a room without door or window sensors). The details of a room are the Sensors, Lights and Plugs cards of that area, for the kinds of entities the room has.
+A tile shows the most important state of the room: open doors and windows, then presence, otherwise *All closed* (or *All quiet* for a room without door or window sensors). The details of a room are the Sensors, Lights and Plugs cards of that area, for the kinds of entities the room has.
 
 ### Sensors
 
-The card keeps every `binary_sensor` of the area whose device class is `moisture`, `smoke`, `carbon_monoxide`, `gas`, `door`, `window`, `opening` or `garage_door`, and with `presence` (the default) `occupancy`, `presence` or `motion` (the area set on the entity, or on its device). Hidden entities are skipped. Camera detections count too (motion, person, line crossing), except the pet detections, and the vehicle detections outside an outdoor room: a sensor whose entity ID or name says *pet*, *animal*, *dog*, *cat* (*chien*, *chat*), or *vehicle*, *véhicule*, *car* (*voiture*). A room is outdoor when its name says *jardin*, *terrasse*, *balcon*, *patio*, *extérieur*, *cour*, *allée*, *porche*, *portail*, *parking*, *garden*, *terrace*, *balcony*, *outdoor*, *outside*, *yard*, *driveway*, *porch* or *gate*; `outdoor: true` / `false` overrides it. Leave out any other sensor with `exclude`.
+The card keeps every `binary_sensor` of the area whose device class is `door`, `window`, `opening` or `garage_door`, and with `presence` (the default) `occupancy`, `presence` or `motion` (the area set on the entity, or on its device). Hidden entities are skipped. Camera detections count too (motion, person, line crossing), except the pet detections, and the vehicle detections outside an outdoor room: a sensor whose entity ID or name says *pet*, *animal*, *dog*, *cat* (*chien*, *chat*), or *vehicle*, *véhicule*, *car* (*voiture*). A room is outdoor when its name says *jardin*, *terrasse*, *balcon*, *patio*, *extérieur*, *cour*, *allée*, *porche*, *portail*, *parking*, *garden*, *terrace*, *balcony*, *outdoor*, *outside*, *yard*, *driveway*, *porch* or *gate*; `outdoor: true` / `false` overrides it. Leave out any other sensor with `exclude`. Smoke, carbon monoxide, gas and water leak detectors are left to [ha-safety-card](https://github.com/juju35/ha-safety-card).
 
-The room is **in alert** when a sensor is open (orange) and **critical** when a leak sensor is wet or a smoke, carbon monoxide or gas detector goes off (red; the status names the most serious alarm: smoke, then CO, then gas, then the leak). Those detectors show Home Assistant's own state (*Clear* / *Detected*, *Non détecté* / *Détecté* in French), not *Open* / *Closed*. Presence and motion are information, not alerts: shown in blue, they never change the header colour. Wet leak sensors come first, then open doors and windows, then detected presence, then the others by name. The icon follows the sensor: a sensor whose entity ID contains `porte_fenetre`, `baie`, `sliding` or `patio` gets a sliding door, whatever its device class (garage doors, leak, presence and motion sensors excepted), a `window` sensor (or a `door` sensor with `fenetre` / `window` in its ID) gets a window.
+The room is **in alert** when a sensor is open or unavailable (orange). Presence and motion are information, not alerts: shown in blue, they never change the header colour. Open doors and windows come first, then detected presence, then the others by name. The icon follows the sensor: a sensor whose entity ID contains `porte_fenetre`, `baie`, `sliding` or `patio` gets a sliding door, whatever its device class (garage doors, presence and motion sensors excepted), a `window` sensor (or a `door` sensor with `fenetre` / `window` in its ID) gets a window.
 
 ### Lights
 

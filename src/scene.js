@@ -3,7 +3,7 @@
 // and the status on the left, over the room's wall colour, a 200 × 80 scene on the right and a 10 px floor strip
 // edge to edge at the bottom. Two layers:
 // - the card's own theme, always there and drawn from the card's real state: pendant lamps (lights), door, window,
-//   motion detector and leak puck (sensors), wall sensor, window and plant (environment), electrical panel and plugs
+//   motion detector (sensors), wall sensor, window and plant (environment), electrical panel and plugs
 //   (plugs), a cutaway house with four rooms (overview);
 // - the room type (`room_type`, guessed from the area's name or icon, `none` for the theme alone): wall colour, a
 //   faint silhouette of the room's typical furniture and the floor (tiles, concrete or parquet). The Lights card
@@ -105,8 +105,6 @@ const rcGhost = (type, n) => {
   const g = RC_GHOSTS[type];
   return g ? `<g fill="${rcPick(n, "#5c4a3a", "#ffffff")}" color="${rcPick(n, "#5c4a3a", "#ffffff")}" opacity="${rcPick(n, 0.09, 0.07)}">${g}</g>` : "";
 };
-// A falling drop (leak), its tip at (x, y).
-const rcDrop = (x, y, fill, cls = "sc-drip") => `<path class="${cls}" d="M${x} ${y} q-3 4 0 6 q3 -2 0 -6z" fill="${fill}"/>`;
 // A person standing, feet at (x, y).
 const rcPerson = (x, y, fill) =>
   `<g transform="translate(${x} ${y})" fill="${fill}"><circle cy="-30" r="4.4"/><path d="M-5 -24 h10 l2 14 h-3 l-1 10 h-3 l-1 -10 h-1 l-1 10 h-3 l-1 -10 h-3z"/></g>`;
@@ -145,10 +143,8 @@ const rcSceneLights = (s, n) => {
 };
 
 // Sensors: the door and its contact, the window and its contact, the motion detector (its beam and someone walking
-// in when it detects), the leak puck (a puddle and a red LED on a leak), smoke under the ceiling on a smoke, CO or
-// gas alarm.
+// in when it detects).
 const rcSceneSensors = (s, n) => {
-  const leak = s.leak;
   const door = `<g transform="translate(108 76)"><rect x="-15" y="-64" width="30" height="64" fill="${rcPick(n, "#6d4c3d", "#3a3040")}"/>${
     s.door ? `<rect x="-12" y="-61" width="24" height="61" fill="${rcPick(n, "#fff4d6", "#d8c48a")}" opacity="${rcPick(n, 0.8, 0.35)}"/>` : ""
   }<g transform="translate(-12 0) scale(${s.door ? 0.42 : 1} 1) translate(12 0)"><rect x="-12" y="-61" width="24" height="61" fill="${rcPick(n, "#8a5a3a", "#4a3a30")}"/><circle cx="8" cy="-30" r="1.4" fill="#d4b26a"/></g>${rcContact(15, -50, s.door)}</g>`;
@@ -158,18 +154,7 @@ const rcSceneSensors = (s, n) => {
   const motion = `<g transform="translate(194 6)"><path d="M0 0 h-9 v7 q4.5 4.5 9 0z" fill="${rcPick(n, "#fff", "#3d475c")}" stroke="#9aa3ae" stroke-width=".6"/><circle cx="-4.5" cy="7" r="1.6" fill="${s.motion ? "#2f80ed" : "#2a3038"}"/>${
     s.motion ? '<path class="sc-pir" d="M-5 10 L-46 74 H-6Z" fill="#2f80ed"/>' : ""
   }</g>${s.motion ? rcPerson(164, 76, rcPick(n, "#5f6b7a", "#8fa3c4")) : ""}`;
-  const puck = `<g transform="translate(186 76)">${leak ? '<ellipse class="sc-puddle" cx="-4" cy="0" rx="18" ry="3.6" fill="#4fb3e8" opacity=".55"/>' : ""}<ellipse rx="7" ry="2.6" fill="${rcPick(n, "#fff", "#3d475c")}" stroke="${leak ? "#e5484d" : "#9aa3ae"}" stroke-width="${leak ? 1 : 0.6}"/><circle class="${leak ? "sc-blink" : ""}" cx="3" cy="-.6" r="${leak ? 1.3 : 0.8}" fill="${leak ? "#e5484d" : "#43c463"}"/>${leak ? rcDrop(-1, -12, "#4fb3e8") : ""}</g>`;
-  const smoke = s.smoke
-    ? `<g class="sc-smoke" fill="${rcPick(n, "#b4b2a9", "#6a6f7a")}" opacity=".5">${[
-        [124, 14, 10],
-        [142, 10, 12],
-        [160, 16, 10],
-        [138, 22, 9],
-      ]
-        .map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`)
-        .join("")}</g>`
-    : "";
-  return `${door}${rcWindow(140, 12, 34, 36, n, { open: s.window ? 1 : 0 })}<g transform="translate(140 12)">${rcContact(34, 12, s.window)}</g>${breeze}${smoke}${motion}${puck}`;
+  return `${door}${rcWindow(140, 12, 34, 36, n, { open: s.window ? 1 : 0 })}<g transform="translate(140 12)">${rcContact(34, 12, s.window)}</g>${breeze}${motion}`;
 };
 
 // Environment: the window (sun or moon; snow when cold, mist and drops when humid, a strong sun and its beam when
@@ -267,8 +252,8 @@ const rcScenePlugs = (s, n) => {
 };
 
 // Overview: a cutaway house (two floors, four rooms: bedroom, bathroom, living room, kitchen), each room showing the
-// state of the home's room it stands for: blue and someone there (presence), a warm glow (light on), amber (open),
-// red with a drip, a puddle and an alert badge (leak, smoke, CO, gas).
+// state of the home's room it stands for: blue and someone there (presence), a warm glow (light on), amber and an
+// alert badge (open or unavailable).
 const RC_HOUSE_SLOTS = [
   [98, 28, 46, 22],
   [146, 28, 46, 22],
@@ -279,8 +264,7 @@ const rcSlotState = (slot, st, n) => {
   if (!st) return "";
   const [x, y, w, h] = slot;
   const out = [];
-  if (st.alert) out.push(`<rect class="sc-alarm" x="${x}" y="${y}" width="${w}" height="${h}" fill="#e5484d" opacity="${rcPick(n, 0.2, 0.3)}"/>`);
-  else if (st.warn) out.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#f5b400" opacity="${rcPick(n, 0.16, 0.24)}"/>`);
+  if (st.warn) out.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#f5b400" opacity="${rcPick(n, 0.16, 0.24)}"/>`);
   else if (st.presence) out.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#4fb3e8" opacity="${rcPick(n, 0.16, 0.22)}"/>`);
   if (st.light) out.push(`<ellipse class="sc-glow2" cx="${x + w / 2}" cy="${y + h / 2 + 2}" rx="${w / 2 - 2}" ry="${h / 2 + 1}" fill="#ffd27a" opacity="${rcPick(n, 0.3, 0.4)}"/>`);
   if (st.presence) {
@@ -290,16 +274,11 @@ const rcSlotState = (slot, st, n) => {
       `<g transform="translate(${px} ${py})"><circle cy="-8" r="2.6" fill="#2f80ed"/><path d="M-4 2 q0 -6 4 -6 q4 0 4 6z" fill="#2f80ed"/><circle class="sc-ping" cy="-4" r="6" fill="none" stroke="#2f80ed" stroke-width=".8"/></g>`,
     );
   }
-  if (st.alert) {
-    out.push(
-      `${rcDrop(x + Math.round(w * 0.28), y + h - 15, "#2f80ed")}<ellipse cx="${x + Math.round(w * 0.45)}" cy="${y + h - 1}" rx="9" ry="1.2" fill="#4fb3e8" opacity=".85"/>`,
-    );
-  }
-  if (st.alert || st.warn) {
+  if (st.warn) {
     const bx = x + w - 4;
     const by = y + 4;
     out.push(
-      `<circle class="sc-blink" cx="${bx}" cy="${by}" r="3.2" fill="${st.alert ? "#e5484d" : "#f5b400"}"/><path d="M${bx} ${by - 1.8} v2.2 M${bx} ${by + 1.6} v.3" stroke="#fff" stroke-width=".9" stroke-linecap="round"/>`,
+      `<circle class="sc-blink" cx="${bx}" cy="${by}" r="3.2" fill="#f5b400"/><path d="M${bx} ${by - 1.8} v2.2 M${bx} ${by + 1.6} v.3" stroke="#fff" stroke-width=".9" stroke-linecap="round"/>`,
     );
   }
   return out.join("");
@@ -442,37 +421,30 @@ const RC_BANNER_STYLES = `
   ha-card > .banner + .grid, ha-card > .banner + .rs { margin-top: 10px; }
   .rc-scene .sc-blink { animation: sc-blink 1.2s steps(2) infinite; }
   .rc-scene .sc-flow { stroke-dasharray: 3 4; animation: sc-flow 1s linear infinite; }
-  .rc-scene .sc-drip { animation: sc-drip 1.6s ease-in infinite; }
   .rc-scene .sc-glow { transform-box: fill-box; transform-origin: center; animation: sc-glow 3s ease-in-out infinite; }
   .rc-scene .sc-g1 { animation-delay: -1s; } .rc-scene .sc-g2 { animation-delay: -2s; }
   .rc-scene .sc-glow2 { animation: sc-glow2 4s ease-in-out infinite; }
-  .rc-scene .sc-alarm { animation: sc-blink-soft 1.4s ease-in-out infinite; }
   .rc-scene .sc-breeze path, .rc-scene .sc-haze { animation: sc-wave 3s ease-in-out infinite; }
   .rc-scene .sc-pir { opacity: .14; animation: sc-pir 2s ease-in-out infinite; }
-  .rc-scene .sc-puddle { transform-box: fill-box; transform-origin: center; animation: sc-puddle 2.4s ease-in-out infinite; }
   .rc-scene .sc-snow { animation: sc-snow 2.4s linear infinite; }
   .rc-scene .sc-pp { animation: sc-float 6s ease-in-out infinite; }
   .rc-scene .sc-p1 { animation-delay: -1.5s; } .rc-scene .sc-p2 { animation-delay: -3s; } .rc-scene .sc-p3 { animation-delay: -4.5s; }
   .rc-scene .sc-beam { animation: sc-blink-soft 5s ease-in-out infinite; }
   .rc-scene .sc-leaf { transform-box: fill-box; transform-origin: 50% 100%; animation: sc-sway 4s ease-in-out infinite; }
   .rc-scene .sc-ping { transform-box: fill-box; transform-origin: center; animation: sc-ping 2s ease-out infinite; }
-  .rc-scene .sc-smoke circle { animation: sc-smoke 4s ease-in-out infinite; }
   .rc-scene .sc-cloud { animation: sc-drift 4s ease-in-out infinite alternate; }
   .rc-scene .sc-tw:nth-child(3n) { animation: sc-blink-soft 3.2s ease-in-out infinite; }
   @keyframes sc-blink { 50% { opacity: .2; } }
   @keyframes sc-blink-soft { 50% { opacity: .08; } }
   @keyframes sc-flow { to { stroke-dashoffset: -14; } }
-  @keyframes sc-drip { from { transform: translateY(0); opacity: 1; } to { transform: translateY(14px); opacity: 0; } }
   @keyframes sc-glow { 50% { transform: scale(1.08); opacity: .36; } }
   @keyframes sc-glow2 { 50% { opacity: .2; } }
   @keyframes sc-wave { 50% { transform: translateX(-6px); } }
   @keyframes sc-pir { 0%, 100% { opacity: .06; } 50% { opacity: .18; } }
-  @keyframes sc-puddle { 50% { transform: scaleX(1.12); } }
   @keyframes sc-snow { from { transform: translateY(-4px); } to { transform: translateY(4px); } }
   @keyframes sc-float { 50% { transform: translate(-6px, -4px); } }
   @keyframes sc-sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
   @keyframes sc-ping { from { transform: scale(1); opacity: .9; } to { transform: scale(2.6); opacity: 0; } }
-  @keyframes sc-smoke { 50% { transform: translate(-4px, 2px); } }
   @keyframes sc-drift { to { transform: translateX(4px); } }
   @media (prefers-reduced-motion: reduce) { .rc-scene * { animation: none !important; } }
 `;

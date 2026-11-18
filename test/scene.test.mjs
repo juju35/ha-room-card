@@ -58,7 +58,7 @@ test("The cards draw the banner by default, the classic header with illustration
   assert.doesNotMatch(card.shadowRoot.innerHTML, /class="banner/);
 });
 
-test("Sensors: an open door opens the door of the picture, a leak draws the puddle", () => {
+test("Sensors: an open door opens the door of the picture", () => {
   const card = new cards["room-sensors-card"]();
   card.attachShadow();
   card.setConfig({ area: "kitchen", illustration_theme: "day" });
@@ -66,9 +66,7 @@ test("Sensors: an open door opens the door of the picture, a leak draws the pudd
   hass.states["binary_sensor.door"].state = "on";
   card.hass = hass;
   assert.equal(card._sceneState().door, true);
-  assert.equal(card._sceneState().leak, false);
   assert.match(card.shadowRoot.innerHTML, /scale\(0.42 1\)/);
-  assert.doesNotMatch(card.shadowRoot.innerHTML, /class="sc-puddle"/);
 });
 
 test("Plugs: the plugs on carry current; 3 kW together is an overload (amber level, panel in alert)", () => {

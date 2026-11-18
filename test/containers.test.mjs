@@ -124,7 +124,7 @@ for (const tag of TAGS) {
 // words (a word too long for its line ends with "…").
 const ROOMS = [
   ["living_room", "Living room", [["binary_sensor.patio_door", "door", "on"], ["light.living_room", "light", "on"], ["switch.tv_plug", "outlet", "on", 1240]]],
-  ["kitchen", "Kitchen", [["binary_sensor.sink_leak", "moisture", "on"], ["light.kitchen", "light", "on"]]],
+  ["kitchen", "Kitchen", [["binary_sensor.kitchen_window", "window", "on"], ["light.kitchen", "light", "on"]]],
   ["bedroom_2", "Bedroom 2", [["binary_sensor.bedroom_presence", "occupancy", "on"]]],
 ];
 const ENV_ROOMS = [

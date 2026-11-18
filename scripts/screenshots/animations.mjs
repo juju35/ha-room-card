@@ -71,10 +71,9 @@ const ago = (min) => new Date(Date.now() - min * 60000).toISOString();
 const area = { living_room: { area_id: "living_room", name: "Living room" } };
 const hassOf = (states, entities) => ({ states, entities, devices: {}, areas: area, language: "en", locale: { language: "en" } });
 
-// Sensors card: a leak sensor, two doors and a window, some of them on.
+// Sensors card: two doors and a window, some of them on.
 const sensorsHass = (on) => {
   const defs = [
-    ["binary_sensor.sink_leak", "Sink Leak", "moisture"],
     ["binary_sensor.kitchen_door", "Kitchen Patio Door Contact", "door"],
     ["binary_sensor.living_room_door", "Living Room Patio Door Contact", "door"],
     ["binary_sensor.living_room_window", "Living Room Window Contact", "window"],
@@ -128,23 +127,6 @@ for (const theme of ["light", "dark"]) {
     const dir = mkdtempSync(join(tmpdir(), "rc-frames-"));
     await recordCycle(page, dir, 1.5);
     encode(dir, `screenshots/sensors-blink${suffix}.gif`);
-    rmSync(dir, { recursive: true });
-    await page.close();
-  }
-
-  // Water leak: the header badge pulses (rc-pulse) while the leaking sensor blinks (one 1.6 s cycle).
-  {
-    const page = await openPage(browser, { theme, width: WIDTH, icons: iconsFor([]), label: `sensors-alert${suffix}` });
-    await mountCard(page, {
-      tag: "room-sensors-card",
-      hass: sensorsHass({ "binary_sensor.sink_leak": [true, 3], "binary_sensor.kitchen_door": [true, 12] }),
-      config: { area: "living_room" },
-      dark,
-    });
-    await page.waitForTimeout(300);
-    const dir = mkdtempSync(join(tmpdir(), "rc-frames-"));
-    await recordCycle(page, dir, 1.6);
-    encode(dir, `screenshots/sensors-alert${suffix}.gif`);
     rmSync(dir, { recursive: true });
     await page.close();
   }
