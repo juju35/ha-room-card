@@ -1466,7 +1466,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "The card only appears when a room has a reading to check",
     ed_sort_state: "Rooms needing a look first",
     ed_exclude_helper: "Left out of the tiles, the averages and the room details",
-    ed_rooms_helper: "Order and overrides: a list of {area, name, icon, navigation_path, thresholds}, thresholds applying to that room only",
+    ed_rooms_helper: "Order and overrides: a list of {area, name, icon, navigation_path, include, thresholds}, thresholds applying to that room only",
   },
   fr: {
     ...RE_I18N.fr,
@@ -1484,7 +1484,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "La carte n'apparaît que si une pièce a une mesure à surveiller",
     ed_sort_state: "Pièces à surveiller en premier",
     ed_exclude_helper: "Ignorés dans les tuiles, les moyennes et le détail des pièces",
-    ed_rooms_helper: "Ordre et personnalisation : une liste de {area, name, icon, navigation_path, thresholds}, thresholds ne valant que pour cette pièce",
+    ed_rooms_helper: "Ordre et personnalisation : une liste de {area, name, icon, navigation_path, include, thresholds}, thresholds ne valant que pour cette pièce",
   },
   de: {
     ...RE_I18N.de,
@@ -1502,7 +1502,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Die Karte erscheint nur, wenn ein Raum einen zu prüfenden Messwert hat",
     ed_sort_state: "Räume, die Aufmerksamkeit brauchen, zuerst",
     ed_exclude_helper: "Bei den Kacheln, den Durchschnitten und den Raumdetails nicht berücksichtigt",
-    ed_rooms_helper: "Reihenfolge und Anpassungen: eine Liste von {area, name, icon, navigation_path, thresholds}, wobei thresholds nur für diesen Raum gilt",
+    ed_rooms_helper: "Reihenfolge und Anpassungen: eine Liste von {area, name, icon, navigation_path, include, thresholds}, wobei thresholds nur für diesen Raum gilt",
   },
   es: {
     ...RE_I18N.es,
@@ -1520,7 +1520,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "La tarjeta solo aparece cuando una habitación tiene una lectura que revisar",
     ed_sort_state: "Primero las habitaciones que requieren atención",
     ed_exclude_helper: "Se ignoran en los mosaicos, las medias y el detalle de las habitaciones",
-    ed_rooms_helper: "Orden y personalización: una lista de {area, name, icon, navigation_path, thresholds}, aplicándose thresholds solo a esa habitación",
+    ed_rooms_helper: "Orden y personalización: una lista de {area, name, icon, navigation_path, include, thresholds}, aplicándose thresholds solo a esa habitación",
   },
   sr: {
     ...RE_I18N.sr,
@@ -1539,7 +1539,7 @@ const REO_I18N = {
     ed_sort_state: "Прво просторије које захтевају пажњу",
     ed_exclude_helper: "Изостављено из плочица, просека и детаља просторије",
     ed_rooms_helper:
-      "Редослед и измене: листа са {area, name, icon, navigation_path, thresholds}, при чему thresholds важи само за ту просторију",
+      "Редослед и измене: листа са {area, name, icon, navigation_path, include, thresholds}, при чему thresholds важи само за ту просторију",
   },
   "sr-Latn": {
     ...RE_I18N["sr-Latn"],
@@ -1558,7 +1558,7 @@ const REO_I18N = {
     ed_sort_state: "Prvo prostorije koje zahtevaju pažnju",
     ed_exclude_helper: "Izostavljeno iz pločica, proseka i detalja prostorije",
     ed_rooms_helper:
-      "Redosled i izmene: lista sa {area, name, icon, navigation_path, thresholds}, pri čemu thresholds važi samo za tu prostoriju",
+      "Redosled i izmene: lista sa {area, name, icon, navigation_path, include, thresholds}, pri čemu thresholds važi samo za tu prostoriju",
   },
   it: {
     ...RE_I18N.it,
@@ -1576,7 +1576,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "La scheda appare solo quando una stanza ha una misura da controllare",
     ed_sort_state: "Prima le stanze da controllare",
     ed_exclude_helper: "Ignorati nei riquadri, nelle medie e nei dettagli delle stanze",
-    ed_rooms_helper: "Ordine e personalizzazioni: un elenco di {area, name, icon, navigation_path, thresholds}, dove thresholds vale solo per quella stanza",
+    ed_rooms_helper: "Ordine e personalizzazioni: un elenco di {area, name, icon, navigation_path, include, thresholds}, dove thresholds vale solo per quella stanza",
   },
   nl: {
     ...RE_I18N.nl,
@@ -1594,7 +1594,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "De kaart verschijnt alleen als een ruimte een meting heeft om te controleren",
     ed_sort_state: "Ruimtes die aandacht nodig hebben eerst",
     ed_exclude_helper: "Niet meegeteld in de tegels, de gemiddelden en de ruimtedetails",
-    ed_rooms_helper: "Volgorde en aanpassingen: een lijst van {area, name, icon, navigation_path, thresholds}, waarbij thresholds alleen voor die ruimte geldt",
+    ed_rooms_helper: "Volgorde en aanpassingen: een lijst van {area, name, icon, navigation_path, include, thresholds}, waarbij thresholds alleen voor die ruimte geldt",
   },
   pt: {
     ...RE_I18N.pt,
@@ -1612,7 +1612,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "O cartão só aparece quando uma divisão tem uma medição a verificar",
     ed_sort_state: "Primeiro as divisões que precisam de atenção",
     ed_exclude_helper: "Ignorados nos mosaicos, nas médias e no detalhe das divisões",
-    ed_rooms_helper: "Ordem e personalização: uma lista de {area, name, icon, navigation_path, thresholds}, aplicando-se thresholds apenas a essa divisão",
+    ed_rooms_helper: "Ordem e personalização: uma lista de {area, name, icon, navigation_path, include, thresholds}, aplicando-se thresholds apenas a essa divisão",
   },
   pl: {
     ...RE_I18N.pl,
@@ -1630,7 +1630,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Karta pojawia się tylko, gdy w pomieszczeniu jest odczyt do sprawdzenia",
     ed_sort_state: "Najpierw pomieszczenia wymagające uwagi",
     ed_exclude_helper: "Pomijane w kafelkach, średnich i szczegółach pomieszczeń",
-    ed_rooms_helper: "Kolejność i nadpisania: lista {area, name, icon, navigation_path, thresholds}, przy czym thresholds dotyczy tylko tego pomieszczenia",
+    ed_rooms_helper: "Kolejność i nadpisania: lista {area, name, icon, navigation_path, include, thresholds}, przy czym thresholds dotyczy tylko tego pomieszczenia",
   },
   ro: {
     ...RE_I18N.ro,
@@ -1648,7 +1648,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Cardul apare doar când o cameră are o valoare de verificat",
     ed_sort_state: "Întâi camerele care necesită atenție",
     ed_exclude_helper: "Ignorați în dale, în medii și în detaliile camerelor",
-    ed_rooms_helper: "Ordine și personalizări: o listă de {area, name, icon, navigation_path, thresholds}, thresholds aplicându-se doar acelei camere",
+    ed_rooms_helper: "Ordine și personalizări: o listă de {area, name, icon, navigation_path, include, thresholds}, thresholds aplicându-se doar acelei camere",
   },
   da: {
     ...RE_I18N.da,
@@ -1666,7 +1666,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Kortet vises kun, når et rum har en måling, der skal tjekkes",
     ed_sort_state: "Rum, der kræver opmærksomhed, først",
     ed_exclude_helper: "Udelades fra felterne, gennemsnittene og rummenes detaljer",
-    ed_rooms_helper: "Rækkefølge og tilpasninger: en liste med {area, name, icon, navigation_path, thresholds}, hvor thresholds kun gælder for det rum",
+    ed_rooms_helper: "Rækkefølge og tilpasninger: en liste med {area, name, icon, navigation_path, include, thresholds}, hvor thresholds kun gælder for det rum",
   },
   sv: {
     ...RE_I18N.sv,
@@ -1684,7 +1684,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Kortet visas bara när ett rum har ett mätvärde att kontrollera",
     ed_sort_state: "Rum som behöver ses över först",
     ed_exclude_helper: "Utelämnas från rutorna, medelvärdena och rummens detaljer",
-    ed_rooms_helper: "Ordning och anpassningar: en lista med {area, name, icon, navigation_path, thresholds}, där thresholds bara gäller det rummet",
+    ed_rooms_helper: "Ordning och anpassningar: en lista med {area, name, icon, navigation_path, include, thresholds}, där thresholds bara gäller det rummet",
   },
   bg: {
     ...RE_I18N.bg,
@@ -1702,7 +1702,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Картата се показва само когато в стая има стойност за проверка",
     ed_sort_state: "Първо стаите, които изискват внимание",
     ed_exclude_helper: "Пропускат се в плочките, средните стойности и подробностите за стаите",
-    ed_rooms_helper: "Ред и персонализиране: списък от {area, name, icon, navigation_path, thresholds}, като thresholds важи само за тази стая",
+    ed_rooms_helper: "Ред и персонализиране: списък от {area, name, icon, navigation_path, include, thresholds}, като thresholds важи само за тази стая",
   },
   ru: {
     ...RE_I18N.ru,
@@ -1720,7 +1720,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Карточка появляется, только когда в комнате есть показание, требующее внимания",
     ed_sort_state: "Сначала комнаты, требующие внимания",
     ed_exclude_helper: "Не учитываются в плитках, средних значениях и подробностях комнат",
-    ed_rooms_helper: "Порядок и настройки: список {area, name, icon, navigation_path, thresholds}, где thresholds действует только для этой комнаты",
+    ed_rooms_helper: "Порядок и настройки: список {area, name, icon, navigation_path, include, thresholds}, где thresholds действует только для этой комнаты",
   },
   uk: {
     ...RE_I18N.uk,
@@ -1738,7 +1738,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Картка з'являється, лише коли в кімнаті є показник, що потребує уваги",
     ed_sort_state: "Спершу кімнати, що потребують уваги",
     ed_exclude_helper: "Не враховуються в плитках, середніх значеннях і подробицях кімнат",
-    ed_rooms_helper: "Порядок і налаштування: список {area, name, icon, navigation_path, thresholds}, де thresholds діє лише для цієї кімнати",
+    ed_rooms_helper: "Порядок і налаштування: список {area, name, icon, navigation_path, include, thresholds}, де thresholds діє лише для цієї кімнати",
   },
   hu: {
     ...RE_I18N.hu,
@@ -1756,7 +1756,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "A kártya csak akkor jelenik meg, ha egy helyiségben ellenőrizendő érték van",
     ed_sort_state: "Elöl a figyelmet igénylő helyiségek",
     ed_exclude_helper: "Kimaradnak a csempékből, az átlagokból és a helyiségek részleteiből",
-    ed_rooms_helper: "Sorrend és testreszabás: {area, name, icon, navigation_path, thresholds} elemek listája, ahol a thresholds csak az adott helyiségre vonatkozik",
+    ed_rooms_helper: "Sorrend és testreszabás: {area, name, icon, navigation_path, include, thresholds} elemek listája, ahol a thresholds csak az adott helyiségre vonatkozik",
   },
   sk: {
     ...RE_I18N.sk,
@@ -1774,7 +1774,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Karta sa zobrazí len vtedy, keď má miestnosť hodnotu na kontrolu",
     ed_sort_state: "Najprv miestnosti vyžadujúce pozornosť",
     ed_exclude_helper: "Vynechané z dlaždíc, priemerov a podrobností miestností",
-    ed_rooms_helper: "Poradie a úpravy: zoznam {area, name, icon, navigation_path, thresholds}, pričom thresholds platí len pre danú miestnosť",
+    ed_rooms_helper: "Poradie a úpravy: zoznam {area, name, icon, navigation_path, include, thresholds}, pričom thresholds platí len pre danú miestnosť",
   },
   cs: {
     ...RE_I18N.cs,
@@ -1792,7 +1792,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Karta se zobrazí jen tehdy, když má místnost hodnotu ke kontrole",
     ed_sort_state: "Nejprve místnosti vyžadující pozornost",
     ed_exclude_helper: "Vynechané z dlaždic, průměrů a podrobností místností",
-    ed_rooms_helper: "Pořadí a úpravy: seznam {area, name, icon, navigation_path, thresholds}, přičemž thresholds platí jen pro danou místnost",
+    ed_rooms_helper: "Pořadí a úpravy: seznam {area, name, icon, navigation_path, include, thresholds}, přičemž thresholds platí jen pro danou místnost",
   },
   sl: {
     ...RE_I18N.sl,
@@ -1810,7 +1810,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Kartica se prikaže samo, ko ima prostor vrednost za preverjanje",
     ed_sort_state: "Najprej prostori, ki potrebujejo pozornost",
     ed_exclude_helper: "Izpuščeni iz ploščic, povprečij in podrobnosti prostorov",
-    ed_rooms_helper: "Vrstni red in prilagoditve: seznam {area, name, icon, navigation_path, thresholds}, pri čemer thresholds velja samo za ta prostor",
+    ed_rooms_helper: "Vrstni red in prilagoditve: seznam {area, name, icon, navigation_path, include, thresholds}, pri čemer thresholds velja samo za ta prostor",
   },
   lv: {
     ...RE_I18N.lv,
@@ -1828,7 +1828,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Karte parādās tikai tad, kad telpā ir pārbaudāms rādījums",
     ed_sort_state: "Vispirms telpas, kurām jāpievērš uzmanība",
     ed_exclude_helper: "Netiek ņemti vērā flīzēs, vidējās vērtībās un telpu detaļās",
-    ed_rooms_helper: "Secība un pielāgojumi: saraksts ar {area, name, icon, navigation_path, thresholds}, kur thresholds attiecas tikai uz šo telpu",
+    ed_rooms_helper: "Secība un pielāgojumi: saraksts ar {area, name, icon, navigation_path, include, thresholds}, kur thresholds attiecas tikai uz šo telpu",
   },
   el: {
     ...RE_I18N.el,
@@ -1846,7 +1846,7 @@ const REO_I18N = {
     ed_hide_when_clear_helper: "Η κάρτα εμφανίζεται μόνο όταν ένα δωμάτιο έχει μέτρηση προς έλεγχο",
     ed_sort_state: "Πρώτα τα δωμάτια που χρειάζονται έλεγχο",
     ed_exclude_helper: "Παραλείπονται από τα πλακίδια, τους μέσους όρους και τις λεπτομέρειες των δωματίων",
-    ed_rooms_helper: "Σειρά και προσαρμογές: μια λίστα με {area, name, icon, navigation_path, thresholds}, όπου το thresholds ισχύει μόνο για εκείνο το δωμάτιο",
+    ed_rooms_helper: "Σειρά και προσαρμογές: μια λίστα με {area, name, icon, navigation_path, include, thresholds}, όπου το thresholds ισχύει μόνο για εκείνο το δωμάτιο",
   },
 };
 
@@ -1879,12 +1879,20 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
     const c = this._config;
     const excluded = new Set(c.exclude_areas || []);
     const overrides = Object.fromEntries((c.rooms || []).map((x) => [x.area, x]));
+    // `rooms[].include`: sensors added by hand to a room, counted there only and taken as they are (no appliance
+    // filter); a sensor of no known kind gives no reading.
+    const included = rcRoomIncludes(h, c);
+    this._included = included;
     const byArea = {};
-    for (const [id, aid] of rcByArea(this, (id) => id.startsWith("sensor."))) (byArea[aid] ||= []).push(id);
+    for (const [id, aid] of rcByArea(this, (id) => id.startsWith("sensor."))) if (!included.has(id)) (byArea[aid] ||= []).push(id);
+    for (const { aid } of included.values()) byArea[aid] ||= [];
     const rooms = [];
     for (const [aid, ids] of Object.entries(byArea)) {
       const area = h.areas?.[aid];
-      const entries = ids.filter((id) => h.states[id] && reMatch(h, id) && this._ambientSensor(id)).map((entity) => ({ entity }));
+      const entries = [
+        ...ids.filter((id) => h.states[id] && reMatch(h, id) && this._ambientSensor(id)).map((entity) => ({ entity })),
+        ...rcIncludesOf(included, aid),
+      ];
       const o = overrides[aid] || {};
       const thresholds = this._roomThresholds(o);
       const items = area && !excluded.has(aid) ? this._itemsOf(entries, { name: area.name, thresholds }) : [];
@@ -2027,8 +2035,9 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
       type: `custom:${RoomEnvironmentCard.tag}`,
       area: this._openArea,
       title: this._t("readings"),
-      exclude: c.exclude || [],
+      exclude: [...(c.exclude || []), ...rcIncludedElsewhere(this._included || new Map(), this._openArea)],
       illustration: false,
+      ...(rcIncludesOf(this._included || new Map(), this._openArea).length ? { include: rcIncludesOf(this._included, this._openArea) } : {}),
       ...(c.appliance_filter === false ? { appliance_filter: false } : {}),
       ...(thresholds ? { thresholds } : {}),
       ...(c.language ? { language: c.language } : {}),

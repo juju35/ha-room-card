@@ -141,6 +141,52 @@ test("the Overview counts what the sensors card shows (diagnostic door sensors i
   assert.deepEqual(ids(room.plugs), ["switch.coffee_plug"]);
 });
 
+test("the Overview counts a room's `include` there only, sorted by domain whatever its class, and passes it to the details", () => {
+  const hass = makeHass();
+  hass.areas.garden = { area_id: "garden", name: "Garden" };
+  // A template gate without area nor device class, a presence sensor of the kitchen moved to the garden, a switch.
+  const st = (entity_id, state, attributes = {}) => ({ entity_id, state, attributes, last_changed: "2026-01-01T00:00:00Z" });
+  hass.states["binary_sensor.gate"] = st("binary_sensor.gate", "on", { friendly_name: "Gate" });
+  hass.states["binary_sensor.motion"] = st("binary_sensor.motion", "on", { device_class: "motion", friendly_name: "Motion" });
+  hass.states["switch.pump"] = st("switch.pump", "off", { friendly_name: "Pump" });
+  hass.entities["binary_sensor.motion"] = { area_id: "kitchen" };
+  const overview = new cards["room-overview-card"]();
+  overview._config = {
+    ...cards["room-overview-card"].defaults,
+    zoom: false,
+    rooms: [{ area: "garden", include: ["binary_sensor.gate", { entity: "binary_sensor.motion", name: "Lawn" }, "switch.pump", "sensor.missing"] }],
+  };
+  overview._hass = hass;
+  const rooms = overview._collect();
+  const garden = rooms.find((x) => x.id === "garden");
+  assert.deepEqual(ids(garden.sensors), ["binary_sensor.gate"]);
+  assert.deepEqual(ids(garden.presence), ["binary_sensor.motion"]);
+  assert.deepEqual(ids(garden.plugs), ["switch.pump"]);
+  assert.equal(garden.open, 1);
+  assert.ok(!ids(rooms.find((x) => x.id === "kitchen").presence).includes("binary_sensor.motion"));
+  // presence: false leaves an included presence sensor out too.
+  overview._config = { ...overview._config, presence: false };
+  overview._memo = {};
+  assert.deepEqual(ids(overview._collect().find((x) => x.id === "garden").presence), []);
+  // The details: each card gets the items it shows, the kitchen ones leave the moved sensor out.
+  const configs = [];
+  const panel = fakeNode();
+  overview.shadowRoot = { ...fakeNode(), querySelector: (q) => (q === ".panel" ? panel : null) };
+  overview._config = { ...overview._config, presence: true };
+  overview._rooms = overview._collect();
+  for (const area of ["garden", "kitchen"]) {
+    overview._openArea = area;
+    overview._fillPanel();
+    for (const el of panel.children) configs.push(JSON.parse(JSON.stringify(el._config)));
+  }
+  const byTag = (area, tag) => configs.find((c) => c.area === area && c.type === `custom:${tag}`);
+  assert.deepEqual(byTag("garden", "room-sensors-card").include, [{ entity: "binary_sensor.gate" }, { entity: "binary_sensor.motion", name: "Lawn" }]);
+  assert.deepEqual(byTag("garden", "room-switch-card").include, [{ entity: "switch.pump" }]);
+  assert.equal(byTag("garden", "room-lights-card"), undefined);
+  assert.equal(byTag("kitchen", "room-sensors-card").include, undefined);
+  assert.ok(byTag("kitchen", "room-sensors-card").exclude.includes("binary_sensor.motion"));
+});
+
 test("the Overview passes its language to the room details", () => {
   const overview = new cards["room-overview-card"]();
   const panel = fakeNode();

@@ -215,6 +215,21 @@ test("the overview groups the environment sensors by room, with each room's stat
   );
 });
 
+test("the overview counts a room's `include` sensors there only, a room of included sensors alone included", () => {
+  // A template temperature without area, and the kitchen probe moved to the cellar.
+  const hass = makeHass({}, { "sensor.cellar_template": st("sensor.cellar_template", 12, "temperature", "°C", "Cave") });
+  delete hass.entities["sensor.cellar_template"];
+  hass.areas.cellar = { area_id: "cellar", name: "Cave" };
+  const card = overview({ rooms: [{ area: "cellar", include: ["sensor.cellar_template", "sensor.kitchen_temperature"] }] }, hass);
+  const rooms = [...card._collect()];
+  assert.deepEqual(
+    rooms.map((x) => x.id),
+    ["cellar", "living_room"],
+  );
+  assert.equal(rooms[0].items[0].kind, "temperature");
+  assert.equal(rooms[0].items[0].num, 16);
+});
+
 test("the overview sorts rooms needing a look first, shows only those until zoomed in, and leaves excluded rooms out", () => {
   const hass = makeHass({ hum: 75 });
   const ids = (config) => [...overview(config, hass)._collect()].map((x) => x.id);

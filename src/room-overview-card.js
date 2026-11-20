@@ -743,10 +743,13 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       return rooms[aid];
     };
 
-    // The room cards' own rules, so that a room counts what its unfolded details show.
+    // The room cards' own rules, so that a room counts what its unfolded details show. An entity listed in a room's
+    // `include` counts in that room only.
+    const included = rcRoomIncludes(h, c);
+    this._included = included;
     for (const [id, aid] of rcByArea(this, (id) => /^(binary_sensor|light|switch)\./.test(id))) {
       const st = h.states[id];
-      if (!st) continue;
+      if (!st || included.has(id)) continue;
       const dc = st.attributes.device_class;
       if (rcMatchSensor(h, id, { presence: c.presence, outdoor: outdoor(aid) })) {
         if (RC_OPENING_CLASSES.includes(dc)) room(aid).sensors.push({ id, st });
@@ -754,6 +757,20 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       } else if (rcMatchLight(h, id)) {
         room(aid).lights.push({ id, st });
       } else if (rcMatchPlug(h, id)) {
+        room(aid).plugs.push({ id, st, watts: watts(id) });
+      }
+    }
+    // `rooms[].include`, sorted by domain whatever its device class: a binary sensor is an opening unless it is a
+    // presence one, a switch a light when named as one and a plug otherwise; other domains are left out.
+    for (const [id, { aid }] of included) {
+      const st = h.states[id];
+      const domain = id.split(".")[0];
+      if (domain === "binary_sensor") {
+        if (!RC_PRESENCE_CLASSES.includes(st.attributes.device_class)) room(aid).sensors.push({ id, st });
+        else if (c.presence !== false) room(aid).presence.push({ id, st });
+      } else if (domain === "light" || (domain === "switch" && rcMatchLight(h, id))) {
+        room(aid).lights.push({ id, st });
+      } else if (domain === "switch") {
         room(aid).plugs.push({ id, st, watts: watts(id) });
       }
     }
@@ -1043,10 +1060,17 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     panel.innerHTML = "";
     this._details = [];
 
+    // Each details card gets the room's `include` items it shows, as the tiles count them.
+    const has = (kind) => new Set(x[kind].map((e) => e.id));
+    const inc = (...kinds) => {
+      const ids = new Set(kinds.flatMap((k) => [...has(k)]));
+      const list = rcIncludesOf(this._included || new Map(), x.id, (id) => ids.has(id));
+      return list.length ? { include: list } : {};
+    };
     const parts = [
-      ["room-sensors-card", x.sensors.length + x.presence.length, { title: this._t("sensors"), presence: this._config.presence, outdoor: x.outdoor }],
-      ["room-lights-card", x.lights.length, { title: this._t("lights") }],
-      ["room-switch-card", x.plugs.length, { title: this._t("plugs"), all_off_button: this._config.plugs_off_button === true }],
+      ["room-sensors-card", x.sensors.length + x.presence.length, { title: this._t("sensors"), presence: this._config.presence, outdoor: x.outdoor, ...inc("sensors", "presence") }],
+      ["room-lights-card", x.lights.length, { title: this._t("lights"), ...inc("lights") }],
+      ["room-switch-card", x.plugs.length, { title: this._t("plugs"), all_off_button: this._config.plugs_off_button === true, ...inc("plugs") }],
     ];
     for (const [tag, count, extra] of parts) {
       if (!count || !customElements.get(tag)) continue;
@@ -1054,7 +1078,7 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       el.setConfig({
         type: `custom:${tag}`,
         area: x.id,
-        exclude: this._config.exclude || [],
+        exclude: [...(this._config.exclude || []), ...rcIncludedElsewhere(this._included || new Map(), x.id)],
         illustration: false,
         ...(this._config.language ? { language: this._config.language } : {}),
         ...extra,

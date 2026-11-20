@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0 - 2026-11-20
+
+### Features
+- Overview and Environment overview: `include` in a `rooms` item adds entities the discovery misses (no area, no recognised device class, a template gate say) to that room; each item is an entity ID or `{entity, name, icon}`. They count in that room only, in its tile, the totals and its details. On the Overview they are sorted by domain whatever their device class (a binary sensor without a presence class is an opening); on the Environment overview the sensors are taken as they are, with no appliance filter (#99).
+
 ## 2.1.0 - 2026-11-18
 
 ### Features
