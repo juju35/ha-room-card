@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.1 - 2026-11-20
+
+### Fixes
+- Every card: a state update no longer rebuilds the card's content. The nodes are updated in place (text, attributes, classes), so the card keeps its height, its icons and its scene animations from one update to the next, and an update of an entity the card does not show changes nothing. Before, each update rewrote the whole card: the status pill was measured before Home Assistant's `<ha-card>` had laid out its new content and jumped to the wrong line (the card's height changed on narrow cards, more so without the illustration), and the sections view reflowed, which made the page move by itself.
+- Banner status pill: fitted once Home Assistant's `<ha-card>` has drawn its content, not before (it was measured at 0 px on a freshly drawn card).
+
 ## 2.2.0 - 2026-11-20
 
 ### Features
