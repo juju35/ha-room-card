@@ -603,6 +603,34 @@ test("a diagnostic number on the device does not disqualify an ambient sensor", 
   assert.ok(ids(card).includes("sensor.lr_temperature"));
 });
 
+test("a temperature/humidity sensor's own uncategorised settings do not disqualify it (issue #98)", () => {
+  // SONOFF SNZB-02DR2 under Zigbee2MQTT / ZHA: comfort range, calibration and remote-source numbers with no category.
+  const hass = makeHass();
+  for (const id of ["sensor.lr_temperature", "sensor.lr_humidity"]) if (hass.entities[id]) hass.entities[id].device_id = "dev_snzb";
+  const settings = {
+    "number.snzb_02dr2_comfort_temperature_min": "Comfort temperature min",
+    "number.snzb_02dr2_comfort_temperature_max": "Comfort temperature max",
+    "number.snzb_02dr2_comfort_humidity_min": "Comfort humidity min",
+    "number.snzb_02dr2_temperature_calibration": "Temperature calibration",
+    "number.snzb_02dr2_humidity_calibration": "Humidity calibration",
+    "number.snzb_02dr2_temperature_offset": "Décalage de température",
+    "number.snzb_02dr2_source_1_temperature": "Source 1 temperature",
+    "number.snzb_02dr2_source_2_humidity": "Source 2 humidity",
+    "number.snzb_02dr2_external_temperature": "External temperature",
+  };
+  for (const [id, name] of Object.entries(settings)) {
+    hass.entities[id] = { area_id: "living_room", device_id: "dev_snzb" };
+    hass.states[id] = { entity_id: id, state: "0", attributes: { friendly_name: name, device_class: "temperature" } };
+  }
+  const card = render({}, hass);
+  assert.ok(ids(card).includes("sensor.lr_temperature"));
+  // A real setpoint still marks the device as an appliance.
+  hass.entities["number.snzb_target_temperature"] = { area_id: "living_room", device_id: "dev_snzb" };
+  hass.states["number.snzb_target_temperature"] = { entity_id: "number.snzb_target_temperature", state: "45", attributes: { friendly_name: "Target temperature" } };
+  hass.entities = { ...hass.entities };
+  assert.ok(!ids(render({}, hass)).includes("sensor.lr_temperature"));
+});
+
 test("an explicit entities list re-includes a sensor the heuristic would drop", () => {
   const oven = st("sensor.four_oven_temperature", 60, "temperature", "°C", "Oven");
   const hass = makeHass({}, { "sensor.four_oven_temperature": oven });

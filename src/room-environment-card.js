@@ -891,6 +891,14 @@ const RE_APPLIANCE_WORDS =
 // A sibling entity of one of these domains marks the device as an appliance, not a room: a thermostat/heat-pump
 // `climate`, a `water_heater`, a `humidifier`, or a `number` setpoint.
 const RE_APPLIANCE_DOMAINS = new Set(["climate", "water_heater", "humidifier", "number"]);
+// A `number` that tunes the sensor itself rather than setting a target: a calibration offset, a comfort range, an alarm
+// threshold, a reporting interval, or a remote reading pushed to its screen (SNZB-02DR2 `source_1_temperature`,
+// older firmware `external_temperature`)… A temperature/humidity sensor (SONOFF SNZB-02D/02DR2, Aqara, Tuya…) exposes
+// these without an entity category under Zigbee2MQTT or ZHA, and they must not turn it into an appliance (issue #98).
+const RE_SENSOR_SETTING =
+  /\b(source|external|externe|exterieure|extérieure|remote|distant|distante|display|affichage|calibration|calibrage|etalonnage|étalonnage|offset|decalage|décalage|correction|comfort|confort|min|max|minimum|maximum|lower|upper|low|high|threshold|seuil|alarm|alarme|alert|alerte|limit|limite|report|reporting|interval|intervalle|sensitivity|sensibilite|sensibilité|hysteresis|hystérésis|precision|précision|delta|change|led|brightness|luminosite|luminosité)\b/;
+const reSensorSetting = (hass, id) => RE_SENSOR_SETTING.test(reNorm(id)) || RE_SENSOR_SETTING.test(reNorm(hass.states?.[id]?.attributes?.friendly_name));
+
 // A `select` / `sensor` for an operation state or a program (Home Connect, Miele, LG ThinQ, SmartThings…).
 const RE_APPLIANCE_STATE = /\b(program|programme|operation|op state)\b/;
 
@@ -907,8 +915,9 @@ const reIsAppliance = (hass, id, devEnts) => {
     const dom = reDomain(sib);
     const cat = hass.entities?.[sib]?.entity_category;
     // A climate / water_heater / humidifier is a decisive appliance signal; a setpoint `number` only when it is not a
-    // config/diagnostic entity (a multisensor's LED-brightness number must not disqualify its temperature).
-    if (RE_APPLIANCE_DOMAINS.has(dom) && (dom !== "number" || !cat)) return true;
+    // config/diagnostic entity nor a setting of the sensor itself (a multisensor's LED brightness, a calibration
+    // offset or comfort range must not disqualify its temperature).
+    if (RE_APPLIANCE_DOMAINS.has(dom) && (dom !== "number" || (!cat && !reSensorSetting(hass, sib)))) return true;
     if ((dom === "select" || dom === "sensor") && !cat && RE_APPLIANCE_STATE.test(reNorm(sib))) return true;
   }
   return false;

@@ -5,6 +5,11 @@
 ### Features
 - Overview and Environment overview: `include` in a `rooms` item adds entities the discovery misses (no area, no recognised device class, a template gate say) to that room; each item is an entity ID or `{entity, name, icon}`. They count in that room only, in its tile, the totals and its details. On the Overview they are sorted by domain whatever their device class (a binary sensor without a presence class is an opening); on the Environment overview the sensors are taken as they are, with no appliance filter (#99).
 
+## 2.1.1 - 2026-11-20
+
+### Fixes
+- Environment cards: a temperature/humidity sensor whose device also exposes its own settings as numbers with no entity category (comfort range, calibration offset, remote-source readings shown on its screen, alarm thresholds, reporting interval — SONOFF SNZB-02D/02DR2 under Zigbee2MQTT or ZHA, say) is no longer taken for an appliance, so its room shows its readings again without disabling those entities (#98). A real setpoint `number` still marks an appliance.
+
 ## 2.1.0 - 2026-11-18
 
 ### Features
