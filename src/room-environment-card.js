@@ -1317,7 +1317,7 @@ class RoomEnvironmentCard extends RcCard {
 
   // A tap opens the details (history graph): a reading cannot be toggled.
   _bindTile(el) {
-    el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id));
+    el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id), this._on);
   }
 
   static styles = `
@@ -1996,9 +1996,12 @@ class RoomEnvironmentOverviewCard extends rcRoomsPanel(RoomEnvironmentCard) {
     const badge = `<div class="badge"><ha-icon icon="${this._headIcon(worst)}"></ha-icon></div>`;
     const title = `<div class="title">${rcEsc(c.title || this._t("title"))}</div>`;
     if (illus) this._updateBanner(card.querySelector(".banner"));
-    card.querySelector(".head").innerHTML = illus
+    // In place (see rcMorph): the header keeps its nodes, the pill is fitted again.
+    rcMorph(card.querySelector(".head"), illus
       ? `${badge}<div class="titles"><div class="trow">${title}${pill}</div>${avg ? `<div class="sub">${avg}</div>` : ""}</div>${rcZoomButton(this)}`
-      : `${badge}${title}${avg}${pill}${rcZoomButton(this)}`;
+      : `${badge}${title}${avg}${pill}${rcZoomButton(this)}`,
+    );
+    this._fitPill();
 
     this._roomGrid(card.querySelector(".grid"), rooms, (x) => {
       const chips = x.items

@@ -934,7 +934,8 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     const pill = `<div class="pill" title="${rcEsc(status)}"><span class="pt">${rcEsc(status)}</span></div>`;
     const hchips = headChips ? `<div class="hchips">${headChips}</div>` : "";
     if (illus) this._updateBanner(card.querySelector(".banner"));
-    card.querySelector(".head").innerHTML = illus
+    // In place (see rcMorph): the header keeps its nodes, the pill is fitted again.
+    rcMorph(card.querySelector(".head"), illus
       ? `
       <div class="badge"><ha-icon icon="${headIcon}"></ha-icon></div>
       <div class="titles"><div class="trow"><div class="title">${rcEsc(c.title || this._t("title"))}</div>${pill}</div>${hchips}</div>
@@ -944,7 +945,9 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
       <div class="title">${rcEsc(c.title || this._t("title"))}</div>
       ${hchips}
       ${pill}
-      ${rcZoomButton(this)}`;
+      ${rcZoomButton(this)}`,
+    );
+    this._fitPill();
 
     this._roomGrid(card.querySelector(".grid"), rooms, (x) => {
       const s = this._roomState(x);
