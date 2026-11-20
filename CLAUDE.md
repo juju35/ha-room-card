@@ -13,8 +13,8 @@
   mere idea or feature issue.
 - Keep history clean and linear: small, focused commits, one logical change each.
 - `main` is protected by a ruleset: **squash-merge only**, the commit message is the PR
-  **title + description** (not the commit list, so the screenshots bot's `[skip ci]` never
-  reaches `main`); tags follow a `v*` ruleset.
+  **title + description** (not the commit list, so the screenshots bot's commits never
+  reach `main`); tags follow a `v*` ruleset.
 
 ## Before opening a PR — run the checks locally
 CI mirrors these; running them first avoids round-trips:
@@ -63,7 +63,8 @@ This builds on other Home Assistant integrations, so keep the `## Supported inte
 - Card UI strings are split per language by `scripts/i18n-split.mjs`; the non-English outputs are generated — **do not hand-edit them**; a CI check fails if the split is stale.
 
 ## Screenshots — do not edit or commit them by hand
-The Screenshots workflow regenerates them on the PR branch and commits them with `[skip ci]`.
+The Screenshots workflow regenerates them on the PR branch and commits them as the
+`juju35-screenshots[bot]` GitHub App, so the PR checks re-run on that commit by themselves.
 Comparison is exact. They are English, with light/dark twins, neutral/mock data, and never
 real family names. **One GIF per distinct animation/state/variant** (not one per repo).
 

@@ -12,10 +12,10 @@ on:
 
 # Protected main is never pushed to: the job commits the refreshed screenshots
 # back onto the pull request's own branch, so they land through the normal merge.
-# actions: write lets the job re-run the checks on the screenshots commit (see below).
+# The push uses the juju35-screenshots GitHub App token, not GITHUB_TOKEN: a push made with
+# GITHUB_TOKEN starts no workflow, which left the required checks "Expected" on the bot commit.
 permissions:
-  contents: write
-  actions: write
+  contents: read
 
 concurrency:
   group: screenshots-${{ github.head_ref || github.ref_name }}
@@ -24,6 +24,9 @@ concurrency:
 jobs:
   screenshots:
     name: Render screenshots
+    # The bot's own screenshots commit re-triggers this workflow: skip it (a skipped job counts as passed),
+    # so a render that is not byte-identical can never loop.
+    if: github.actor != 'juju35-screenshots[bot]'
     runs-on: ubuntu-latest
     # Debian 12 container (Node 22 included): apt goes to the Debian mirrors, not the runner's Ubuntu ones, which
     # kept hanging. The job runs as root, hence no sudo below.
@@ -33,8 +36,18 @@ jobs:
       run:
         shell: bash
     steps:
+      # Same-repo PRs only (fork and Dependabot runs get no Actions secrets): they are the ones pushed back to.
+      - name: App token
+        id: app-token
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # The checkout keeps this token for the push below: the App's push triggers the PR checks.
+          token: ${{ steps.app-token.outputs.token || github.token }}
           # Fork PR branches do not exist in this repository: only check out the
           # head branch for same-repo PRs (where screenshots get pushed back).
           # Everything else keeps the default ref — for a fork PR that is the merge
@@ -72,33 +85,21 @@ jobs:
             exit 1
           }
       - name: Commit refreshed screenshots
-        id: push
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        if: steps.app-token.outputs.token != ''
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
         run: |
           if [ -z "$(git status --porcelain screenshots)" ]; then
             echo "No screenshot changes."
             exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BOT_ID="$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/users/${APP_SLUG}%5Bbot%5D" | grep -m1 -o '"id": *[0-9]*' | grep -o '[0-9]*$')"
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${BOT_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
           git add screenshots
-          # [skip ci]: a push made with GITHUB_TOKEN starts pull_request runs that then wait for an approval.
-          # The PR checks are re-run on this commit below as workflow_dispatch runs, which it does not stop.
-          git commit -m "chore: refresh screenshots [skip ci]"
+          git commit -m "chore: refresh screenshots"
           git push
-          echo "pushed=true" >> "$GITHUB_OUTPUT"
-      # A push made with GITHUB_TOKEN triggers no pull_request run, but workflow_dispatch does: re-run the PR checks
-      # on the new head so the screenshots commit gets its own Lint / Validate / HACS results.
-      - name: Re-run checks on the screenshot commit
-        if: steps.push.outputs.pushed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          # Passed through the environment, never expanded into the script: a branch name cannot inject commands.
-          HEAD_REF: ${{ github.head_ref }}
-        run: |
-          for wf in lint.yml validate.yml hacs.yml; do
-            [ -f ".github/workflows/$wf" ] && gh workflow run "$wf" --ref "$HEAD_REF"
-          done
       - name: Upload screenshots (manual run)
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
