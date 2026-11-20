@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.1 - 2026-11-20
+
+### Fixes
+- Environment cards: a temperature/humidity sensor whose device also exposes its own settings as numbers with no entity category (comfort range, calibration offset, alarm thresholds, reporting interval — SONOFF SNZB-02D/02DR2 under Zigbee2MQTT or ZHA, say) is no longer taken for an appliance, so its room shows its readings again without disabling those entities (#98). A real setpoint `number` still marks an appliance.
+
 ## 2.1.0 - 2026-11-18
 
 ### Features
