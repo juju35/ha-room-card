@@ -745,8 +745,8 @@ class RoomLightsCard extends RcToggleCard {
       this._render();
       // From the keyboard (Enter / Space: no click count), the new title keeps the focus.
       if (ev.detail === 0) this.shadowRoot.querySelector(".section-title")?.focus({ preventScroll: true });
-    });
-    for (const el of root.querySelectorAll(".scene")) el.addEventListener("click", (ev) => this._activateScene(ev, el.dataset.scene));
+    }, this._on);
+    for (const el of root.querySelectorAll(".scene")) el.addEventListener("click", (ev) => this._activateScene(ev, el.dataset.scene), this._on);
   }
 
   _activateScene(ev, id) {

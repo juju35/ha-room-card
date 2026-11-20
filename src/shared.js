@@ -1843,12 +1843,85 @@ const rcNavigate = (path) => {
   window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
 };
 
-// Wires a card header to its `navigation_path`: click, and Enter on the header itself.
-const rcBindNav = (head, path) => {
-  head.addEventListener("click", () => rcNavigate(path));
-  head.addEventListener("keydown", (ev) => {
-    if (ev.key === "Enter" && ev.target === head) rcNavigate(path);
-  });
+// Wires a card header to its `navigation_path`: click, and Enter on the header itself. `opts`: the listeners'
+// options (the card's abort signal, so that the next redraw can wire the same node again).
+const rcBindNav = (head, path, opts) => {
+  head.addEventListener("click", () => rcNavigate(path), opts);
+  head.addEventListener(
+    "keydown",
+    (ev) => {
+      if (ev.key === "Enter" && ev.target === head) rcNavigate(path);
+    },
+    opts,
+  );
+};
+
+// ── In-place redraw ──
+// Home Assistant sets `hass` on every state change of the house. Rewriting the card's whole content then (innerHTML)
+// replaces every node: <ha-card> and <ha-icon> come back empty until their own update, the scene's animations start
+// over, the status pill is measured before the new <ha-card> lays out its content (wrong line, other height), and
+// the sections view reflows under the page (it moves by itself). rcMorph brings the nodes in place in line with the
+// new markup instead: same node, text and attributes updated; a tile is matched by its key (data-id, data-area,
+// data-scene), the rest by position and tag. Attributes the card sets itself after drawing (the pill's fit) are
+// kept, and so are the nodes it adds itself (data-rc-own: the mini cards' zoom button).
+const RC_KEEP_ATTRS = new Set(["data-wrap", "data-dot"]);
+const rcIsOwn = (n) => n?.nodeType === 1 && n.hasAttribute("data-rc-own");
+const rcKeyOf = (n) => (n.nodeType === 1 ? (n.getAttribute("data-id") ?? n.getAttribute("data-area") ?? n.getAttribute("data-scene")) : null);
+
+const rcPatchNode = (a, b) => {
+  if (a.nodeType !== 1) {
+    if (a.nodeValue !== b.nodeValue) a.nodeValue = b.nodeValue;
+    return;
+  }
+  for (const { name, value } of b.attributes) if (a.getAttribute(name) !== value) a.setAttribute(name, value);
+  for (const { name } of [...a.attributes]) if (!b.hasAttribute(name) && !RC_KEEP_ATTRS.has(name)) a.removeAttribute(name);
+  rcMorphChildren(a, b);
+};
+
+const rcMorphChildren = (from, to) => {
+  const old = [...from.childNodes].filter((n) => !rcIsOwn(n));
+  const keyed = new Map();
+  for (const n of old) {
+    const k = rcKeyOf(n);
+    if (k != null) keyed.set(`${n.nodeName}|${k}`, n);
+  }
+  const used = new Set();
+  let cursor = 0;
+  let prev = null;
+  for (const n of [...to.childNodes]) {
+    const k = rcKeyOf(n);
+    let match = null;
+    if (k != null) match = keyed.get(`${n.nodeName}|${k}`) ?? null;
+    else {
+      while (cursor < old.length && (used.has(old[cursor]) || rcKeyOf(old[cursor]) != null)) cursor++;
+      if (old[cursor]?.nodeName === n.nodeName) match = old[cursor++];
+    }
+    if (match && !used.has(match)) {
+      used.add(match);
+      rcPatchNode(match, n);
+    } else match = n;
+    // Where it goes: right after the previous node, before the card's own nodes (which stay at the end).
+    let ref = prev ? prev.nextSibling : from.firstChild;
+    let own = null;
+    while (rcIsOwn(ref)) {
+      own ??= ref;
+      ref = ref.nextSibling;
+    }
+    if (ref !== match) from.insertBefore(match, ref ?? own);
+    prev = match;
+  }
+  for (const n of old) if (!used.has(n) && n.parentNode === from) from.removeChild(n);
+};
+
+// `el`'s content brought in line with `html`, in place (see above); a plain rewrite where there is no DOM to morph.
+const rcMorph = (el, html) => {
+  if (!el.childNodes || typeof document.createElement("template").content !== "object") {
+    el.innerHTML = html;
+    return;
+  }
+  const t = document.createElement("template");
+  t.innerHTML = html;
+  rcMorphChildren(el, t.content);
 };
 
 const rcUnavailable = (st) => ["unavailable", "unknown"].includes(st.state);
@@ -1950,16 +2023,22 @@ class RcCard extends HTMLElement {
     root.addEventListener("keydown", () => {
       this._byPointer = false;
     });
-    // The banner's status pill is fitted after every redraw of the card and for every new width.
-    if (typeof MutationObserver === "function") new MutationObserver(() => this._fitPill()).observe(root, { childList: true, subtree: true });
+    // The banner's status pill is fitted after every redraw of the card (each draw calls _fitPill) and for every
+    // new width; the observer is let go while the card is off the page.
     if (typeof ResizeObserver === "function") {
-      new ResizeObserver((entries) => {
+      this._fitObserver = new ResizeObserver((entries) => {
         const w = Math.round(entries.at(-1).contentRect.width);
         if (w === this._fitWidth) return;
         this._fitWidth = w;
         this._fitPill();
-      }).observe(this);
+      });
+      if (this.isConnected !== false) this._fitObserver.observe(this);
     }
+  }
+
+  connectedCallback() {
+    super.connectedCallback?.();
+    this._fitObserver?.observe(this);
   }
 
   // The status pill stays right after the title only while the whole title and the pill's whole label fit on that
@@ -1968,6 +2047,13 @@ class RcCard extends HTMLElement {
   // pill at its natural width), so that every language and title length gets its own answer.
   _fitPill() {
     const root = this.shadowRoot;
+    // Home Assistant's <ha-card> (a Lit element) lays out its content only from its first update, a microtask after
+    // it is connected: measured before, everything is 0 px wide and the pill lands on the wrong line. Fitted then.
+    const card = root?.querySelector?.("ha-card");
+    if (card && card.hasUpdated === false && card.updateComplete?.then) {
+      card.updateComplete.then(() => this._fitPill());
+      return;
+    }
     for (const pill of root?.querySelectorAll?.(".banner .trow > .pill, .banner .trow > .st, .head > .pill, .mini .head > .st") || []) {
       const banner = pill.closest(".banner");
       const host = banner || pill.parentElement;
@@ -2000,6 +2086,8 @@ class RcCard extends HTMLElement {
 
   disconnectedCallback() {
     super.disconnectedCallback?.();
+    this._fitObserver?.disconnect();
+    this._fitWidth = null;
     window.removeEventListener("pointerup", this._onPressEnd, true);
     window.removeEventListener("pointercancel", this._onPressEnd, true);
     // A press cut short by the detach never gets its release: rendered now, and the next updates too.
@@ -2083,7 +2171,12 @@ class RcCard extends HTMLElement {
 
   // Re-render only when something visible changed.
   _changed(parts) {
-    const sig = JSON.stringify([this._config, this._lang(), this._illustrated() && this._night(), parts]);
+    // The config is serialised once per config object (it is replaced, never changed in place), not on every push.
+    if (this._config !== this._sigConfig) {
+      this._sigConfig = this._config;
+      this._sigConfigJson = JSON.stringify(this._config);
+    }
+    const sig = `${this._sigConfigJson}|${JSON.stringify([this._lang(), this._illustrated() && this._night(), parts])}`;
     if (sig === this._sig) return false;
     this._sig = sig;
     return true;
@@ -2137,8 +2230,8 @@ class RcCard extends HTMLElement {
     // Every room idle with the "hide idle rooms" option: the header alone says it all.
     const idle = !rooms.length && this._total > 0;
     grid.hidden = idle;
-    if (idle) grid.innerHTML = "";
-    else grid.innerHTML = rooms.length ? rooms.map(tile).join("") : `<div class="empty">${rcEsc(this._t("no_rooms"))}</div>`;
+    // In place: the tiles keep their nodes from one update to the next (see rcMorph).
+    rcMorph(grid, idle ? "" : rooms.length ? rooms.map(tile).join("") : `<div class="empty">${rcEsc(this._t("no_rooms"))}</div>`);
     if (this._openArea && !rooms.some((x) => x.id === this._openArea)) this._toggle(null);
     else if (this._openArea) this._fillPanel();
   }
@@ -2178,7 +2271,8 @@ class RcCard extends HTMLElement {
     el.setAttribute?.("style", b.style);
     const art = el.querySelector(".bn-art");
     if (art && this._artHtml !== b.art) {
-      art.innerHTML = b.art;
+      // In place: the scene's animations go on, its nodes are not rebuilt.
+      rcMorph(art, b.art);
       this._artHtml = b.art;
     }
   }
@@ -2237,21 +2331,37 @@ class RcCard extends HTMLElement {
   _paint(level, head, tiles, extraClass = "") {
     // The tile with the keyboard focus keeps it through the redraw (a toggle or a brightness step from the keyboard).
     const focused = this._byPointer ? null : this.shadowRoot.activeElement?.dataset?.id;
-    this.shadowRoot.innerHTML = `
+    // In place (see rcMorph): the nodes stay, so the card keeps its height and its animations from one update to the
+    // next. Their listeners are wired again for the new items, the previous ones dropped (abort signal).
+    rcMorph(
+      this.shadowRoot,
+      `
       <style>${RC_BASE_STYLES}${this._illustrated() ? RC_BANNER_STYLES : ""}${this.constructor.styles}</style>
       <ha-card class="lvl-${level}${extraClass}${this._tiles() ? " layout-tiles" : ""}">
         ${head}
         ${tiles ? `<div class="grid" style="--cols:${this._cols()}">${tiles}</div>` : ""}
         ${this._afterGrid()}
-      </ha-card>`;
+      </ha-card>`,
+    );
     const root = this.shadowRoot;
-    root.querySelector(".pill.action")?.addEventListener("click", (ev) => this._allOff(ev));
-    if (this._config.navigation_path) rcBindNav(root.querySelector(".head"), this._config.navigation_path);
+    const on = this._rewire();
+    root.querySelector(".pill.action")?.addEventListener("click", (ev) => this._allOff(ev), on);
+    if (this._config.navigation_path) rcBindNav(root.querySelector(".head"), this._config.navigation_path, on);
     for (const el of root.querySelectorAll(".tile")) {
       this._bindTile(el, (this._items || []).find((i) => i.id === el.dataset.id));
-      if (focused && el.dataset.id === focused) el.focus({ preventScroll: true });
+      if (focused && el.dataset.id === focused && root.activeElement !== el) el.focus({ preventScroll: true });
     }
     this._bindAfter(root);
+    this._fitPill();
+  }
+
+  // The listeners of the previous drawing dropped, and the options ({ signal }) of the new ones (`this._on`): the
+  // nodes drawn in place are wired again for the items they now show.
+  _rewire() {
+    this._ac?.abort();
+    this._ac = typeof AbortController === "function" ? new AbortController() : null;
+    this._on = this._ac ? { signal: this._ac.signal } : undefined;
+    return this._on;
   }
 
   // What a card adds under its tiles (the Lights card's scenes), and its event wiring.
@@ -2279,6 +2389,7 @@ class RcCard extends HTMLElement {
     let mode = null; // null | "hold" | "drag"
     let timer = null;
     let lastStep = 0;
+    const on = this._on;
     el.addEventListener("pointerdown", (ev) => {
       if (ev.button !== 0) return;
       start = { x: ev.clientX, y: ev.clientY };
@@ -2293,7 +2404,7 @@ class RcCard extends HTMLElement {
         this._released();
         onHold();
       }, RC_HOLD_MS);
-    });
+    }, on);
     el.addEventListener("pointermove", (ev) => {
       if (!start || mode === "hold") return;
       const dx = ev.clientX - start.x;
@@ -2310,7 +2421,7 @@ class RcCard extends HTMLElement {
         this._released();
       }
       if (mode === "drag") drag.move(ev.clientX);
-    });
+    }, on);
     const end = (ev, cancelled) => {
       clearTimeout(timer);
       if (!start) return;
@@ -2329,15 +2440,19 @@ class RcCard extends HTMLElement {
       this._released(!wasDrag);
     };
     // The mouse leaving the tile mid-press (no capture outside a drag) cancels it: neither a tap nor a hold.
-    el.addEventListener("pointerleave", () => {
-      if (!start || mode) return;
-      clearTimeout(timer);
-      start = null;
-      this._released();
-    });
-    el.addEventListener("pointerup", (ev) => end(ev, false));
-    el.addEventListener("pointercancel", (ev) => end(ev, true));
-    el.addEventListener("contextmenu", (ev) => ev.preventDefault());
+    el.addEventListener(
+      "pointerleave",
+      () => {
+        if (!start || mode) return;
+        clearTimeout(timer);
+        start = null;
+        this._released();
+      },
+      on,
+    );
+    el.addEventListener("pointerup", (ev) => end(ev, false), on);
+    el.addEventListener("pointercancel", (ev) => end(ev, true), on);
+    el.addEventListener("contextmenu", (ev) => ev.preventDefault(), on);
     el.addEventListener("keydown", (ev) => {
       if ((ev.key === "Enter" && ev.shiftKey) || ev.key === "ContextMenu") {
         ev.preventDefault();
@@ -2351,11 +2466,11 @@ class RcCard extends HTMLElement {
         lastStep = ev.timeStamp;
         drag.step(ev.key === "ArrowRight" ? 10 : -10);
       }
-    });
+    }, on);
     // The arrow released: the stepped level goes out now rather than after the pause.
     el.addEventListener("keyup", (ev) => {
       if (ev.key === "ArrowLeft" || ev.key === "ArrowRight") drag?.flush?.();
-    });
+    }, on);
   }
 
   // End of a press: renders now what an update brought during it.
@@ -2486,7 +2601,8 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
       const title = rcEsc(c.title || this._areaName() || this._t("title"));
       const navAttrs = `${nav ? " nav" : ""}"${nav ? ' role="link" tabindex="0"' : ""}`;
       // Illustrated: the banner (icon, title and status on the wall, the scene at the right), the chips under it.
-      this.shadowRoot.innerHTML = this._illustrated()
+      // In place, as the full card (see rcMorph and _paint).
+      const html = this._illustrated()
         ? `
         <style>${RC_BASE_STYLES}${RC_BANNER_STYLES}${this.constructor.styles}</style>
         <ha-card class="lvl-${level}${cls}">
@@ -2510,10 +2626,13 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
             </div>
           </div>
         </ha-card>`;
+      rcMorph(this.shadowRoot, html);
       const root = this.shadowRoot;
-      if (nav) rcBindNav(root.querySelector(".head"), nav);
-      root.querySelector(".st.action")?.addEventListener("click", (ev) => this._allOff(ev));
-      for (const el of root.querySelectorAll(".r")) el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id));
+      const on = this._rewire();
+      if (nav) rcBindNav(root.querySelector(".head"), nav, on);
+      root.querySelector(".st.action")?.addEventListener("click", (ev) => this._allOff(ev), on);
+      for (const el of root.querySelectorAll(".r")) el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id), on);
+      this._fitPill();
     }
 
     // Zoom button at the end of the header, top right in both views, added once per render.
@@ -2521,10 +2640,20 @@ const rcMini = (Base, tag, styles, { alertsOnly = false } = {}) =>
     // keyboard focus (Enter / Space: no click count) on the button that replaced this one.
     _addZoom() {
       const head = this._config.zoom && this.shadowRoot.querySelector(".head");
-      if (!head || head.querySelector(".zoom")) return;
+      if (!head) return;
+      const title = this._t(this._zoomed ? "zoom_out" : "zoom_in");
+      // Kept from one drawing to the next (data-rc-own: rcMorph leaves it), brought up to date.
+      const kept = head.querySelector(":scope > .zoom");
+      if (kept) {
+        if (kept.title !== title) kept.title = title;
+        const icon = kept.querySelector("ha-icon");
+        if (icon && icon.getAttribute("icon") !== rcZoomIcon(this)) icon.setAttribute("icon", rcZoomIcon(this));
+        return;
+      }
       const button = document.createElement("button");
       button.className = "zoom";
-      button.title = this._t(this._zoomed ? "zoom_out" : "zoom_in");
+      button.setAttribute?.("data-rc-own", "");
+      button.title = title;
       button.innerHTML = `<ha-icon icon="${rcZoomIcon(this)}"></ha-icon>`;
       button.addEventListener("click", (ev) => rcZoomClick(this, ev));
       head.appendChild(button);

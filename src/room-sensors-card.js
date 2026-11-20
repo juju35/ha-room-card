@@ -807,7 +807,7 @@ class RoomSensorsCard extends RcCard {
 
   // A tap opens the details: a sensor cannot be toggled.
   _bindTile(el) {
-    el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id));
+    el.addEventListener("click", () => rcMoreInfo(this, el.dataset.id), this._on);
   }
 
   static styles = `

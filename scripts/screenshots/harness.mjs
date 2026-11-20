@@ -45,7 +45,18 @@ customElements.define("ha-card", class extends HTMLElement {
       "<style>:host{display:block;background:var(--ha-card-background,var(--card-background-color));" +
       "border-radius:var(--ha-card-border-radius,12px);border-style:solid;border-width:var(--ha-card-border-width,1px);" +
       "border-color:var(--ha-card-border-color,var(--divider-color));box-shadow:var(--ha-card-box-shadow,none);" +
-      "color:var(--primary-text-color);overflow:hidden}</style><slot></slot>";
+      "color:var(--primary-text-color);overflow:hidden}</style>" + (window.__litCard ? "" : "<slot></slot>");
+  }
+  // window.__litCard (the layout tests): like Home Assistant's Lit <ha-card>, the content shows from the first update
+  // only, a microtask after the card is connected (hasUpdated / updateComplete as Lit's).
+  connectedCallback() {
+    if (!window.__litCard || this.updateComplete) return;
+    this.hasUpdated = false;
+    this.updateComplete = Promise.resolve().then(() => {
+      this.shadowRoot.appendChild(document.createElement("slot"));
+      this.hasUpdated = true;
+      return true;
+    });
   }
 });
 customElements.define("ha-icon", class extends HTMLElement {
@@ -84,11 +95,12 @@ export const launch = () => chromium.launch(process.env.CHROMIUM_PATH ? { execut
 // A new page per shot: the card's script declares top-level names, which cannot be evaluated twice in one page.
 // `ws`: a recorder mock, as script source defining window.__ws (the card's hass.callWS). `js`: another bundle (the
 // tests load one with every language inline).
-export const openPage = async (browser, { theme, width, icons = {}, label = "", ws = "", js = null }) => {
+// `lit`: a <ha-card> that lays its content out a microtask late, as Home Assistant's.
+export const openPage = async (browser, { theme, width, icons = {}, label = "", ws = "", js = null, lit = false }) => {
   const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1000, height: 2000 } });
   page.on("pageerror", (err) => console.error(`pageerror${label ? ` (${label})` : ""}: ${err.message}`));
   await page.setContent(pageHtml(theme, width));
-  await page.addScriptTag({ content: haElements(icons) + ws });
+  await page.addScriptTag({ content: `window.__litCard = ${lit};${haElements(icons)}${ws}` });
   await page.addScriptTag({ content: js ?? cardJs() });
   return page;
 };
