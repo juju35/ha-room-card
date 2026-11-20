@@ -1012,8 +1012,8 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
           <div class="hint">${rcEsc(this._tn("confirm_plugs", n))}</div>
           <div class="modal-list">${items}</div>
           <div class="modal-actions">
-            <button class="act cancel" data-action="cancel">${rcEsc(this._t("cancel"))}</button>
-            <button class="act primary" data-action="ok">${rcEsc(this._t("turn_off"))}</button>
+            <button type="button" class="act cancel" data-action="cancel">${rcEsc(this._t("cancel"))}</button>
+            <button type="button" class="act primary" data-action="ok">${rcEsc(this._t("turn_off"))}</button>
           </div>
         </div>
       </div>`;

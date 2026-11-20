@@ -6,6 +6,12 @@
 - Every card: a state update no longer rebuilds the card's content. The nodes are updated in place (text, attributes, classes), so the card keeps its height, its icons and its scene animations from one update to the next, and an update of an entity the card does not show changes nothing. Before, each update rewrote the whole card: the status pill was measured before Home Assistant's `<ha-card>` had laid out its new content and jumped to the wrong line (the card's height changed on narrow cards, more so without the illustration), and the sections view reflowed, which made the page move by itself.
 - Banner status pill: fitted once Home Assistant's `<ha-card>` has drawn its content, not before (it was measured at 0 px on a freshly drawn card).
 
+### Performance
+- Every card: the change test serialises the card's configuration once per configuration, not on every update of Home Assistant; the status pill is no longer measured again by a mutation observer on every redraw (each draw already measures it), and the width observer is let go while the card is off the page.
+
+### Maintenance
+- Overview: the buttons of the confirmation popup are typed `button`.
+
 ## 2.2.0 - 2026-11-20
 
 ### Features

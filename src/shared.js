@@ -2023,16 +2023,22 @@ class RcCard extends HTMLElement {
     root.addEventListener("keydown", () => {
       this._byPointer = false;
     });
-    // The banner's status pill is fitted after every redraw of the card and for every new width.
-    if (typeof MutationObserver === "function") new MutationObserver(() => this._fitPill()).observe(root, { childList: true, subtree: true });
+    // The banner's status pill is fitted after every redraw of the card (each draw calls _fitPill) and for every
+    // new width; the observer is let go while the card is off the page.
     if (typeof ResizeObserver === "function") {
-      new ResizeObserver((entries) => {
+      this._fitObserver = new ResizeObserver((entries) => {
         const w = Math.round(entries.at(-1).contentRect.width);
         if (w === this._fitWidth) return;
         this._fitWidth = w;
         this._fitPill();
-      }).observe(this);
+      });
+      if (this.isConnected !== false) this._fitObserver.observe(this);
     }
+  }
+
+  connectedCallback() {
+    super.connectedCallback?.();
+    this._fitObserver?.observe(this);
   }
 
   // The status pill stays right after the title only while the whole title and the pill's whole label fit on that
@@ -2080,6 +2086,8 @@ class RcCard extends HTMLElement {
 
   disconnectedCallback() {
     super.disconnectedCallback?.();
+    this._fitObserver?.disconnect();
+    this._fitWidth = null;
     window.removeEventListener("pointerup", this._onPressEnd, true);
     window.removeEventListener("pointercancel", this._onPressEnd, true);
     // A press cut short by the detach never gets its release: rendered now, and the next updates too.
@@ -2163,7 +2171,12 @@ class RcCard extends HTMLElement {
 
   // Re-render only when something visible changed.
   _changed(parts) {
-    const sig = JSON.stringify([this._config, this._lang(), this._illustrated() && this._night(), parts]);
+    // The config is serialised once per config object (it is replaced, never changed in place), not on every push.
+    if (this._config !== this._sigConfig) {
+      this._sigConfig = this._config;
+      this._sigConfigJson = JSON.stringify(this._config);
+    }
+    const sig = `${this._sigConfigJson}|${JSON.stringify([this._lang(), this._illustrated() && this._night(), parts])}`;
     if (sig === this._sig) return false;
     this._sig = sig;
     return true;
