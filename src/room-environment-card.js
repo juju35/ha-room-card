@@ -892,10 +892,11 @@ const RE_APPLIANCE_WORDS =
 // `climate`, a `water_heater`, a `humidifier`, or a `number` setpoint.
 const RE_APPLIANCE_DOMAINS = new Set(["climate", "water_heater", "humidifier", "number"]);
 // A `number` that tunes the sensor itself rather than setting a target: a calibration offset, a comfort range, an alarm
-// threshold, a reporting interval… A temperature/humidity sensor (SONOFF SNZB-02D/02DR2, Aqara, Tuya…) exposes these
-// without an entity category under Zigbee2MQTT or ZHA, and they must not turn it into an appliance (issue #98).
+// threshold, a reporting interval, or a remote reading pushed to its screen (SNZB-02DR2 `source_1_temperature`,
+// older firmware `external_temperature`)… A temperature/humidity sensor (SONOFF SNZB-02D/02DR2, Aqara, Tuya…) exposes
+// these without an entity category under Zigbee2MQTT or ZHA, and they must not turn it into an appliance (issue #98).
 const RE_SENSOR_SETTING =
-  /\b(calibration|calibrage|etalonnage|étalonnage|offset|decalage|décalage|correction|comfort|confort|min|max|minimum|maximum|lower|upper|low|high|threshold|seuil|alarm|alarme|alert|alerte|limit|limite|report|reporting|interval|intervalle|sensitivity|sensibilite|sensibilité|hysteresis|hystérésis|precision|précision|delta|change|led|brightness|luminosite|luminosité)\b/;
+  /\b(source|external|externe|exterieure|extérieure|remote|distant|distante|display|affichage|calibration|calibrage|etalonnage|étalonnage|offset|decalage|décalage|correction|comfort|confort|min|max|minimum|maximum|lower|upper|low|high|threshold|seuil|alarm|alarme|alert|alerte|limit|limite|report|reporting|interval|intervalle|sensitivity|sensibilite|sensibilité|hysteresis|hystérésis|precision|précision|delta|change|led|brightness|luminosite|luminosité)\b/;
 const reSensorSetting = (hass, id) => RE_SENSOR_SETTING.test(reNorm(id)) || RE_SENSOR_SETTING.test(reNorm(hass.states?.[id]?.attributes?.friendly_name));
 
 // A `select` / `sensor` for an operation state or a program (Home Connect, Miele, LG ThinQ, SmartThings…).

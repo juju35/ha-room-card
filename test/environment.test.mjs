@@ -589,7 +589,7 @@ test("a diagnostic number on the device does not disqualify an ambient sensor", 
 });
 
 test("a temperature/humidity sensor's own uncategorised settings do not disqualify it (issue #98)", () => {
-  // SONOFF SNZB-02DR2 under Zigbee2MQTT / ZHA: comfort range, calibration and reporting numbers with no category.
+  // SONOFF SNZB-02DR2 under Zigbee2MQTT / ZHA: comfort range, calibration and remote-source numbers with no category.
   const hass = makeHass();
   for (const id of ["sensor.lr_temperature", "sensor.lr_humidity"]) if (hass.entities[id]) hass.entities[id].device_id = "dev_snzb";
   const settings = {
@@ -599,6 +599,9 @@ test("a temperature/humidity sensor's own uncategorised settings do not disquali
     "number.snzb_02dr2_temperature_calibration": "Temperature calibration",
     "number.snzb_02dr2_humidity_calibration": "Humidity calibration",
     "number.snzb_02dr2_temperature_offset": "Décalage de température",
+    "number.snzb_02dr2_source_1_temperature": "Source 1 temperature",
+    "number.snzb_02dr2_source_2_humidity": "Source 2 humidity",
+    "number.snzb_02dr2_external_temperature": "External temperature",
   };
   for (const [id, name] of Object.entries(settings)) {
     hass.entities[id] = { area_id: "living_room", device_id: "dev_snzb" };
