@@ -263,6 +263,9 @@ rooms:
     icon: mdi:bed-king-outline
   - area: office
     navigation_path: /dashboard-home/office
+  - area: garden
+    include:
+      - binary_sensor.gate
 ```
 
 #### Options reference
@@ -293,6 +296,7 @@ rooms:
 | `icon` | Room icon; defaults to the area icon, or one picked from the name |
 | `navigation_path` | Dashboard opened on tap instead of the details, e.g. `/dashboard-home/office` |
 | `outdoor` | Outdoor room (camera vehicle detections count); defaults to a guess from the area name |
+| `include` | Entities added to the room: from another room, without one, or not recognised (a template gate with no area nor device class, say); each item is an entity ID or `{entity, name, icon}`. They count in this room only, in its tile, the totals and its details, sorted by domain whatever their device class: a `binary_sensor` is an opening (a presence one, with a presence or motion class, unless `presence: false`), a `light` a light, a `switch` a light when named as one and a plug otherwise; other domains are left out. YAML only |
 
 ### Sensors
 
@@ -697,6 +701,8 @@ rooms:
   - area: office
     navigation_path: /dashboard-home/office
   - area: cellar
+    include:
+      - sensor.cellar_temperature
     thresholds:
       humidity: [30, 40, 75, 85]
 ```
@@ -716,7 +722,7 @@ rooms:
 | `thresholds` | ❌ | See [Thresholds](#thresholds) | Comfort limits per kind, also used by the unfolded room |
 | `exclude_areas` | ❌ | — | Rooms left out; the visual editor only offers the rooms the card finds |
 | `exclude` | ❌ | — | Sensors left out of the tiles, the averages and the room details |
-| `rooms` | ❌ | — | Room order and overrides (`area`, `name`, `icon`, `navigation_path`, as on the [Overview](#overview)), plus `thresholds` for that room only, on top of the card's |
+| `rooms` | ❌ | — | Room order and overrides (`area`, `name`, `icon`, `navigation_path`, as on the [Overview](#overview)), plus `thresholds` for that room only, on top of the card's, and `include`: sensors added to the room (from another room, without one, or left out by the discovery), counted there only and taken as they are, with no appliance filter; a sensor of no known kind gives no reading |
 | `language` | ❌ | Auto | Force language: `en`, `fr`, `de`, `es`, `sr`, `sr-Latn`, `it`, `nl`, `pt`, `pl`, `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv` or `el` (auto-detects from HA settings) |
 
 ## Screenshots
@@ -830,7 +836,7 @@ The card goes through every entity with an area (set on the entity or on its dev
 - **Lights**: every `light` except light groups, and every `switch` whose name contains *lumière*, *lampe*, *lamp*, *light*, *veilleuse* or *guirlande*
 - **Plugs**: every other `switch` with device class `outlet`, or whose name contains *prise*, *multiprise*, *plug*, *outlet* or *socket*, with the power sensor of the same device
 
-Hidden entities are skipped, and so are the configuration and diagnostic entities of lights and plugs (an indicator LED, say); door, window and presence sensors count whatever their entity category, like on the Sensors card. A room is shown when it has at least one of them.
+Hidden entities are skipped, and so are the configuration and diagnostic entities of lights and plugs (an indicator LED, say); door, window and presence sensors count whatever their entity category, like on the Sensors card. A room is shown when it has at least one of them. A room's `include` adds entities the discovery misses (no area, no recognised device class), counted in that room only.
 
 A tile shows the most important state of the room: open doors and windows, then presence, otherwise *All closed* (or *All quiet* for a room without door or window sensors). The details of a room are the Sensors, Lights and Plugs cards of that area, for the kinds of entities the room has.
 
@@ -862,7 +868,7 @@ Each reading falls in one of five bands of its [thresholds](#thresholds). The he
 
 ### Environment overview
 
-The card finds the rooms the way the Environment card does, area by area, and shows each with the same readings and levels. A room needs a look when one of its readings is in a warning or alert band; the header counts those rooms, and its averages count each room once (its mean temperature and humidity).
+The card finds the rooms the way the Environment card does, area by area (plus each room's `include`), and shows each with the same readings and levels. A room needs a look when one of its readings is in a warning or alert band; the header counts those rooms, and its averages count each room once (its mean temperature and humidity).
 
 ## Development
 

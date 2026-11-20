@@ -144,6 +144,25 @@ const rcByArea = (card, match) => {
   });
 };
 
+// The overviews' `rooms[].include`: entities added by hand to a room, from another room, without one or not
+// recognised (a template without an area or a device class, say). A map of entity ID to { aid, entry }, `entry` the
+// `{entity, name, icon}` item; an entity listed in several rooms counts in the first. Only existing states count.
+const rcRoomIncludes = (hass, config) => {
+  const out = new Map();
+  for (const r of config.rooms || []) {
+    for (const e of r?.include || []) {
+      const entry = typeof e === "string" ? { entity: e } : e;
+      if (entry?.entity && hass.states[entry.entity] && !out.has(entry.entity)) out.set(entry.entity, { aid: r.area, entry });
+    }
+  }
+  return out;
+};
+// The entities included in a room other than `aid`: left out of `aid`'s details card, as of its tiles.
+const rcIncludedElsewhere = (included, aid) => [...included].filter(([, x]) => x.aid !== aid).map(([id]) => id);
+// The `include` items of one room, for its details card.
+const rcIncludesOf = (included, aid, keep = () => true) =>
+  [...included.values()].filter((x) => x.aid === aid && keep(x.entry.entity)).map((x) => x.entry);
+
 // Rooms in the order of the config's `rooms` list, then, with `sort: state`, the highest `rank(room)` first,
 // then by name.
 const rcSortRooms = (list, config, rank) => {
@@ -301,7 +320,7 @@ const RC_I18N = {
     ed_thresholds: "Comfort thresholds (YAML)",
     ed_thresholds_helper: "Per kind, in the sensor's unit, e.g. co2: [800, 1200] or humidity: [25, 35, 70, 80]",
     ed_rooms: "Rooms (YAML)",
-    ed_rooms_helper: "Order and overrides: a list of {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Order and overrides: a list of {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Navigation path",
     ed_all_off_button: "“Turn everything off” button",
     err_config: "Set `area` or `entities`",
@@ -369,7 +388,7 @@ const RC_I18N = {
     ed_thresholds: "Seuils de confort (YAML)",
     ed_thresholds_helper: "Par type, dans l'unité du capteur, par exemple co2: [800, 1200] ou humidity: [25, 35, 70, 80]",
     ed_rooms: "Pièces (YAML)",
-    ed_rooms_helper: "Ordre et personnalisation : une liste de {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Ordre et personnalisation : une liste de {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Chemin de navigation",
     ed_all_off_button: "Bouton « Tout éteindre »",
     err_config: "Définis `area` ou `entities`",
@@ -437,7 +456,7 @@ const RC_I18N = {
     ed_thresholds: "Komfortschwellen (YAML)",
     ed_thresholds_helper: "Pro Art, in der Einheit des Sensors, z. B. co2: [800, 1200] oder humidity: [25, 35, 70, 80]",
     ed_rooms: "Räume (YAML)",
-    ed_rooms_helper: "Reihenfolge und Anpassungen: eine Liste von {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Reihenfolge und Anpassungen: eine Liste von {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Navigationspfad",
     ed_all_off_button: "Schaltfläche „Alles ausschalten“",
     err_config: "Lege `area` oder `entities` fest",
@@ -505,7 +524,7 @@ const RC_I18N = {
     ed_thresholds: "Umbrales de confort (YAML)",
     ed_thresholds_helper: "Por tipo, en la unidad del sensor, p. ej. co2: [800, 1200] o humidity: [25, 35, 70, 80]",
     ed_rooms: "Habitaciones (YAML)",
-    ed_rooms_helper: "Orden y personalización: una lista de {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Orden y personalización: una lista de {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Ruta de navegación",
     ed_all_off_button: "Botón «Apagar todo»",
     err_config: "Define `area` o `entities`",
@@ -574,7 +593,7 @@ const RC_I18N = {
     ed_thresholds: "Прагови комфора (YAML)",
     ed_thresholds_helper: "По врсти, у јединици сензора, нпр. co2: [800, 1200] или humidity: [25, 35, 70, 80]",
     ed_rooms: "Собе/Просторије (YAML)",
-    ed_rooms_helper: "Редослед и измене: листа са {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Редослед и измене: листа са {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Путања за навигацију",
     ed_all_off_button: "Дугме „Искључи све“",
     err_config: "Подесите `area` или `entities`",
@@ -643,7 +662,7 @@ const RC_I18N = {
     ed_thresholds: "Pragovi komfora (YAML)",
     ed_thresholds_helper: "Po vrsti, u jedinici senzora, npr. co2: [800, 1200] ili humidity: [25, 35, 70, 80]",
     ed_rooms: "Sobe/Prostorije (YAML)",
-    ed_rooms_helper: "Redosled i izmene: lista sa {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Redosled i izmene: lista sa {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Putanja za navigaciju",
     ed_all_off_button: "Dugme „Isključi sve“",
     err_config: "Podesite `area` ili `entities`",
@@ -711,7 +730,7 @@ const RC_I18N = {
     ed_thresholds: "Soglie di comfort (YAML)",
     ed_thresholds_helper: "Per tipo, nell'unità del sensore, ad es. co2: [800, 1200] o humidity: [25, 35, 70, 80]",
     ed_rooms: "Stanze (YAML)",
-    ed_rooms_helper: "Ordine e personalizzazioni: un elenco di {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Ordine e personalizzazioni: un elenco di {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Percorso di navigazione",
     ed_all_off_button: "Pulsante «Spegni tutto»",
     err_config: "Imposta `area` o `entities`",
@@ -779,7 +798,7 @@ const RC_I18N = {
     ed_thresholds: "Comfortdrempels (YAML)",
     ed_thresholds_helper: "Per soort, in de eenheid van de sensor, bijv. co2: [800, 1200] of humidity: [25, 35, 70, 80]",
     ed_rooms: "Ruimtes (YAML)",
-    ed_rooms_helper: "Volgorde en aanpassingen: een lijst van {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Volgorde en aanpassingen: een lijst van {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Navigatiepad",
     ed_all_off_button: "Knop “Alles uitschakelen”",
     err_config: "Stel `area` of `entities` in",
@@ -847,7 +866,7 @@ const RC_I18N = {
     ed_thresholds: "Limiares de conforto (YAML)",
     ed_thresholds_helper: "Por tipo, na unidade do sensor, p. ex. co2: [800, 1200] ou humidity: [25, 35, 70, 80]",
     ed_rooms: "Divisões (YAML)",
-    ed_rooms_helper: "Ordem e personalização: uma lista de {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Ordem e personalização: uma lista de {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Caminho de navegação",
     ed_all_off_button: "Botão «Desligar tudo»",
     err_config: "Defina `area` ou `entities`",
@@ -915,7 +934,7 @@ const RC_I18N = {
     ed_thresholds: "Progi komfortu (YAML)",
     ed_thresholds_helper: "Dla każdego rodzaju, w jednostce czujnika, np. co2: [800, 1200] lub humidity: [25, 35, 70, 80]",
     ed_rooms: "Pomieszczenia (YAML)",
-    ed_rooms_helper: "Kolejność i nadpisania: lista {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Kolejność i nadpisania: lista {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Ścieżka nawigacji",
     ed_all_off_button: "Przycisk „Wyłącz wszystko”",
     err_config: "Ustaw `area` lub `entities`",
@@ -983,7 +1002,7 @@ const RC_I18N = {
     ed_thresholds: "Praguri de confort (YAML)",
     ed_thresholds_helper: "Pe tip, în unitatea senzorului, de ex. co2: [800, 1200] sau humidity: [25, 35, 70, 80]",
     ed_rooms: "Camere (YAML)",
-    ed_rooms_helper: "Ordine și personalizări: o listă de {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Ordine și personalizări: o listă de {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Cale de navigare",
     ed_all_off_button: "Butonul „Oprește tot”",
     err_config: "Setează `area` sau `entities`",
@@ -1051,7 +1070,7 @@ const RC_I18N = {
     ed_thresholds: "Komforttærskler (YAML)",
     ed_thresholds_helper: "Pr. type, i sensorens enhed, f.eks. co2: [800, 1200] eller humidity: [25, 35, 70, 80]",
     ed_rooms: "Rum (YAML)",
-    ed_rooms_helper: "Rækkefølge og tilpasninger: en liste med {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Rækkefølge og tilpasninger: en liste med {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Navigationssti",
     ed_all_off_button: "Knappen »Sluk alt«",
     err_config: "Angiv `area` eller `entities`",
@@ -1119,7 +1138,7 @@ const RC_I18N = {
     ed_thresholds: "Komfortgränser (YAML)",
     ed_thresholds_helper: "Per typ, i sensorns enhet, t.ex. co2: [800, 1200] eller humidity: [25, 35, 70, 80]",
     ed_rooms: "Rum (YAML)",
-    ed_rooms_helper: "Ordning och anpassningar: en lista med {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Ordning och anpassningar: en lista med {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Navigeringssökväg",
     ed_all_off_button: "Knappen ”Stäng av allt”",
     err_config: "Ange `area` eller `entities`",
@@ -1187,7 +1206,7 @@ const RC_I18N = {
     ed_thresholds: "Прагове на комфорт (YAML)",
     ed_thresholds_helper: "По вид, в мерната единица на сензора, напр. co2: [800, 1200] или humidity: [25, 35, 70, 80]",
     ed_rooms: "Стаи (YAML)",
-    ed_rooms_helper: "Ред и персонализиране: списък от {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Ред и персонализиране: списък от {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Път за навигация",
     ed_all_off_button: "Бутон „Изключи всичко“",
     err_config: "Задайте `area` или `entities`",
@@ -1255,7 +1274,7 @@ const RC_I18N = {
     ed_thresholds: "Пороги комфорта (YAML)",
     ed_thresholds_helper: "Для каждого типа, в единицах датчика, например co2: [800, 1200] или humidity: [25, 35, 70, 80]",
     ed_rooms: "Комнаты (YAML)",
-    ed_rooms_helper: "Порядок и настройки: список {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Порядок и настройки: список {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Путь навигации",
     ed_all_off_button: "Кнопка «Выключить всё»",
     err_config: "Укажите `area` или `entities`",
@@ -1323,7 +1342,7 @@ const RC_I18N = {
     ed_thresholds: "Пороги комфорту (YAML)",
     ed_thresholds_helper: "Для кожного типу, в одиницях датчика, наприклад co2: [800, 1200] або humidity: [25, 35, 70, 80]",
     ed_rooms: "Кімнати (YAML)",
-    ed_rooms_helper: "Порядок і налаштування: список {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Порядок і налаштування: список {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Шлях навігації",
     ed_all_off_button: "Кнопка «Вимкнути все»",
     err_config: "Вкажіть `area` або `entities`",
@@ -1391,7 +1410,7 @@ const RC_I18N = {
     ed_thresholds: "Komfortküszöbök (YAML)",
     ed_thresholds_helper: "Típusonként, az érzékelő mértékegységében, pl. co2: [800, 1200] vagy humidity: [25, 35, 70, 80]",
     ed_rooms: "Helyiségek (YAML)",
-    ed_rooms_helper: "Sorrend és testreszabás: {area, name, icon, navigation_path} elemek listája",
+    ed_rooms_helper: "Sorrend és testreszabás: {area, name, icon, navigation_path, include} elemek listája",
     ed_navigation_path: "Navigációs útvonal",
     ed_all_off_button: "„Minden kikapcsolása” gomb",
     err_config: "Állítsd be az `area` vagy az `entities` értékét",
@@ -1459,7 +1478,7 @@ const RC_I18N = {
     ed_thresholds: "Prahy komfortu (YAML)",
     ed_thresholds_helper: "Podľa druhu, v jednotke senzora, napr. co2: [800, 1200] alebo humidity: [25, 35, 70, 80]",
     ed_rooms: "Miestnosti (YAML)",
-    ed_rooms_helper: "Poradie a úpravy: zoznam {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Poradie a úpravy: zoznam {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Navigačná cesta",
     ed_all_off_button: "Tlačidlo „Vypnúť všetko“",
     err_config: "Nastavte `area` alebo `entities`",
@@ -1527,7 +1546,7 @@ const RC_I18N = {
     ed_thresholds: "Prahy komfortu (YAML)",
     ed_thresholds_helper: "Podle druhu, v jednotce senzoru, např. co2: [800, 1200] nebo humidity: [25, 35, 70, 80]",
     ed_rooms: "Místnosti (YAML)",
-    ed_rooms_helper: "Pořadí a úpravy: seznam {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Pořadí a úpravy: seznam {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Navigační cesta",
     ed_all_off_button: "Tlačítko „Vypnout vše“",
     err_config: "Nastavte `area` nebo `entities`",
@@ -1595,7 +1614,7 @@ const RC_I18N = {
     ed_thresholds: "Pragovi udobja (YAML)",
     ed_thresholds_helper: "Po vrsti, v enoti senzorja, npr. co2: [800, 1200] ali humidity: [25, 35, 70, 80]",
     ed_rooms: "Prostori (YAML)",
-    ed_rooms_helper: "Vrstni red in prilagoditve: seznam {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Vrstni red in prilagoditve: seznam {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Navigacijska pot",
     ed_all_off_button: "Gumb »Izklopi vse«",
     err_config: "Nastavite `area` ali `entities`",
@@ -1663,7 +1682,7 @@ const RC_I18N = {
     ed_thresholds: "Komforta sliekšņi (YAML)",
     ed_thresholds_helper: "Pēc veida, sensora mērvienībā, piem., co2: [800, 1200] vai humidity: [25, 35, 70, 80]",
     ed_rooms: "Telpas (YAML)",
-    ed_rooms_helper: "Secība un pielāgojumi: saraksts ar {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Secība un pielāgojumi: saraksts ar {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Navigācijas ceļš",
     ed_all_off_button: "Poga “Izslēgt visu”",
     err_config: "Iestatiet `area` vai `entities`",
@@ -1731,7 +1750,7 @@ const RC_I18N = {
     ed_thresholds: "Όρια άνεσης (YAML)",
     ed_thresholds_helper: "Ανά είδος, στη μονάδα του αισθητήρα, π.χ. co2: [800, 1200] ή humidity: [25, 35, 70, 80]",
     ed_rooms: "Δωμάτια (YAML)",
-    ed_rooms_helper: "Σειρά και προσαρμογές: μια λίστα με {area, name, icon, navigation_path}",
+    ed_rooms_helper: "Σειρά και προσαρμογές: μια λίστα με {area, name, icon, navigation_path, include}",
     ed_navigation_path: "Διαδρομή πλοήγησης",
     ed_all_off_button: "Κουμπί «Απενεργοποίηση όλων»",
     err_config: "Ορίστε `area` ή `entities`",
