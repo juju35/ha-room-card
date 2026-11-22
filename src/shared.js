@@ -2346,7 +2346,7 @@ class RcCard extends HTMLElement {
         <button class="pill${allOff ? " action" : ""}" title="${rcEsc(allOff ? this._t("turn_all_off") : status)}"${allOff ? "" : " disabled"}>
           ${allOff ? '<ha-icon icon="mdi:power"></ha-icon>' : ""}<span class="pt">${rcEsc(status)}</span>
         </button>
-        <span class="chev" aria-hidden="true"></span>
+        <span class="rc-fold" aria-hidden="true"></span>
       </div>`;
     }
     return `
@@ -3178,14 +3178,14 @@ const RC_BASE_STYLES = `
   :host([embedded]) .head > .badge { width: 28px; height: 28px; }
   :host([embedded]) .head > .badge ha-icon { --mdc-icon-size: 16px; }
   :host([embedded]) .title { font-size: 14px; }
-  .chev { order: 3; flex: none; margin-left: auto; width: 7px; height: 7px; margin-right: 4px;
+  .rc-fold { order: 3; flex: none; margin-left: auto; width: 7px; height: 7px; margin-right: 4px;
           border-right: 2px solid var(--secondary-text-color); border-bottom: 2px solid var(--secondary-text-color);
           transform: translateY(-2px) rotate(45deg); transition: transform .2s; }
-  :host([collapsed]) .chev { transform: rotate(-45deg); }
+  :host([collapsed]) .rc-fold { transform: rotate(-45deg); }
   :host([collapsed]) ha-card > :not(.head) { display: none; }
   :host([embedded]) .mini > .badge, :host([embedded]) .mini .head { display: none; }
   :host([embedded]) .mini .body { min-height: 0; }
-  @media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .rc-fold { transition: none; } }
   .pill.action { cursor: pointer; }
   .pill.action:hover { background: color-mix(in srgb, var(--c) 24%, transparent); }
   .pill.action:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
