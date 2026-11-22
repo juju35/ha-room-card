@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.3 - 2026-11-22
+
+### Performance
+- Card picker: the previews are back (`preview: true`), and light. Each card's preview is drawn only once it scrolls into view of Home Assistant's card picker, which otherwise builds the preview of every card at once: until then it holds Home Assistant's state (no render, no history request, no animation). On a dashboard or in the card editor the card is drawn as before.
+
 ## 2.2.2 - 2026-11-22
 
 ### Performance
