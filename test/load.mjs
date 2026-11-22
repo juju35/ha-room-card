@@ -42,6 +42,17 @@ export const load = () => {
       return this.shadowRoot;
     }
     dispatchEvent() {}
+    addEventListener() {}
+    removeEventListener() {}
+    // Attributes the cards set on themselves (hide-title, embedded, collapsed).
+    toggleAttribute(name, on) {
+      this.attrs ||= new Set();
+      if (on) this.attrs.add(name);
+      else this.attrs.delete(name);
+    }
+    hasAttribute(name) {
+      return !!this.attrs?.has(name);
+    }
   }
   const sandbox = {
     HTMLElement,
@@ -84,12 +95,12 @@ export const load = () => {
   sandbox.intervals = intervals;
   sandbox.window = sandbox;
   const ctx = vm.createContext(sandbox);
-  const cards = ["room-sensors-card", "room-lights-card", "room-switch-card", "room-environment-card", "room-overview-card"];
+  const cards = ["room-sensors-card", "room-lights-card", "room-switch-card", "room-environment-card", "room-card", "room-overview-card"];
   const code = [read("shared"), read("scene"), ...cards.map((c) => `{\n${read(c)}}\n`)].join("\n");
   return vm.runInContext(
     `${code}
     ({ RcCard, RC_I18N, rcLang, rcGuessRoomType, rcRoomType, rcIsNight, rcScene, rcWatts, rcCleanName, rcIsPlug, rcIsLightSwitch, rcMatchSensor, rcIsOutdoor, rcMatchLight, rcMatchPlug, rcEsc, rcMemo,
-       rcPowerSensors, rcCall, rcInDialog, RC_HOLD_MS, RC_BASE_STYLES, RC_ROOM_GRID_STYLES, customElements, window, cards: Object.fromEntries(${JSON.stringify([...cards, "room-environment-mini-card", "room-sensors-mini-card", "room-lights-mini-card", "room-switch-mini-card"])}.map((t) => [t, customElements.get(t)])) })`,
+       rcPowerSensors, rcCall, rcInDialog, RC_HOLD_MS, RC_BASE_STYLES, RC_ROOM_GRID_STYLES, customElements, window, cards: Object.fromEntries(${JSON.stringify([...cards, "room-environment-mini-card", "room-sensors-mini-card", "room-lights-mini-card", "room-switch-mini-card", "room-mini-card"])}.map((t) => [t, customElements.get(t)])) })`,
     ctx,
   );
 };

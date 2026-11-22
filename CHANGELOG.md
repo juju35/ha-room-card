@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.3.0 - 2026-11-22
+
+### Features
+- New Room card (`custom:room-card`): a whole room in one card, from its area — the illustrated header shows the room over its furniture (a lamp, the window, a wall plug, someone walking in), with the room's status (an opening, then a reading needing a look, a presence, the lights on) and chips for someone there, the lights on and the plugs' power draw; the environment readings on a line under it; then one foldable section each for the lights, plugs and door / window / presence sensors, each being the matching room card with its tiles and actions. `sections` picks and orders the sections, `collapsed` folds some at first, `show_environment: false` drops the readings, and `include` items go to the section of their kind (#106).
+- New Room mini card (`custom:room-mini-card`): the same room on two lines — its status, readings and a pill for the lights on, the plugs on and someone there — with a zoom to the full Room card.
+
+### Maintenance
+- The header chips' styles and the illustration's lamp, breeze and motion detector are shared between the cards (no change in how they look).
+
 ## 2.2.3 - 2026-11-22
 
 ### Performance
