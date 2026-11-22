@@ -2978,7 +2978,7 @@ const rcRegister = (card, editor, name, description) => {
     type: card.tag,
     name,
     description,
-    preview: true,
+    preview: false,
     documentationURL: "https://github.com/juju35/ha-room-card",
   });
 };
