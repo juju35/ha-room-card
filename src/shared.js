@@ -1856,6 +1856,36 @@ const rcBindNav = (head, path, opts) => {
   );
 };
 
+// A section of the Room card folds and unfolds from its header (a tap, Enter or Space), not from its buttons (the
+// "turn everything off" pill): the `collapsed` attribute hides everything under the header (RC_BASE_STYLES), and
+// `rc-fold` tells the Room card, which keeps the state.
+const rcFold = (card, head) => {
+  const collapsed = !card.hasAttribute("collapsed");
+  card.toggleAttribute("collapsed", collapsed);
+  head?.setAttribute?.("aria-expanded", String(!collapsed));
+  card.dispatchEvent(new CustomEvent("rc-fold", { detail: { collapsed } }));
+};
+const rcBindFold = (card, head, opts) => {
+  if (!head) return;
+  head.addEventListener(
+    "click",
+    (ev) => {
+      if (!ev.target.closest?.("button")) rcFold(card, head);
+    },
+    opts,
+  );
+  head.addEventListener(
+    "keydown",
+    (ev) => {
+      if ((ev.key === "Enter" || ev.key === " ") && ev.target === head) {
+        ev.preventDefault();
+        rcFold(card, head);
+      }
+    },
+    opts,
+  );
+};
+
 // ── In-place redraw ──
 // Home Assistant sets `hass` on every state change of the house. Rewriting the card's whole content then (innerHTML)
 // replaces every node: <ha-card> and <ha-icon> come back empty until their own update, the scene's animations start
@@ -1993,6 +2023,8 @@ class RcCard extends HTMLElement {
     this._config = { ...this.constructor.defaults, ...config };
     // show_title: the header's title, hidden by the stylesheet
     this.toggleAttribute?.("hide-title", config.show_title === false);
+    // embedded: a section of the Room card (no frame, a foldable header), set by the Room card itself.
+    this.toggleAttribute?.("embedded", config.embedded === true);
     if (!this.shadowRoot) this._attach();
     this._sig = null;
     this._render();
@@ -2304,6 +2336,19 @@ class RcCard extends HTMLElement {
         </div>
       </div>`);
     }
+    if (c.embedded) {
+      const open = !this.hasAttribute?.("collapsed");
+      return `
+      <div class="head fold" role="button" tabindex="0" aria-expanded="${open}">
+        <div class="badge"><ha-icon icon="${rcEsc(icon)}"></ha-icon></div>
+        <div class="title">${rcEsc(title)}</div>
+        ${chips}
+        <button class="pill${allOff ? " action" : ""}" title="${rcEsc(allOff ? this._t("turn_all_off") : status)}"${allOff ? "" : " disabled"}>
+          ${allOff ? '<ha-icon icon="mdi:power"></ha-icon>' : ""}<span class="pt">${rcEsc(status)}</span>
+        </button>
+        <span class="chev" aria-hidden="true"></span>
+      </div>`;
+    }
     return `
       <div class="head${c.navigation_path ? " nav" : ""}"${c.navigation_path ? ' role="link" tabindex="0"' : ""}>
         <div class="badge"><ha-icon icon="${rcEsc(icon)}"></ha-icon></div>
@@ -2346,7 +2391,8 @@ class RcCard extends HTMLElement {
     const root = this.shadowRoot;
     const on = this._rewire();
     root.querySelector(".pill.action")?.addEventListener("click", (ev) => this._allOff(ev), on);
-    if (this._config.navigation_path) rcBindNav(root.querySelector(".head"), this._config.navigation_path, on);
+    if (this._config.embedded) rcBindFold(this, root.querySelector(".head.fold"), on);
+    else if (this._config.navigation_path) rcBindNav(root.querySelector(".head"), this._config.navigation_path, on);
     for (const el of root.querySelectorAll(".tile")) {
       this._bindTile(el, (this._items || []).find((i) => i.id === el.dataset.id));
       if (focused && el.dataset.id === focused && root.activeElement !== el) el.focus({ preventScroll: true });
@@ -3125,6 +3171,21 @@ const RC_BASE_STYLES = `
     .head > .badge ha-icon { --mdc-icon-size: 20px; }
     .head > .chip { display: none; }
   }
+  /* embedded: a section of the Room card. Its header folds the section (chevron right folded, down unfolded), with a
+     smaller badge; the environment readings show without their header (the Room card's banner holds the room). */
+  :host([embedded]) .head.fold { cursor: pointer; border-radius: 8px; }
+  :host([embedded]) .head.fold:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+  :host([embedded]) .head > .badge { width: 28px; height: 28px; }
+  :host([embedded]) .head > .badge ha-icon { --mdc-icon-size: 16px; }
+  :host([embedded]) .title { font-size: 14px; }
+  .chev { order: 3; flex: none; margin-left: auto; width: 7px; height: 7px; margin-right: 4px;
+          border-right: 2px solid var(--secondary-text-color); border-bottom: 2px solid var(--secondary-text-color);
+          transform: translateY(-2px) rotate(45deg); transition: transform .2s; }
+  :host([collapsed]) .chev { transform: rotate(-45deg); }
+  :host([collapsed]) ha-card > :not(.head) { display: none; }
+  :host([embedded]) .mini > .badge, :host([embedded]) .mini .head { display: none; }
+  :host([embedded]) .mini .body { min-height: 0; }
+  @media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
   .pill.action { cursor: pointer; }
   .pill.action:hover { background: color-mix(in srgb, var(--c) 24%, transparent); }
   .pill.action:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
@@ -3194,6 +3255,36 @@ const RC_TOGGLE_MINI_STYLES = `
   .r.off { --t: var(--rc-idle); }
   .r.na  { --t: var(--rc-na); opacity: .7; }
   .r small { flex: none; font-size: 10px; font-weight: 400; opacity: .8; margin-left: 4px; }
+`;
+
+// Header chips of the overviews and the Room card (people there, lights on, plugs drawing power), and their row.
+const RC_CHIP_STYLES = `
+      :where(button.chip) { all: unset; }
+      .chip { --k: var(--rc-idle); flex: none; display: inline-flex; align-items: center; gap: 2px; height: 18px; padding: 0 5px;
+              border-radius: 999px; font-size: 11px; font-weight: 500; line-height: 1; white-space: nowrap;
+              color: var(--k); background: color-mix(in srgb, var(--k) 14%, transparent); }
+      .head .chip { height: 20px; padding: 0 6px; font-size: 11px; }
+      .chip ha-icon { --mdc-icon-size: 12px; }
+      .chip:not(:has(span)) { width: 18px; padding: 0; justify-content: center; }
+      .chip.warn  { --k: var(--rc-warn); }
+      .chip.info  { --k: var(--rc-info); }
+      .chip.light { --k: var(--rc-light); }
+      .chip.plug  { --k: var(--rc-plug); }
+      button.chip { cursor: pointer; transition: background .2s; }
+      button.chip:hover { background: color-mix(in srgb, var(--k) 26%, transparent); }
+      button.chip:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+      button.chip .off { --mdc-icon-size: 11px; margin-left: 2px; opacity: .75; }
+      /* A 32 px tall touch target around the 20 px header chips, without changing how they look. */
+      .head button.chip { position: relative; }
+      .head button.chip::before { content: ""; position: absolute; inset: -6px -3px; }
+      .hchips { flex: none; display: flex; align-items: center; gap: inherit; }
+      /* Narrow card: the chips go to a line of their own under the title, which keeps the first line (title, status,
+         detail button) readable; they wrap there if they still do not fit. */
+      @container (max-width: 420px) {
+        .head { gap: 6px; flex-wrap: wrap; }
+        .hchips { order: 2; flex: 1 0 100%; flex-wrap: wrap; box-sizing: border-box; padding-left: 46px; }
+        .head > .zoom { order: 1; }
+      }
 `;
 
 // The overviews' room grid: the tiles, their icon, chips row, empty state and details panel. Each overview sets the

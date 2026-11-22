@@ -122,6 +122,21 @@ const rcStars = (pts) => `<g fill="#fff" opacity=".8">${pts.map(([x, y]) => `<ci
 
 // ── Card themes ──────────────────────────────────────────────────────────────
 // Lights: three pendant lamps, lit in the lights' own colours; the room a little darker when everything is off.
+// A pendant lamp hanging from the ceiling at (x, y), lit (`on`) in colour `c`; `i` staggers its glow animation.
+const rcLamp = (x, y, on, c, i, n) => {
+  const glow = on
+    ? `<circle class="sc-glow sc-g${i}" cx="${x}" cy="${y + 6}" r="20" fill="${c}" opacity="${rcPick(n, 0.28, 0.22)}"/><path d="M${x - 7} ${y + 4} L${x - 18} ${y + 50} H${x + 18} L${x + 7} ${y + 4}Z" fill="${c}" opacity="${rcPick(n, 0.14, 0.12)}"/>`
+    : "";
+  return `<path d="M${x} 0 V${y}" stroke="${rcPick(n, "#8a8478", "#4a4f60")}" stroke-width=".8"/><g transform="translate(${x} ${y}) scale(1.45) translate(${-x} ${-y})">${glow}<path d="M${x - 7} ${y + 2} Q${x - 7} ${y - 6} ${x} ${y - 6} Q${x + 7} ${y - 6} ${x + 7} ${y + 2}Z" fill="${rcPick(n, "#2a3038", "#3a3f50")}"/><circle cx="${x}" cy="${y + 4}" r="3.2" fill="${on ? c : rcPick(n, "#d3cfc6", "#4a4f60")}"/></g>`;
+};
+// The breeze through an open window, and the motion detector in the top right corner (its beam and someone walking in
+// when it detects).
+const rcBreeze = (n) =>
+  `<g class="sc-breeze" fill="none" stroke="${rcPick(n, "#86b9de", "#5c7ea8")}" stroke-width="1.2" stroke-linecap="round"><path d="M158 26 q-8 -4 -16 0"/><path d="M158 36 q-8 -4 -16 0"/></g>`;
+const rcMotion = (on, n) =>
+  `<g transform="translate(194 6)"><path d="M0 0 h-9 v7 q4.5 4.5 9 0z" fill="${rcPick(n, "#fff", "#3d475c")}" stroke="#9aa3ae" stroke-width=".6"/><circle cx="-4.5" cy="7" r="1.6" fill="${on ? "#2f80ed" : "#2a3038"}"/>${
+    on ? '<path class="sc-pir" d="M-5 10 L-46 74 H-6Z" fill="#2f80ed"/>' : ""
+  }</g>${on ? rcPerson(164, 76, rcPick(n, "#5f6b7a", "#8fa3c4")) : ""}`;
 const RC_LAMP_POS = [
   [110, 20],
   [146, 32],
@@ -131,13 +146,7 @@ const RC_LAMP_COLORS = ["#ffd27a", "#ffb36b", "#c9b8ff"];
 const rcSceneLights = (s, n) => {
   const lamps = s.lamps || [];
   const start = RC_LAMP_POS.length - Math.max(1, lamps.length);
-  const one = ([x, y], l, i) => {
-    const c = l.color || RC_LAMP_COLORS[(start + i) % 3];
-    const glow = l.on
-      ? `<circle class="sc-glow sc-g${i}" cx="${x}" cy="${y + 6}" r="20" fill="${c}" opacity="${rcPick(n, 0.28, 0.22)}"/><path d="M${x - 7} ${y + 4} L${x - 18} ${y + 50} H${x + 18} L${x + 7} ${y + 4}Z" fill="${c}" opacity="${rcPick(n, 0.14, 0.12)}"/>`
-      : "";
-    return `<path d="M${x} 0 V${y}" stroke="${rcPick(n, "#8a8478", "#4a4f60")}" stroke-width=".8"/><g transform="translate(${x} ${y}) scale(1.45) translate(${-x} ${-y})">${glow}<path d="M${x - 7} ${y + 2} Q${x - 7} ${y - 6} ${x} ${y - 6} Q${x + 7} ${y - 6} ${x + 7} ${y + 2}Z" fill="${rcPick(n, "#2a3038", "#3a3f50")}"/><circle cx="${x}" cy="${y + 4}" r="3.2" fill="${l.on ? c : rcPick(n, "#d3cfc6", "#4a4f60")}"/></g>`;
-  };
+  const one = ([x, y], l, i) => rcLamp(x, y, l.on, l.color || RC_LAMP_COLORS[(start + i) % 3], i, n);
   const list = lamps.length ? lamps : [{ on: false }];
   return `${list.map((l, i) => one(RC_LAMP_POS[start + i], l, i)).join("")}`;
 };
@@ -148,12 +157,8 @@ const rcSceneSensors = (s, n) => {
   const door = `<g transform="translate(108 76)"><rect x="-15" y="-64" width="30" height="64" fill="${rcPick(n, "#6d4c3d", "#3a3040")}"/>${
     s.door ? `<rect x="-12" y="-61" width="24" height="61" fill="${rcPick(n, "#fff4d6", "#d8c48a")}" opacity="${rcPick(n, 0.8, 0.35)}"/>` : ""
   }<g transform="translate(-12 0) scale(${s.door ? 0.42 : 1} 1) translate(12 0)"><rect x="-12" y="-61" width="24" height="61" fill="${rcPick(n, "#8a5a3a", "#4a3a30")}"/><circle cx="8" cy="-30" r="1.4" fill="#d4b26a"/></g>${rcContact(15, -50, s.door)}</g>`;
-  const breeze = s.window
-    ? `<g class="sc-breeze" fill="none" stroke="${rcPick(n, "#86b9de", "#5c7ea8")}" stroke-width="1.2" stroke-linecap="round"><path d="M158 26 q-8 -4 -16 0"/><path d="M158 36 q-8 -4 -16 0"/></g>`
-    : "";
-  const motion = `<g transform="translate(194 6)"><path d="M0 0 h-9 v7 q4.5 4.5 9 0z" fill="${rcPick(n, "#fff", "#3d475c")}" stroke="#9aa3ae" stroke-width=".6"/><circle cx="-4.5" cy="7" r="1.6" fill="${s.motion ? "#2f80ed" : "#2a3038"}"/>${
-    s.motion ? '<path class="sc-pir" d="M-5 10 L-46 74 H-6Z" fill="#2f80ed"/>' : ""
-  }</g>${s.motion ? rcPerson(164, 76, rcPick(n, "#5f6b7a", "#8fa3c4")) : ""}`;
+  const breeze = s.window ? rcBreeze(n) : "";
+  const motion = rcMotion(s.motion, n);
   return `${door}${rcWindow(140, 12, 34, 36, n, { open: s.window ? 1 : 0 })}<g transform="translate(140 12)">${rcContact(34, 12, s.window)}</g>${breeze}${motion}`;
 };
 
@@ -324,7 +329,18 @@ ${decor}${RC_HOUSE_SLOTS.map((slot, i) => rcSlotState(slot, slots[i], n)).join("
 <rect x="94" y="25" width="102" height="55" fill="none" stroke="${edge}" stroke-width="1.4"/><path d="M94 51 H196 M145 25 V51 M151 51 V80" stroke="${edge}" stroke-width="1.4"/>`;
 };
 
-const RC_THEMES = { lights: rcSceneLights, sensors: rcSceneSensors, environment: rcSceneEnv, plugs: rcScenePlugs, overview: rcSceneHouse };
+// Room (the Room card): the whole room at once over its furniture — a pendant lamp lit in the colour of the first light on,
+// the window and its contact (open with any opening), a wall plug whose cord carries current when a plug is on, and
+// the motion detector with someone walking in on a presence.
+const rcSceneRoom = (s, n) => {
+  const plug = `<g transform="translate(132 60)"><rect x="-6" y="-6" width="12" height="12" rx="3" fill="${rcPick(n, "#fff", "#3d475c")}" stroke="${rcPick(n, "#c9ced6", "#55617a")}"/><circle cx="-2" cy="0" r="1" fill="#5f6b7a"/><circle cx="2" cy="0" r="1" fill="#5f6b7a"/><circle class="${s.plug ? "sc-blink" : ""}" cx="3.4" cy="-3.4" r="1" fill="${s.plug ? "#43c463" : "#9aa3ae"}"/>${
+    s.plug ? '<path d="M0 6 V16" stroke="#5f6b7a" stroke-width="1.8"/><path class="sc-flow" d="M0 6 V16" stroke="#f5b400" stroke-width=".9"/>' : ""
+  }</g>`;
+  const lamp = rcLamp(104, 18, !!s.lamp?.on, s.lamp?.color || RC_LAMP_COLORS[0], 0, n);
+  return `${lamp}${rcWindow(140, 12, 34, 36, n, { open: s.window ? 1 : 0 })}<g transform="translate(140 12)">${rcContact(34, 12, s.window)}</g>${s.window ? rcBreeze(n) : ""}${plug}${rcMotion(s.motion, n)}`;
+};
+
+const RC_THEMES = { lights: rcSceneLights, sensors: rcSceneSensors, environment: rcSceneEnv, plugs: rcScenePlugs, overview: rcSceneHouse, room: rcSceneRoom };
 
 // The whole picture: { wall, floor, svg } for the card's theme, its room type and state `s`, by day or night `n`.
 const rcScene = (theme, type, s, n) => {

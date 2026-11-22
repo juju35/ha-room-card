@@ -1094,37 +1094,10 @@ class RoomOverviewCard extends rcRoomsPanel(RcCard) {
     }
   }
 
-  static styles = `${RC_ZOOM_STYLES}${RC_ROOM_GRID_STYLES}
+  static styles = `${RC_ZOOM_STYLES}${RC_ROOM_GRID_STYLES}${RC_CHIP_STYLES}
       ha-card { container-type: inline-size; position: relative; }
       ha-card.lvl-ok    { --c: var(--rc-ok); }
       ha-card.lvl-warn  { --c: var(--rc-warn); }
-
-      :where(button.chip) { all: unset; }
-      .chip { --k: var(--rc-idle); flex: none; display: inline-flex; align-items: center; gap: 2px; height: 18px; padding: 0 5px;
-              border-radius: 999px; font-size: 11px; font-weight: 500; line-height: 1; white-space: nowrap;
-              color: var(--k); background: color-mix(in srgb, var(--k) 14%, transparent); }
-      .head .chip { height: 20px; padding: 0 6px; font-size: 11px; }
-      .chip ha-icon { --mdc-icon-size: 12px; }
-      .chip:not(:has(span)) { width: 18px; padding: 0; justify-content: center; }
-      .chip.warn  { --k: var(--rc-warn); }
-      .chip.info  { --k: var(--rc-info); }
-      .chip.light { --k: var(--rc-light); }
-      .chip.plug  { --k: var(--rc-plug); }
-      button.chip { cursor: pointer; transition: background .2s; }
-      button.chip:hover { background: color-mix(in srgb, var(--k) 26%, transparent); }
-      button.chip:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
-      button.chip .off { --mdc-icon-size: 11px; margin-left: 2px; opacity: .75; }
-      /* A 32 px tall touch target around the 20 px header chips, without changing how they look. */
-      .head button.chip { position: relative; }
-      .head button.chip::before { content: ""; position: absolute; inset: -6px -3px; }
-      .hchips { flex: none; display: flex; align-items: center; gap: inherit; }
-      /* Narrow card: the chips go to a line of their own under the title, which keeps the first line (title, status,
-         detail button) readable; they wrap there if they still do not fit. */
-      @container (max-width: 420px) {
-        .head { gap: 6px; flex-wrap: wrap; }
-        .hchips { order: 2; flex: 1 0 100%; flex-wrap: wrap; box-sizing: border-box; padding-left: 46px; }
-        .head > .zoom { order: 1; }
-      }
 
       .confirm[hidden] { display: none; }
       ha-card:has(> .confirm:not([hidden])) { min-height: 220px; }

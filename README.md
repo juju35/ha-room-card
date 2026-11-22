@@ -10,13 +10,15 @@
 
 <p align="center"><img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/images/icon.svg" alt="Room Cards" width="120"></p>
 
-Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, plugs, environment readings, and an overview of every room. Add a card, pick a room, it finds the entities by itself.
+Compact Lovelace cards for Home Assistant, **room by room**: sensors, lights, plugs, environment readings, a whole room in one card, and an overview of every room. Add a card, pick a room, it finds the entities by itself.
 
 [![Open your Home Assistant instance and open a repository inside the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-room-card&category=plugin)
 
 | Card | Type | What it shows |
 |---|---|---|
 | [Overview](#overview) | `custom:room-overview-card` | Every room at a glance: one tile per room, tap a room to unfold its sensors, lights and plugs. |
+| [Room](#room) | `custom:room-card` | A whole room in one card: its lights, plugs, door, window and presence sensors and environment readings, one foldable section each. |
+| [Room mini](#room-mini) | `custom:room-mini-card` | The same room on two lines: its status, readings, lights and plugs on, with a zoom to the full card. |
 | [Sensors](#sensors) | `custom:room-sensors-card` | Door, window, opening and presence sensors of a room: what is open comes first, with how long it has been open. |
 | [Sensors mini](#sensors-mini) | `custom:room-sensors-mini-card` | The same sensors on two lines, with a zoom to the full card. |
 | [Lights](#lights) | `custom:room-lights-card` | Lights of a room: tap to toggle, drag to dim, turn everything off from the header. |
@@ -47,6 +49,26 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Automatic discovery: every area with door, window or presence sensors, lights or plugs becomes a room, with an icon picked from its name
 - Same rules as the room cards: hidden entities are skipped, and so are light groups and the configuration and diagnostic entities of lights and plugs (door, window and presence sensors count whatever their category); light switches count as lights
 - Only the rooms with something open, on, detected or unavailable show; the **detail** button (top right) shows every room, and back, as does a click anywhere else (`zoom: false`: every room, always, no button); `sort: state` lists the rooms needing attention first
+
+### Room
+
+`custom:room-card` — A whole room in one card: its lights, plugs, door, window and presence sensors and environment readings, from its area ([#106](https://github.com/juju35/ha-room-card/issues/106)).
+
+- Illustrated header showing the whole room over its furniture (`room_type`): a pendant lamp lit in the colour of the first light on, the window opening with any opening, a wall plug carrying current, someone walking in on a presence
+- Status pill by priority: *1 open* (orange) or a reading needing a look (*Too humid*), then *Occupied* (blue), *2 lights on*, otherwise *All quiet*; chips under the title for someone there, the lights on and the plugs' power draw
+- The environment readings on a line under the header (temperature, humidity, CO₂…), coloured by comfort, the mean when the room has several sensors of a kind
+- One section per kind — **Lights**, **Plugs**, **Sensors** — each one the matching room card as it is: the same tiles, **tap** to toggle, **drag** to dim, **hold** for details, its status pill with the *turn everything off* button
+- **Tap** a section's header to fold or unfold it (chevron right folded, down unfolded); `collapsed` sets the sections folded at first, `sections` picks and orders them; a section with nothing to show is left out
+- `include` adds entities from another room or without one, each going to the section of its kind (lights, plugs, door/window/presence sensors, readings); `exclude` leaves entities out of every section
+- **Tiles layout** (`layout: tiles`) and `columns` apply to every section
+
+### Room mini
+
+`custom:room-mini-card` — The same room on two lines, for a compact dashboard; zoom in for the full card.
+
+- The illustrated header with the room's status, then its readings and a pill for the lights on, the plugs on (their power draw) and someone there; each opens the details of the entity it stands for
+- **Zoom** button (top right) switches the card to the full [Room card](#room) and back, as does a click anywhere else (`zoom: false` removes it)
+- Same options as the Room card
 
 ### Sensors
 
@@ -297,6 +319,61 @@ rooms:
 | `navigation_path` | Dashboard opened on tap instead of the details, e.g. `/dashboard-home/office` |
 | `outdoor` | Outdoor room (camera vehicle detections count); defaults to a guess from the area name |
 | `include` | Entities added to the room: from another room, without one, or not recognised (a template gate with no area nor device class, say); each item is an entity ID or `{entity, name, icon}`. They count in this room only, in its tile, the totals and its details, sorted by domain whatever their device class: a `binary_sensor` is an opening (a presence one, with a presence or motion class, unless `presence: false`), a `light` a light, a `switch` a light when named as one and a plug otherwise; other domains are left out. YAML only |
+
+### Room
+
+Minimal:
+
+```yaml
+type: custom:room-card
+area: kitchen
+```
+
+Full options:
+
+```yaml
+type: custom:room-card
+area: kitchen
+title: Kitchen
+navigation_path: /kitchen
+columns: 2
+layout: compact
+show_environment: true
+sections: [lights, plugs, sensors]
+collapsed: [sensors]
+room_type: kitchen
+include:
+  - light.dining_pendant
+  - binary_sensor.back_door
+exclude:
+  - switch.fridge_plug
+```
+
+#### Options reference
+
+In addition to the [common options](#common-options) (`area`, `include`, `title`, `show_title`, `columns`, `layout`, `exclude`, `names`, `navigation_path`, `illustration`, `illustration_theme`, `room_type`, `language`):
+
+| Option | Required | Default | Description |
+|---|---|---|---|
+| `sections` | ❌ | `[lights, plugs, sensors]` | The sections shown, in this order: `lights`, `plugs`, `sensors` |
+| `collapsed` | ❌ | — | Sections folded at first (`[plugs, sensors]`, say); a tap on a section's header unfolds it, and the card comes back as configured when it leaves the page |
+| `show_environment` | ❌ | `true` | The environment readings under the header |
+| `presence` | ❌ | `true` | Sensors section: presence and motion sensors (YAML only) |
+
+`include` items go to the section of their kind: a `light`, or a `switch` named like a light, to Lights; any other `switch` to Plugs; a `binary_sensor` to Sensors; a `sensor` reading to the environment line. Each section follows the options of its own card at their defaults (the Lights pill turns the lights off, the Plugs pill does not).
+
+### Room mini
+
+Same options as the [Room card](#room), plus:
+
+| Option | Required | Default | Description |
+|---|---|---|---|
+| `zoom` | ❌ | `true` | Zoom button switching to the full Room card and back |
+
+```yaml
+type: custom:room-mini-card
+area: kitchen
+```
 
 ### Sensors
 
@@ -750,6 +827,27 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-active.png" alt="Active rooms" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all.png" alt="Every room" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-details.png" alt="Room details" width="400"> |
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-active-dark.png" alt="Active rooms dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-all-dark.png" alt="Every room dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/overview-details-dark.png" alt="Room details dark" width="400"> |
 
+### Room
+
+| Busy room | All quiet |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-busy.png" alt="Busy room" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-quiet.png" alt="All quiet" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-busy-dark.png" alt="Busy room dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-quiet-dark.png" alt="All quiet dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-mini-busy.png" alt="Mini busy room" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-mini-quiet.png" alt="Mini all quiet" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-mini-busy-dark.png" alt="Mini busy room dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-mini-quiet-dark.png" alt="Mini all quiet dark" width="400"> |
+
+| Folded sections (`collapsed: [plugs, sensors]`) | |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-folded.png" alt="Folded sections" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-folded-dark.png" alt="Folded sections dark" width="400"> |
+
+| Mini card zoomed in | |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-mini-zoom.png" alt="Mini zoomed in" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-mini-zoom-dark.png" alt="Mini zoomed in dark" width="400"> |
+
+| Tiles layout (`layout: tiles`) | |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-tiles.png" alt="Room tiles" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-tiles-dark.png" alt="Room tiles dark" width="400"> |
+
 ### Sensors
 
 | A door open |
@@ -839,6 +937,10 @@ The card goes through every entity with an area (set on the entity or on its dev
 Hidden entities are skipped, and so are the configuration and diagnostic entities of lights and plugs (an indicator LED, say); door, window and presence sensors count whatever their entity category, like on the Sensors card. A room is shown when it has at least one of them. A room's `include` adds entities the discovery misses (no area, no recognised device class), counted in that room only.
 
 A tile shows the most important state of the room: open doors and windows, then presence, otherwise *All closed* (or *All quiet* for a room without door or window sensors). The details of a room are the Sensors, Lights and Plugs cards of that area, for the kinds of entities the room has.
+
+### Room
+
+The card embeds the Lights, Plugs and Sensors cards of the area (and the Environment mini card's readings), each without its own frame or illustration, so it finds exactly what they find and acts the same way. Their `include` items are split by kind; `exclude`, `names`, `columns`, `layout` and `language` reach all of them. The header takes, in this order, an open or unavailable door or window, the worst environment reading at a warning or an alert, a presence, the lights on; otherwise *All quiet*.
 
 ### Sensors
 
