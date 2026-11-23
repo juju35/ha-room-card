@@ -188,7 +188,7 @@ The cards read the entities Home Assistant gives them, whatever the integration:
 
 | Integration | What the cards add |
 |---|---|
-| [Philips Hue](https://www.home-assistant.io/integrations/hue/) | Lights card: the Hue scenes of the room, found by their Hue room (`group_name`) when they have no area; a dynamic scene starts with its colours moving (`hue.activate_scene`) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/images/hue.png" alt="" width="16"> [Philips Hue](https://www.home-assistant.io/integrations/hue/) | Lights card: the Hue scenes of the room, found by their Hue room (`group_name`) when they have no area; a dynamic scene starts with its colours moving (`hue.activate_scene`) |
 | [IKEA TRÅDFRI](https://www.home-assistant.io/integrations/tradfri/) | Lights card: its lights, colours and brightness, as any `light` entity |
 
 ## Prerequisites
