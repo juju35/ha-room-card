@@ -1,0 +1,21 @@
+// RM_I18N — "es"; a missing key falls back to English.
+export default {
+  title: "Habitación",
+  occupied: "Ocupada",
+  lights_on_one: "{n} luz encendida",
+  lights_on_many: "{n} luces encendidas",
+  chip_lights: "Luces encendidas",
+  chip_plugs: "Enchufes encendidos",
+  no_entities: "No se encontró nada en esta habitación",
+  ed_sections: "Secciones",
+  ed_sections_helper: "Se muestran en este orden; vacío: todas",
+  ed_collapsed: "Secciones plegadas",
+  ed_collapsed_helper: "Plegadas al inicio; toca el encabezado de una sección para desplegarla",
+  ed_show_environment: "Lecturas ambientales",
+  ed_show_environment_helper: "Temperatura, humedad, calidad del aire… bajo el encabezado",
+  ed_include: "Entidades a añadir",
+  ed_include_helper: "De otra habitación o sin habitación: luces, enchufes, sensores de puerta, ventana y presencia, lecturas ambientales",
+  ed_exclude: "Entidades a excluir",
+  ed_navigation_path_helper: "Panel que se abre al tocar el título, p. ej. /cocina",
+  ed_columns_helper: "Columnas de los mosaicos de cada sección",
+};

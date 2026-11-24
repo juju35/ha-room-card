@@ -1,0 +1,21 @@
+// RM_I18N — "sl"; a missing key falls back to English.
+export default {
+  title: "Prostor",
+  occupied: "Zaseden",
+  lights_on_one: "Prižgane luči: {n}",
+  lights_on_many: "Prižgane luči: {n}",
+  chip_lights: "Prižgane luči",
+  chip_plugs: "Vklopljene vtičnice",
+  no_entities: "V tem prostoru ni bilo najdeno nič",
+  ed_sections: "Razdelki",
+  ed_sections_helper: "Prikazani v tem vrstnem redu; prazno: vsi",
+  ed_collapsed: "Strnjeni razdelki",
+  ed_collapsed_helper: "Na začetku strnjeni; dotaknite se glave razdelka, da ga razprete",
+  ed_show_environment: "Vrednosti okolja",
+  ed_show_environment_helper: "Temperatura, vlažnost, kakovost zraka… pod glavo",
+  ed_include: "Entitete za dodajanje",
+  ed_include_helper: "Iz drugega prostora ali brez prostora: luči, vtičnice, senzorji vrat, oken in prisotnosti, vrednosti okolja",
+  ed_exclude: "Izpuščene entitete",
+  ed_navigation_path_helper: "Nadzorna plošča, ki se odpre ob dotiku naslova, npr. /kuhinja",
+  ed_columns_helper: "Stolpci ploščic vsakega razdelka",
+};

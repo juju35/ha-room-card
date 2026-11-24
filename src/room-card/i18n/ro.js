@@ -1,0 +1,21 @@
+// RM_I18N — "ro"; a missing key falls back to English.
+export default {
+  title: "Cameră",
+  occupied: "Ocupată",
+  lights_on_one: "Lumini aprinse: {n}",
+  lights_on_many: "Lumini aprinse: {n}",
+  chip_lights: "Lumini aprinse",
+  chip_plugs: "Prize pornite",
+  no_entities: "Nimic găsit în această cameră",
+  ed_sections: "Secțiuni",
+  ed_sections_helper: "Afișate în această ordine; gol: toate",
+  ed_collapsed: "Secțiuni pliate",
+  ed_collapsed_helper: "Pliate la început; atinge antetul unei secțiuni pentru a o desface",
+  ed_show_environment: "Valori ambientale",
+  ed_show_environment_helper: "Temperatură, umiditate, calitatea aerului… sub antet",
+  ed_include: "Entități de adăugat",
+  ed_include_helper: "Din altă cameră sau fără cameră: lumini, prize, senzori de ușă, fereastră și prezență, valori ambientale",
+  ed_exclude: "Entități excluse",
+  ed_navigation_path_helper: "Tablou de bord deschis la atingerea titlului, de ex. /bucatarie",
+  ed_columns_helper: "Coloanele dalelor fiecărei secțiuni",
+};

@@ -1,0 +1,21 @@
+// RM_I18N — "pt"; a missing key falls back to English.
+export default {
+  title: "Divisão",
+  occupied: "Ocupada",
+  lights_on_one: "{n} luz acesa",
+  lights_on_many: "{n} luzes acesas",
+  chip_lights: "Luzes acesas",
+  chip_plugs: "Tomadas ligadas",
+  no_entities: "Nada encontrado nesta divisão",
+  ed_sections: "Secções",
+  ed_sections_helper: "Mostradas por esta ordem; vazio: todas",
+  ed_collapsed: "Secções recolhidas",
+  ed_collapsed_helper: "Recolhidas ao início; toque no cabeçalho de uma secção para a expandir",
+  ed_show_environment: "Leituras ambientais",
+  ed_show_environment_helper: "Temperatura, humidade, qualidade do ar… sob o cabeçalho",
+  ed_include: "Entidades a adicionar",
+  ed_include_helper: "De outra divisão ou sem divisão: luzes, tomadas, sensores de porta, janela e presença, leituras ambientais",
+  ed_exclude: "Entidades a excluir",
+  ed_navigation_path_helper: "Painel aberto ao tocar no título, p. ex. /cozinha",
+  ed_columns_helper: "Colunas dos mosaicos de cada secção",
+};

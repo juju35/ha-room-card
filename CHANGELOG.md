@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.1 - 2026-11-24
+
+### Maintenance
+- The card source is split into ES modules: `src/room-card/` (entry `src/room-card/index.js`), `src/room-environment-card/` (entry `src/room-environment-card/index.js`), `src/room-lights-card/` (entry `src/room-lights-card/index.js`), `src/room-overview-card/` (entry `src/room-overview-card/index.js`), `src/room-sensors-card/` (entry `src/room-sensors-card/index.js`), `src/shared/` (entry `src/shared/index.js`), cut at its sections, with the translations in one file per language (`i18n/<lang>.js`). `scripts/bundle.mjs` concatenates them back, in their original order, into the same single file and per-language files as before; the tests evaluate that bundle.
+
 ## 2.3.0 - 2026-11-22
 
 ### Features

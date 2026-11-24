@@ -1,0 +1,21 @@
+// RM_I18N — "nl"; a missing key falls back to English.
+export default {
+  title: "Ruimte",
+  occupied: "Bezet",
+  lights_on_one: "{n} lamp aan",
+  lights_on_many: "{n} lampen aan",
+  chip_lights: "Lampen aan",
+  chip_plugs: "Stekkers aan",
+  no_entities: "Niets gevonden in deze ruimte",
+  ed_sections: "Secties",
+  ed_sections_helper: "In deze volgorde getoond; leeg: allemaal",
+  ed_collapsed: "Ingeklapte secties",
+  ed_collapsed_helper: "Bij de start ingeklapt; tik op de kop van een sectie om die uit te klappen",
+  ed_show_environment: "Omgevingswaarden",
+  ed_show_environment_helper: "Temperatuur, luchtvochtigheid, luchtkwaliteit… onder de koptekst",
+  ed_include: "Toe te voegen entiteiten",
+  ed_include_helper: "Uit een andere ruimte of zonder ruimte: lampen, stekkers, deur-, raam- en aanwezigheidssensoren, omgevingswaarden",
+  ed_exclude: "Uit te sluiten entiteiten",
+  ed_navigation_path_helper: "Dashboard dat opent bij een tik op de titel, bijv. /keuken",
+  ed_columns_helper: "Kolommen van de tegels van elke sectie",
+};

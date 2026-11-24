@@ -16,7 +16,7 @@
   "javascript": { "globals": ["customElements", "HTMLElement", "hass"] },
   "overrides": [
     {
-      "includes": ["src/shared.js", "src/scene.js"],
+      "includes": ["src/shared/**", "src/scene.js"],
       "linter": { "rules": { "correctness": { "noUnusedVariables": "off" } } }
     }
   ]

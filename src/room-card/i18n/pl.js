@@ -1,0 +1,21 @@
+// RM_I18N — "pl"; a missing key falls back to English.
+export default {
+  title: "Pomieszczenie",
+  occupied: "Zajęte",
+  lights_on_one: "Włączone światła: {n}",
+  lights_on_many: "Włączone światła: {n}",
+  chip_lights: "Włączone światła",
+  chip_plugs: "Włączone gniazdka",
+  no_entities: "Nic nie znaleziono w tym pomieszczeniu",
+  ed_sections: "Sekcje",
+  ed_sections_helper: "Wyświetlane w tej kolejności; puste: wszystkie",
+  ed_collapsed: "Zwinięte sekcje",
+  ed_collapsed_helper: "Zwinięte na starcie; dotknij nagłówka sekcji, aby ją rozwinąć",
+  ed_show_environment: "Odczyty środowiska",
+  ed_show_environment_helper: "Temperatura, wilgotność, jakość powietrza… pod nagłówkiem",
+  ed_include: "Encje do dodania",
+  ed_include_helper: "Z innego pomieszczenia lub bez pomieszczenia: światła, gniazdka, czujniki drzwi, okien i obecności, odczyty środowiska",
+  ed_exclude: "Encje do wykluczenia",
+  ed_navigation_path_helper: "Dashboard otwierany po dotknięciu tytułu, np. /kuchnia",
+  ed_columns_helper: "Kolumny kafelków każdej sekcji",
+};
