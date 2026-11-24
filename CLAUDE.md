@@ -26,8 +26,11 @@ node --test test/*.test.mjs
 ```
 
 ## Releasing — how it works here
-A release is **automatic**: on push to `main`, if `package.json` carries a version with
-no matching tag, the Release workflow publishes `vX.Y.Z`. **Never create a tag by hand.**
+A release is **manual**: run the Release workflow (`gh workflow run release.yml`, or
+*Actions → Release → Run workflow*). It publishes `vX.Y.Z` from the version `package.json`
+carries on `main` if that tag does not exist yet, with the CHANGELOG sections of every version
+since the previous tag: several bumped PRs ship as one release. Merging a PR publishes nothing.
+**Never create a tag by hand.**
 `dist/` is **not** committed — the bundle is built in CI and attached to the release.
 
 The `Version consistency` check (validate.yml) requires the **same version in every place**,
@@ -40,7 +43,10 @@ carries the new version, updated together in one commit:
 2. `package.json` → `"version": "X.Y.Z"`.
 3. `package-lock.json` → run `npm install` so its version matches (CI checks it).
 - Bump rule: `fix` → patch, `feat` → minor, breaking change → major.
-- The PR/commit title carries the version in parentheses, e.g. `feat: new option (X.Y.Z)`.
+- **Bump only when what users install changes** (shipped code, translations, assets of the
+  release). CI, workflows, tests, screenshots, README, lint config, CLAUDE.md: no bump, no
+  CHANGELOG entry, no version in the title (e.g. `ci: …`, `docs: …`, `test: …`, `chore: …`).
+- A bumping PR/commit title carries the version in parentheses, e.g. `feat: new option (X.Y.Z)`.
 
 ## README layout
 - Header order: H1, then the badge row, then the repo's **own logo** centered under the badges —
