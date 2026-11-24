@@ -1,10 +1,13 @@
 name: Release
 
-# Manual: run this workflow (Actions -> Release -> Run workflow, or `gh workflow run release.yml`)
-# to publish the version main carries, if it has no tag yet. Merging a pull request publishes nothing:
-# several bumped pull requests ship together, with the CHANGELOG.md sections of every version since
-# the previous tag, once Lint, Validate and HACS Validation pass on that commit.
+# On push to main, a release follows only a feat or fix commit (the squash-merge title, e.g.
+# `fix: … (1.4.1) (#12)`) whose version has no tag yet; ci/docs/test/chore/refactor merges publish nothing.
+# Run it by hand (Actions -> Release -> Run workflow, or `gh workflow run release.yml`) to publish other
+# bumps. The notes gather the CHANGELOG.md sections of every version since the previous tag, and the
+# release only follows a commit on which Lint, Validate and HACS Validation pass.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -16,16 +19,19 @@ concurrency:
 
 jobs:
   lint:
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'feat') || startsWith(github.event.head_commit.message, 'fix') }}
     uses: ./.github/workflows/lint.yml
     permissions:
       contents: read
 
   validate:
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'feat') || startsWith(github.event.head_commit.message, 'fix') }}
     uses: ./.github/workflows/validate.yml
     permissions:
       contents: read
 
   hacs:
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'feat') || startsWith(github.event.head_commit.message, 'fix') }}
     uses: ./.github/workflows/hacs.yml
     permissions:
       contents: read
