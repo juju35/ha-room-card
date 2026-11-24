@@ -1,0 +1,21 @@
+// RM_I18N — "en" (the source every other language follows).
+export default {
+  title: "Room",
+  occupied: "Occupied",
+  lights_on_one: "{n} light on",
+  lights_on_many: "{n} lights on",
+  chip_lights: "Lights on",
+  chip_plugs: "Plugs on",
+  no_entities: "Nothing found in this room",
+  ed_sections: "Sections",
+  ed_sections_helper: "Shown in this order; empty: all of them",
+  ed_collapsed: "Folded sections",
+  ed_collapsed_helper: "Start folded; tap a section's header to unfold it",
+  ed_show_environment: "Environment readings",
+  ed_show_environment_helper: "Temperature, humidity, air quality… under the header",
+  ed_include: "Entities to add",
+  ed_include_helper: "From another room or without one: lights, plugs, door, window and presence sensors, environment readings",
+  ed_exclude: "Entities to exclude",
+  ed_navigation_path_helper: "Dashboard opened when tapping the title, e.g. /kitchen",
+  ed_columns_helper: "Columns of each section's tiles",
+};

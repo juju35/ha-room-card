@@ -1,0 +1,21 @@
+// RM_I18N — "sk"; a missing key falls back to English.
+export default {
+  title: "Miestnosť",
+  occupied: "Obsadená",
+  lights_on_one: "Zapnuté svetlá: {n}",
+  lights_on_many: "Zapnuté svetlá: {n}",
+  chip_lights: "Zapnuté svetlá",
+  chip_plugs: "Zapnuté zásuvky",
+  no_entities: "V tejto miestnosti sa nič nenašlo",
+  ed_sections: "Sekcie",
+  ed_sections_helper: "Zobrazené v tomto poradí; prázdne: všetky",
+  ed_collapsed: "Zbalené sekcie",
+  ed_collapsed_helper: "Na začiatku zbalené; ťuknutím na hlavičku sekcie ju rozbalíte",
+  ed_show_environment: "Hodnoty prostredia",
+  ed_show_environment_helper: "Teplota, vlhkosť, kvalita vzduchu… pod hlavičkou",
+  ed_include: "Entity na pridanie",
+  ed_include_helper: "Z inej miestnosti alebo bez miestnosti: svetlá, zásuvky, senzory dverí, okien a prítomnosti, hodnoty prostredia",
+  ed_exclude: "Vynechané entity",
+  ed_navigation_path_helper: "Ovládací panel otvorený ťuknutím na názov, napr. /kuchyna",
+  ed_columns_helper: "Stĺpce dlaždíc každej sekcie",
+};

@@ -1,0 +1,21 @@
+// RM_I18N — "bg"; a missing key falls back to English.
+export default {
+  title: "Стая",
+  occupied: "Заета",
+  lights_on_one: "{n} светлина включена",
+  lights_on_many: "{n} светлини включени",
+  chip_lights: "Включени светлини",
+  chip_plugs: "Включени контакти",
+  no_entities: "В тази стая не е намерено нищо",
+  ed_sections: "Секции",
+  ed_sections_helper: "Показват се в този ред; празно: всички",
+  ed_collapsed: "Свити секции",
+  ed_collapsed_helper: "Свити в началото; докоснете заглавието на секция, за да я разгънете",
+  ed_show_environment: "Показания на средата",
+  ed_show_environment_helper: "Температура, влажност, качество на въздуха… под заглавието",
+  ed_include: "Обекти за добавяне",
+  ed_include_helper: "От друга стая или без стая: светлини, контакти, сензори за врата, прозорец и присъствие, показания на средата",
+  ed_exclude: "Обекти за пропускане",
+  ed_navigation_path_helper: "Табло, което се отваря с докосване на заглавието, напр. /kuhnya",
+  ed_columns_helper: "Колони плочки във всяка секция",
+};

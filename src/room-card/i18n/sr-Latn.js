@@ -1,0 +1,22 @@
+// RM_I18N — "sr-Latn"; a missing key falls back to English.
+export default {
+  title: "Prostorija",
+  occupied: "Zauzeta",
+  lights_on_one: "{n} svetlo uključeno",
+  lights_on_few: "{n} svetla uključena",
+  lights_on_many: "{n} svetala uključeno",
+  chip_lights: "Uključena svetla",
+  chip_plugs: "Uključene utičnice",
+  no_entities: "U ovoj prostoriji ništa nije pronađeno",
+  ed_sections: "Odeljci",
+  ed_sections_helper: "Prikazuju se ovim redom; prazno: svi",
+  ed_collapsed: "Skupljeni odeljci",
+  ed_collapsed_helper: "Skupljeni na početku; dodir na zaglavlje odeljka ga otvara",
+  ed_show_environment: "Očitavanja ambijenta",
+  ed_show_environment_helper: "Temperatura, vlažnost, kvalitet vazduha… ispod zaglavlja",
+  ed_include: "Entiteti za dodavanje",
+  ed_include_helper: "Iz druge prostorije ili bez nje: svetla, utičnice, senzori vrata, prozora i prisustva, očitavanja ambijenta",
+  ed_exclude: "Izostavi entitete",
+  ed_navigation_path_helper: "Kontrolna tabla koja se otvara dodirom na naslov, npr. /kuhinja",
+  ed_columns_helper: "Kolone pločica svakog odeljka",
+};

@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { makeHass } from "./hass.mjs";
+import { sources } from "./source.mjs";
 
 let harness;
 try {
@@ -15,7 +16,7 @@ try {
 const browser = await harness?.launch().catch(() => null);
 
 // The bundle as scripts/build.mjs makes it, with every language inline (the build moves them to files of their own).
-const src = (name) => readFileSync(new URL(`../src/${name}.js`, import.meta.url), "utf8");
+const src = (name) => (sources[`${name}.js`] ?? readFileSync(new URL(`../src/${name}.js`, import.meta.url), "utf8"));
 const CARDS = ["room-sensors-card", "room-lights-card", "room-switch-card", "room-environment-card", "room-overview-card"];
 const js = ["{", src("shared"), src("scene"), ...CARDS.map((c) => `{\n${src(c)}}\n`), "}"].join("\n");
 

@@ -57,6 +57,11 @@ carries the new version, updated together in one commit:
 ## Supported integrations
 This builds on other Home Assistant integrations, so keep the `## Supported integrations` section (title verbatim) listing the HA integrations it works on top of, with a link to each.
 
+## Source layout
+- `src/room-card/` holds ES modules (entry `src/room-card/index.js`); `src/room-environment-card/` holds ES modules (entry `src/room-environment-card/index.js`); `src/room-lights-card/` holds ES modules (entry `src/room-lights-card/index.js`); `src/room-overview-card/` holds ES modules (entry `src/room-overview-card/index.js`); `src/room-sensors-card/` holds ES modules (entry `src/room-sensors-card/index.js`); `src/shared/` holds ES modules (entry `src/shared/index.js`), concatenated in the order of the entry file by `scripts/bundle.mjs` (called by `scripts/build.mjs`) into the classic script the card ships as: import lines removed, `export` keywords dropped. Modules share one scope, so keep top-level names unique across modules; a new module must be listed in the entry file.
+- Translations: one file per language in `i18n/<lang>.js` (`export default { … };`), gathered by the table file next to them and rebuilt into a single object literal at build for `scripts/i18n-split.mjs`.
+- Tests evaluate the bundle (`test/source.mjs`), not a source file.
+
 ## Translations
 - English is the source. Keep every language in sync when a user-facing string changes.
 - Languages to keep in sync: en, fr, de, es, it, nl, pt, pl, sr, sr-Latn, ro, da, sv, bg, ru, uk, hu, sk, cs, sl, lv, el (no Irish or Maltese).

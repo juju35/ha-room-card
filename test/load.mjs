@@ -1,10 +1,11 @@
-// Evaluates src/shared.js and the cards in a sandbox with minimal DOM stand-ins, the way scripts/build.mjs
+// Evaluates the bundled card source (test/source.mjs) and the cards in a sandbox with minimal DOM stand-ins, the way scripts/build.mjs
 // concatenates them, and returns the names the tests need. No dependency, no browser.
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
+import { sources } from "./source.mjs";
 
 const root = new URL("../src/", import.meta.url);
-const read = (name) => readFileSync(new URL(`${name}.js`, root), "utf8");
+const read = (name) => (sources[`${name}.js`] ?? readFileSync(new URL(`${name}.js`, root), "utf8"));
 
 // Shadow root / element stand-in: enough for the cards' render and event wiring.
 export const fakeNode = () => ({

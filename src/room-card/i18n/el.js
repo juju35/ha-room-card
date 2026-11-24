@@ -1,0 +1,21 @@
+// RM_I18N — "el"; a missing key falls back to English.
+export default {
+  title: "Δωμάτιο",
+  occupied: "Κατειλημμένο",
+  lights_on_one: "{n} φως αναμμένο",
+  lights_on_many: "{n} φώτα αναμμένα",
+  chip_lights: "Αναμμένα φώτα",
+  chip_plugs: "Ενεργές πρίζες",
+  no_entities: "Δεν βρέθηκε τίποτα σε αυτό το δωμάτιο",
+  ed_sections: "Ενότητες",
+  ed_sections_helper: "Εμφανίζονται με αυτή τη σειρά· κενό: όλες",
+  ed_collapsed: "Συμπτυγμένες ενότητες",
+  ed_collapsed_helper: "Συμπτυγμένες αρχικά· πατήστε την κεφαλίδα μιας ενότητας για να την αναπτύξετε",
+  ed_show_environment: "Μετρήσεις περιβάλλοντος",
+  ed_show_environment_helper: "Θερμοκρασία, υγρασία, ποιότητα αέρα… κάτω από την κεφαλίδα",
+  ed_include: "Οντότητες προς προσθήκη",
+  ed_include_helper: "Από άλλο δωμάτιο ή χωρίς δωμάτιο: φώτα, πρίζες, αισθητήρες πόρτας, παραθύρου και παρουσίας, μετρήσεις περιβάλλοντος",
+  ed_exclude: "Οντότητες προς εξαίρεση",
+  ed_navigation_path_helper: "Πίνακας που ανοίγει πατώντας τον τίτλο, π.χ. /kitchen",
+  ed_columns_helper: "Στήλες πλακιδίων κάθε ενότητας",
+};

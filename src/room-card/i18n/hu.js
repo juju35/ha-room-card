@@ -1,0 +1,21 @@
+// RM_I18N — "hu"; a missing key falls back to English.
+export default {
+  title: "Helyiség",
+  occupied: "Foglalt",
+  lights_on_one: "{n} lámpa bekapcsolva",
+  lights_on_many: "{n} lámpa bekapcsolva",
+  chip_lights: "Bekapcsolt lámpák",
+  chip_plugs: "Bekapcsolt aljzatok",
+  no_entities: "Ebben a helyiségben nem található semmi",
+  ed_sections: "Szakaszok",
+  ed_sections_helper: "Ebben a sorrendben jelennek meg; üres: mind",
+  ed_collapsed: "Összecsukott szakaszok",
+  ed_collapsed_helper: "Kezdetben összecsukva; koppints egy szakasz fejlécére a kibontáshoz",
+  ed_show_environment: "Környezeti értékek",
+  ed_show_environment_helper: "Hőmérséklet, páratartalom, levegőminőség… a fejléc alatt",
+  ed_include: "Hozzáadandó entitások",
+  ed_include_helper: "Másik helyiségből vagy helyiség nélkül: lámpák, aljzatok, ajtó-, ablak- és jelenlétérzékelők, környezeti értékek",
+  ed_exclude: "Kihagyott entitások",
+  ed_navigation_path_helper: "A címre koppintva megnyíló irányítópult, pl. /konyha",
+  ed_columns_helper: "Az egyes szakaszok csempéinek oszlopai",
+};

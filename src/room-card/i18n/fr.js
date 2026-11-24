@@ -1,0 +1,21 @@
+// RM_I18N — "fr"; a missing key falls back to English.
+export default {
+  title: "Pièce",
+  occupied: "Occupée",
+  lights_on_one: "{n} lumière allumée",
+  lights_on_many: "{n} lumières allumées",
+  chip_lights: "Lumières allumées",
+  chip_plugs: "Prises allumées",
+  no_entities: "Rien trouvé dans cette pièce",
+  ed_sections: "Sections",
+  ed_sections_helper: "Affichées dans cet ordre ; vide : toutes",
+  ed_collapsed: "Sections repliées",
+  ed_collapsed_helper: "Repliées au départ ; un tap sur l'en-tête d'une section la déplie",
+  ed_show_environment: "Mesures d'ambiance",
+  ed_show_environment_helper: "Température, humidité, qualité de l'air… sous l'en-tête",
+  ed_include: "Entités à ajouter",
+  ed_include_helper: "D'une autre pièce ou sans pièce : lumières, prises, capteurs de porte, de fenêtre et de présence, mesures d'ambiance",
+  ed_exclude: "Entités à exclure",
+  ed_navigation_path_helper: "Tableau de bord ouvert au tap sur le titre, par exemple /cuisine",
+  ed_columns_helper: "Colonnes des tuiles de chaque section",
+};

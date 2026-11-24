@@ -1,0 +1,21 @@
+// RM_I18N — "lv"; a missing key falls back to English.
+export default {
+  title: "Telpa",
+  occupied: "Aizņemta",
+  lights_on_one: "Ieslēgtas gaismas: {n}",
+  lights_on_many: "Ieslēgtas gaismas: {n}",
+  chip_lights: "Ieslēgtas gaismas",
+  chip_plugs: "Ieslēgtas kontaktligzdas",
+  no_entities: "Šajā telpā nekas netika atrasts",
+  ed_sections: "Sadaļas",
+  ed_sections_helper: "Tiek rādītas šādā secībā; tukšs: visas",
+  ed_collapsed: "Sakļautās sadaļas",
+  ed_collapsed_helper: "Sākumā sakļautas; pieskarieties sadaļas galvenei, lai to izvērstu",
+  ed_show_environment: "Vides rādījumi",
+  ed_show_environment_helper: "Temperatūra, mitrums, gaisa kvalitāte… zem galvenes",
+  ed_include: "Pievienojamās entītijas",
+  ed_include_helper: "No citas telpas vai bez telpas: gaismas, kontaktligzdas, durvju, logu un klātbūtnes sensori, vides rādījumi",
+  ed_exclude: "Izslēgtās entītijas",
+  ed_navigation_path_helper: "Informācijas panelis, kas tiek atvērts, pieskaroties virsrakstam, piem., /virtuve",
+  ed_columns_helper: "Katras sadaļas flīžu kolonnas",
+};

@@ -1,0 +1,21 @@
+// RM_I18N — "sv"; a missing key falls back to English.
+export default {
+  title: "Rum",
+  occupied: "Upptaget",
+  lights_on_one: "{n} lampa tänd",
+  lights_on_many: "{n} lampor tända",
+  chip_lights: "Tända lampor",
+  chip_plugs: "Påslagna uttag",
+  no_entities: "Inget hittades i det här rummet",
+  ed_sections: "Sektioner",
+  ed_sections_helper: "Visas i den här ordningen; tomt: alla",
+  ed_collapsed: "Hopfällda sektioner",
+  ed_collapsed_helper: "Hopfällda från början; tryck på en sektions rubrik för att fälla ut den",
+  ed_show_environment: "Miljövärden",
+  ed_show_environment_helper: "Temperatur, luftfuktighet, luftkvalitet… under rubriken",
+  ed_include: "Entiteter att lägga till",
+  ed_include_helper: "Från ett annat rum eller utan rum: lampor, uttag, dörr-, fönster- och närvarosensorer, miljövärden",
+  ed_exclude: "Entiteter att utesluta",
+  ed_navigation_path_helper: "Instrumentpanel som öppnas vid tryck på titeln, t.ex. /kok",
+  ed_columns_helper: "Kolumner med brickor i varje sektion",
+};

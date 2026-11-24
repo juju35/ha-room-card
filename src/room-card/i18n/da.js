@@ -1,0 +1,21 @@
+// RM_I18N — "da"; a missing key falls back to English.
+export default {
+  title: "Rum",
+  occupied: "Optaget",
+  lights_on_one: "{n} lys tændt",
+  lights_on_many: "{n} lys tændt",
+  chip_lights: "Tændte lys",
+  chip_plugs: "Tændte stikkontakter",
+  no_entities: "Intet fundet i dette rum",
+  ed_sections: "Sektioner",
+  ed_sections_helper: "Vises i denne rækkefølge; tom: alle",
+  ed_collapsed: "Sammenklappede sektioner",
+  ed_collapsed_helper: "Sammenklappet fra start; tryk på en sektions overskrift for at folde den ud",
+  ed_show_environment: "Miljømålinger",
+  ed_show_environment_helper: "Temperatur, luftfugtighed, luftkvalitet… under overskriften",
+  ed_include: "Enheder, der tilføjes",
+  ed_include_helper: "Fra et andet rum eller uden rum: lys, stikkontakter, dør-, vindues- og tilstedeværelsessensorer, miljømålinger",
+  ed_exclude: "Enheder, der udelades",
+  ed_navigation_path_helper: "Dashboard, der åbnes ved tryk på titlen, f.eks. /koekken",
+  ed_columns_helper: "Kolonner af fliser i hver sektion",
+};

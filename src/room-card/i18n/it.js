@@ -1,0 +1,21 @@
+// RM_I18N — "it"; a missing key falls back to English.
+export default {
+  title: "Stanza",
+  occupied: "Occupata",
+  lights_on_one: "{n} luce accesa",
+  lights_on_many: "{n} luci accese",
+  chip_lights: "Luci accese",
+  chip_plugs: "Prese accese",
+  no_entities: "Nessun elemento trovato in questa stanza",
+  ed_sections: "Sezioni",
+  ed_sections_helper: "Mostrate in quest'ordine; vuoto: tutte",
+  ed_collapsed: "Sezioni chiuse",
+  ed_collapsed_helper: "Chiuse all'inizio; tocca l'intestazione di una sezione per aprirla",
+  ed_show_environment: "Letture ambientali",
+  ed_show_environment_helper: "Temperatura, umidità, qualità dell'aria… sotto l'intestazione",
+  ed_include: "Entità da aggiungere",
+  ed_include_helper: "Da un'altra stanza o senza stanza: luci, prese, sensori di porta, finestra e presenza, letture ambientali",
+  ed_exclude: "Entità da escludere",
+  ed_navigation_path_helper: "Plancia aperta toccando il titolo, ad es. /cucina",
+  ed_columns_helper: "Colonne dei riquadri di ogni sezione",
+};

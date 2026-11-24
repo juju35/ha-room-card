@@ -1,0 +1,21 @@
+// RM_I18N — "ru"; a missing key falls back to English.
+export default {
+  title: "Комната",
+  occupied: "Занята",
+  lights_on_one: "Включено светильников: {n}",
+  lights_on_many: "Включено светильников: {n}",
+  chip_lights: "Включённые светильники",
+  chip_plugs: "Включённые розетки",
+  no_entities: "В этой комнате ничего не найдено",
+  ed_sections: "Разделы",
+  ed_sections_helper: "Показываются в этом порядке; пусто: все",
+  ed_collapsed: "Свёрнутые разделы",
+  ed_collapsed_helper: "Свёрнуты изначально; нажмите на заголовок раздела, чтобы развернуть его",
+  ed_show_environment: "Показатели среды",
+  ed_show_environment_helper: "Температура, влажность, качество воздуха… под заголовком",
+  ed_include: "Добавить объекты",
+  ed_include_helper: "Из другой комнаты или без комнаты: светильники, розетки, датчики двери, окна и присутствия, показатели среды",
+  ed_exclude: "Исключить объекты",
+  ed_navigation_path_helper: "Панель, открываемая нажатием на заголовок, например /kitchen",
+  ed_columns_helper: "Столбцы плиток каждого раздела",
+};
