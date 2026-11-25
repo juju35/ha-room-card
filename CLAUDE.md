@@ -78,6 +78,7 @@ The Screenshots workflow regenerates them on the PR branch and commits them as t
 `juju35-screenshots[bot]` GitHub App, so the PR checks re-run on that commit by themselves.
 Comparison is exact. They are English, with light/dark twins, neutral/mock data, and never
 real family names. **One GIF per distinct animation/state/variant** (not one per repo).
+No capture that serves no purpose: every file in `screenshots/` is shown in the README, and the README shows only captures the scripts render — `scripts/check_screenshots.py` (pre-commit hook `screenshots-used`, run in CI) fails otherwise. A capture no longer shown is removed from the screenshot list and deleted; a new one is added to the README with its twin. Tests on `screenshots/` flag only orphan files, never a capture just listed and not rendered yet (the workflow commits it after the first push).
 
 ## Cards — UX & rendering
 - Check rendering under **WebKit/Safari** (a `subgrid`-at-`:hover` bug has bitten before).
