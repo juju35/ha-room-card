@@ -28,3 +28,11 @@ repos:
         entry: bash -c 'for f in "$@"; do node --check "$f" || exit 1; done' --
         language: system
         files: \.js$
+  - repo: local
+    hooks:
+      - id: screenshots-used
+        name: every capture shown in the README, and only those
+        entry: python scripts/check_screenshots.py
+        language: python
+        pass_filenames: false
+        always_run: true
