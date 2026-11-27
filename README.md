@@ -211,7 +211,7 @@ Or manually:
 3. Open **Room Cards** and click **Install**
 4. Clear your browser cache and refresh
 
-The Marketplace registers the dashboard resource for you; the single file provides every card.
+The Marketplace registers the dashboard resource for you (`/local/community/ha-room-card/ha-room-card.js`); the single file provides every card.
 
 ### Manual
 
