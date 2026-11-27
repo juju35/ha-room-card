@@ -109,7 +109,7 @@ export const RC_BASE_STYLES = `
   @container (max-width: 260px) { .grid { grid-template-columns: minmax(0, 1fr); } }
   /* layout: tiles — the size of Home Assistant's Tile card — 56 px high, a 40 px icon, the name over the state. */
   .layout-tiles .grid { gap: 8px; }
-  .layout-tiles .tile { min-height: 56px; gap: 10px; padding: 8px 10px 8px 8px; border-radius: 12px; }
+  .layout-tiles .tile { min-height: 56px; gap: 10px; padding: 8px 10px 8px 8px; border-radius: 10px; }
   .layout-tiles .ic { width: 40px; height: 40px; }
   .layout-tiles .ic ha-icon { --mdc-icon-size: 24px; }
   .layout-tiles .txt { gap: 2px; }

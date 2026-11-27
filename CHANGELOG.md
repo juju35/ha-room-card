@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.2 - 2026-11-27
+
+### Fixes
+- Tiles have the 10 px corner radius shared by the ha-* cards.
+
 ## 2.3.1 - 2026-11-24
 
 ### Maintenance
