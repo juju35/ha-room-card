@@ -68,7 +68,8 @@ export class RoomSensorsCard extends RcCard {
           on,
           unavailable,
           name: e.name ?? rcCleanName(st.attributes.friendly_name, areaName, RS_PREFIX, RS_SUFFIX),
-          icon: e.icon ?? (on ? RS_KINDS[kind].on : RS_KINDS[kind].off),
+          // The icon set on the entity (its registry settings, or a template's `icon`) wins over the kind's (#115).
+          icon: e.icon ?? this._hass.entities?.[e.entity]?.icon ?? st.attributes.icon ?? (on ? RS_KINDS[kind].on : RS_KINDS[kind].off),
           state: unavailable ? this._t("unavailable") : this._stateText(kind, on),
           since: st.last_changed,
         };
