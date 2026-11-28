@@ -233,3 +233,80 @@ test("Room card: custom_entities make a custom section with toggles and buttons"
   assert.match(html, /data-act="toggle"/);
   assert.match(html, /data-act="press"/);
 });
+
+// #118: helpers and template entities in the sensors.
+const helpersHass = () => {
+  const h = kitchen();
+  const st = (entity_id, state, attributes) => ({ entity_id, state, attributes, last_changed: "2026-01-01T00:00:00Z" });
+  h.states["input_boolean.entrydoor_hook"] = st("input_boolean.entrydoor_hook", "on", { friendly_name: "Entry door hook" });
+  h.states["sensor.gate_status"] = st("sensor.gate_status", "Ajar", { friendly_name: "Gate status" });
+  h.states["sensor.hall_temp"] = st("sensor.hall_temp", "20", { device_class: "temperature", unit_of_measurement: "°C" });
+  h.states["sensor.tv_power"] = st("sensor.tv_power", "80", { device_class: "power", unit_of_measurement: "W" });
+  h.states["sensor.hidden_status"] = st("sensor.hidden_status", "On", {});
+  h.entities["sensor.hidden_status"] = { hidden: true };
+  return h;
+};
+// The entities a card's editor offers in `include`.
+const offered = (tag, hass) => {
+  const editor = new (rc.customElements.get(`${tag}-editor`))();
+  editor.appendChild = () => {};
+  editor.setConfig({ area: "kitchen" });
+  editor.hass = hass;
+  const field = [...editor._form.schema].flatMap((f) => (f.schema ? [...f.schema] : [f])).find((f) => f.name === "include");
+  return field ? [...field.selector.entity.include_entities] : [];
+};
+
+test("the editors offer helpers and text sensors in `include`, not measured values nor hidden entities (#118)", () => {
+  const h = helpersHass();
+  const sensors = offered("room-sensors-card", h);
+  assert.ok(sensors.includes("input_boolean.entrydoor_hook") && sensors.includes("sensor.gate_status"));
+  for (const id of ["sensor.hall_temp", "sensor.tv_power", "sensor.hidden_status"]) assert.ok(!sensors.includes(id), id);
+  const roomOffer = offered("room-card", h);
+  for (const id of ["input_boolean.entrydoor_hook", "sensor.gate_status", "sensor.hall_temp"]) assert.ok(roomOffer.includes(id), id);
+  for (const id of ["sensor.tv_power", "sensor.hidden_status"]) assert.ok(!roomOffer.includes(id), id);
+});
+
+test("Room card: an included boolean or text sensor goes to Sensors, a reading to the environment line (#118)", () => {
+  const card = room({ include: ["input_boolean.entrydoor_hook", "sensor.gate_status", "sensor.hall_temp"] }, helpersHass());
+  assert.deepEqual(plain(card._kids.sensors._config.include), ["input_boolean.entrydoor_hook", "sensor.gate_status"]);
+  assert.deepEqual(plain(card._kids.environment._config.include), ["sensor.hall_temp"]);
+  const items = card._kids.sensors._collect();
+  const hook = items.find((i) => i.id === "input_boolean.entrydoor_hook");
+  const gate = items.find((i) => i.id === "sensor.gate_status");
+  // The boolean reads as an opening (on = open); the text sensor shows its state, with a neutral icon, never open.
+  assert.equal(hook.on, true);
+  assert.equal(hook.state, "Open");
+  assert.equal(gate.on, false);
+  assert.equal(gate.state, "Ajar");
+  assert.equal(gate.icon, "mdi:information-outline");
+});
+
+test("Room card: a reading that reports its device class late moves to the environment line (#118)", () => {
+  const h = helpersHass();
+  const temp = h.states["sensor.hall_temp"];
+  h.states["sensor.hall_temp"] = { ...temp, state: "unavailable", attributes: {} };
+  const card = room({ include: ["sensor.hall_temp"] }, h);
+  assert.deepEqual(plain(card._kids.sensors._config.include), ["sensor.hall_temp"]);
+  // Loaded: same registries, a new state with its device class.
+  card.hass = { ...h, states: { ...h.states, "sensor.hall_temp": temp } };
+  assert.deepEqual(plain(card._kids.sensors._config.include), []);
+  assert.deepEqual(plain(card._kids.environment._config.include), ["sensor.hall_temp"]);
+});
+
+test("Sensors card: an included text sensor never warns, unknown or not, nor counts as an opening (#118)", () => {
+  const h = helpersHass();
+  h.states["sensor.gate_status"] = { ...h.states["sensor.gate_status"], state: "unknown" };
+  const card = new rc.cards["room-sensors-card"]();
+  card.setConfig({ include: ["sensor.gate_status"], language: "en" });
+  card.hass = h;
+  const sum = card._summary(card._collect());
+  assert.equal(sum.level, "ok");
+  assert.equal(sum.status, "All quiet");
+  // With the room's door (closed) as well: all closed, still no warning.
+  const both = new rc.cards["room-sensors-card"]();
+  both.setConfig({ area: "kitchen", include: ["sensor.gate_status"], language: "en" });
+  both.hass = h;
+  const s2 = both._summary(both._collect());
+  assert.equal(s2.level, "ok");
+  assert.equal(s2.status, "All closed");
+});

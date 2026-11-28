@@ -7,8 +7,12 @@ export class RoomCard extends RcCard {
   static tag = "room-card";
   static i18n = RM_I18N;
   static needsArea = true;
-  static includeDomains = ["light", "switch", "binary_sensor", "sensor", "climate", "cover", "media_player"];
-  static includeMatch = (hass, id) => !id.startsWith("sensor.") || !!customElements.get("room-environment-card")?.includeMatch?.(hass, id);
+  // Sensors offered: the readings (to the environment line) and the text sensors the Sensors section shows (#118).
+  static includeDomains = ["light", "switch", "binary_sensor", "input_boolean", "sensor", "climate", "cover", "media_player"];
+  static includeMatch = (hass, id) =>
+    !id.startsWith("sensor.") ||
+    !!customElements.get("room-environment-card")?.includeMatch?.(hass, id) ||
+    !!customElements.get("room-sensors-card")?.includeMatch?.(hass, id);
   static sceneTheme = "room";
   // The indicators' condition and colour rules, for the tests.
   static indicatorActive = rmIndicatorActive;
@@ -73,11 +77,16 @@ export class RoomCard extends RcCard {
     return out;
   }
 
-  // The embedded cards, built again when the config, the language or the registries change (an `include` entity's
-  // section depends on its name). A section whose card cannot run (no area and nothing included for it) is left out.
+  // The embedded cards, built again when the config, the language, the registries or the section of an `include`
+  // entity change (it depends on a switch's name and on a sensor's device class, which a sensor may only report once
+  // loaded, #118). A section whose card cannot run (no area and nothing included for it) is left out.
   _ensureKids() {
     const h = this._hass;
-    const deps = [this._config, this._lang(), h.entities, h.devices];
+    const routes = (this._config.include || []).map((e) => {
+      const id = typeof e === "string" ? e : e?.entity;
+      return id ? rmRoute(h, id) : null;
+    });
+    const deps = [this._config, this._lang(), h.entities, h.devices, routes.join()];
     if (this._kids && this._kidDeps?.every((d, i) => d === deps[i])) return;
     this._kidDeps = deps;
     this._kidsGen = (this._kidsGen || 0) + 1;

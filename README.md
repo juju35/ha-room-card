@@ -85,6 +85,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - Show only the open or active sensors (`only_alerts`), or hide the whole card when everything is closed, reporting and nobody is there (`hide_when_clear`)
 - Tap a sensor to open its details
 - Automatic discovery from the area, or an explicit list with name and icon overrides; the icon set on the entity in Home Assistant (or a template's `icon`) replaces the door / window / presence one
+- `include` also takes helpers and template entities: an `input_boolean` reads as an opening (on = open); a `sensor` with no unit (a template's text state, say) shows its state as it is, with an information icon unless the entity sets one, and never counts as open nor warns when unknown or unavailable. The visual editor offers these text sensors, not the measured values (power, energy, battery…); temperature, humidity and other readings stay on the Environment cards
 
 ### Sensors mini
 
@@ -376,7 +377,7 @@ In addition to the [common options](#common-options) (`area`, `include`, `title`
 | `auto_indicators` | ❌ | `true` | Indicators found in the room: heating, cooling, covers open, playing, an appliance running |
 | `indicators` | ❌ | — | Your own indicators, each `{entity, icon, color, label, state, state_not, above, below, show_state}`: shown while the entity is active (on, open, playing, heat… — or while `state` / `state_not` / `above` / `below` say so), coloured `red`, `orange`, `yellow`, `green`, `blue`, `purple`, `grey` or any CSS colour, with its state as text when `show_state: true` (YAML only) |
 
-`include` items go to the section of their kind: a `light`, or a `switch` named like a light, to Lights; any other `switch` to Plugs; a `binary_sensor` to Sensors; a `sensor` reading to the environment line; a `climate` to Climate, a `cover` to Covers, a `media_player` to Media. Each section follows the options of its own card at their defaults (the Lights pill turns the lights off, the Plugs pill does not).
+`include` items go to the section of their kind: a `light`, or a `switch` named like a light, to Lights; any other `switch` to Plugs; a `binary_sensor` or an `input_boolean` to Sensors; a `sensor` reading (temperature, humidity…) to the environment line, any other `sensor` (a template's text state, say) to Sensors, which shows its state as it is (the visual editor offers the readings and the sensors with no unit); a `climate` to Climate, a `cover` to Covers, a `media_player` to Media. Each section follows the options of its own card at their defaults (the Lights pill turns the lights off, the Plugs pill does not).
 
 ### Room mini
 
