@@ -84,7 +84,7 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - **Tiles layout** (`layout: tiles`): one large tile per sensor, the size of Home Assistant's Tile card, easier to tap on a phone
 - Show only the open or active sensors (`only_alerts`), or hide the whole card when everything is closed, reporting and nobody is there (`hide_when_clear`)
 - Tap a sensor to open its details
-- Automatic discovery from the area, or an explicit list with name and icon overrides
+- Automatic discovery from the area, or an explicit list with name and icon overrides; the icon set on the entity in Home Assistant (or a template's `icon`) replaces the door / window / presence one
 
 ### Sensors mini
 
@@ -368,6 +368,7 @@ In addition to the [common options](#common-options) (`area`, `include`, `title`
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `sections` | ❌ | all | The sections shown, in this order: `lights`, `plugs`, `sensors`, `climate`, `covers`, `media`, `appliances`, `custom`; a section with nothing to show is left out |
+| `section_titles` | ❌ | — | Rename sections: a map of section key to its title (`section_titles: {sensors: Openings, lights: Lighting}`); a section left out keeps its own name (YAML only, [#115](https://github.com/juju35/ha-room-card/issues/115)) |
 | `collapsed` | ❌ | — | Sections folded at first (`[plugs, sensors]`, say); a tap on a section's header unfolds it, and the card comes back as configured when it leaves the page |
 | `show_environment` | ❌ | `true` | The environment readings under the header |
 | `presence` | ❌ | `true` | Sensors section: presence and motion sensors (YAML only) |

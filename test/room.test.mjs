@@ -37,6 +37,14 @@ test("Room card: each section embeds its room card, framed by the room card, wit
   assert.equal(card._kids.environment._config.show_history, false);
 });
 
+test("Room card: `section_titles` renames the sections, the others keep their name (#115)", () => {
+  const card = room({ section_titles: { lights: "Lighting", sensors: "Openings", plugs: "  " } });
+  assert.equal(card._kids.lights._config.title, "Lighting");
+  assert.equal(card._kids.sensors._config.title, "Openings");
+  assert.equal(card._kids.plugs._config.title, "Plugs"); // blank: the default name
+  assert.equal(card._kids.climate._config.title, "Climate");
+});
+
 test("Room card: status — an open door first, then the lights on, then all quiet", () => {
   const h = kitchen();
   const card = room({}, h);

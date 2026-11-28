@@ -559,6 +559,19 @@ test("the sensors mini card: a named pill for each open sensor, quiet ones hidde
   assert.match(html, /class="tile on/);
 });
 
+test("the sensors card uses the icon set on the entity, before the kind's (#115)", () => {
+  const card = new cards["room-sensors-card"]();
+  card.setConfig({ area: "kitchen", illustration: false });
+  const h = makeHass();
+  h.entities["binary_sensor.door"] = { ...h.entities["binary_sensor.door"], icon: "mdi:door-sliding" };
+  card.hass = h;
+  assert.equal(card._collect().find((i) => i.id === "binary_sensor.door").icon, "mdi:door-sliding");
+  const h2 = makeHass();
+  h2.states["binary_sensor.door"] = { ...h2.states["binary_sensor.door"], attributes: { ...h2.states["binary_sensor.door"].attributes, icon: "mdi:garage" } };
+  card.hass = h2;
+  assert.equal(card._collect().find((i) => i.id === "binary_sensor.door").icon, "mdi:garage");
+});
+
 test("the sensors mini card hides itself when clear, like the full card", () => {
   const card = new cards["room-sensors-mini-card"]();
   card.setConfig({ area: "kitchen", hide_when_clear: true, entities: ["binary_sensor.door"] });

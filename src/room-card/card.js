@@ -25,6 +25,8 @@ export class RoomCard extends RcCard {
   _kidConfigs() {
     const c = this._config;
     const lang = this._lang();
+    // A section's title: `section_titles` (#115), else the section's own name in the card's language.
+    const titleOf = (key) => (typeof c.section_titles?.[key] === "string" && c.section_titles[key].trim()) || rmTitle(key, lang);
     const inc = {};
     for (const e of c.include || []) {
       const id = typeof e === "string" ? e : e?.entity;
@@ -50,7 +52,7 @@ export class RoomCard extends RcCard {
           type: `custom:${tag}`,
           ...base,
           kind: key,
-          title: rmTitle(key, lang),
+          title: titleOf(key),
           include: inc[key] || [],
           ...(key === "custom" ? { entities: c.custom_entities } : {}),
         };
@@ -60,7 +62,7 @@ export class RoomCard extends RcCard {
         type: `custom:${tag}`,
         ...base,
         ...tiles,
-        title: rmTitle(key, lang),
+        title: titleOf(key),
         include: inc[key] || [],
         ...(key === "sensors" && c.presence !== undefined ? { presence: c.presence } : {}),
       };

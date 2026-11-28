@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.0 - 2026-11-28
+
+### Features
+- Room card: `section_titles` renames the sections (`section_titles: {sensors: Openings}`), the others keep their name (#115).
+- Sensors cards (and the Sensors section of the Room card): the icon set on the entity in Home Assistant, or a template's `icon`, replaces the door / window / presence icon, as on the Lights and Plugs cards (#115).
+
 ## 2.4.0 - 2026-11-28
 
 ### Features
