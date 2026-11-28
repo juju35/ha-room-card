@@ -1,15 +1,19 @@
 // ── Card ─────────────────────────────────────────────────────────────────────
-import { RM_ENV, RM_ORDER, RM_SECTIONS, rmRoute, rmTitle } from "./sections.js";
+import { RM_CONTROLS, RM_ENV, RM_ORDER, RM_SECTIONS, rmRoute, rmTitle } from "./sections.js";
+import { rmColor, rmIndicatorActive, rmIndicators } from "./indicators.js";
 import { RM_I18N } from "./i18n/rm-i18n.js";
 
 export class RoomCard extends RcCard {
   static tag = "room-card";
   static i18n = RM_I18N;
   static needsArea = true;
-  static includeDomains = ["light", "switch", "binary_sensor", "sensor"];
+  static includeDomains = ["light", "switch", "binary_sensor", "sensor", "climate", "cover", "media_player"];
   static includeMatch = (hass, id) => !id.startsWith("sensor.") || !!customElements.get("room-environment-card")?.includeMatch?.(hass, id);
   static sceneTheme = "room";
-  static defaults = { columns: 2, layout: "compact", show_environment: true, exclude: [] };
+  // The indicators' condition and colour rules, for the tests.
+  static indicatorActive = rmIndicatorActive;
+  static indicatorColor = rmColor;
+  static defaults = { columns: 2, layout: "compact", show_environment: true, auto_indicators: true, exclude: [] };
 
   // The sections shown, in their order (`sections`, all of them by default).
   _sections() {
@@ -39,11 +43,24 @@ export class RoomCard extends RcCard {
     const out = {};
     for (const key of this._sections()) {
       const tag = RM_SECTIONS[key];
+      if (RM_CONTROLS.includes(key)) {
+        // A control section: its kind, the entities it shows (`custom_entities` for the custom one).
+        if (key === "custom" && !c.custom_entities?.length) continue;
+        out[key] = {
+          type: `custom:${tag}`,
+          ...base,
+          kind: key,
+          title: rmTitle(key, lang),
+          include: inc[key] || [],
+          ...(key === "custom" ? { entities: c.custom_entities } : {}),
+        };
+        continue;
+      }
       out[key] = {
         type: `custom:${tag}`,
         ...base,
         ...tiles,
-        title: rmTitle(tag, lang),
+        title: rmTitle(key, lang),
         include: inc[key] || [],
         ...(key === "sensors" && c.presence !== undefined ? { presence: c.presence } : {}),
       };
@@ -110,7 +127,9 @@ export class RoomCard extends RcCard {
     const env = items("environment");
     const lit = lights.filter((i) => i.on);
     const plugsOn = plugs.filter((i) => i.on);
+    const controls = Object.fromEntries(RM_CONTROLS.map((k) => [k, items(k)]));
     return {
+      controls,
       lights,
       plugs,
       sensors,
@@ -137,16 +156,23 @@ export class RoomCard extends RcCard {
     return { level: "ok", icon, status: this._t("all_quiet") };
   }
 
-  // The header chips: someone there, the lights on, the plugs on (their power draw when they report it).
+  // The indicators after the lights, plugs and presence (#114): heating, cooling, covers open, playing, an appliance
+  // running (unless `auto_indicators: false`), then the `indicators` of the config that are active.
+  _indicators(x) {
+    return rmIndicators(this, x);
+  }
+
+  // The header chips: someone there, the lights on, the plugs on (their power draw when they report it), the indicators.
   _chips(x) {
-    const chip = (cls, icon, label, text) =>
-      `<span class="chip ${cls}" title="${rcEsc(label)}"><ha-icon icon="${icon}"></ha-icon>${text ? `<span>${rcEsc(text)}</span>` : ""}</span>`;
+    const chip = (cls, icon, label, text, style = "") =>
+      `<span class="chip ${cls}"${style ? ` style="${rcEsc(style)}"` : ""} title="${rcEsc(label)}"><ha-icon icon="${rcEsc(icon)}"></ha-icon>${text ? `<span>${rcEsc(text)}</span>` : ""}</span>`;
     return [
       x.sens?.occupied ? chip("info", "mdi:account", this._t("occupied"), "") : "",
       x.lit.length ? chip("light", "mdi:lightbulb", this._t("chip_lights"), String(x.lit.length)) : "",
       x.plugsOn.length
         ? chip("plug", "mdi:power-socket-fr", this._t("chip_plugs"), x.watts != null ? rcWatts(x.watts, this._lang()) : String(x.plugsOn.length))
         : "",
+      ...this._indicators(x).map((i) => chip(i.cls, i.icon, i.label, i.text, i.style)),
     ].join("");
   }
 
@@ -168,7 +194,8 @@ export class RoomCard extends RcCard {
       x.plugsOn.length,
       x.watts == null ? null : Math.round(x.watts),
       this._sceneState(),
-      ...["lights", "plugs", "sensors", "environment"].map((k) => this._kids[k]?._items?.length ?? -1),
+      this._indicators(x),
+      ...["lights", "plugs", "sensors", "environment", ...RM_CONTROLS].map((k) => this._kids[k]?._items?.length ?? -1),
     ];
   }
 
@@ -259,6 +286,12 @@ export class RoomCard extends RcCard {
   }
 
   static styles = `${RC_CHIP_STYLES}
+    .chip.heat { --k: var(--rc-warn); }
+    .chip.cool, .chip.cover { --k: var(--rc-info); }
+    .chip.media { --k: var(--rc-media, #9c6ade); }
+    .chip.run { --k: var(--rc-ok); }
+    .chip.alert { --k: var(--rc-alert); }
+    .chip.custom { --k: var(--ind, var(--rc-idle)); }
     ha-card { position: relative; }
     ha-card.lvl-ok   { --c: var(--rc-ok); }
     ha-card.lvl-on   { --c: var(--rc-light); }

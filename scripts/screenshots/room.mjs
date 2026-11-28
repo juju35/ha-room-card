@@ -28,6 +28,9 @@ const ago = (min) => new Date(Date.now() - min * 60000).toISOString();
 // off and closed.
 const BUSY = { on: ["light.kitchen_ceiling", "switch.kettle_plug", "binary_sensor.kitchen_patio_door", "binary_sensor.kitchen_presence"] };
 const QUIET = { on: [] };
+// Controls (#114, captures room-controls and room-mini-indicators): the busy kitchen with a radiator heating, the bay's roller shutter half open, the TV playing and the
+// dishwasher running, as sections and as indicators; a smoke detector as a configured indicator (clear).
+const CONTROLS = { ...BUSY, controls: true };
 
 const setup = (s) => {
   const on = new Set(s.on);
@@ -52,19 +55,37 @@ const setup = (s) => {
   }
   for (const [id, name, device_class] of SENSORS) add(id, { friendly_name: name, device_class }, on.has(id) ? "on" : "off");
   for (const [id, name, device_class, unit, value] of ENV) add(id, { friendly_name: name, device_class, unit_of_measurement: unit }, String(value));
+  if (s.controls) {
+    add("climate.kitchen_radiator", { friendly_name: "Kitchen Radiator", hvac_action: "heating", current_temperature: 19.6, temperature: 20, target_temp_step: 0.5 }, "heat");
+    add("cover.kitchen_bay", { friendly_name: "Kitchen Bay Shutter", current_position: 40, supported_features: 15 }, "open");
+    add("media_player.kitchen_tv", { friendly_name: "Kitchen TV", media_title: "Evening news", supported_features: 16385 }, "playing");
+    devices.dishwasher = { id: "dishwasher", name: "Dishwasher", area_id: "kitchen" };
+    add("sensor.dishwasher_operation_state", { friendly_name: "Dishwasher", icon: "mdi:dishwasher" }, "Running", { device_id: "dishwasher" });
+    add("sensor.dishwasher_remaining_program_time", { friendly_name: "Dishwasher Remaining time", unit_of_measurement: "min" }, "42", { device_id: "dishwasher" });
+    add("binary_sensor.kitchen_smoke", { friendly_name: "Kitchen Smoke", device_class: "smoke" }, "off");
+  }
   const areas = { kitchen: { area_id: "kitchen", name: "Kitchen", icon: "mdi:silverware-fork-knife" } };
   return {
     hass: { states, entities, devices, areas, language: "en", locale: { language: "en" } },
-    config: { area: "kitchen", ...(s.config || {}) },
+    config: {
+      area: "kitchen",
+      ...(s.controls ? { indicators: [{ entity: "binary_sensor.kitchen_smoke", icon: "mdi:smoke-detector-variant", color: "red" }] } : {}),
+      ...(s.config || {}),
+    },
   };
 };
 
-const icons = ["mdi:kettle", "mdi:coffee-maker", "mdi:silverware-fork-knife"];
+const icons = ["mdi:kettle", "mdi:coffee-maker", "mdi:silverware-fork-knife", "mdi:dishwasher", "mdi:smoke-detector-variant"];
 await shoot({
   prefix: "room",
   tag: "room-card",
   icons,
-  shots: [...pair("busy", BUSY), ...pair("quiet", QUIET), ...pair("folded", { ...BUSY, config: { collapsed: ["plugs", "sensors"] } })],
+  shots: [
+    ...pair("busy", BUSY),
+    ...pair("quiet", QUIET),
+    ...pair("folded", { ...BUSY, config: { collapsed: ["plugs", "sensors"] } }),
+    ...pair("controls", { ...CONTROLS, config: { collapsed: ["lights", "plugs", "sensors"] } }),
+  ],
   setup,
 });
 // The tiles layout at a phone's width: one large tile per entity, two columns.
@@ -74,6 +95,6 @@ await shoot({
   prefix: "room-mini",
   tag: "room-mini-card",
   icons,
-  shots: [...pair("busy", BUSY), ...pair("quiet", QUIET), ...pair("zoom", { ...BUSY, zoom: true })],
+  shots: [...pair("busy", BUSY), ...pair("quiet", QUIET), ...pair("zoom", { ...BUSY, zoom: true }), ...pair("indicators", CONTROLS)],
   setup: (s) => ({ ...setup(s), open: s.zoom && ".zoom" }),
 });
