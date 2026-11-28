@@ -14,6 +14,15 @@ export const RS_KINDS = {
 
 // An on/off entity of the card: a binary sensor, or an input boolean added through `include` (#118).
 export const rsIsBinary = (id) => id.startsWith("binary_sensor.") || id.startsWith("input_boolean.");
+// A sensor the card can show as a state (#118): no unit (a template's text state…) and not a room reading, which the
+// environment cards show.
+export const rsTextSensor = (hass, id) =>
+  id.startsWith("sensor.") &&
+  !!hass.states[id] &&
+  !hass.states[id].attributes.unit_of_measurement &&
+  !customElements.get("room-environment-card")?.includeMatch?.(hass, id);
+// Icon of an included text sensor, unless the entity sets its own.
+export const RS_STATE_ICON = "mdi:information-outline";
 // The state of another included entity (a template sensor's text, say), as Home Assistant shows it.
 export const rsRawState = (hass, st) => {
   if (typeof hass.formatEntityState === "function") return hass.formatEntityState(st);

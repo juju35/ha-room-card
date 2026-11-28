@@ -3,7 +3,7 @@
 ## 2.5.1 - 2026-11-28
 
 ### Fixes
-- Sensors card and Sensors section of the Room card: `include` now offers helpers and template entities that are not binary sensors (#118). An `input_boolean` reads as an opening (on = open); any other `sensor` (a template's text state, say) shows its state as it is and never counts as open. On the Room card, a sensor of a known reading kind still goes to the environment line, any other one to Sensors.
+- Sensors card and Sensors section of the Room card: `include` now offers helpers and template entities that are not binary sensors (#118). An `input_boolean` reads as an opening (on = open); a `sensor` with no unit (a template's text state, say) shows its state as it is, with an information icon unless the entity sets one, and never counts as open nor warns when unknown or unavailable. On the Room card, a sensor of a known reading kind still goes to the environment line, any other one to Sensors, and moves to the environment line once it reports its device class.
 
 ## 2.5.0 - 2026-11-28
 

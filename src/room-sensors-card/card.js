@@ -1,5 +1,5 @@
 // ── Card ─────────────────────────────────────────────────────────────────────
-import { RS_KINDS, RS_PREFIX, RS_SUFFIX, rsIsBinary, rsKindOf, rsRawState } from "./sensor-kinds.js";
+import { RS_KINDS, RS_PREFIX, RS_STATE_ICON, RS_SUFFIX, rsIsBinary, rsKindOf, rsRawState, rsTextSensor } from "./sensor-kinds.js";
 import { RS_I18N } from "./i18n/rs-i18n.js";
 
 export class RoomSensorsCard extends RcCard {
@@ -7,9 +7,10 @@ export class RoomSensorsCard extends RcCard {
   static i18n = RS_I18N;
   static needsArea = true;
   // `include` also takes a helper or template entity that is not a binary sensor (#118): an input boolean reads as an
-  // opening, any other sensor shows its state as it is (the environment readings stay on the environment cards).
+  // opening, a sensor with no unit (a template's text state…) shows its state as it is. Readings stay on the
+  // environment cards, and measured values (power, energy, battery…) are not offered.
   static includeDomains = ["binary_sensor", "input_boolean", "sensor"];
-  static includeMatch = (hass, id) => !id.startsWith("sensor.") || !customElements.get("room-environment-card")?.includeMatch?.(hass, id);
+  static includeMatch = (hass, id) => !id.startsWith("sensor.") || rsTextSensor(hass, id);
   static sceneTheme = "sensors";
   static defaults = { columns: 2, layout: "compact", only_alerts: false, hide_when_clear: false, presence: true, blink: true, exclude: [] };
 
@@ -69,12 +70,13 @@ export class RoomSensorsCard extends RcCard {
         return {
           id: e.entity,
           kind,
+          binary,
           info: !!RS_KINDS[kind].info,
           on,
           unavailable,
           name: e.name ?? rcCleanName(st.attributes.friendly_name, areaName, RS_PREFIX, RS_SUFFIX),
           // The icon set on the entity (its registry settings, or a template's `icon`) wins over the kind's (#115).
-          icon: e.icon ?? this._hass.entities?.[e.entity]?.icon ?? st.attributes.icon ?? (on ? RS_KINDS[kind].on : RS_KINDS[kind].off),
+          icon: e.icon ?? this._hass.entities?.[e.entity]?.icon ?? st.attributes.icon ?? (binary ? (on ? RS_KINDS[kind].on : RS_KINDS[kind].off) : RS_STATE_ICON),
           state: unavailable ? this._t("unavailable") : binary ? this._stateText(kind, on) : rsRawState(this._hass, st),
           since: st.last_changed,
         };
@@ -95,16 +97,18 @@ export class RoomSensorsCard extends RcCard {
 
   // State of the room, shared by the full and the mini card. An unavailable opening sensor is no all-clear: it warns
   // (*2 unavailable*) like an open one.
+  // An included text sensor only shows its state: it neither opens nor warns when unknown or unavailable (#118).
   _summary(items) {
-    const open = items.filter((i) => !i.info && i.on).length;
-    const unavail = items.filter((i) => !i.info && i.unavailable).length;
+    const openings = items.filter((i) => !i.info && i.binary);
+    const open = openings.filter((i) => i.on).length;
+    const unavail = openings.filter((i) => i.unavailable).length;
     const warn = open || unavail;
     return {
       open,
       occupied: items.some((i) => i.info && i.on),
       level: warn ? "warn" : "ok",
       icon: warn ? "mdi:shield-alert-outline" : "mdi:shield-home-outline",
-      status: this._openingStatus(open, items.some((i) => !i.info), items.length ? "all_quiet" : "no_sensors", unavail),
+      status: this._openingStatus(open, openings.length > 0, items.length ? "all_quiet" : "no_sensors", unavail),
     };
   }
 
