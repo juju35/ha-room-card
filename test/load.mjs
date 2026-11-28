@@ -61,6 +61,8 @@ export const load = () => {
       constructor(type, init = {}) {
         this.type = type;
         this.detail = init.detail;
+        this.bubbles = !!init.bubbles;
+        this.composed = !!init.composed;
       }
     },
     console: { info() {} },
@@ -101,7 +103,7 @@ export const load = () => {
   return vm.runInContext(
     `${code}
     ({ RcCard, RC_I18N, rcLang, rcGuessRoomType, rcRoomType, rcIsNight, rcScene, rcWatts, rcCleanName, rcIsPlug, rcIsLightSwitch, rcMatchSensor, rcIsOutdoor, rcMatchLight, rcMatchPlug, rcEsc, rcMemo,
-       rcPowerSensors, rcCall, rcInDialog, RC_HOLD_MS, RC_BASE_STYLES, RC_ROOM_GRID_STYLES, customElements, window, cards: Object.fromEntries(${JSON.stringify([...cards, "room-environment-mini-card", "room-sensors-mini-card", "room-lights-mini-card", "room-switch-mini-card", "room-mini-card"])}.map((t) => [t, customElements.get(t)])) })`,
+       rcPowerSensors, rcCall, rcNavigate, rcBindNav, rcInDialog, RC_HOLD_MS, RC_BASE_STYLES, RC_ROOM_GRID_STYLES, customElements, window, cards: Object.fromEntries(${JSON.stringify([...cards, "room-environment-mini-card", "room-sensors-mini-card", "room-lights-mini-card", "room-switch-mini-card", "room-mini-card"])}.map((t) => [t, customElements.get(t)])) })`,
     ctx,
   );
 };
