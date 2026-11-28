@@ -42,7 +42,7 @@ export const rcRoomsPanel = (Base) =>
 
     _tap(aid) {
       const x = this._shownRooms().find((r) => r.id === aid);
-      if (x?.navigation_path) rcNavigate(x.navigation_path);
+      if (x?.navigation_path) rcNavigate(this, x.navigation_path);
       else this._toggle(this._openArea === aid ? null : aid);
     }
 

@@ -80,3 +80,26 @@ test("rcPowerSensors finds a power sensor whose state arrives after the first re
   assert.equal(rc.rcPowerSensors({ ...h, states: late }).d1, undefined);
   assert.equal(rc.rcPowerSensors(h).d1, "sensor.coffee_power");
 });
+
+test("rcNavigate hands the path to Home Assistant's navigate action, so a subview's back arrow returns here (#121)", () => {
+  const events = [];
+  const node = { dispatchEvent: (ev) => events.push(ev) };
+  rc.rcNavigate(node, "/dashboard-b/kitchen");
+  assert.equal(events.length, 1);
+  const [ev] = events;
+  assert.equal(ev.type, "hass-action");
+  assert.ok(ev.bubbles && ev.composed, "it reaches the Home Assistant root from the card's shadow DOM");
+  assert.equal(JSON.stringify(ev.detail), JSON.stringify({ config: { tap_action: { action: "navigate", navigation_path: "/dashboard-b/kitchen" } }, action: "tap" }));
+});
+
+test("rcBindNav navigates from the header on a click and on Enter", () => {
+  const events = [];
+  const listeners = {};
+  const head = { dispatchEvent: (ev) => events.push(ev), addEventListener: (type, fn) => (listeners[type] = fn) };
+  rc.rcBindNav(head, "/energy");
+  listeners.click();
+  listeners.keydown({ key: "Enter", target: head });
+  listeners.keydown({ key: "Enter", target: {} });
+  assert.equal(events.length, 2);
+  assert.ok(events.every((ev) => ev.detail.config.tap_action.navigation_path === "/energy"));
+});

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.2 - 2026-11-28
+
+### Fixes
+- `navigation_path` (the title of every card, the rooms of the overviews) opens the page through Home Assistant's own `navigate` action, like a native card (#121): the back arrow of a subview opened this way, in this dashboard or another one, returns to the page of the card instead of the first view of the subview's dashboard.
+
 ## 2.5.1 - 2026-11-28
 
 ### Fixes

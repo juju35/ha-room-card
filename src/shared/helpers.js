@@ -72,19 +72,21 @@ export const rcMoreInfo = (node, entityId) => {
   node.dispatchEvent(ev);
 };
 
-export const rcNavigate = (path) => {
-  history.pushState(null, "", path);
-  window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
+// Opens `path` through Home Assistant's own `navigate` action (#121): the frontend then pushes the page and keeps the
+// history the way its native cards do, so the back arrow of a subview, even in another dashboard, returns here.
+export const rcNavigate = (node, path) => {
+  const config = { tap_action: { action: "navigate", navigation_path: path } };
+  node.dispatchEvent(new CustomEvent("hass-action", { bubbles: true, composed: true, detail: { config, action: "tap" } }));
 };
 
 // Wires a card header to its `navigation_path`: click, and Enter on the header itself. `opts`: the listeners'
 // options (the card's abort signal, so that the next redraw can wire the same node again).
 export const rcBindNav = (head, path, opts) => {
-  head.addEventListener("click", () => rcNavigate(path), opts);
+  head.addEventListener("click", () => rcNavigate(head, path), opts);
   head.addEventListener(
     "keydown",
     (ev) => {
-      if (ev.key === "Enter" && ev.target === head) rcNavigate(path);
+      if (ev.key === "Enter" && ev.target === head) rcNavigate(head, path);
     },
     opts,
   );
