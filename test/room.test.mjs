@@ -23,7 +23,7 @@ const room = (config, hass = kitchen()) => {
 
 test("Room card: each section embeds its room card, framed by the room card, with the area's entities", () => {
   const card = room({});
-  assert.deepEqual(Object.keys(card._kids), ["lights", "plugs", "sensors", "environment"]);
+  assert.deepEqual(Object.keys(card._kids), ["lights", "plugs", "sensors", "climate", "covers", "media", "appliances", "environment"]);
   assert.deepEqual(ids(card._items.lights), ["light.ceiling"]);
   assert.deepEqual(ids(card._items.plugs), ["switch.coffee_plug"]);
   assert.deepEqual(ids(card._items.sensors), ["binary_sensor.door"]);
@@ -123,4 +123,105 @@ test("Room mini card: readings, then a pill for the lights on, the plugs on and 
   assert.match(painted.chips, /data-id="light.ceiling"/);
   assert.match(painted.chips, /data-id="switch.coffee_plug"[^>]*>.*12 W/s);
   assert.match(painted.chips, /data-id="binary_sensor.motion"/);
+});
+
+// #114: climate, covers, media and appliances of the room as control sections, and as indicators.
+const busyKitchen = () => {
+  const h = kitchen();
+  const add = (id, state, attributes, extra = {}) => {
+    h.states[id] = { entity_id: id, state, attributes, last_changed: "2026-01-01T00:00:00Z" };
+    h.entities[id] = { area_id: "kitchen", ...extra };
+  };
+  add("climate.radiator", "heat", { friendly_name: "Kitchen Radiator", hvac_action: "heating", current_temperature: 19.6, temperature: 20, target_temp_step: 0.5, min_temp: 7, max_temp: 30 });
+  add("cover.bay", "open", { friendly_name: "Bay", current_position: 40, supported_features: 15 });
+  add("media_player.tv", "playing", { friendly_name: "TV", media_title: "News", supported_features: 16385 });
+  add("sensor.dishwasher_operation_state", "run", { friendly_name: "Dishwasher Operation state" }, { device_id: "dw" });
+  add("sensor.dishwasher_remaining_program_time", "42", { friendly_name: "Remaining", unit_of_measurement: "min" }, { device_id: "dw" });
+  add("binary_sensor.smoke", "off", { friendly_name: "Smoke", device_class: "smoke" });
+  h.devices = { ...(h.devices || {}), dw: { id: "dw", name: "Dishwasher", area_id: "kitchen" } };
+  return h;
+};
+
+test("Room card: climate, covers, media and appliances of the area as control sections (#114)", () => {
+  const card = room({}, busyKitchen());
+  const ctl = card._items.controls;
+  assert.deepEqual(ids(ctl.climate), ["climate.radiator"]);
+  assert.deepEqual(ids(ctl.covers), ["cover.bay"]);
+  assert.deepEqual(ids(ctl.media), ["media_player.tv"]);
+  assert.deepEqual(ids(ctl.appliances), ["sensor.dishwasher_operation_state"]);
+  assert.equal(ctl.appliances[0].remaining, 42);
+  assert.equal(card._kids.climate._config.title, "Climate");
+  assert.equal(card._kids.custom, undefined); // nothing configured
+  const html = card._kids.climate.shadowRoot.innerHTML;
+  assert.match(html, /data-act="down"/);
+  assert.match(html, /20°/);
+  assert.match(card._kids.covers.shadowRoot.innerHTML, /data-act="open"[\s\S]*data-act="stop"[\s\S]*data-act="close"/);
+  assert.match(card._kids.media.shadowRoot.innerHTML, /data-act="playpause"/);
+});
+
+test("Room card: the set temperature steps with − / +, sent once the taps pause", async () => {
+  const h = busyKitchen();
+  const calls = [];
+  h.callService = (d, s, data) => calls.push([d, s, plain(data)]);
+  const card = room({}, h);
+  const sec = card._kids.climate;
+  const item = sec._items[0];
+  sec._step(item, 1);
+  sec._step(item, 1);
+  assert.equal(calls.length, 0);
+  await new Promise((r) => setTimeout(r, 800));
+  assert.deepEqual(calls, [["climate", "set_temperature", { entity_id: "climate.radiator", temperature: 21 }]]);
+});
+
+test("Room card: indicators for heating, covers open, playing, an appliance running, and the configured ones (#114)", () => {
+  const h = busyKitchen();
+  const card = room({ indicators: [{ entity: "binary_sensor.smoke", icon: "mdi:smoke-detector-variant", color: "red" }] }, h);
+  let ind = plain(card._indicators(card._items));
+  assert.deepEqual(ind.map((i) => i.cls), ["heat", "cover", "media", "run"]); // the smoke detector is clear
+  assert.equal(ind[3].text, "42 min");
+  h.states["binary_sensor.smoke"] = { ...h.states["binary_sensor.smoke"], state: "on" };
+  card.hass = { ...h, states: { ...h.states } };
+  ind = plain(card._indicators(card._items));
+  assert.equal(ind.at(-1).id, "binary_sensor.smoke");
+  assert.equal(ind.at(-1).style, "--ind:var(--rc-alert)");
+  // auto_indicators: false keeps only the configured ones.
+  const quiet = room({ auto_indicators: false, indicators: ["binary_sensor.smoke"] }, card._hass);
+  assert.deepEqual(plain(quiet._indicators(quiet._items)).map((i) => i.id), ["binary_sensor.smoke"]);
+});
+
+test("Room card: indicator conditions — state, state_not, above / below; a colour cannot carry another declaration", () => {
+  const st = (state) => ({ state, attributes: {} });
+  assert.equal(rc.cards["room-card"].indicatorActive(st("on"), {}), true);
+  assert.equal(rc.cards["room-card"].indicatorActive(st("off"), {}), false);
+  assert.equal(rc.cards["room-card"].indicatorActive(st("programmed"), { state: ["programmed", "run"] }), true);
+  assert.equal(rc.cards["room-card"].indicatorActive(st("idle"), { state_not: "idle" }), false);
+  assert.equal(rc.cards["room-card"].indicatorActive(st("31"), { above: 30 }), true);
+  assert.equal(rc.cards["room-card"].indicatorActive(st("x"), { below: 3 }), false);
+  assert.equal(rc.cards["room-card"].indicatorColor("blue"), "var(--rc-info)");
+  assert.equal(rc.cards["room-card"].indicatorColor("#ff0000"), "#ff0000");
+  assert.equal(rc.cards["room-card"].indicatorColor("red;background:url(x)"), "");
+});
+
+test("Room mini card: the indicators follow the lights, plugs and presence pills (#114)", () => {
+  const card = new rc.cards["room-mini-card"]();
+  let painted;
+  card._paintMini = (p) => {
+    painted = p;
+  };
+  card.setConfig({ area: "kitchen", language: "en" });
+  card.hass = busyKitchen();
+  assert.match(painted.chips, /class="r pill heat" data-id="climate.radiator"/);
+  assert.match(painted.chips, /class="r pill cover" data-id="cover.bay"[^>]*>.*<span>1<\/span>/s);
+  assert.match(painted.chips, /class="r pill run" data-id="sensor.dishwasher_operation_state"[^>]*>.*42 min/s);
+});
+
+test("Room card: custom_entities make a custom section with toggles and buttons", () => {
+  const h = busyKitchen();
+  h.states["input_boolean.guest"] = { entity_id: "input_boolean.guest", state: "off", attributes: { friendly_name: "Guest mode" } };
+  h.states["script.coffee"] = { entity_id: "script.coffee", state: "off", attributes: { friendly_name: "Coffee" } };
+  const card = room({ custom_entities: ["input_boolean.guest", "script.coffee"] }, h);
+  assert.deepEqual(ids(card._items.controls.custom), ["input_boolean.guest", "script.coffee"]);
+  const html = card._kids.custom.shadowRoot.innerHTML;
+  assert.match(html, /data-act="toggle"/);
+  assert.match(html, /data-act="press"/);
 });

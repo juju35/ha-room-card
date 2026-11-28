@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.0 - 2026-11-28
+
+### Features
+- Room card and Room mini card: control sections for what else the room holds (#114), each shown only when the area has some — **Climate** (the set temperature with − / +, sent once the taps pause), **Covers** (open / stop / close and the position), **Media** (what plays, play / pause, power on), **Appliances** (a washer's, dishwasher's, dryer's or oven's machine state with its remaining time) and **More** for your own `custom_entities` (toggles and buttons). `sections` and `collapsed` take `climate`, `covers`, `media`, `appliances` and `custom`; `include` routes `climate`, `cover` and `media_player` entities to them.
+- Indicators after the readings (mini card) and under the title (full card): heating, cooling, covers open, a media player playing, an appliance running with its remaining time, only while it happens (`auto_indicators: false` leaves them out), then your own `indicators` — any entity with its icon, colour, label and condition (`state`, `state_not`, `above`, `below`, `show_state`).
+
 ## 2.3.2 - 2026-11-27
 
 ### Fixes

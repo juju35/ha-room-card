@@ -61,12 +61,14 @@ All the cards share the same look (header with a status pill, compact tiles), a 
 - **Tap** a section's header to fold or unfold it (chevron right folded, down unfolded); `collapsed` sets the sections folded at first, `sections` picks and orders them; a section with nothing to show is left out
 - `include` adds entities from another room or without one, each going to the section of its kind (lights, plugs, door/window/presence sensors, readings); `exclude` leaves entities out of every section
 - **Tiles layout** (`layout: tiles`) and `columns` apply to every section
+- **Control sections** ([#114](https://github.com/juju35/ha-room-card/issues/114)) for what else the room holds, each shown only when the area has some: **Climate** (the set temperature with − / +, sent once the taps pause), **Covers** (open / stop / close, the position), **Media** (what plays, play / pause, power on), **Appliances** (a washer's, dishwasher's, dryer's or oven's machine state with its remaining time) and **More** (`custom_entities`: a toggle for switches, lights, fans and input booleans, a button for scripts, scenes and buttons); a tap on a row's name opens its details
+- **Indicators** after the readings and under the title: heating, cooling, covers open, a media player playing, an appliance running (its remaining time), only while it happens (`auto_indicators: false` leaves them out), then the `indicators` of the config — any entity, with its icon, colour, label and condition
 
 ### Room mini
 
 `custom:room-mini-card` — The same room on two lines, for a compact dashboard; zoom in for the full card.
 
-- The illustrated header with the room's status, then its readings and a pill for the lights on, the plugs on (their power draw) and someone there; each opens the details of the entity it stands for
+- The illustrated header with the room's status, then its readings and a pill for the lights on, the plugs on (their power draw), someone there and the [indicators](#room) (heating, covers open, playing, an appliance running, your own); each opens the details of the entity it stands for
 - **Zoom** button (top right) switches the card to the full [Room card](#room) and back, as does a click anywhere else (`zoom: false` removes it)
 - Same options as the Room card
 
@@ -339,8 +341,18 @@ navigation_path: /kitchen
 columns: 2
 layout: compact
 show_environment: true
-sections: [lights, plugs, sensors]
+sections: [lights, plugs, sensors, climate, covers, media, appliances, custom]
 collapsed: [sensors]
+custom_entities:
+  - input_boolean.guest_mode
+  - script.coffee
+indicators:
+  - entity: binary_sensor.kitchen_smoke
+    icon: mdi:smoke-detector-variant
+    color: red
+  - entity: sensor.dishwasher_status
+    state: [programmed, running]
+    show_state: true
 room_type: kitchen
 include:
   - light.dining_pendant
@@ -355,12 +367,15 @@ In addition to the [common options](#common-options) (`area`, `include`, `title`
 
 | Option | Required | Default | Description |
 |---|---|---|---|
-| `sections` | ❌ | `[lights, plugs, sensors]` | The sections shown, in this order: `lights`, `plugs`, `sensors` |
+| `sections` | ❌ | all | The sections shown, in this order: `lights`, `plugs`, `sensors`, `climate`, `covers`, `media`, `appliances`, `custom`; a section with nothing to show is left out |
 | `collapsed` | ❌ | — | Sections folded at first (`[plugs, sensors]`, say); a tap on a section's header unfolds it, and the card comes back as configured when it leaves the page |
 | `show_environment` | ❌ | `true` | The environment readings under the header |
 | `presence` | ❌ | `true` | Sensors section: presence and motion sensors (YAML only) |
+| `custom_entities` | ❌ | — | Entities of the **More** section, each an entity ID or `{entity, name, icon}`: a toggle for `switch`, `light`, `fan`, `input_boolean`, `automation`, a button for `script`, `scene`, `button`, the state otherwise (YAML only) |
+| `auto_indicators` | ❌ | `true` | Indicators found in the room: heating, cooling, covers open, playing, an appliance running |
+| `indicators` | ❌ | — | Your own indicators, each `{entity, icon, color, label, state, state_not, above, below, show_state}`: shown while the entity is active (on, open, playing, heat… — or while `state` / `state_not` / `above` / `below` say so), coloured `red`, `orange`, `yellow`, `green`, `blue`, `purple`, `grey` or any CSS colour, with its state as text when `show_state: true` (YAML only) |
 
-`include` items go to the section of their kind: a `light`, or a `switch` named like a light, to Lights; any other `switch` to Plugs; a `binary_sensor` to Sensors; a `sensor` reading to the environment line. Each section follows the options of its own card at their defaults (the Lights pill turns the lights off, the Plugs pill does not).
+`include` items go to the section of their kind: a `light`, or a `switch` named like a light, to Lights; any other `switch` to Plugs; a `binary_sensor` to Sensors; a `sensor` reading to the environment line; a `climate` to Climate, a `cover` to Covers, a `media_player` to Media. Each section follows the options of its own card at their defaults (the Lights pill turns the lights off, the Plugs pill does not).
 
 ### Room mini
 
@@ -839,6 +854,11 @@ Dragging a dimmable light sideways sets its brightness, the bar and the percenta
 | Folded sections (`collapsed: [plugs, sensors]`) | |
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-folded.png" alt="Folded sections" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-folded-dark.png" alt="Folded sections dark" width="400"> |
+
+| Control sections and indicators ([#114](https://github.com/juju35/ha-room-card/issues/114)) | Mini card with indicators |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-controls.png" alt="Control sections" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-mini-indicators.png" alt="Mini indicators" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-controls-dark.png" alt="Control sections dark" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-room-card/main/screenshots/room-mini-indicators-dark.png" alt="Mini indicators dark" width="400"> |
 
 | Mini card zoomed in | |
 |---|---|
