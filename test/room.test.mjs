@@ -233,3 +233,34 @@ test("Room card: custom_entities make a custom section with toggles and buttons"
   assert.match(html, /data-act="toggle"/);
   assert.match(html, /data-act="press"/);
 });
+
+test("helpers and template entities can be included in the sensors (#118)", () => {
+  const h = kitchen();
+  const st = (entity_id, state, attributes) => ({ entity_id, state, attributes, last_changed: "2026-01-01T00:00:00Z" });
+  h.states["input_boolean.entrydoor_hook"] = st("input_boolean.entrydoor_hook", "on", { friendly_name: "Entry door hook" });
+  h.states["sensor.gate_status"] = st("sensor.gate_status", "Ajar", { friendly_name: "Gate status" });
+  h.states["sensor.hall_temp"] = st("sensor.hall_temp", "20", { device_class: "temperature", unit_of_measurement: "°C" });
+  // The editor offers them, the environment readings excepted on the Sensors card.
+  const offered = (tag) => {
+    const card = rc.cards[tag];
+    return Object.keys(h.states).filter((id) => card.includeDomains.includes(id.split(".")[0]) && (!card.includeMatch || card.includeMatch(h, id)));
+  };
+  const sensorsOffer = offered("room-sensors-card");
+  assert.ok(sensorsOffer.includes("input_boolean.entrydoor_hook"));
+  assert.ok(sensorsOffer.includes("sensor.gate_status"));
+  assert.ok(!sensorsOffer.includes("sensor.hall_temp"));
+  const roomOffer = offered("room-card");
+  assert.ok(roomOffer.includes("input_boolean.entrydoor_hook") && roomOffer.includes("sensor.gate_status") && roomOffer.includes("sensor.hall_temp"));
+  // The room card routes them: the boolean and the text sensor to Sensors, the reading to the environment line.
+  const card = room({ include: ["input_boolean.entrydoor_hook", "sensor.gate_status", "sensor.hall_temp"] }, h);
+  assert.deepEqual(plain(card._kids.sensors._config.include), ["input_boolean.entrydoor_hook", "sensor.gate_status"]);
+  assert.deepEqual(plain(card._kids.environment._config.include), ["sensor.hall_temp"]);
+  // The boolean reads as an opening (on = open); the text sensor shows its state and never counts as open.
+  const items = card._kids.sensors._collect();
+  const hook = items.find((i) => i.id === "input_boolean.entrydoor_hook");
+  const gate = items.find((i) => i.id === "sensor.gate_status");
+  assert.equal(hook.on, true);
+  assert.equal(hook.state, "Open");
+  assert.equal(gate.on, false);
+  assert.equal(gate.state, "Ajar");
+});

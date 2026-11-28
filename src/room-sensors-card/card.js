@@ -1,12 +1,15 @@
 // ── Card ─────────────────────────────────────────────────────────────────────
-import { RS_KINDS, RS_PREFIX, RS_SUFFIX, rsKindOf } from "./sensor-kinds.js";
+import { RS_KINDS, RS_PREFIX, RS_SUFFIX, rsIsBinary, rsKindOf, rsRawState } from "./sensor-kinds.js";
 import { RS_I18N } from "./i18n/rs-i18n.js";
 
 export class RoomSensorsCard extends RcCard {
   static tag = "room-sensors-card";
   static i18n = RS_I18N;
   static needsArea = true;
-  static includeDomains = ["binary_sensor"];
+  // `include` also takes a helper or template entity that is not a binary sensor (#118): an input boolean reads as an
+  // opening, any other sensor shows its state as it is (the environment readings stay on the environment cards).
+  static includeDomains = ["binary_sensor", "input_boolean", "sensor"];
+  static includeMatch = (hass, id) => !id.startsWith("sensor.") || !customElements.get("room-environment-card")?.includeMatch?.(hass, id);
   static sceneTheme = "sensors";
   static defaults = { columns: 2, layout: "compact", only_alerts: false, hide_when_clear: false, presence: true, blink: true, exclude: [] };
 
@@ -60,7 +63,9 @@ export class RoomSensorsCard extends RcCard {
         const st = this._hass.states[e.entity];
         const kind = rsKindOf(st);
         const unavailable = rcUnavailable(st);
-        const on = st.state === "on";
+        // Only a binary sensor or an input boolean opens; another included entity just shows its state (#118).
+        const binary = rsIsBinary(e.entity);
+        const on = binary && st.state === "on";
         return {
           id: e.entity,
           kind,
@@ -70,7 +75,7 @@ export class RoomSensorsCard extends RcCard {
           name: e.name ?? rcCleanName(st.attributes.friendly_name, areaName, RS_PREFIX, RS_SUFFIX),
           // The icon set on the entity (its registry settings, or a template's `icon`) wins over the kind's (#115).
           icon: e.icon ?? this._hass.entities?.[e.entity]?.icon ?? st.attributes.icon ?? (on ? RS_KINDS[kind].on : RS_KINDS[kind].off),
-          state: unavailable ? this._t("unavailable") : this._stateText(kind, on),
+          state: unavailable ? this._t("unavailable") : binary ? this._stateText(kind, on) : rsRawState(this._hass, st),
           since: st.last_changed,
         };
       })

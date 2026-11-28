@@ -12,6 +12,15 @@ export const RS_KINDS = {
   motion: { on: "mdi:motion-sensor", off: "mdi:motion-sensor-off", info: true },
 };
 
+// An on/off entity of the card: a binary sensor, or an input boolean added through `include` (#118).
+export const rsIsBinary = (id) => id.startsWith("binary_sensor.") || id.startsWith("input_boolean.");
+// The state of another included entity (a template sensor's text, say), as Home Assistant shows it.
+export const rsRawState = (hass, st) => {
+  if (typeof hass.formatEntityState === "function") return hass.formatEntityState(st);
+  const unit = st.attributes.unit_of_measurement;
+  return unit ? `${st.state} ${unit}` : st.state;
+};
+
 export const rsKindOf = (st) => {
   const dc = st.attributes.device_class;
   const id = st.entity_id;

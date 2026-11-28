@@ -7,8 +7,8 @@ export class RoomCard extends RcCard {
   static tag = "room-card";
   static i18n = RM_I18N;
   static needsArea = true;
-  static includeDomains = ["light", "switch", "binary_sensor", "sensor", "climate", "cover", "media_player"];
-  static includeMatch = (hass, id) => !id.startsWith("sensor.") || !!customElements.get("room-environment-card")?.includeMatch?.(hass, id);
+  // Any sensor: a reading goes to the environment line, any other (a template's text state…) to Sensors (#118).
+  static includeDomains = ["light", "switch", "binary_sensor", "input_boolean", "sensor", "climate", "cover", "media_player"];
   static sceneTheme = "room";
   // The indicators' condition and colour rules, for the tests.
   static indicatorActive = rmIndicatorActive;

@@ -20,8 +20,9 @@ export const rmRoute = (hass, id) => {
   const domain = id.split(".")[0];
   if (domain === "light") return "lights";
   if (domain === "switch") return hass.states[id] && rcIsLightSwitch(hass.states[id]) ? "lights" : "plugs";
-  if (domain === "binary_sensor") return "sensors";
-  if (domain === "sensor") return "environment";
+  if (domain === "binary_sensor" || domain === "input_boolean") return "sensors";
+  // A sensor of a known reading kind goes to the environment line, any other to Sensors, which shows its state (#118).
+  if (domain === "sensor") return customElements.get("room-environment-card")?.includeMatch?.(hass, id) ? "environment" : "sensors";
   if (domain === "climate") return "climate";
   if (domain === "cover") return "covers";
   if (domain === "media_player") return "media";
